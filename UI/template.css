@@ -71,7 +71,7 @@
     nav .menu ul .menu-dashboard,
     nav .menu ul .menu-payroll,
     nav .menu ul .menu-employees,
-    nav .menu ul .menu-settings{
+    nav .menu ul .menu-about{
         margin: 0;
         padding: 10px 20px;
         
@@ -80,7 +80,7 @@
     nav .menu ul .menu-dashboard a,
     nav .menu ul .menu-payroll a,
     nav .menu ul .menu-employees a,
-    nav .menu ul .menu-settings a{
+    nav .menu ul .menu-about a{
         text-decoration: none;
         display: flex;
     }
@@ -88,7 +88,7 @@
     nav .menu ul .menu-dashboard a .link,
     nav .menu ul .menu-payroll a .link,
     nav .menu ul .menu-employees a .link,
-    nav .menu ul .menu-settings a .link{
+    nav .menu ul .menu-about a .link{
         margin: 8px;
 
         text-decoration: none;
