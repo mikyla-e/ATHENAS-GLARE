@@ -1,0 +1,100 @@
+@media screen and (max-width: 1920px){
+    html, body{
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        background-color: #EFEDE6;
+    }
+
+    header{
+        position: fixed;
+        top: 0;
+        background-color: #1e1e1e;
+        height: 8%;
+        width: 100%;
+        z-index: 0;
+    }
+    
+    nav{
+        display: block;
+        position: fixed;
+        left: 0;
+        background-color: #FFF;
+        height: 100%;
+        width: 12%;
+        z-index: 1;
+    }
+
+    nav .logo{
+        height: 8%;
+        display: flex;
+    }
+
+    nav .logo .logo-picture{
+
+    }
+    
+    nav .logo .logo-name{
+        margin: ;
+    }
+
+    nav .logo .logo-name p{
+        margin: 0;
+        text-align: left;
+        color: #1e1e1e;
+        font-family: 'League Spartan';
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    nav .menu{
+        height: fit-content;
+    }
+
+    nav .menu ul{
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    nav .menu ul .menu-dashboard,
+    nav .menu ul .menu-payroll,
+    nav .menu ul .menu-employees,
+    nav .menu ul .menu-settings{
+        margin: 0;
+        padding: 10px 20px;
+
+        display: flex;
+        
+    }
+
+    nav .menu ul .menu-dashboard img,
+    nav .menu ul .menu-payroll img,
+    nav .menu ul .menu-employees img,
+    nav .menu ul .menu-settings img{
+        margin-left: 5px;
+    }
+
+    nav .menu ul .menu-dashboard .link,
+    nav .menu ul .menu-payroll .link,
+    nav .menu ul .menu-employees .link,
+    nav .menu ul .menu-settings .link{
+        margin: 8px;
+
+        text-decoration: none;
+        text-align: left;
+        color: #1e1e1e;
+        font-family: 'Roboto';
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    #focused{
+        background: linear-gradient(89.98deg, rgba(248, 209, 70, 0), rgba(248, 209, 70, 0.6) 23%, #f8d146 66%, #f5b93f);
+    }
+
+    #focused .link{
+        color: #fff;
+    }
+    
+}
