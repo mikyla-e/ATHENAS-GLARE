@@ -27,24 +27,29 @@
 
     nav .logo{
         height: 8%;
+
+    }
+
+    nav .logo .logo-group{
+        padding: 12px 0 12px 15px;
         display: flex;
     }
 
-    nav .logo .logo-picture{
+    nav .logo .logo-group .logo-picture{
 
     }
     
-    nav .logo .logo-name{
-        margin: ;
+    nav .logo .logo-group .logo-name{
+        margin: 5px 0 5px 12px;
     }
 
-    nav .logo .logo-name p{
+    nav .logo .logo-group .logo-name p{
         margin: 0;
         text-align: left;
         color: #1e1e1e;
         font-family: 'League Spartan';
-        font-size: 1.2rem;
-        font-weight: 700;
+        font-size: 120%;
+        font-weight: 900;
     }
 
     nav .menu{
@@ -98,3 +103,5 @@
     }
     
 }
+
+
