@@ -12,13 +12,13 @@
         background-color: #1e1e1e;
         color: #f8d146;
 
-        margin-left: 12%;
+        margin-left: 11.8%;
         padding: 0 20px 0 20px;
         height: 8%;
         width: 100%;
         font-family: 'League Spartan';
 
-        z-index: 0;
+        z-index: 9;
     }
     
     nav{
@@ -28,7 +28,7 @@
         background-color: #FFF;
         height: 100%;
         width: 12%;
-        z-index: 1;
+        z-index: 10;
     }
 
     nav .logo{
