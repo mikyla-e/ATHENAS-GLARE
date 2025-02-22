@@ -61,7 +61,7 @@
     .container .register_container .register_field .fields_2 .field{
         display: flex;
         flex-direction: column;
-        margin: 20px 0;
+        margin: 5px 0;
     }
 
     .container .register_container .register_field .fields_1 .field label,
@@ -115,14 +115,42 @@
         resize: none
     }
 
-    .container .register_container .register_field .login_buttons{
+    .container .register_container .register_field .fields_2 .buttons{
+        
         display: flex;
-        justify-content: space-evenly;
-        width: 35%;
-        margin: 40px 8px;
+        justify-content: space-between;
+        gap: 5%;
+        margin: 15px 8px;
     }
 
-    .container .register_container .register_field .register_buttons input[type=submit]{
+    .container .register_container .register_field .fields_2 .buttons .camera_button{
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .container .register_container .register_field .fields_2 .buttons .camera_button input[type=button]{
+        border: none;
+        border-radius: 100px;
+        width: 100%;
+
+        padding: 15px 70px 15px 25px;
+
+        font-family: 'Roboto';
+        font-size: 1.3rem;
+        font-weight: 700;
+        text-align: start;
+        background-color: #1e1e1e;
+        color: #fff;
+    }
+
+    .container .register_container .register_field .fields_2 .buttons .camera_button img{
+        position: relative;
+        width: 40px;
+        margin-left: -18%;
+    }
+
+    .container .register_container .register_field .fields_2 .buttons input[type=submit]{
         border: none;
         border-radius: 100px;
 
