@@ -2,10 +2,6 @@ from django.db import models
 
 # Create your models here.
 
-from django.db import models
-
-# Create your models here.
-
 class Admin(models.Model):
     admin_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=100, null=False)
@@ -19,6 +15,7 @@ class Employee(models.Model):
     email = models.EmailField(unique=True, null=False)
     employee_status = models.CharField(max_length=15, null=False)
     absences = models.IntegerField(default=0, null=False)
+    # employee_profile
     admin_id_fk = models.ForeignKey(Admin, on_delete=models.CASCADE)
 
 class Attendance(models.Model):
