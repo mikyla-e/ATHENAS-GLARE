@@ -10,3 +10,56 @@
     padding: 0 20px 0 20px; 
     z-index: 8;
 }
+
+table {
+    font-size: 12px;
+    border: none;
+    border-radius: 15px;
+    width: 100%;
+    background-color: white;
+    text-align: center;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+}
+th {
+    font-family: 'League Spartan';
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    border-bottom: 2px solid #cac5c5;
+}
+td {
+    border-bottom: 1px solid #cac5c5;
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+}
+td:nth-child(odd) {
+    background-color: white;
+}
+
+td:nth-child(even) {
+    background-color: #ececec;
+}
+
+.addemployeebutton {
+    font-family: 'League Spartan';
+    padding: 10px 30px;
+    font-size: 14px;
+    border-radius: 30px;
+    border: none;
+    background-image: linear-gradient(to right, #F8D146 , #F5B93F);
+    margin-top: 10px;
+    display: block; 
+    width: fit-content; 
+    max-width: 100%; 
+    margin-left: auto;
+}
+.addemployeebutton:hover  {
+    scale: 1.05;
+    transition: 0.1s;
+    border: 1px solid;
+    border-color: #1E1E1E;
+}
