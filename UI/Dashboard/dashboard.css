@@ -1,0 +1,47 @@
+.body{
+    border: solid;
+    height: 100vh;
+    padding: 1px;
+}
+.container{
+    /* border: solid; */
+    height: 100%;
+    margin: 4% 0 0 12%;
+    padding: 0 20px 0 20px; 
+    z-index: 11;
+    border: solid;
+}
+.total_emp{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-family: "League Spartan";
+    padding: 5px;
+    height: 20%;
+    width: 38%;
+    border-radius: 10px;
+    background-color: #1E1E1E;
+    color: white;
+}
+.content{
+    margin: 10px;
+}
+.total_emp h2{
+    font-size: 15px;
+}
+.total_emp h1{
+    font-size: 3em;
+    color: #F8D146;
+    font-weight: bold;
+}
+.total_emp p{
+
+}
+.vertical-line {
+    border-left: 2px solid #F8D146;
+    height: 100%;
+    margin-right: 10px;
+}
+.content_2{
+    margin: 10px;
+}
