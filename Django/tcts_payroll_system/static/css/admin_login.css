@@ -105,6 +105,20 @@
         border-radius: 20px;
     }
 
+    .container .login_container .login_field input[type=password]{
+        margin: 8px;
+        padding: 10px 15px;
+        border: none;
+
+        font-family: 'Inter';
+        font-size: 1rem;
+
+        background-color: rgba(111, 81, 21, 0.10);
+        width: 32%;
+        height: 30px;
+        border-radius: 20px;
+    }
+
     .container .login_container .login_field .login_buttons{
         display: flex;
         justify-content: space-evenly;
