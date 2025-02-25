@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payroll</title>
+    <title>Employee Profile</title>
     <link rel="stylesheet" href="../template.css">
-    <link rel="stylesheet" href="employee.css">
+    <link rel="stylesheet" href="employee_profile.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -95,7 +95,167 @@
         </header>
 
         <div class="container">
-         
+            <div class="profile">
+                <div class="top">
+                    <div class="employee_pic">
+                        <img src="../pictures/employee_img.png" alt="Employee Image">
+                    </div>
+                    <div class="employee_info1">
+                        <div class="employee_name">
+                            <h1>Employee Name <span>ID</span></h1>
+                        </div>
+                        <div class="employee_role">
+                            <h3>Employee Position/Role</h3>
+                        </div>
+                        <div class="line">
+                            <div class="details">DETAILS</div>
+                            <div class="hr1"></div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="bottom">
+                    <div class="employee_info2">
+                        <div class="info_content1">
+                            <div class="gender">
+                                <h1>GENDER</h1>
+                                <p>gender</p>
+                            </div>
+                            <div class="date_of_birth">
+                                <h1>DATE OF BIRTH</h1>
+                                <p>date of birth</p>
+                            </div>
+                            <div class="contact_number">
+                                <h1>CONTACT NUMBER</h1>
+                                <p>contact number</p>
+                            </div>
+                            <div class="emergency_contact">
+                                <h1>EMERGENCY CONTACT</h1>
+                                <p>emergency contact</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info_content2">
+                            <div class="barangay">
+                                <h1>BARANGAY</h1>
+                                <p>barangay</p>
+                            </div>
+                            <div class="postal_address">
+                                <h1>POSTAL ADDRESS</h1>
+                                <p>postal address</p>
+                            </div>
+                            <div class="education">
+                                <h1>EDUCATION</h1>
+                                <p>education</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hr2"></div>
+                    <div class="employee_info3">
+                        <div class="info_content1">
+                            <div class="work_experience">
+                                <h1>WORK EXPERIENCE</h1>
+                                <p>work experience</p>
+                            </div>
+                        </div>
+                        <div class="info_content2">
+                            <div class="date_of_employment">
+                                <h1>DATE OF EMPLOYMENT</h1>
+                                <p>date of employment</p>
+                            </div>
+                            <div class="employee_status">
+                                <h1>EMPLOYEE STATUS</h1>
+                                <p>employee status</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="duration_filter">
+                    <select name="duration" id="duration">
+                        <option value="Current Week">Current Week</option>
+                        <option value="Last Week">Last Week</option>
+                        <option value="Two Weeks Ago">Two Weeks Ago</option>
+                        <option value="Last Month">Last Month</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+                <div class="employee_state">
+                    <div class="left">
+                        <div class="statistic_1">
+                            <div class="img">
+                                <img src="../pictures/icons/payroll_status_icon.png" alt="">
+                            </div>
+                            <div class="text">
+                                <h2>PAYROLL STATUS</h2>
+                                <p>PROCESSED</p>
+                            </div>
+                        </div>
+                        <div class="statistic_2">
+                            <div class="img">
+                                <img src="../pictures/icons/attendance_icon.png" alt="">
+                            </div>
+                            <div class="text">
+                                <h2>LAST ATTENDANCE</h2>
+                                <p>01/01/2025, WED</p>
+                            </div>
+                        </div>
+                        <div class="statistic_3">
+                            <div class="img">
+                                <img src="../pictures/icons/absences_icon.png" alt="">
+                            </div>
+                            <div class="text">
+                                <h2>ABSENCES</h2>
+                                <p>XX</p>
+                            </div>
+                        </div>
+                        <div class="statistic_4">
+                            <div class="img">
+                                <img src="../pictures/icons/day_worked_icon.png" alt="">
+                            </div>
+                            <div class="text">
+                                <h2>DAYS WORKED</h2>
+                                <p>XX Days</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="table">
+                            <table>
+                                <tr>
+                                    <th>DATE</th>
+                                    <th>TIME IN</th>
+                                    <th>TIME OUT</th>
+                                    <th>TIME WORKED</th>
+                                </tr>
+                                <tr>
+                                    <td>XX/XX/XX</td>
+                                    <td>XX:XX am</td>
+                                    <td>XX:XX pm</td>
+                                    <td>XX Hours</td>
+                                </tr>
+                                <tr>
+                                    <td>XX/XX/XX</td>
+                                    <td>XX:XX am</td>
+                                    <td>XX:XX pm</td>
+                                    <td>XX Hours</td>
+                                </tr>
+                                <tr>
+                                    <td>XX/XX/XX</td>
+                                    <td>XX:XX am</td>
+                                    <td>XX:XX pm</td>
+                                    <td>XX Hours</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="pagination">
+                            <p>1 2 3 4 5 ... 10</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </body>
