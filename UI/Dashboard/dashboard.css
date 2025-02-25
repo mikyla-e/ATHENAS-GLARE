@@ -1,47 +1,117 @@
 .body{
-    border: solid;
-    height: 100vh;
-    padding: 1px;
+    height: 100%;
+    
 }
 .container{
-    /* border: solid; */
-    height: 100%;
-    margin: 4% 0 0 12%;
-    padding: 0 20px 0 20px; 
-    z-index: 11;
-    border: solid;
-}
-.total_emp{
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    position: absolute;
+    height: 100%;
+    gap: 5px;
+    margin: 70px 0 0 12%;
+    padding: 0 20px 0 20px; 
+    z-index: 8;
+    display: flex;
+}
+
+.total_emp{
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
     font-family: "League Spartan";
-    padding: 5px;
-    height: 20%;
-    width: 38%;
+    height: 25%;
+    width: fit-content;
+    /* min-width: 400px; */
     border-radius: 10px;
     background-color: #1E1E1E;
     color: white;
 }
 .content{
-    margin: 10px;
+    margin: 0 10px;
 }
 .total_emp h2{
-    font-size: 15px;
+    font-size: 18px;
 }
 .total_emp h1{
-    font-size: 3em;
+    font-size: 2.5em;
     color: #F8D146;
     font-weight: bold;
 }
-.total_emp p{
-
-}
 .vertical-line {
-    border-left: 2px solid #F8D146;
+    border-left: 2px solid #F5B93F;
     height: 100%;
     margin-right: 10px;
 }
-.content_2{
-    margin: 10px;
+.payroll_stats{
+    font-family: "League Spartan";
+    display: flex;
+    flex-wrap: nowrap;
+    background-color: #1E1E1E;
+    color: white;
+    height: 25%;
+    width: fit-content;
+    /* min-width: 400px; */
+    border-radius: 10px;
+}
+.content1{
+    margin-left: 10px;
+    width: 50%;
+    padding: 5px;
+}
+.content1 h1{
+    
+}
+.content1 h2{
+    font-size: 16px;
+}
+.content1 h1{
+    font-size: 2em;
+    color: #F8D146;
+    font-weight: bold;
+}
+.content2{
+    border-radius: 10px;
+    text-align: right;
+    margin-left: 10px;
+    background-color: #F8D146;
+    width: 66%;
+    height: 100%;
+}
+.content2 h1{
+    margin-right: 10px;
+    margin-left: 10px;
+    font-size: 2.2em;
+    color: #1E1E1E;
+    font-weight: bold;
+}
+.content2 h2{
+    margin-right: 10px;
+    font-size: 20px;
+}
+.time{
+    font-family: "League Spartan";
+    height: fit-content;
+    /* border: solid; */
+    /* min-width: 400px; */
+    border-radius: 10px;
+}
+.time h1{
+    font-size: 6em;
+    text-align: right;
+    margin: 0;
+}
+.time h2{
+    text-align: right;
+}
+.content3{
+    display: flex;
+    justify-content: right;
+}
+.content3 h1{
+    font-size: 3em;
+    font-family: "Roboto";
+    margin: 5px;
+}
+.content3 p{
+    font-weight: bold;
 }
