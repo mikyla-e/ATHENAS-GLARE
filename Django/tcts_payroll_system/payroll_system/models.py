@@ -15,7 +15,7 @@ class Employee(models.Model):
     email = models.EmailField(unique=True, null=False)
     employee_status = models.CharField(max_length=15, null=False)
     absences = models.IntegerField(default=0, null=False)
-    # employee_profile
+    employee_image = models.ImageField(null=False, upload_to='images/')
     admin_id_fk = models.ForeignKey(Admin, on_delete=models.CASCADE)
 
 class Attendance(models.Model):

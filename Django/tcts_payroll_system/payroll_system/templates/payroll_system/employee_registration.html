@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registering Employees...</title>
-    <link rel="stylesheet" href="../../../static/css/employee_registration.css">
+    <link rel="stylesheet" href="{% static 'css/employee_registration.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -14,42 +15,39 @@
                 <p>Welcome, new employee!</p>
             </div>
             <div >
-                <form method="post" class="register_field">
-                    {% csrf_token %}
+                <form action="" class="register_field">
                     <div class="fields_1">
                         <div class="field">
-                            <!-- <label for="first_name">first name</label> -->
-                            <!-- <input type="text" name="first-name" id="first-name"> -->
-                            {{form.first_name.label_tag}}
-                             {{form.first_name}}
+                            <label for="first-name">first name</label>
+                            <input type="text" name="first-name" id="first-name">
                         </div>
                         <div class="field">
                             <label for="last-name">last name</label>
-                            <!-- <input type="text" name="last-name" id="last-name"> -->
+                            <input type="text" name="last-name" id="last-name">
                         </div>
                         <div class="field">
                             <label for="gender">gender</label>
-                            <!-- <input type="text" name="gender" id="gender"> -->
+                            <input type="text" name="gender" id="gender">
                         </div>
                         <div class="field">
                             <label for="date-of-birth">date of birth</label>
-                            <!-- <input type="text" name="date-of-birth" id="date-of-birth"> -->
+                            <input type="text" name="date-of-birth" id="date-of-birth">
                         </div>
                         <div class="field">
                             <label for="contact-number">contact number</label>
-                            <!-- <input type="text" name="contact-number" id="contact-number"> -->
+                            <input type="text" name="contact-number" id="contact-number">
                         </div>
                         <div class="field">
                             <label for="emergency-contact">emergency contact</label>
-                            <!-- <input type="text" name="emergency-contact" id="emergency-contact"> -->
+                            <input type="text" name="emergency-contact" id="emergency-contact">
                         </div>
                         <div class="field">
                             <label for="barangay">barangay</label>
-                            <!-- <input type="text" name="barangay" id="barangay"> -->
+                            <input type="text" name="barangay" id="barangay">
                         </div>
                         <div class="field">
                             <label for="postal-address">postal address</label>
-                            <!-- <input type="text" name="postal-address" id="postal-address"> -->
+                            <input type="text" name="postal-address" id="postal-address">
                         </div>
                     </div>
                     
@@ -70,7 +68,7 @@
                         </div>
                         <div class="field">
                             <label for="date-of-employment">date of employment</label>
-                            <!-- <input type="text" name="date-of-employment" id="date-of-employment"> -->
+                            <input type="text" name="date-of-employment" id="date-of-employment">
                         </div>  
                         <div class="field">
                             <label for="employee-status">employee status</label>
@@ -105,7 +103,7 @@
                 </svg>
                 <p class="logo_name">ATTENDANCE</p>
             </div>
-            <img src="../pictures/clients_logo.png" alt="Toto's Car Tinting Shop">
+            <img src="{% static 'images/clients_logo.png' %}" alt="Toto's Car Tinting Shop">
         </div>
         
     </div>

@@ -12,3 +12,12 @@ def dashboard(request):
 
 def time_in_out(request):
     return render(request, 'payroll_system/time_in_out.html')
+
+def employee_registration(request):
+    pass
+
+def employees():
+    pass
+
+def payrolls():
+    pass

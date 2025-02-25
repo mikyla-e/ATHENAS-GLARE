@@ -1,13 +1,15 @@
 from django.contrib import admin
-from .models import Admin
-from .models import Attendance
-from .models import Employee
-from .models import History
+from .models import Admin, Employee, Payroll, Attendance, History
 
 
-# Register your models here.
+class AdminAdmin(admin.ModelAdmin):
+    list_display = ('username', 'password')
 
-admin.site.register(Admin)
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'middle_name', 'last_name', 'email', 'employee_status', 'absences')
+
+admin.site.register(Admin, AdminAdmin)
+admin.site.register(Employee, EmployeeAdmin)
+admin.site.register(Payroll)
 admin.site.register(Attendance)
-admin.site.register(Employee)
 admin.site.register(History)
