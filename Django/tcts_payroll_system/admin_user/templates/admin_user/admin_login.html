@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-    <link rel="stylesheet" href="../../../../../static/css/admin_login.css">
+    <link rel="stylesheet" href="{% static 'css/admin_login.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -30,14 +31,16 @@
             <div class="login_field">
                 <form method="POST">
                     {% csrf_token %}
-                    <!-- <label for="admin_name">name</label><br> -->
-                    {{ form.admin_name.label_tag }} <br>
-                    {{ form.admin_name }} <br><br>
+
+                    {{ form.as_p }}
+                    <!-- <label for="admin-name">name</label><br>
+                    {{form.username}}
+                    <br><br> -->
                     <!-- <input type="text" name="admin-name" id="admin-name"><br><br> -->
 
-                    <label for="admin_password">password</label><br>
-                    {{ form.password }}
-                    <!-- <input type="password" name="admin-password" id="admin-password"> -->
+                    <!-- <label for="admin-password">password</label><br>
+                    {{form.password}} -->
+                    <!-- <input type="text" name="admin-password" id="admin-password"> -->
 
                     <div class="login_buttons">
                         <input type="submit" value="LOGIN">
@@ -46,7 +49,7 @@
             </div>
         </div>
         <div class="clientlogo_img">
-            <img src="../../../static/images/clients_logo.png" alt="Toto's Car Tinting Shop">
+            <img src="{% static 'images/clients_logo.png' %}" alt="Toto's Car Tinting Shop">
         </div>
         
     </div>
