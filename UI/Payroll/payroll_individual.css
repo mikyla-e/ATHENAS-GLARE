@@ -23,7 +23,7 @@
 }
 
 table {
-    font-family: 'League Spartan';
+    
     font-size: 12px;
     border: none;
     border-radius: 15px;
@@ -34,21 +34,21 @@ table {
     border-collapse: separate;
     border-spacing: 0;
     overflow: hidden;
-    
 
 }
 
 th {
     font-family: 'League Spartan';
-    font-size: 15px;
+    font-size: 17px;
     font-weight: bold;
     text-align: center;
-    padding: 10px;
+    padding: 12.5px;
     border-bottom: 2px solid #cac5c5;
     border-inline: 1px solid #cac5c5;
     writing-mode: horizontal-tb;
 }
 td {
+    font-family: 'Inter';
     border-bottom: 1px solid #cac5c5;
     padding: 10px;
     text-align: center;
@@ -57,7 +57,23 @@ td {
     writing-mode: horizontal-tb;
 }
 
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
+th:first-child, td:first-child, th:last-child, td:last-child {
+    border-left: none;
+    border-right: none;
+}
+tr:first-child th {
+    border-top: none;
+}
+tr:last-child td {
+    border-bottom: none;
+}
+
+
+td:nth-child(odd) {
+    background-color: white;
+}
+
+td:nth-child(even) {
+    background-color: #ececec;
+}
 
