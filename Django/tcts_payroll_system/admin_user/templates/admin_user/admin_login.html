@@ -30,11 +30,14 @@
             <div class="login_field">
                 <form method="POST">
                     {% csrf_token %}
-                    <label for="admin-name">name</label><br>
-                    <input type="text" name="admin-name" id="admin-name"><br><br>
+                    <!-- <label for="admin_name">name</label><br> -->
+                    {{ form.admin_name.label_tag }} <br>
+                    {{ form.admin_name }} <br><br>
+                    <!-- <input type="text" name="admin-name" id="admin-name"><br><br> -->
 
-                    <label for="admin-password">password</label><br>
-                    <input type="text" name="admin-password" id="admin-password">
+                    <label for="admin_password">password</label><br>
+                    {{ form.password }}
+                    <!-- <input type="password" name="admin-password" id="admin-password"> -->
 
                     <div class="login_buttons">
                         <input type="submit" value="LOGIN">
