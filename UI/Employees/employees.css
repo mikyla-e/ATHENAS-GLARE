@@ -24,10 +24,10 @@ table {
 }
 th {
     font-family: 'League Spartan';
-    font-size: 10px;
+    font-size: 16px;
     font-weight: bold;
     text-align: center;
-    padding: 10px;
+    padding: 12.5px;
     border-bottom: 2px solid #cac5c5;
 }
 td {
@@ -35,6 +35,10 @@ td {
     padding: 10px;
     text-align: center;
     font-size: 13px;
+    font-family: 'Inter';
+}
+tr:last-child td {
+    border-bottom: none;
 }
 td:nth-child(odd) {
     background-color: white;
@@ -57,6 +61,7 @@ td:nth-child(even) {
     width: fit-content; 
     max-width: 100%; 
     margin-left: auto;
+    text-align: center;
 }
 .addemployeebutton:hover  {
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
