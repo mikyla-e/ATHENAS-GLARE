@@ -142,7 +142,7 @@
     width: 30%;
 }
 .table-1{
-    /* border: solid; */
+    border: none;
     background-color: #FFFF;
     /* margin: 10px; */
     border-radius: 10px;
@@ -199,37 +199,46 @@
     width: 40%;
     height: 100%;
 }
-.table2{
-    margin-left: 10px;
-}
-.table-2{
-    /* border: solid; */
-    background-color: #FFFF;
-    /* margin: 10px; */
-    border-radius: 10px;
+
+.table2 table {
+    font-size: 12px;
+    border: none;
+    border-radius: 15px;
     width: 100%;
-    float: right;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    /* margin-left: 10px; */
+    background-color: white;
+    text-align: center;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
 }
-.table-2 th,td,tr{
+.table2{
+    /* border: solid; */
+    margin: 10px;
+}
+.table2 th {
+    font-family: 'League Spartan';
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    padding: 12.5px;
+    border-bottom: 2px solid #cac5c5;
+}
+.table2 td {
+    border-bottom: 1px solid #cac5c5;
     padding: 10px;
-    font-family: "League Spartan";
+    text-align: center;
+    font-size: 13px;
+    font-family: 'Inter';
 }
-.table-2 th{
-    text-align: left;
-    color: #F8D146;
-    font-size: 1em;
+.table2 tr:last-child td {
+    border-bottom: none;
 }
-.table-2 tr{
-    font-size: 1em;
+.table2 td:nth-child(odd) {
+    background-color: white;
 }
-.table-2 td{
-    font-size: 1em;
-}
-.table-2 tr:nth-child(even) {
-    background-color: rgb(241, 241, 241);
+
+.table2 td:nth-child(even) {
+    background-color: #ececec;
 }
 #donutchart {
     width: 400px;
@@ -243,3 +252,41 @@
     border-radius: 20px;
     overflow: hidden;
 }
+
+
+
+/* 
+.table2{
+    margin-left: 10px;
+}
+.table-2{
+    border: none;
+    background-color: #FFFF;
+    margin: 10px;
+    border-radius: 10px;
+    width: 100%;
+    float: right;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+.table2 th,td,tr{
+    padding: 10px;
+    font-family: "League Spartan";
+    border-bottom: solid;
+}
+.table-2 th{
+    text-align: left;
+    color: #F8D146;
+    font-size: 1em;
+    border-bottom: solid #0000000F;
+}
+.table-2 tr{
+    font-size: 1em;
+}
+.table-2 td{
+    font-size: 1em;
+}
+.table-2 tr:nth-child(even) {
+    background-color: rgb(241, 241, 241);
+} */
