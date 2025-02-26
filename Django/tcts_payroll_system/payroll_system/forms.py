@@ -6,13 +6,9 @@ class AdminForm(ModelForm):
     class Meta:
         model = Admin
         fields = ('username', 'password')
-        labels = {
-            'username': '',
-            'password': ''
-        }
         widgets = {
-            'username': forms.TextInput(attrs={'placeholder':'Enter your Username'}),
-            'password': forms.PasswordInput(attrs={'placeholder':'Enter your Password'})
+            'username': forms.TextInput(),
+            'password': forms.PasswordInput()
         }
 
 class EmployeeForm(ModelForm):
