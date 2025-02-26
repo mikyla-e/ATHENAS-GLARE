@@ -16,7 +16,7 @@
 }
 
 .top{
-    height: 25%;
+    height: 20%;
     /* border: solid; */
     position: relative;
     width: 100%;
@@ -54,7 +54,7 @@
     font-size: 20px;
 }
 .total_emp h1{
-    font-size: 6em;
+    font-size: 5em;
     color: #F8D146;
     font-weight: bold;
 }
@@ -97,6 +97,9 @@
     background-color: #F8D146;
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 .content2 h1{
     margin-right: 10px;
