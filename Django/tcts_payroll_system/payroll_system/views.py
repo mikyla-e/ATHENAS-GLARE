@@ -10,6 +10,9 @@ from .forms import EmployeeForm
 def dashboard(request):
     return render(request, 'payroll_system/dashboard.html')
 
+def payroll(request):
+    return render(request, '/payroll_system/payroll.html')
+
 def time_in_out(request):
     return render(request, 'payroll_system/time_in_out.html')
 

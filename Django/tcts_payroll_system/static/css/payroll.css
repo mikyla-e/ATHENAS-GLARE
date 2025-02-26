@@ -1,0 +1,48 @@
+.body{
+    height: 100%;
+}
+.container{
+    position: absolute;
+    height: 100%;
+    width: 85%;
+
+    display: flex;
+
+    margin: 80px 0 0 12%;
+    padding: 0 20px 0 20px; 
+    z-index: 8;
+}
+
+.top{
+    height: 15%;
+    width: 100%;
+    
+    display: flex;
+}
+
+.content_1{
+    position: relative;
+    
+    width: 70%;
+    border: 2px solid black;
+}
+
+.content_2{
+    position: relative;
+
+    width: 30%;
+    border: 2px solid black;
+
+}
+
+.content_1 .statistics{
+    display: flex;
+}
+
+.total_payroll, .avg_rate, .payroll_status{
+    border: 2px solid black;
+}
+
+
+
+
