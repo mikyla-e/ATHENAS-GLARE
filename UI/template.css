@@ -31,12 +31,13 @@
     }
 
     nav .logo{
-        height: 8%;
-
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     nav .logo .logo-group{
-        padding: 12px 0 12px 15px;
         display: flex;
         overflow: hidden;
     }
