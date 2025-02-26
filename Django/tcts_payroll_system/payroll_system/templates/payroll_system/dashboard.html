@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="{% static '/css/template.css' %}">
+    <link rel="stylesheet" href="{% static 'css/template.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -95,20 +96,208 @@
         </header>
     
         <div class="container">
-         
-        </div>
+            <div class="top">
+                <div class="total_emp">
+                    <div class="content">
+                        <h2 style="margin-bottom: 0;">TOTAL EMPLOYEES</h2>
+                        <p style="margin-top: 0;">In the company</p>
+                        <h1 style="margin-top: 0;">XX</h1>
+                    </div>
+                    <div class="vertical-line"></div>
+                    <div class="content">
+                        <h2 style="margin-bottom: 0;">TOTAL EMPLOYEES</h2>
+                        <p style="margin-top: 0;">In the company</p>
+                        <h1 style="margin-top: 0;">XX%</h1>
+                    </div>
+                </div>
+    
+                <!-- Hello -->
+    
+                <div class="payroll_stats">
+                    <div class="content1">
+                        <h2>PAYROLL STATUS</h2>
+                        <h2 style="margin-bottom: 0;">PROCESSED</h2>
+                        <h1 style="margin-top: 0; color: #F5B93F;">XX</h1><hr>
+                        <h2 style="margin-bottom: 0;">PENDING</h2>
+                        <h1 style="margin-top: 0; color: #DC4646;">XX</h1>
+                    </div>
+                    <div class="content2">
+                        <h2 style="margin-bottom: 0;">TOTAL PAYROLL</h2>
+                        <h1 style="margin-bottom: 0; margin-top: 0;">XXXX-XXXX</h1><br>
+                        <h1 style="margin-top: 0; margin-bottom: 0;">02/24/25</h1>
+                        <h2 style="margin-bottom: 0; margin-top: 0;">NEXT PAYDAY</h2>
+                    </div>
+                </div>
+                <div class="time">
+                    <h2 style="margin-bottom: 0;">WEATHER</h2>
+                    <h1>10:00PM</h1>
+                    <div class="content3">
+                        <p>SAT | FEB 1, 2025</p>
+                        <h1 style="margin-top: 0; color: #F5B93F;">GMT +8</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="div1">
+                <div class="table">
+                    <table class="table-1">
+                        <th style="font-weight: bold;">RECENT HISTORY</th>
+    
+                        <tr>
+                            <td>Deleted a payroll</td>
+                        </tr>
+                        <tr>
+                            <td>Added a new Employee</td>
+                        </tr>
+                        <tr>
+                            <td>Deleted a payroll</td>
+                        </tr>
+                        <tr>
+                            <td>Added a new Employee</td>
+                        </tr>
+                        <tr>
+                            <td>Deleted a payroll</td>
+                        </tr>
+                        <tr>
+                            <td>Added a new Employee</td>
+                        </tr>
+                        <tr>
+                            <td>Deleted a payroll</td>
+                        </tr>
+                        <tr>
+                            <td>Added a new Employee</td>
+                        </tr>
+                        <tr>
+                            <td>Deleted a payroll</td>
+                        </tr>
+                        <tr>
+                            <td>Added a new Employee</td>
+                        </tr>
+                        <tr>
+                            <td>Deleted a payroll</td>
+                        </tr>
+                        <tr>
+                            <td>Added a new Employee</td>
+                        </tr>
+                        <tr>
+                            <td>Deleted a payroll</td>
+                        </tr>
+                        <tr>
+                            <td>Added a new Employee</td>
+                        </tr>
+                        
+                    </table>
+                </div>
+                <div class="div2">
+                    <div class="basket">
+                        <div class="basket2">
+                            <div class="attendance">
+                                <div id="donutchart" style="width: 400px; height: 250px;"></div>
+                            </div>
+                            <div class="pay-per-payday">
+                                <div id="columnchart_values" style="width: 100%; height: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table2">
+                        <table class="table-2">
+                            <th style="color: #1E1E1E; font-weight: bold;">EMPLOYEE</th>
+                            <th style="color: #1E1E1E; font-weight: bold;">PAYMENT AMOUNT</th>
+                            <th style="color: #1E1E1E; font-weight: bold;">STATUS</th>
+                            <th style="color: #1E1E1E; font-weight: bold;">LAST ATTENDANCE</th>
+        
+                            <tr>
+                                <td>Viktor Greg Lim</td>
+                                <td>₱2,450</td>
+                                <td>Active</td>
+                                <td>Feb. 24, 2025</td>
+                            </tr>
+                            <tr>
+                                <td>Juliana Mikyla Escudero</td>
+                                <td>₱2,450</td>
+                                <td>Active</td>
+                                <td>Feb. 24, 2025</td>
+                            </tr>
+                            <tr>
+                                <td>Ejay Rulona</td>
+                                <td>₱2,450</td>
+                                <td>Active</td>
+                                <td>Feb. 24, 2025</td>
+                            </tr>
+                            <tr>
+                                <td>Aaron Jess Flores</td>
+                                <td>₱2,450</td>
+                                <td>Active</td>
+                                <td>Feb. 24, 2025</td>
+                            </tr>
+                            <tr>
+                                <td>Lady Melodiluz Galope</td>
+                                <td>₱2,450</td>
+                                <td>Active</td>
+                                <td>Feb. 24, 2025</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                </div>
+            </div>
+            
+            
     </div>
 </body>
-<style>
-    .body{
-        border: solid;
-        height: 100%;
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+        google.charts.load("current", {packages:["corechart"]});
+        google.charts.setOnLoadCallback(drawChart);
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable([
+            ['Task', 'Hours per Day'],
+            ['Present', 11],
+            ['Absent', 2]
+            ]);
+
+            var options = {
+            title: 'ATTENDANCE',
+            pieHole: 0.4,
+            colors: ['#F5B93F', '#DC4646'],
+            chartArea: { width: '90%', height: '90%' }
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+            chart.draw(data, options);
+        }
+    </script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+        google.charts.load("current", {packages:['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+        function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+        ["Element", "Density", { role: "style" } ],
+        ["Jan. 1", 8.94, "#1E1E1E"],
+        ["Jan. 8", 10.49, "#F5B93F"],
+        ["Jan. 15", 19.30, "1E1E1E"],
+        ["Jan. 22", 21.45, "color: #F5B93F"]
+        ]);
+
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1,
+                        { calc: "stringify",
+                        sourceColumn: 1,
+                        type: "string",
+                        role: "annotation" },
+                        2]);
+
+        var options = {
+        title: "PAYROLL per payday",
+        width: 450,
+        height: 250,
+        bar: {groupWidth: "95%"},
+        legend: { position: "none" },
+        };
+        var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+        chart.draw(view, options);
     }
-    .container{
-        font-size: 100px;
-        margin: 4% 0 0 12%;
-        padding: 0 20px 0 20px; 
-        z-index: 11;
-    }
-</style>
+</script>
+
+    
 </html>

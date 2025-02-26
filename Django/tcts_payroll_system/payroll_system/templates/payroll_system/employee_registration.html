@@ -15,72 +15,67 @@
                 <p>Welcome, new employee!</p>
             </div>
             <div >
-                <form action="" class="register_field">
+                <form action="" class="register_field" method="POST">
+                    {% csrf_token %}
+
                     <div class="fields_1">
                         <div class="field">
                             <label for="first-name">first name</label>
-                            <input type="text" name="first-name" id="first-name">
+                            {{ form.first_name }}
                         </div>
                         <div class="field">
                             <label for="last-name">last name</label>
-                            <input type="text" name="last-name" id="last-name">
+                            {{ form.last_name }}
                         </div>
-                        <div class="field">
-                            <label for="gender">gender</label>
-                            <input type="text" name="gender" id="gender">
+                        <div class="fields_2">
+                            <div class="field">
+                                <label for="gender">gender</label>
+                                {{ form.gender}}
+                            </div>
                         </div>
                         <div class="field">
                             <label for="date-of-birth">date of birth</label>
-                            <input type="text" name="date-of-birth" id="date-of-birth">
+                            {{ form.date_of_birth }}
                         </div>
                         <div class="field">
                             <label for="contact-number">contact number</label>
-                            <input type="text" name="contact-number" id="contact-number">
+                            {{ form.contact_number }}
                         </div>
                         <div class="field">
                             <label for="emergency-contact">emergency contact</label>
-                            <input type="text" name="emergency-contact" id="emergency-contact">
+                            {{ form.emergency_contact }}
                         </div>
                         <div class="field">
                             <label for="barangay">barangay</label>
-                            <input type="text" name="barangay" id="barangay">
+                            {{ form.barangay }}
                         </div>
                         <div class="field">
                             <label for="postal-address">postal address</label>
-                            <input type="text" name="postal-address" id="postal-address">
+                            {{ form.postal_address }}
                         </div>
                     </div>
                     
                     <div class="fields_2">
                         <div class="field">
                             <label for="education">highest education attainment</label>
-                            <select name="education" id="education">
-                                <option value="Grade School">Grade School</option>
-                                <option value="High School">High School</option>
-                                <option value="Bachelor's Degree">Bachelor's Degree</option>
-                                <option value="Vocational Education">Vocational Education</option>
-                                <option value="Master's Degree">Master's Degree</option>
-                            </select>
+                            {{ form.highest_education }}
                         </div>
                         <div class="field">
                             <label for="work-experience">work experience</label>
-                            <textarea name="work-experience" id="work-experience"></textarea>
+                            {{ form.work_experience }}
                         </div>
                         <div class="field">
                             <label for="date-of-employment">date of employment</label>
-                            <input type="text" name="date-of-employment" id="date-of-employment">
+                            {{ form.date_of_employment }}
                         </div>  
                         <div class="field">
                             <label for="employee-status">employee status</label>
-                            <select name="employee-status" id="employee-status">
-                                <option value="Full Time">Full Time</option>
-                                <option value="Part Time">Part Time</option>
-                            </select>
+                            {{ form.employee_status }}
                         </div>
                         <div class="buttons">
                             <div class="camera_button">
                                 <input type="button" value="TAKE A PICTURE">
-                                <img src="../pictures/icons/camera.png" alt="Camera">
+                                <img src="{% static 'images/camera.png' %}" alt="Camera">
                             </div>
                             <input class="submit" type="submit" value="SUBMIT">
                         </div>
