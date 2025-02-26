@@ -16,7 +16,7 @@
 }
 
 .top{
-    height: 25%;
+    height: 20%;
     /* border: solid; */
     position: relative;
     width: 100%;
@@ -38,6 +38,7 @@
 }
 .div1{
     display: flex;
+    margin: 10px;
 
     /* border: solid; */
 }
@@ -53,7 +54,7 @@
     font-size: 20px;
 }
 .total_emp h1{
-    font-size: 6em;
+    font-size: 5em;
     color: #F8D146;
     font-weight: bold;
 }
@@ -96,6 +97,9 @@
     background-color: #F8D146;
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 .content2 h1{
     margin-right: 10px;
@@ -163,20 +167,26 @@
     background-color: rgb(241, 241, 241);
 }
 .basket{
-    margin: 5px;
+    margin: 0;
     display: flex;
     /* border: solid; */
     width: 100%;
-}
-.basket2{
-    display: flex;
     flex-wrap: nowrap;
     justify-content: space-evenly;
     /* border: solid; */
-    width: 100%;
+    /* width: 100%; */
     height: fit-content;
     /* height: 40%; */
 }
+/* .basket2{
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    border: solid;
+    width: 100%;
+    height: fit-content;
+    height: 40%;
+} */
 .attendance{
     width: 40%;
     /* border: solid; */
@@ -220,4 +230,16 @@
 }
 .table-2 tr:nth-child(even) {
     background-color: rgb(241, 241, 241);
+}
+#donutchart {
+    width: 400px;
+    height: 250px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+#columnchart_values {
+    width: 400px;
+    height: 250px;
+    border-radius: 20px;
+    overflow: hidden;
 }
