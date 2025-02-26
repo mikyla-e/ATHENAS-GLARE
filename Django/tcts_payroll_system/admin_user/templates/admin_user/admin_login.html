@@ -32,6 +32,14 @@
                 <form method="POST">
                     {% csrf_token %}
 
+                    <label for="username">name</label><br>
+                    {{ form.username }}
+
+                    <br><br>
+
+                    <label for="password">password</label><br>
+                    {{ form.password }}
+
                     {{ form.as_p }}
                     <!-- <label for="admin-name">name</label><br>
                     {{form.username}}

@@ -101,6 +101,7 @@
         resize: none
     }
 
+    .container .register_container .register_field .fields_1 .field select,
     .container .register_container .register_field .fields_2 .field select{
         margin: 8px;
         padding: 10px 15px;
