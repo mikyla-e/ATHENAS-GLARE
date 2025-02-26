@@ -1,5 +1,6 @@
 .body{
     height: 100%;
+    
 }
 .container{
     position: absolute;
@@ -10,3 +11,4 @@
     padding: 0 20px 0 20px; 
     z-index: 8;
 }
+
