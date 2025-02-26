@@ -16,11 +16,12 @@
 }
 
 .top{
-    height: 25%;
+    height: 20%;
     /* border: solid; */
     position: relative;
     width: 100%;
     display: flex;
+    margin-top: 10px;
     justify-content: space-between;
 }
 
@@ -38,6 +39,7 @@
 }
 .div1{
     display: flex;
+    margin: 10px;
 
     /* border: solid; */
 }
@@ -53,7 +55,7 @@
     font-size: 20px;
 }
 .total_emp h1{
-    font-size: 6em;
+    font-size: 5em;
     color: #F8D146;
     font-weight: bold;
 }
@@ -78,9 +80,6 @@
     width: 50%;
     padding: 5px;
 }
-.content1 h1{
-    
-}
 .content1 h2{
     font-size: 16px;
 }
@@ -96,6 +95,9 @@
     background-color: #F8D146;
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 .content2 h1{
     margin-right: 10px;
@@ -138,7 +140,7 @@
     width: 30%;
 }
 .table-1{
-    /* border: solid; */
+    border: none;
     background-color: #FFFF;
     /* margin: 10px; */
     border-radius: 10px;
@@ -163,20 +165,26 @@
     background-color: rgb(241, 241, 241);
 }
 .basket{
-    margin: 5px;
+    margin: 0;
     display: flex;
     /* border: solid; */
     width: 100%;
-}
-.basket2{
-    display: flex;
     flex-wrap: nowrap;
     justify-content: space-evenly;
     /* border: solid; */
-    width: 100%;
+    /* width: 100%; */
     height: fit-content;
     /* height: 40%; */
 }
+/* .basket2{
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    border: solid;
+    width: 100%;
+    height: fit-content;
+    height: 40%;
+} */
 .attendance{
     width: 40%;
     /* border: solid; */
@@ -189,28 +197,87 @@
     width: 40%;
     height: 100%;
 }
+
+.table2 table {
+    font-size: 12px;
+    border: none;
+    border-radius: 15px;
+    width: 100%;
+    background-color: white;
+    text-align: center;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+}
+.table2{
+    /* border: solid; */
+    margin: 10px;
+}
+.table2 th {
+    font-family: 'League Spartan';
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    padding: 12.5px;
+    border-bottom: 2px solid #cac5c5;
+}
+.table2 td {
+    border-bottom: 1px solid #cac5c5;
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+    font-family: 'Inter';
+}
+.table2 tr:last-child td {
+    border-bottom: none;
+}
+.table2 td:nth-child(odd) {
+    background-color: white;
+}
+
+.table2 td:nth-child(even) {
+    background-color: #ececec;
+}
+#donutchart {
+    width: 400px;
+    height: 250px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+#columnchart_values {
+    width: 400px;
+    height: 250px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+
+
+/* 
 .table2{
     margin-left: 10px;
 }
 .table-2{
-    /* border: solid; */
+    border: none;
     background-color: #FFFF;
-    /* margin: 10px; */
+    margin: 10px;
     border-radius: 10px;
     width: 100%;
     float: right;
     margin-bottom: 10px;
     margin-top: 10px;
-    /* margin-left: 10px; */
+    margin-left: 10px;
 }
-.table-2 th,td,tr{
+.table2 th,td,tr{
     padding: 10px;
     font-family: "League Spartan";
+    border-bottom: solid;
 }
 .table-2 th{
     text-align: left;
     color: #F8D146;
     font-size: 1em;
+    border-bottom: solid #0000000F;
 }
 .table-2 tr{
     font-size: 1em;
@@ -220,4 +287,4 @@
 }
 .table-2 tr:nth-child(even) {
     background-color: rgb(241, 241, 241);
-}
+} */
