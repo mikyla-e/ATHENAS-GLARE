@@ -25,6 +25,10 @@ class Employee(models.Model):
     class EmployeeStatus(models.TextChoices):
         FULLTIME = 'FT', _('Full Time')
         PARTTIME = 'PT', _('Part Time')
+
+    class PayrollStatus(models.TextChoices):
+        PENDING = 'PEND', _('Pending')
+        PROCESSED = 'PROC', _('Processed')
     
     employee_id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=100, null=False)
@@ -39,6 +43,7 @@ class Employee(models.Model):
     work_experience = models.CharField(max_length=2083, null=True)
     date_of_employment = models.DateField(default=timezone.now)
     employee_status = models.CharField(max_length=2, choices=EmployeeStatus.choices, null=True)
+    payroll_status = models.CharField(max_length=4, choices=PayrollStatus.choices, null=True, blank=True)
     absences = models.IntegerField(default=0, null=False)
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
     admin_id_fk = models.ForeignKey(Admin, on_delete=models.CASCADE, null=True, blank=True)

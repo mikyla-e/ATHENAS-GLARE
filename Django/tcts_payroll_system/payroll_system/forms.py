@@ -14,7 +14,9 @@ class AdminForm(ModelForm):
 class EmployeeForm(ModelForm):
     class Meta:
         model = Employee
-        fields = ('first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact', 'barangay', 'postal_address', 'highest_education', 'work_experience', 'date_of_employment', 'employee_status')
+        fields = ('first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
+                   'barangay', 'postal_address', 'highest_education', 'work_experience', 'date_of_employment',
+                   'employee_status')
         widgets = {
             'first_name': forms.TextInput(),
             'last_name': forms.TextInput(),

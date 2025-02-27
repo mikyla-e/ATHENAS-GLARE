@@ -4,14 +4,15 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import EmployeeForm
+from .models import Employee
 # Create your views here.
 
 @login_required
 def dashboard(request):
     return render(request, 'payroll_system/dashboard.html')
 
-def payroll(request):
-    return render(request, '/payroll_system/payroll.html')
+def payrolls(request):
+    return render(request, 'payroll_system/payroll.html')
 
 def time_in_out(request):
     return render(request, 'payroll_system/time_in_out.html')
@@ -27,8 +28,10 @@ def employee_registration(request):
     }
     return render(request, 'payroll_system/employee_registration.html', context)
 
-def employees():
-    pass
+def employees(request):
+    employees = Employee.objects.all()
+    context = {
+        'employees': employees
+    }
+    return render(request, 'payroll_system/employees.html', context)
 
-def payrolls():
-    pass
