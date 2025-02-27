@@ -11,39 +11,39 @@ class Admin(models.Model):
 
 class Employee(models.Model):
     class Gender(models.TextChoices):
-        MALE = 'M', _('Male')
-        FEMALE = 'F', _('Female')
-        OTHERS = 'O', _('Others')
+        MALE = 'Male', _('Male')
+        FEMALE = 'Female', _('Female')
+        OTHERS = 'Others', _('Others')
 
     class HighestEducation(models.TextChoices):
-        GRADESCHOOL = 'GS', _('Grade School')
-        HIGHSCHOOL = 'HS', _('High School')
-        BACHELORS_DEGREE = 'B.', _('Bachelor\'s Degree')
-        VOCATIONAL_EDUCATION = 'Voc. Ed.', _('Vocational Education')
-        MASTERS_DEGREE = 'M.', _('Master\'s Degree')
+        GRADESCHOOL = 'Grade School', _('Grade School')
+        HIGHSCHOOL = 'High School', _('High School')
+        BACHELORS_DEGREE = 'Bachelor\'s Degree', _('Bachelor\'s Degree')
+        VOCATIONAL_EDUCATION = 'Vocational Education', _('Vocational Education')
+        MASTERS_DEGREE = 'Master\'s Degree', _('Master\'s Degree')
 
     class EmployeeStatus(models.TextChoices):
-        FULLTIME = 'FT', _('Full Time')
-        PARTTIME = 'PT', _('Part Time')
+        FULLTIME = 'Full Time', _('Full Time')
+        PARTTIME = 'Part Time', _('Part Time')
 
     class PayrollStatus(models.TextChoices):
-        PENDING = 'PEND', _('Pending')
-        PROCESSED = 'PROC', _('Processed')
+        PENDING = 'PENDING', _('Pending')
+        PROCESSED = 'PROCESSED', _('Processed')
     
     employee_id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=100, null=False)
     last_name = models.CharField(max_length=100, null=False)
-    gender = models.CharField(max_length=1, choices=Gender.choices, null=False)
+    gender = models.CharField(max_length=6, choices=Gender.choices, null=False)
     date_of_birth = models.DateField(null=True)
     contact_number = models.CharField(max_length=15, null=True)
     emergency_contact = models.CharField(max_length=15, null=True)
     barangay = models.CharField(max_length=100, null=True)
     postal_address = models.IntegerField(null=True)
-    highest_education = models.CharField(max_length=8, choices=HighestEducation.choices, null=True)
+    highest_education = models.CharField(max_length=20, choices=HighestEducation.choices, null=True)
     work_experience = models.CharField(max_length=2083, null=True)
     date_of_employment = models.DateField(default=timezone.now)
-    employee_status = models.CharField(max_length=2, choices=EmployeeStatus.choices, null=True)
-    payroll_status = models.CharField(max_length=4, choices=PayrollStatus.choices, null=True, blank=True)
+    employee_status = models.CharField(max_length=9, choices=EmployeeStatus.choices, null=True)
+    payroll_status = models.CharField(max_length=9, choices=PayrollStatus.choices, null=True, blank=True)
     absences = models.IntegerField(default=0, null=False)
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
     admin_id_fk = models.ForeignKey(Admin, on_delete=models.CASCADE, null=True, blank=True)
