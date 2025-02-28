@@ -13,7 +13,7 @@
 
 .top{
     width: 100%;
-    height: 48px;   
+    height: 42px;   
     
     display: flex;
     justify-content: space-between;
@@ -120,7 +120,14 @@
     border-right: 1px solid #1e1e1e;
 }
 
-.top .container_2 .search_filter .search button{
+.top .container_2 .search_filter .search form{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.top .container_2 .search_filter .search form button{
     width: 10%;
     height: 100%;
     padding-left: 15px;
@@ -131,22 +138,22 @@
     align-items: center;
 }
 
-.top .container_2 .search_filter .search button img{
-    height: 30px;
-    width: 30px;
+.top .container_2 .search_filter .search form button img{
+    height: 25px;
+    width: 25px;
 }
 
-.top .container_2 .search_filter .search input[type=text]{
+.top .container_2 .search_filter .search form input[type=text]{
     width: 100%;
     height: 100%;
     border: none;
 }
 
-.top .container_2 .search_filter .search input[type=text]:focus{
+.top .container_2 .search_filter .search form input[type=text]:focus{
     outline: none;
 }
 
-.top .container_2 .search_filter .search input[type=text]::placeholder{
+.top .container_2 .search_filter .search form input[type=text]::placeholder{
     font-family: 'League Spartan';
     font-size: 1rem;
     font-weight: 600;
@@ -225,6 +232,18 @@ td {
     font-size: 14px;
     font-family: 'Inter';
 }
+
+td a{
+    text-decoration: none;
+    font-weight: 600;
+    color: #1e1e1e;
+}
+
+td a:hover{
+    color: #F8D146;
+    transition: 0.2s;
+}
+
 tr:last-child td {
     border-bottom: none;
 }
@@ -236,20 +255,29 @@ td:nth-child(even) {
     background-color: #f2f2f2;
 }
 
+.button{
+    padding: 10px 0;
+    width: 100%;
+
+    display: flex;
+    justify-content: end;
+}
+
 .addemployeebutton {
+    width: fit-content;
+    padding: 10px 30px;
+
     font-family: 'League Spartan';
     font-weight: bold;
-    padding: 10px 30px;
     font-size: 1rem;
+    text-align: center;
+
     border-radius: 30px;
     border: none;
-    background-image: linear-gradient(to right, #F8D146 , #F5B93F);
-    margin-top: 10px;
-    display: block; 
-    width: fit-content; 
-    max-width: 100%; 
-    margin-left: auto;
-    text-align: center;
+
+    background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
+    
+
 }
 .addemployeebutton:hover  {
     scale: 1.05;
