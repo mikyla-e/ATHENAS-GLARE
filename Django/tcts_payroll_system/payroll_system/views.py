@@ -5,12 +5,8 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import EmployeeForm
 from .models import Employee
-# Create your views here.
 
 @login_required
-def time_in_out(request):
-    return render(request, 'payroll_system/time_in_out.html')
-
 def dashboard(request):
     return render(request, 'payroll_system/dashboard.html')
 
@@ -41,3 +37,9 @@ def employee_profile(request, employee_id):
 
 def payrolls(request):
     return render(request, 'payroll_system/payroll.html')
+
+def payroll_individual(request):
+    return render(request, 'payroll_system/payroll_individual.html')
+
+def settings(request):
+    return render(request, 'payroll_system/settings.html')

@@ -46,7 +46,6 @@ class Employee(models.Model):
     payroll_status = models.CharField(max_length=9, choices=PayrollStatus.choices, null=True, blank=True)
     absences = models.IntegerField(default=0, null=False)
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
-    admin_id_fk = models.ForeignKey(Admin, on_delete=models.CASCADE, null=True, blank=True)
 
 class Attendance(models.Model):
     attendance_id = models.AutoField(primary_key=True)
@@ -67,7 +66,6 @@ class Payroll(models.Model):
     payment_date = models.DateField(null=False)
     employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE)
     attendance_id_fk = models.ForeignKey(Attendance, on_delete=models.CASCADE)
-    admin_id_fk = models.ForeignKey(Admin, on_delete=models.CASCADE)
 
 class History(models.Model):
     history_id = models.AutoField(primary_key=True)
