@@ -37,7 +37,7 @@
 .buttons .check-employee{
     background-color: #F8D146;
     color: #fff;
-    border: none;
+    /* border: none; */
 }
 
 .buttons .check-employee:hover{
@@ -114,8 +114,8 @@
 .employee_status .all button:hover,
 .employee_status .full-time button:hover,
 .employee_status .part-time button:hover{
-    color: #fff;
-    background-color: #F8D146;
+    color: #F8D146;
+    /* background-color: #F8D146; */
     transition: 0.25s;
 }
 
@@ -123,7 +123,7 @@
 /* SUMMARY TABLE CSS */
 
 .div1{
-    border: solid;
+    /* border: solid; */
     width: 100%;
 }
 .div2{
@@ -131,7 +131,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: solid;
+    /* border: solid; */
     width: 100%;
 }
 .edit-icon{
