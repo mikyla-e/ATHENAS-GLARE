@@ -1,8 +1,10 @@
 .body{
     height: 100%;
-    
+    /* border: solid; */
 }
-
+.containerr{
+    /* border: solid; */
+}
 .container{
     display: flex;
     flex-direction: column;
@@ -17,12 +19,14 @@
 }
 
 .top{
-    height: 20%;
-    /* border: solid; */
-    position: relative;
-    width: 100%;
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
+    /* flex-wrap: wrap; */
+    gap: 10px;
+    height: 20%;
+    width: 100%;
+    /* border: solid; */
+    
 }
 
 .total_emp{
@@ -31,7 +35,8 @@
     justify-content: space-evenly;
     font-family: "League Spartan";
     height: 100%;
-    width: fit-content;
+    min-height: 150px;
+    width: 33%;
     min-width: 430px;
     border-radius: 10px;
     background-color: #1E1E1E;
@@ -41,23 +46,22 @@
     display: flex;
     margin: 10px;
 
-    /* border: solid; */
 }
 .div2{
-    /* border: solid; */
     width: 100%;
 }
-
 .content{
     margin: 10px;
 }
 .total_emp h2{
-    font-size: 20px;
+    font-size: clamp(1.2em, 1em, 5em);
 }
 .total_emp h1{
-    font-size: 5em;
     color: #F8D146;
     font-weight: bold;
+}
+.content h1{
+    font-size: clamp(2em, 4.2rem, 5em);
 }
 .vertical-line {
     border-left: 2px solid #F5B93F;
@@ -71,14 +75,15 @@
     background-color: #1E1E1E;
     color: white;
     height: 100%;
-    width: fit-content;
+    min-height: 150px;
+    width: 33%;
     min-width: 480px;
     border-radius: 10px;
 }
 .content1{
     margin-left: 10px;
     width: 50%;
-    padding: 5px;
+    /* padding: 5px; */
 }
 .content1 h2{
     font-size: 16px;
@@ -102,21 +107,24 @@
 .content2 h1{
     margin-right: 10px;
     margin-left: 10px;
-    font-size: 2.5em;
+    font-size: clamp(1.2em, 2.5em, 5em);
     color: #1E1E1E;
     font-weight: bold;
 }
 .content2 h2{
     margin-right: 10px;
-    font-size: 20px;
+    font-size: clamp(1.2em, 1em, 5em);
 }
 .time{
     font-family: "League Spartan";
-    height: fit-content;
+    /* height: fit-content; */
     border-radius: 10px;
+    height: 100%;
+    min-height: 150px;
+    width: 25%;
 }
 .time h1{
-    font-size: 5em;
+    font-size: clamp(3em, 1em + 4vw , 10em);
     text-align: right;
     margin: 0;
 }
@@ -128,9 +136,10 @@
     justify-content: right;
 }
 .content3 h1{
-    font-size: 2em;
+    /* font-size: 2em; */
+    font-size: clamp(1em, 2em, 5em);
     font-family: "Roboto";
-    margin: 5px;
+    /* margin: 5px; */
 }
 .content3 p{
     font-weight: bold;
@@ -159,30 +168,26 @@
 .table-1 tr:nth-child(even) {
     background-color: rgb(241, 241, 241);
 }
-.basket{
-    margin: 0;
+
+.basket {
     display: flex;
+    justify-content: center;  
+    align-items: center;  
+    gap: 15px; 
+    flex-wrap: wrap; 
     /* border: solid; */
-    width: 100%;
-    flex-wrap: nowrap;
-    justify-content: space-evenly;
-    /* border: solid; */
-    /* width: 100%; */
-    height: fit-content;
-    /* height: 40%; */
 }
 
-.attendance{
+#donutchart, #columnchart_values {
+    width: 100%;
     width: 45%;
+    height: 250px;
     /* border: solid; */
-    height: 100%;
-}
-.pay-per-payday{
+    overflow: hidden;
+    background: white;
     border-radius: 10px;
-    /* border: solid; */
-    height: fit-content;
-    width: 45%;
-    height: 100%;
+    /* padding: 10px; */
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .table2 table {
@@ -197,7 +202,6 @@
     overflow: hidden;
 }
 .table2{
-    /* border: solid; */
     margin: 10px;
 }
 .table2 th {
@@ -212,7 +216,8 @@
     border-bottom: 1px solid #cac5c5;
     padding: 10px;
     text-align: center;
-    font-size: 13px;
+    /* font-size: 13px; */
+    font-size: clamp(8px, 1em, 1.5em);
     font-family: 'Inter';
 }
 .table2 tr:last-child td {
@@ -225,15 +230,132 @@
 .table2 td:nth-child(even) {
     background-color: #ececec;
 }
-#donutchart {
-    width: 100%;
-    height: 250px;
-    border-radius: 20px;
-    overflow: hidden;
+
+@media (max-width: 1071px) {
+    .container{
+        height: 100%;
+    }
+    .top{
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        height: fit-content;
+        width: 100%;
+        /* border: solid; */
+    }
+    .total_emp{
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-evenly;
+        font-family: "League Spartan";
+        height: 100%;
+        min-height: 120px;
+        width: 40%;
+        min-width: 100px;
+        border-radius: 10px;
+        background-color: #1E1E1E;
+        color: white;
+    }
+    .total_emp h2{
+        font-size: 1em;
+    }
+    .total_emp h1{
+        font-size: 4em;
+        color: #F8D146;
+        font-weight: bold;
+    }
+    .payroll_stats{
+        font-family: "League Spartan";
+        display: flex;
+        flex-wrap: nowrap;
+        background-color: #1E1E1E;
+        color: white;
+        height: 100%;
+        min-height: 150px;
+        width: 50%;
+        min-width: 480px;
+        border-radius: 10px;
+    }
+    .content1{
+        margin-left: 10px;
+        width: 50%;
+    }
+    .content1 h2{
+        font-size: 16px;
+    }
+    .content1 h1{
+        font-size: 1.5em;
+        color: #F8D146;
+        font-weight: bold;
+    }
+    .content2{
+        border-radius: 10px;
+        text-align: right;
+        margin-left: 10px;
+        background-color: #F8D146;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .content2 h1{
+        margin-right: 10px;
+        margin-left: 10px;
+        font-size: clamp(1.2em, 2.5em, 5em);
+        color: #1E1E1E;
+        font-weight: bold;
+    }
+    .content2 h2{
+        margin-right: 10px;
+        font-size: clamp(1.2em, 1em, 5em);
+    }
+    .div1{
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+    .div1 .table{
+        width: 90%;
+    }
+    .time{
+        gap: 15px;
+        margin: 0;
+        /* display: flex; */
+        display: none;
+        justify-content: center;
+        align-items: center;
+        font-family: "League Spartan";
+        height: fit-content;
+        width: 100%;
+        border: solid;
+    }
+    .time h1{
+        font-size: clamp(3em, 1em + 4vw , 10em);
+        text-align: right;
+        margin: 0;
+    }
+    .time h2{
+        text-align: right;
+    }
+    .content3{
+        display: flex;
+        justify-content: right;
+    }
+    .content3 h1{
+        font-size: clamp(1em, 2em, 5em);
+        font-family: "Roboto";
+    }
+    .content3 p{
+        font-weight: bold;
+    }
 }
-#columnchart_values {
-    width: 100%;
-    height: 250px;
-    border-radius: 20px;
-    overflow: hidden;
-}
+
+
+
+
+

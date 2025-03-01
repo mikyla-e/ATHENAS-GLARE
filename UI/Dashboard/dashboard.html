@@ -97,7 +97,6 @@
         <header>
             <h1>DASHBOARD</h1>
         </header>
-    
         <div class="container">
             <div class="top">
                 <div class="total_emp">
@@ -113,9 +112,7 @@
                         <h1 style="margin-top: 0;">XX%</h1>
                     </div>
                 </div>
-    
-                <!-- Hello -->
-    
+                
                 <div class="payroll_stats">
                     <div class="content1">
                         <h2>PAYROLL STATUS</h2>
@@ -216,12 +213,8 @@
                 </div>
                 <div class="div2">
                     <div class="basket">
-                        <div class="attendance">
                             <div id="donutchart"></div>
-                        </div>
-                        <div class="pay-per-payday">
                             <div id="columnchart_values"></div>
-                        </div>
                     </div>
                     <div class="table2">
                         <table class="table-2">
@@ -265,64 +258,61 @@
                 </div>
                 </div>
             </div>
-            
-            
-    </div>
-</body>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        <script type="text/javascript">
-        google.charts.load("current", {packages:["corechart"]});
-        google.charts.setOnLoadCallback(drawChart);
-        function drawChart() {
-            var data = google.visualization.arrayToDataTable([
+        </div>
+        
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(drawDonutChart);
+    google.charts.setOnLoadCallback(drawColumnChart);
+
+    function drawDonutChart() {
+        var data = google.visualization.arrayToDataTable([
             ['Task', 'Hours per Day'],
             ['Present', 11],
             ['Absent', 2]
-            ]);
+        ]);
 
-            var options = {
+        var options = {
             title: 'ATTENDANCE',
             pieHole: 0.4,
             colors: ['#F5B93F', '#DC4646'],
-            chartArea: { width: '90%', height: '90%' }
-            };
+            chartArea: { width: '80%', height: '80%' },
+            width: 500, 
+            height: 250
+        };
 
-            var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
-            chart.draw(data, options);
-        }
-    </script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        <script type="text/javascript">
-        google.charts.load("current", {packages:['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
-        function drawChart() {
+        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+        chart.draw(data, options);
+    }
+
+    function drawColumnChart() {
         var data = google.visualization.arrayToDataTable([
-        ["Element", "Density", { role: "style" } ],
-        ["Jan. 1", 8.94, "#1E1E1E"],
-        ["Jan. 8", 10.49, "#F5B93F"],
-        ["Jan. 15", 19.30, "1E1E1E"],
-        ["Jan. 22", 21.45, "color: #F5B93F"]
+            ["Element", "Density", { role: "style" }],
+            ["Jan. 1", 8.94, "#1E1E1E"],
+            ["Jan. 8", 10.49, "#F5B93F"],
+            ["Jan. 15", 19.30, "#1E1E1E"],
+            ["Jan. 22", 21.45, "color: #F5B93F"]
         ]);
 
         var view = new google.visualization.DataView(data);
         view.setColumns([0, 1,
-                        { calc: "stringify",
-                        sourceColumn: 1,
-                        type: "string",
-                        role: "annotation" },
-                        2]);
+            { calc: "stringify", sourceColumn: 1, type: "string", role: "annotation" },
+            2
+        ]);
 
         var options = {
-        title: "PAYROLL per payday",
-        width: 450,
-        height: 250,
-        bar: {groupWidth: "95%"},
-        legend: { position: "none" },
+            title: "PAYROLL per payday",
+            width: 300,
+            height: 250,
+            bar: { groupWidth: "80%" },
+            legend: { position: "none" }
         };
+
         var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
         chart.draw(view, options);
     }
 </script>
-
+</body>
     
 </html>
