@@ -99,28 +99,55 @@
         </header>
     
         <div class="container">
-            <div class="dropdown">
-                <button class="dropbtn" onclick="toggleDropdown()">Dropdown</button>
+            <div class="manage_user">
+                <button class="user" onclick="toggleDropdown()">
+                    <img src="../pictures/icons/user_icon.png" alt="">
+                    <h1>Manage User</h1>
+                </button>
                 <div class="dropdown-content">
-                    <a href="#">Change Username</a>
-                    <a href="#">Change Password</a>
+                    <div class="form">
+                        <form method="post">
+                            <div class="change_username">
+                                <label for="username">Change Username</label>
+                                <input type="text" name="username" id="username" placeholder="insert username here">
+                            </div>
 
+                            <div class="change_password">
+                                <label for="password">Change Password</label>
+                                <input type="password" name="password" id="password" placeholder="insert password here">
+                            </div>
+
+                            <div class="save_btn">
+                                <input type="submit" value="Save">
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
-            <div class="aboutus">
-                <h2 class="settingsmenu">About Us</h2>
-            </div>
-
-            <div class="logout">
-                <h2 class="settingsmenu">Log out</h2>
-            </div>
+            <a href="../About/about.html"> <!--no about html file yet-->
+                <div class="about_us">
+                    <div class="content">
+                        <img src="../pictures/icons/about_icon.png" alt="">
+                        <h1>About Us</h1>
+                    </div>
+                </div>
+            </a>
+                
+            <a href="">
+                <div class="logout">
+                    <div class="content">
+                        <img src="../pictures/icons/logout_icon.png" alt="">
+                        <h1>Logout</h1>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 
     <script>
         function toggleDropdown() {
-            document.querySelector('.dropdown').classList.toggle('active');
+            document.querySelector('.manage_user').classList.toggle('active');
         }
     </script>
 </body>
