@@ -1,0 +1,51 @@
+@media screen and (max-width: 1920px){
+    html, body{
+        margin: 0;
+        height: 100%;
+        width: 100%;
+    }
+
+    .body{
+        height: 100%;
+        width: 100%;
+        display: grid;
+        grid-template-areas: 
+            'nav head head'
+            'nav main main'
+            'nav main main';
+        grid-template-columns: 12% auto auto;
+        grid-template-rows: 80px auto auto;
+
+        background-color: #EFEDE6;
+    }
+    
+    nav{
+        grid-area: nav;
+        z-index: 10;
+
+        background-color: white;
+    }
+
+    nav .logo{
+        height: 80px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    header{
+        grid-area: head;
+        z-index: 9;
+
+        background-color: #1e1e1e;
+        color: #f8d146;
+
+        font-family: 'League Spartan';
+
+    }
+
+    .container{
+        grid-area: main;
+        background-color: #EFEDE6;
+    }
+}
