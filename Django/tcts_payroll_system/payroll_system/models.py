@@ -26,10 +26,6 @@ class Employee(models.Model):
         FULLTIME = 'Full Time', _('Full Time')
         PARTTIME = 'Part Time', _('Part Time')
 
-    class PayrollStatus(models.TextChoices):
-        PENDING = 'PENDING', _('Pending')
-        PROCESSED = 'PROCESSED', _('Processed')
-    
     employee_id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=100, null=False)
     last_name = models.CharField(max_length=100, null=False)
@@ -43,7 +39,7 @@ class Employee(models.Model):
     work_experience = models.CharField(max_length=2083, null=True)
     date_of_employment = models.DateField(default=timezone.now)
     employee_status = models.CharField(max_length=9, choices=EmployeeStatus.choices, null=True)
-    payroll_status = models.CharField(max_length=9, choices=PayrollStatus.choices, null=True, blank=True)
+    rate = models.FloatField(default=0, null=False)
     absences = models.IntegerField(default=0, null=False)
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
 
@@ -57,15 +53,20 @@ class Attendance(models.Model):
     employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
 class Payroll(models.Model):
+    class PayrollStatus(models.TextChoices):
+        PENDING = 'PENDING', _('Pending')
+        PROCESSED = 'PROCESSED', _('Processed')
+    
     payroll_id = models.AutoField(primary_key=True)
     incentives = models.FloatField(default=0, null=False) 
-    payroll_status = models.CharField(max_length=15, null=False)
+    payroll_status = models.CharField(max_length=9, choices=PayrollStatus.choices, default=PayrollStatus.PENDING, null=True, blank=True)
+    deductions = models.FloatField(default=0, null=False)
     salary = models.FloatField(default=0, null=False)  
     cash_advance = models.FloatField(default=0, null=False)  
     under_time = models.FloatField(default=0, null=False)  
     payment_date = models.DateField(null=False)
-    employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    attendance_id_fk = models.ForeignKey(Attendance, on_delete=models.CASCADE)
+    employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='payrolls')
+    attendance_id_fk = models.ForeignKey(Attendance, null=True, blank=True, on_delete=models.CASCADE)
 
 class History(models.Model):
     history_id = models.AutoField(primary_key=True)

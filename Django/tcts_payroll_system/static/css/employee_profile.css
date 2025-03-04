@@ -63,6 +63,17 @@
     color: rgba(30, 30, 30, 0.40);
 }
 
+.profile .top .employee_info1 .employee_role{
+    margin: 0 10px;
+    color: rgba(30, 30, 30, 0.30);
+}
+
+.profile .top .employee_info1 .employee_role h3{
+    font-family: 'Inter';
+    font-size: 1.1rem;
+    margin: 0;
+}
+
 .profile .top .employee_info1 .line{
     display: flex;
     gap: 1%;

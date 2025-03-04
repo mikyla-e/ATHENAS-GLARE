@@ -10,6 +10,7 @@ from .models import Employee
 def dashboard(request):
     return render(request, 'payroll_system/dashboard.html')
 
+@login_required
 def employee_registration(request):
     if request.method == "POST":
         form = EmployeeForm(request.POST)
@@ -21,13 +22,15 @@ def employee_registration(request):
     }
     return render(request, 'payroll_system/employee_registration.html', context)
 
+@login_required
 def employees(request):
-    employees = Employee.objects.all()
+    employees = Employee.objects.prefetch_related('payrolls').all()
     context = {
         'employees': employees
     }
     return render(request, 'payroll_system/employees.html', context)
 
+@login_required
 def employee_profile(request, employee_id):
     employee = Employee.objects.get(employee_id=employee_id)
     context = {
@@ -35,11 +38,18 @@ def employee_profile(request, employee_id):
     }
     return render(request, 'payroll_system/employee_profile.html', context)
 
+@login_required
 def payrolls(request):
-    return render(request, 'payroll_system/payroll.html')
+    employees = Employee.objects.prefetch_related('payrolls').all()
+    context = {
+        'employees': employees
+    }
+    return render(request, 'payroll_system/payroll.html', context)
 
+@login_required
 def payroll_individual(request):
     return render(request, 'payroll_system/payroll_individual.html')
 
+@login_required
 def settings(request):
     return render(request, 'payroll_system/settings.html')

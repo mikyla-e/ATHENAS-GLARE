@@ -178,46 +178,23 @@
                         <th>STATUS</th>
                         <th></th>
                     </tr>
-                    <tr>
-                        <td>?????????????</td>
-                        <td>PHP ???????.????</td>
-                        <td>PHP ?????.???</td>
-                        <td>PHP ???????.???</td>
-                        <td>PROCESSED</td>
-                        <td><a href="{% url 'payroll_system:payroll_individual' %}">MORE</a></td>
-                    </tr>
-                    <tr>
-                        <td>?????????????</td>
-                        <td>PHP ???????.????</td>
-                        <td>PHP ?????.???</td>
-                        <td>PHP ???????.???</td>
-                        <td>PROCESSED</td>
-                        <td><a href="{% url 'payroll_system:payroll_individual' %}">MORE</a></td>
-                    </tr>
-                    <tr>
-                        <td>?????????????</td>
-                        <td>PHP ???????.????</td>
-                        <td>PHP ?????.???</td>
-                        <td>PHP ???????.???</td>
-                        <td>PROCESSED</td>
-                        <td><a href="{% url 'payroll_system:payroll_individual' %}">MORE</a></td>
-                    </tr>
-                    <tr>
-                        <td>?????????????</td>
-                        <td>PHP ???????.????</td>
-                        <td>PHP ?????.???</td>
-                        <td>PHP ???????.???</td>
-                        <td>PROCESSED</td>
-                        <td><a href="{% url 'payroll_system:payroll_individual' %}">MORE</a></td>
-                    </tr>
-                    <tr>
-                        <td>?????????????</td>
-                        <td>PHP ???????.????</td>
-                        <td>PHP ?????.???</td>
-                        <td>PHP ???????.???</td>
-                        <td>PROCESSED</td>
-                        <td><a href="{% url 'payroll_system:payroll_individual' %}">MORE</a></td>
-                    </tr>
+
+                    {% for employee in employees %}
+                        {% for payroll in employee.payrolls.all %}
+                        <tr>
+                            <td>{{ employee.first_name }} {{ employee.first_name }}</td>
+                            <td>{{ employee.rate }}</td>
+                            <td>{{ payroll.deductions }}</td>
+                            <td>{{ payroll.salary }}</td>
+                            <td>{{ payroll.payroll_status }}</td>
+                            <td><a href="{% url 'payroll_system:payroll_individual' %}">MORE</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endfor %}
                 </table>
             </div>
         </div>
