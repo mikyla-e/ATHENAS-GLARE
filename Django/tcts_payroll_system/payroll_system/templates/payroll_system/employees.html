@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payroll</title>
+    <title>Employees</title>
     <link rel="stylesheet" href="{% static 'css/template.css' %}">
     <link rel="stylesheet" href="{% static 'css/employees.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -121,8 +121,10 @@
                 <div class="container_2">
                     <div class="search_filter" >
                         <div class="search">
-                            <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt=""></button>
-                            <input type="text" placeholder="Search">
+                            <form method="post">
+                                <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt=""></button>
+                                <input type="text" placeholder="Search">
+                            </form>
                         </div>
                         <div class="filter">
                             <button>
@@ -143,19 +145,17 @@
                     <th>EMPLOYEE NAME</th>
                     <th>ID</th>
                     <th>CONTACT NUMBER</th>
-                    <th>ROLE</th>
                     <th>EMPLOYMENT STATUS</th>
                     <th>PAYROLL STATUS</th>
                     <th>LAST ATTENDANCE</th>
                     <th></th>
                     
                 {% for employee in employees %}
-                <tr class="emp1">
-                    <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                    <td>{{ employee.employee_id }}</td>
-                    <td>{{ employee.contact_number}}</td>
-                    <td>fake admin</td>
-                    <td>{{ employee.employee_status }}</td>
+                    <tr class="emp1">
+                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td>{{ employee.employee_id }}</td>
+                        <td>{{ employee.contact_number}}</td>
+                        <td>{{ employee.employee_status }}</td>
                     {% for payroll in employee.payrolls.all %}
                         <td>{{ payroll.payroll_status }}</td>
                     {% empty %}
@@ -168,7 +168,9 @@
                     </tr>
                 {% endfor %}
                 </table>
-                <button class="addemployeebutton"><a href="{% url 'payroll_system:employee_registration' %}">ADD EMPLOYEE +</a></button>
+                <div class="button">
+                    <a href="{% url 'payroll_system:employee_registration' %}"><button class="addemployeebutton">ADD EMPLOYEE +</button></a>
+                </div>
             </div>
         </div>
     </div>
