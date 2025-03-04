@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registering Employees...</title>
+    <link rel="stylesheet" href="{% static 'css/payroll_edit.css'%}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="register_container">
+            <div class="register_title">
+                <p>*Employee Name*'s Payroll</p>
+            </div>
+            <div>
+                <form action="" class="register_field" method="POST">
+                    {% csrf_token %}
+                    <div class="fields_1">
+                        <div class="field">
+                            <label for="employee_rate">employee rate</label>
+                            <input type="text" name="employee-rate" id="employee-rate" placeholder="ex. Php 10, 000.00">
+                            <!-- {{ form.employee_rate }} -->
+                        </div>
+                        <div class="field">
+                            <label for="incentives">incentives</label>
+                            <input type="text" name="incentives" id="incentives" placeholder="ex. 10%">
+                            <!-- {{ form.incentives }} -->
+                        </div>
+                        <div class="field">
+                            <!-- readonly lng toh dapat, kasi set ung date of payment every saturday, pwd ba un? -->
+                            <label for="date_of_payment">date of payment</label>
+                            <input type="date" name="incentives" id="incentives">
+                            <!-- {{ form.date_of_payment }} -->
+                        </div>
+                    </div>
+                    
+                    <div class="fields_2">
+                        <div class="buttons">
+                            <a href="{% static 'css/payroll_individual.css'%}"><button class="cancel">CANCEL</button></a>
+                            <input class="submit" type="submit" value="SAVE">
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+        <div class="logos">
+            <div class="logo_container">
+                <img src="{% static 'images/logo_icon.png'%}" alt="">
+                <p class="logo_name">EDITING PAYROLL...</p>
+            </div>
+            <img src="{% static 'images/clients_logo.png' %}" alt="Toto's Car Tinting Shop">
+        </div>
+        
+    </div>
+</body>
+</html>
