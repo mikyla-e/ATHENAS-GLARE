@@ -104,7 +104,7 @@
         <div class="container">
             <div class="container-1">
                 <div class="profile-picture">
-                    <img src="../pictures/icons/profile_picture.png" alt="">
+                    <img src="{% static 'images/profile_picture.png' %}" alt="">
                 </div>
                 <div class="employee_status">
                     <div class="all">
@@ -125,7 +125,7 @@
                 </div>
                 
                 <div class="buttons">
-                    <a href=""><button class="check-employee">Check employee profile >></button></a>
+                    <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}"><button class="check-employee">Check employee profile >></button></a>
                     <a href=""><button class="edit-employee">EDIT EMPLOYEE INCENTIVES</button></a>
                 </div>
             </div>
@@ -140,12 +140,17 @@
                     <th>Date of Pay</th>
                     <th></th>
                     <tr>
-                        <td> </td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <a href=""><td><img class="edit-icon" src="../pictures/icons/payroll_edit_icon.png" alt=""></td></a>
+                        <td>{{ employee.rate }}</td>
+                        {% for attendance in employee.attendances.all %}
+                        <td>{{ attendance.date }}</td>
+                        {% endfor %}
+                        {% for payroll in employee.payrolls.all %}
+                        <td>{{ payroll.salary }}</td>
+                        <td>{{ payroll.payment_date }}</td>
+                        {% endfor %}
+                        <a href=""><td><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></td></a>
                     </tr>
+                    
                 </table>
             </div>
 
@@ -161,61 +166,16 @@
                     <th>Total Payment Amount</th>
                     <th>Date of Pay</th>
                     <th>Remarks</th>
-    
                     <tr>
-                        <td>500</td>
+                        <td>{{ employee.rate }}</td>
                         <td>6</td>
-                        <td>3000</td>
-                        <td>500</td>
-                        <td>8000</td>
-                        <td>02-23-25</td>
-                        <td>idunno</td>
-                    </tr>
-    
-                    <tr>
-                        <td>500</td>
-                        <td>6</td>
-                        <td>3000</td>
-                        <td>500</td>
-                        <td>8000</td>
-                        <td>02-24-25</td>
-                        <td>idunno</td>
-                    </tr>
-                    <tr>
-                        <td>500</td>
-                        <td>6</td>
-                        <td>3000</td>
-                        <td>500</td>
-                        <td>8000</td>
-                        <td>02-25-25</td>
-                        <td>idunno</td>
-                    </tr>
-                    <tr>
-                        <td>500</td>
-                        <td>5</td>
-                        <td>3000</td>
-                        <td>500</td>
-                        <td>8000</td>
-                        <td>02-26-25</td>
-                        <td>idunno</td>
-                    </tr>
-                    <tr>
-                        <td>500</td>
-                        <td>5</td>
-                        <td>3000</td>
-                        <td>500</td>
-                        <td>8000</td>
-                        <td>02-27-25</td>
-                        <td>idunno</td>
-                    </tr>
-                    <tr>
-                        <td>500</td>
-                        <td>5</td>
-                        <td>3000</td>
-                        <td>500</td>
-                        <td>8000</td>
-                        <td>02-28-25</td>
-                        <td>idunno</td>
+                        {% for payroll in employee.payrolls.all %}
+                        <td>{{ payroll.incentives }}</td>
+                        <td>{{ payroll.deductions }}</td>
+                        <td>{{ payroll.salary }}</td>
+                        <td>{{ payroll.payment_date }}</td>
+                        {% endfor %}
+                        <td>remarks</td>
                     </tr>
                 </table>
             </div>

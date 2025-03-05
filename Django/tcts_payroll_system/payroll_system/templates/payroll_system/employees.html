@@ -161,7 +161,11 @@
                     {% empty %}
                         <td>No Payroll Data</td>
                     {% endfor %}
-                        <td>today</td>
+                    {% for attendance in employee.attendances.all %}
+                        <td>{{ attendance.date }}</td>
+                    {% empty %}
+                        <td>No Attendance Data</td>
+                    {% endfor %}
                         <td>
                             <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}">MORE</a>
                         </td>

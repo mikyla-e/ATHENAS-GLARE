@@ -187,7 +187,7 @@
                             <td>{{ payroll.deductions }}</td>
                             <td>{{ payroll.salary }}</td>
                             <td>{{ payroll.payroll_status }}</td>
-                            <td><a href="{% url 'payroll_system:payroll_individual' %}">MORE</a></td>
+                            <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                         </tr>
                         {% empty %}
                         <tr>

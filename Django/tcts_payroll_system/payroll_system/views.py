@@ -24,7 +24,7 @@ def employee_registration(request):
 
 @login_required
 def employees(request):
-    employees = Employee.objects.prefetch_related('payrolls').all()
+    employees = Employee.objects.prefetch_related('payrolls', 'attendances').all()
     context = {
         'employees': employees
     }
@@ -32,7 +32,7 @@ def employees(request):
 
 @login_required
 def employee_profile(request, employee_id):
-    employee = Employee.objects.get(employee_id=employee_id)
+    employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
     context = {
         'employee' : employee,
     }
@@ -47,8 +47,12 @@ def payrolls(request):
     return render(request, 'payroll_system/payroll.html', context)
 
 @login_required
-def payroll_individual(request):
-    return render(request, 'payroll_system/payroll_individual.html')
+def payroll_individual(request, employee_id):
+    employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
+    context = {
+        'employee' : employee,
+    }
+    return render(request, 'payroll_system/payroll_individual.html', context)
 
 @login_required
 def settings(request):

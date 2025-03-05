@@ -194,7 +194,7 @@
                             </div>
                             <div class="text">
                                 <h2>PAYROLL STATUS</h2>
-                                <p>{{ employee.payroll_status }}</p>
+                                <p>{{ payroll.payroll_status }}</p>
                             </div>
                         </div>
                         <div class="statistic_2">
@@ -203,7 +203,7 @@
                             </div>
                             <div class="text">
                                 <h2>LAST ATTENDANCE</h2>
-                                <p>01/01/2025, WED</p>
+                                <p>{{ attendance.date }}</p>
                             </div>
                         </div>
                         <div class="statistic_3">
@@ -235,24 +235,18 @@
                                     <th>TIME OUT</th>
                                     <th>TIME WORKED</th>
                                 </tr>
+                                {% for attendance in employee.attendances.all %}
                                 <tr>
-                                    <td>XX/XX/XX</td>
-                                    <td>XX:XX am</td>
-                                    <td>XX:XX pm</td>
-                                    <td>XX Hours</td>
+                                    <td>{{ attendance.date }}</td>
+                                    <td>{{ attendance.time_in }}</td>
+                                    <td>{{ attendance.time_out }}</td>
+                                    <td>XX</td>
                                 </tr>
+                                {% empty %}
                                 <tr>
-                                    <td>XX/XX/XX</td>
-                                    <td>XX:XX am</td>
-                                    <td>XX:XX pm</td>
-                                    <td>XX Hours</td>
+                                    <td colspan="4">No attendance records found for {{ employee.first_name }} {{ employee.last_name }}</td>
                                 </tr>
-                                <tr>
-                                    <td>XX/XX/XX</td>
-                                    <td>XX:XX am</td>
-                                    <td>XX:XX pm</td>
-                                    <td>XX Hours</td>
-                                </tr>
+                                {% endfor %}
                             </table>
                         </div>
                         <div class="pagination">

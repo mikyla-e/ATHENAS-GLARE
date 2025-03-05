@@ -44,13 +44,18 @@ class Employee(models.Model):
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
 
 class Attendance(models.Model):
+    class ActiveStatus(models.TextChoices):
+        ACTIVE = 'Active', _('Active')
+        INACTIVE = 'Inactive', _('Inactive')
+    
     attendance_id = models.AutoField(primary_key=True)
     time_in = models.TimeField(null=True, blank=True)  
     time_out = models.TimeField(null=True, blank=True)  
     date = models.DateField(default=timezone.now,null=False)
     hours_worked = models.FloatField(default=0, null=False)  
+    active_status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
     remarks = models.CharField(max_length=255, null=True, blank=True)  
-    employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendances')
 
 class Payroll(models.Model):
     class PayrollStatus(models.TextChoices):
