@@ -31,7 +31,7 @@
             <div class="login_field">
                 <form method="post" action="{% url 'users:admin_login' %}">
                     {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.GET.next }}">
+                    <input type="hidden" name="next" value="{{ request.GET.next|default:'/' }}">
 
                     <label for="admin-name">name</label><br>
                     {{form.username}}
