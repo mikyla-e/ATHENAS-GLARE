@@ -183,7 +183,7 @@
                         {% for payroll in employee.payrolls.all %}
                         <tr>
                             <td>{{ employee.first_name }} {{ employee.first_name }}</td>
-                            <td>{{ employee.rate }}</td>
+                            <td>{{ payroll.rate }}</td>
                             <td>{{ payroll.deductions }}</td>
                             <td>{{ payroll.salary }}</td>
                             <td>{{ payroll.payroll_status }}</td>

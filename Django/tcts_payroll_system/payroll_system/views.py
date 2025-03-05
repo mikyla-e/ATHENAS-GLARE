@@ -3,8 +3,8 @@ from http.client import HTTPResponse
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from .forms import EmployeeForm
-from .models import Employee
+from .forms import EmployeeForm, PayrollForm
+from .models import Employee, Payroll
 
 @login_required
 def dashboard(request):
@@ -55,8 +55,18 @@ def payroll_individual(request, employee_id):
     return render(request, 'payroll_system/payroll_individual.html', context)
 
 @login_required
-def payroll_edit(request):
-    return render(request, 'payroll_system/payroll_edit.html')
+def payroll_edit(request, employee_id):
+    employee = Employee.objects.prefetch_related('payrolls').get(employee_id = employee_id)
+    payroll = Payroll.objects.get(employee_id_fk=employee)
+    if request.method == "POST":
+        form = PayrollForm(request.POST, instance=payroll)
+        if form.is_valid():
+            form.save()
+            return redirect('/payroll_system/payrolls')
+    else:
+        form = PayrollForm(instance=payroll)
+    context = { 'employee': employee, 'form': form}
+    return render(request, 'payroll_system/payroll_edit.html', context)
 
 @login_required
 def settings(request):

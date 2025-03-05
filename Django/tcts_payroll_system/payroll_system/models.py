@@ -39,7 +39,6 @@ class Employee(models.Model):
     work_experience = models.CharField(max_length=2083, null=True)
     date_of_employment = models.DateField(default=timezone.now)
     employee_status = models.CharField(max_length=9, choices=EmployeeStatus.choices, null=True)
-    rate = models.FloatField(default=0, null=False)
     absences = models.IntegerField(default=0, null=False)
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
 
@@ -63,6 +62,7 @@ class Payroll(models.Model):
         PROCESSED = 'PROCESSED', _('Processed')
     
     payroll_id = models.AutoField(primary_key=True)
+    rate = models.FloatField(default=0, null=False)
     incentives = models.FloatField(default=0, null=False) 
     payroll_status = models.CharField(max_length=9, choices=PayrollStatus.choices, default=PayrollStatus.PENDING, null=True, blank=True)
     deductions = models.FloatField(default=0, null=False)

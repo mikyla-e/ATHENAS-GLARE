@@ -70,6 +70,13 @@
                             <label for="employee-status">employee status</label>
                             {{ form.employee_status }}
                         </div>
+                        {% if form.errors %}
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                    <li>{{ field }}: {{ errors.0 }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif%}
                         <div class="buttons">
                             <div class="camera_button">
                                 <input type="button" value="TAKE A PICTURE">

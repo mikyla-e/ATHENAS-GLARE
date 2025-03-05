@@ -140,15 +140,15 @@
                     <th>Date of Pay</th>
                     <th></th>
                     <tr>
-                        <td>{{ employee.rate }}</td>
-                        {% for attendance in employee.attendances.all %}
-                        <td>{{ attendance.date }}</td>
-                        {% endfor %}
                         {% for payroll in employee.payrolls.all %}
+                        <td>{{ payroll.rate }}</td>
+                            {% for attendance in employee.attendances.all %}
+                            <td>{{ attendance.date }}</td>
+                            {% endfor %}
                         <td>{{ payroll.salary }}</td>
                         <td>{{ payroll.payment_date }}</td>
                         {% endfor %}
-                        <td><a href="{% url 'payroll_system:payroll_edit' %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
+                        <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
                     </tr>
                     
                 </table>
@@ -167,9 +167,9 @@
                     <th>Date of Pay</th>
                     <th>Remarks</th>
                     <tr>
-                        <td>{{ employee.rate }}</td>
-                        <td>6</td>
                         {% for payroll in employee.payrolls.all %}
+                        <td>{{ payroll.rate }}</td>
+                        <td>6</td>
                         <td>{{ payroll.incentives }}</td>
                         <td>{{ payroll.deductions }}</td>
                         <td>{{ payroll.salary }}</td>

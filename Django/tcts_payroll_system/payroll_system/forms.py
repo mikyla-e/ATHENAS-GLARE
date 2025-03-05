@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Admin, Employee
+from .models import Admin, Employee, Payroll
 
 class AdminForm(ModelForm):
     class Meta:
@@ -10,6 +10,7 @@ class AdminForm(ModelForm):
             'username': forms.TextInput(),
             'password': forms.PasswordInput()
         }
+        
 
 class EmployeeForm(ModelForm):
     class Meta:
@@ -31,3 +32,15 @@ class EmployeeForm(ModelForm):
             'date_of_employment': forms.DateInput(),
             'employee_status': forms.Select(),
         }
+
+        def clean_contact_number(self):
+            contact_number = self.cleaned_data.get('contact_number')
+            if len(contact_number) != 11:
+                raise forms.ValidationError('Contact number must be exactly 11 digits')
+            return contact_number
+    
+class PayrollForm(ModelForm):
+    class Meta:
+        model = Payroll
+        fields = ('rate', 'incentives', 'payment_date')
+        
