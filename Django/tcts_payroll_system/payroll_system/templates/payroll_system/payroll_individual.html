@@ -148,7 +148,7 @@
                         <td>{{ payroll.salary }}</td>
                         <td>{{ payroll.payment_date }}</td>
                         {% endfor %}
-                        <a href="payroll_edit.html"><td><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></td></a>
+                        <td><a href="{% url 'payroll_system:payroll_edit' %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
                     </tr>
                     
                 </table>

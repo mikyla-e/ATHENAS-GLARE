@@ -1,0 +1,99 @@
+@media screen and (max-width: 1920px){
+    body{
+        width: 100%;
+        height: 100%;
+        margin: 0;
+
+        /* background-image: linear-gradient(90deg, #fff 60%, #ffffff00 100%), url('../pictures/login_background.jpg'); */
+        background-image: linear-gradient(90deg, #fff 60%, #ffffff00 100%), url('../pictures/bg_nosrs.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-color: #1e1e1e;
+    }
+
+    .container{
+        height: 100%;
+        width: 100%;
+        position: absolute;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .container .logo_container{
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin: 30px;
+        gap: 10px;
+    }
+
+    .container .logo_container img{
+        height: 35px;
+        width: 35px;
+    }
+
+    .container .logo_container .logo_name{
+        margin: 2px 0 0;
+        font-family: 'League Spartan';
+        font-size: 1.25rem;
+        font-weight: 900;
+    }
+
+    .container .logout_container{
+        max-height: 70%;
+        margin: 0 100px;
+    }
+
+    .container .logout_container .logout_title{
+        margin: 50px 0;
+    }
+    
+    .container .logout_container .logout_title .you-have{
+        margin: 5px 0;
+        font-family: 'Roboto';
+        font-size: 2.3rem;
+        font-weight: 800;
+        letter-spacing: 6px;
+        color: #1e1e1e;
+    }
+
+    .container .logout_container .logout_title .logged-out{
+        margin: 0;
+        font-family: 'League Spartan';
+        font-size: 6rem;
+        background: linear-gradient(180deg, #F8D146 0%, #F5B93F 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .container .logout_container .logout_title p{
+        margin: 7.5px 0;
+        font-family: 'Inter';
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: 5px;
+        color: #1e1e1e;
+    }
+
+    .container .logout_container .logout_title p a{
+        text-decoration: none;
+        color: #F5B93F;
+    }
+
+    .container .clientlogo_img{
+        display: grid;
+        justify-content: end;
+
+    }
+
+    .container .clientlogo_img img{
+        max-width: 200px;
+        max-height: 200px;
+        filter: drop-shadow(1px 1px 1px #222);
+    }
+
+}

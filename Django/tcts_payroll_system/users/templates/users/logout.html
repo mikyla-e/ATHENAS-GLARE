@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="{% static 'css/logout.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="logo_container">
+            <img src="{% static 'images/logo_icon.png' %}" alt="">
+            <p class="logo_name">PAYROLL SYSTEM</p>
+        </div>
+        <div class="logout_container">
+            <div class="logout_title">
+                <h1 class="you-have">YOU HAVE</h1>
+                <h1 class="logged-out">LOGGED OUT</h1>
+                <p>go back to <a href="{% url 'users:time_in_out' %}">time in/out page?</a></p> <!-- if automatic man gawin ung pagpunta time in/out page, alisin toh-->
+            </div>
+        </div>
+        <div class="clientlogo_img">
+            <img src="{% static 'images/clients_logo.png' %}" alt="Toto's Car Tinting Shop">
+        </div>
+        
+    </div>
+</body>
+</html>

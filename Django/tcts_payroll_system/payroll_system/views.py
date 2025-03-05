@@ -55,5 +55,9 @@ def payroll_individual(request, employee_id):
     return render(request, 'payroll_system/payroll_individual.html', context)
 
 @login_required
+def payroll_edit(request):
+    return render(request, 'payroll_system/payroll_edit.html')
+
+@login_required
 def settings(request):
     return render(request, 'payroll_system/settings.html')
