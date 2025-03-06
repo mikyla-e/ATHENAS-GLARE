@@ -12,7 +12,7 @@
     <div class="container">
         <div class="register_container">
             <div class="register_title">
-                <p>*Employee Name*'s Payroll</p>
+                <p>*{{ employee.first_name }} {{ employee.last_name }}*'s Payroll</p>
             </div>
             <div>
                 <form action="" class="register_field" method="POST">
@@ -38,7 +38,7 @@
                     
                     <div class="fields_2">
                         <div class="buttons">
-                            <a href="{% static 'css/payroll_individual.css'%}"><button class="cancel">CANCEL</button></a>
+                            <a href="{% url 'payroll_system:payrolls' %}"><button class="cancel">CANCEL</button></a>
                             <input class="submit" type="submit" value="SAVE">
                         </div>
                     </div>
