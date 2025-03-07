@@ -33,11 +33,12 @@ class EmployeeForm(ModelForm):
             'employee_status': forms.Select(),
         }
 
-        def clean_contact_number(self):
-            contact_number = self.cleaned_data.get('contact_number')
-            if len(contact_number) != 11:
-                raise forms.ValidationError('Contact number must be exactly 11 digits')
-            return contact_number
+    def clean_contact_number(self):
+        contact_number = self.cleaned_data.get('contact_number')
+        print("Running clean_contact_number with:", contact_number)
+        if len(contact_number) != 11:
+            raise forms.ValidationError('Contact number must be exactly 11 digits')
+        return contact_number
     
 class PayrollForm(ModelForm):
     class Meta:

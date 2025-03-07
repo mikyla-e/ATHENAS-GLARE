@@ -137,15 +137,17 @@
                     </div>
                 </div>
             </a>
-                
-            <a href="">
-                <div class="logout">
-                    <div class="content">
-                        <img src="{% static 'images/logout_icon.png' %}" alt="">
-                        <h1>Logout</h1>
+            <form method="post" action="{% url 'users:logout' %}">
+                {% csrf_token %}
+                <button type="submit">
+                    <div class="logout">
+                        <div class="content">
+                            <img src="{% static 'images/logout_icon.png' %}" alt="">
+                            <h1>Logout</h1>
+                        </div>
                     </div>
-                </div>
-            </a>
+                </button>
+            </form>
         </div>
     </div>
 

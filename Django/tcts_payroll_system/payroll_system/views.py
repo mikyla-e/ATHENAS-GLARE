@@ -5,6 +5,37 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import EmployeeForm, PayrollForm
 from .models import Employee, Payroll
+from .face_recognition_attendance import recognize_face
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_protect
+
+@csrf_protect  # Ensure CSRF protection
+def time_in_out(request):
+    if request.method == "POST":
+        employee_id = request.POST.get("employee-id", "").strip()  # Handle empty input
+
+        if not employee_id:
+            messages.error(request, "Employee ID cannot be empty.")
+            return redirect("time_in_out")  # Redirect to avoid resubmission issues
+
+        try:
+            employee = Employee.objects.get(employee_id=employee_id)
+        except Employee.DoesNotExist:
+            messages.error(request, "Employee ID not found.")
+            return redirect("time_in_out")
+
+        # Start face recognition process
+        message = recognize_face(employee_id)
+
+        if "recorded" in message:
+            messages.success(request, message)
+        else:
+            messages.error(request, message)
+
+        return redirect("time_in_out")  # Redirect after processing
+
+    return render(request, "payroll_system/time_in_out.html")
+
 
 @login_required
 def dashboard(request):
@@ -14,9 +45,11 @@ def dashboard(request):
 def employee_registration(request):
     if request.method == "POST":
         form = EmployeeForm(request.POST)
-        form.save()
-        return redirect('/payroll_system/employee_registration')
-    form = EmployeeForm()
+        if form.is_valid():
+            form.save()
+            return redirect('/payroll_system/employee_registration')
+    else:
+        form = EmployeeForm()
     context = {
         'form': form,
     }

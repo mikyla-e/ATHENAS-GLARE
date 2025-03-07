@@ -29,10 +29,9 @@
                 <p>ADMIN CONTROL</p>
             </div>
             <div class="login_field">
-                <form method="post" action="{% url 'users:admin_login' %}">
+                <form method="post">
                     {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.GET.next|default:'/' }}">
-
+                    
                     <label for="admin-name">name</label><br>
                     {{form.username}}
                 

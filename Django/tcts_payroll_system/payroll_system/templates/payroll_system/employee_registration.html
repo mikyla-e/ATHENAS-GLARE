@@ -73,7 +73,9 @@
                         {% if form.errors %}
                             <ul>
                                 {% for field, errors in form.errors.items %}
-                                    <li>{{ field }}: {{ errors.0 }}</li>
+                                    {% for error in errors %}
+                                    <li>{{ field }}: {{ errors}}</li>
+                                    {% endfor %}
                                 {% endfor %}
                             </ul>
                         {% endif%}
