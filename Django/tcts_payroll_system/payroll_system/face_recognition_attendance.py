@@ -23,7 +23,7 @@ def load_registered_faces():
             print(f"Warning: No face detected in {employee.first_name}'s image.")
             continue
 
-        registered_faces[employee.employee_id] = face_encodings[0]  # Store the first encoding
+        registered_faces[str(employee.employee_id)] = face_encodings[0]  # Store the first encoding
 
     return registered_faces
 
@@ -40,7 +40,7 @@ def mark_attendance(employee):
     today = now().date()
     current_time = now().time()
 
-    attendance, created = Attendance.objects.get_or_create(employee=employee, date=today)
+    attendance, created = Attendance.objects.get_or_create(employee_id_fk=employee, date=today)
 
     if created or attendance.time_in is None:
         attendance.time_in = current_time
@@ -58,8 +58,12 @@ def mark_attendance(employee):
 # Start real-time face recognition
 def recognize_face(employee_id):
     registered_faces = load_registered_faces()  # Load saved faces
+    employee_id = str(employee_id)  # Ensure consistent key type
 
-    if str(employee_id) not in registered_faces:
+    print(f"Checking employee_id type: {type(employee_id)}, Value: {employee_id}")
+    print("Loaded registered faces keys:", registered_faces.keys())
+
+    if employee_id not in registered_faces:
         return "Employee not found or no image uploaded."
 
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # Use DirectShow on Windows for better webcam handling
@@ -74,8 +78,12 @@ def recognize_face(employee_id):
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
         for face_encoding in face_encodings:
-            if compare_faces(registered_faces[employee_id], face_encoding):
-                employee = Employee.objects.get(employee_id=employee_id)
+            if compare_faces(registered_faces[employee_id], face_encoding):   # No list wrapping
+                try:
+                    employee = Employee.objects.get(employee_id=employee_id)
+                except Employee.DoesNotExist:
+                    return "Employee record not found."
+
                 message = mark_attendance(employee)
 
                 cap.release()
