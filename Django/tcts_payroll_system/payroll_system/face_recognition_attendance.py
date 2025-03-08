@@ -5,24 +5,31 @@ from django.utils.timezone import now
 from .models import Employee, Attendance
 
 # Load saved face images
-def load_registered_faces():
-    face_encodings = {}
+def train_face_recognizer():
+    face_recognizer = cv2.face.LBPHFaceRecognizer_create()  # Create recognizer
+    faces = []
+    labels = []
+
     for employee in Employee.objects.all():
-        if not employee.employee_image:  # Check if the image exists
+        if not employee.employee_image:
             print(f"Skipping {employee.first_name} (No image uploaded)")
-            continue  # Skip this employee
+            continue  
 
         image_path = employee.employee_image.path
-        image = cv2.imread(image_path)
-        
-        if image is None:  # Ensure image loads correctly
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+        if image is None:
             print(f"Error loading image for {employee.first_name}")
             continue
 
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        face_encodings[employee.employee_id] = gray
+        faces.append(image)
+        labels.append(int(employee.employee_id))  # Use employee ID as label
 
-    return face_encodings
+    if faces:
+        face_recognizer.train(faces, np.array(labels))  # Train the recognizer
+
+    return face_recognizer
+
 
 # Compare captured face with stored face
 def compare_faces(known_face, captured_face):
@@ -53,9 +60,10 @@ def mark_attendance(employee):
 
 # Start face recognition
 def recognize_face(employee_id):
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-    cap = cv2.VideoCapture(0)  # Open webcam
-    registered_faces = load_registered_faces()
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    cap = cv2.VideoCapture(0)
+    
+    face_recognizer = train_face_recognizer()  # Train the recognizer
 
     while True:
         ret, frame = cap.read()
@@ -63,12 +71,15 @@ def recognize_face(employee_id):
             break
 
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.3, minNeighbors=5)
+        faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.2, minNeighbors=7, minSize=(100, 100))
 
         for (x, y, w, h) in faces:
             captured_face = gray_frame[y:y+h, x:x+w]
+            
+            # Predict the recognized employee ID
+            label, confidence = face_recognizer.predict(captured_face)
 
-            if employee_id in registered_faces and compare_faces(registered_faces[employee_id], captured_face):
+            if label == int(employee_id) and confidence < 50:  # Adjust confidence threshold
                 employee = Employee.objects.get(employee_id=employee_id)
                 message = mark_attendance(employee)
                 cap.release()

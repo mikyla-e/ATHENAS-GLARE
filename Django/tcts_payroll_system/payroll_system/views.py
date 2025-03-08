@@ -16,13 +16,13 @@ def time_in_out(request):
 
         if not employee_id:
             messages.error(request, "Employee ID cannot be empty.")
-            return redirect("time_in_out")  # Redirect to avoid resubmission issues
+            return redirect("/payroll_system/time_in_out")  # Redirect to avoid resubmission issues
 
         try:
             employee = Employee.objects.get(employee_id=employee_id)
         except Employee.DoesNotExist:
             messages.error(request, "Employee ID not found.")
-            return redirect("time_in_out")
+            return redirect("/payroll_system/time_in_out")
 
         # Start face recognition process
         message = recognize_face(employee_id)
@@ -32,7 +32,7 @@ def time_in_out(request):
         else:
             messages.error(request, message)
 
-        return redirect("time_in_out")  # Redirect after processing
+        return redirect("/payroll_system/time_in_out")  # Redirect after processing
 
     return render(request, "payroll_system/time_in_out.html")
 
