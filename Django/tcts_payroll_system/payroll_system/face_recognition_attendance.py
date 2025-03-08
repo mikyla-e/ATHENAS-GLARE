@@ -59,7 +59,7 @@ def mark_attendance(employee):
 def recognize_face(employee_id):
     registered_faces = load_registered_faces()  # Load saved faces
 
-    if employee_id not in registered_faces:
+    if str(employee_id) not in registered_faces:
         return "Employee not found or no image uploaded."
 
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # Use DirectShow on Windows for better webcam handling

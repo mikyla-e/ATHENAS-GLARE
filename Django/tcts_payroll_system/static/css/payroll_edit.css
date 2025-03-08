@@ -4,7 +4,7 @@
         max-height: 100%;
         margin: 0;
         /* background-image: linear-gradient(90deg, #fff 47.5%, #ffffff00 100%), url('../pictures/login_background.jpg'); */
-        background-image: linear-gradient(90deg, #fff 47.5%, #ffffff00 200%), url('../pictures/bg_nosrs.png'); 
+        background-image: linear-gradient(90deg, #fff 47.5%, #ffffff00 200%), url('../images/bg_nosrs.png'); 
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
@@ -86,8 +86,7 @@
         color: #1e1e1e;
     }
 
-    .container .register_container .register_field .fields_1 .field input[type=text],
-    .container .register_container .register_field .fields_2 .field input[type=text]{
+    .container .register_container .register_field .fields_1 .field input[type=number]{
         margin: 8px;
         padding: 10px 15px;
         border: none;
@@ -100,8 +99,7 @@
         border-radius: 20px;
     }
 
-    .container .register_container .register_field .fields_1 .field input[type=date],
-    .container .register_container .register_field .fields_2 .field input[type=date]{
+    .container .register_container .register_field .fields_1 .field input[type=text]{
         margin: 8px;
         padding: 10px 15px;
         border: none;
@@ -120,7 +118,7 @@
         align-items: end;
         justify-content: end;
         gap: 2%;
-        margin: 15px 8px;
+        margin: 5px 8px;
     }
 
     .container .register_container .register_field .fields_2 .buttons a{
@@ -155,6 +153,10 @@
         color: #fff;
     } 
 
+    .container .register_container .register_field .fields_2 .buttons a button,
+    .container .register_container .register_field .fields_2 .buttons input[type=submit]:hover{
+        cursor: pointer;
+    }
     
 
     .container .logos{

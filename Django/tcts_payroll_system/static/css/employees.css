@@ -85,6 +85,7 @@
     color: #fff;
     background-color: #F8D146;
     transition: 0.25s;
+    cursor: pointer;
 }
 
 
@@ -127,7 +128,8 @@
     align-items: center;
 }
 
-.top .container_2 .search_filter .search form button{    width: 10%;
+.top .container_2 .search_filter .search form button{
+    width: 10%;
     height: 100%;
     padding-left: 15px;
     border: none;
@@ -246,11 +248,8 @@ td a:hover{
 tr:last-child td {
     border-bottom: none;
 }
-td:nth-child(odd) {
-    background-color: #fff;
-}
 
-td:nth-child(even) {
+tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
@@ -267,7 +266,7 @@ a{
 }
 
 
-.addemployeebutton {
+.addemployeebutton{
     width: fit-content;
     padding: 10px 30px;
 
@@ -282,7 +281,9 @@ a{
     background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
     
 }
-.addemployeebutton:hover  {
+
+.addemployeebutton:hover{
+    cursor: pointer;
     scale: 1.05;
     transition: 0.5s;
     background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
