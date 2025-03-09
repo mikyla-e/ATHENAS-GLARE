@@ -156,7 +156,7 @@
 .info_content2 .postal_address,
 .info_content2 .education{
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-family: 'Inter';
     font-weight: 500;
 }
@@ -209,7 +209,7 @@
 .info_content2 .date_of_employment,
 .info_content2 .employee_status{
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-family: 'Inter';
     font-weight: 500;
 }
@@ -293,8 +293,8 @@
 .left .statistic_2 .img img,
 .left .statistic_3 .img img,
 .left .statistic_4 .img img{
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
 }
 
 .left .statistic_1 .text,
@@ -310,7 +310,7 @@
 .left .statistic_4 .text h2{
     margin: 2.5px 0;
     font-family: 'League Spartan';
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .left .statistic_1 .text p,
@@ -369,10 +369,10 @@
 }
 
 .right .table table tr th{
-    padding: 10px;
+    padding: 12px 0 10px;
     
     font-family: 'League Spartan';
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 800;
 }
 

@@ -84,9 +84,12 @@ nav .menu ul .menu-payroll,
 nav .menu ul .menu-employees,
 nav .menu ul .menu-settings{
     margin: 0;
-    padding: 10px 20px;
+    padding: 0 20px;
+    height: 60px;
     overflow: hidden;
-    
+    display: flex;
+    justify-content: start;
+    align-items: center;
 }
 
 nav .menu ul .menu-dashboard a,
@@ -97,10 +100,19 @@ nav .menu ul .menu-settings a{
     display: flex;
 }
 
+nav .menu ul .menu-dashboard a img,
+nav .menu ul .menu-payroll a img,
+nav .menu ul .menu-employees a img,
+nav .menu ul .menu-settings a img{
+    height: 32.5px;
+    width: 32.5px;
+}
+
 nav .menu ul .menu-dashboard a .link,
 nav .menu ul .menu-payroll a .link,
 nav .menu ul .menu-employees a .link,
 nav .menu ul .menu-settings a .link{
+    height: fit-content;
     margin: 8px;
 
     text-decoration: none;
