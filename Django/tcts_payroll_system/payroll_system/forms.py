@@ -17,7 +17,7 @@ class EmployeeForm(ModelForm):
         model = Employee
         fields = ('first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
                    'barangay', 'postal_address', 'highest_education', 'work_experience', 'date_of_employment',
-                   'employee_status')
+                   'employee_status', 'employee_image')
         widgets = {
             'first_name': forms.TextInput(),
             'last_name': forms.TextInput(),
@@ -31,6 +31,7 @@ class EmployeeForm(ModelForm):
             'work_experience': forms.Textarea(),
             'date_of_employment': forms.DateInput(),
             'employee_status': forms.Select(),
+            'employee_image': forms.ClearableFileInput(),
         }
 
     def clean_contact_number(self):

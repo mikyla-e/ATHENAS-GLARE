@@ -1,105 +1,151 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registering Employees...</title>
-    <link rel="stylesheet" href="{% static 'css/employee_registration.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{% static 'css/employee_registration.css' %}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div class="container">
-        <div class="register_container">
-            <div class="register_title">
-                <p>Welcome, new employee!</p>
-            </div>
-            <div>
-                <form action="" class="register_field" method="POST">
-                    {% csrf_token %}
+      <div class="register_container">
+        <div class="register_title">
+          <p>Welcome, new employee!</p>
+        </div>
+        <div>
+          <form class="register_field" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
 
-                    <div class="fields_1">
-                        <div class="field">
-                            <label for="first-name">first name</label>
-                            {{ form.first_name }}
-                        </div>
-                        <div class="field">
-                            <label for="last-name">last name</label>
-                            {{ form.last_name }}
-                        </div>
-                        <div class="field">
-                            <label for="gender">gender</label>
-                            {{ form.gender}}
-                        </div>
-                        <div class="field">
-                            <label for="date-of-birth">date of birth</label>
-                            {{ form.date_of_birth }}
-                        </div>
-                        <div class="field">
-                            <label for="contact-number">contact number</label>
-                            {{ form.contact_number }}
-                        </div>
-                        <div class="field">
-                            <label for="emergency-contact">emergency contact</label>
-                            {{ form.emergency_contact }}
-                        </div>
-                        <div class="field">
-                            <label for="barangay">barangay</label>
-                            {{ form.barangay }}
-                        </div>
-                        <div class="field">
-                            <label for="postal-address">postal address</label>
-                            {{ form.postal_address }}
-                        </div>
-                    </div>
-                    
-                    <div class="fields_2">
-                        <div class="field">
-                            <label for="education">highest education attainment</label>
-                            {{ form.highest_education }}
-                        </div>
-                        <div class="field">
-                            <label for="work-experience">work experience</label>
-                            {{ form.work_experience }}
-                        </div>
-                        <div class="field">
-                            <label for="date-of-employment">date of employment</label>
-                            {{ form.date_of_employment }}
-                        </div>  
-                        <div class="field">
-                            <label for="employee-status">employee status</label>
-                            {{ form.employee_status }}
-                        </div>
-                        {% if form.errors %}
-                            <ul>
-                                {% for field, errors in form.errors.items %}
-                                    {% for error in errors %}
-                                    <li>{{ field }}: {{ errors}}</li>
-                                    {% endfor %}
-                                {% endfor %}
-                            </ul>
-                        {% endif%}
-                        <div class="buttons">
-                            <div class="camera_button">
-                                <input type="button" value="TAKE A PICTURE">
-                                <img src="{% static 'images/camera.png' %}" alt="Camera">
-                            </div>
-                            <input class="submit" type="submit" value="SUBMIT">
-                        </div>
-                        
-                    </div>
-                    
-                </form>
+            <div class="fields_1">
+              <div class="field">
+                <label for="first-name">first name</label>
+                {{ form.first_name }}
+              </div>
+              <div class="field">
+                <label for="last-name">last name</label>
+                {{ form.last_name }}
+              </div>
+              <div class="field">
+                <label for="gender">gender</label>
+                {{ form.gender}}
+              </div>
+              <div class="field">
+                <label for="date-of-birth">date of birth</label>
+                {{ form.date_of_birth }}
+              </div>
+              <div class="field">
+                <label for="contact-number">contact number</label>
+                {{ form.contact_number }}
+              </div>
+              <div class="field">
+                <label for="emergency-contact">emergency contact</label>
+                {{ form.emergency_contact }}
+              </div>
+              <div class="field">
+                <label for="barangay">barangay</label>
+                {{ form.barangay }}
+              </div>
+              <div class="field">
+                <label for="postal-address">postal address</label>
+                {{ form.postal_address }}
+              </div>
             </div>
-        </div>
-        <div class="logos">
-            <div class="logo_container">
-                <img src="{% static 'images/logo_icon.png'%}" alt="">
-                <p class="logo_name">REGISTERING EMPLOYEE</p>
+
+            <div class="fields_2">
+              <div class="field">
+                <label for="education">highest education attainment</label>
+                {{ form.highest_education }}
+              </div>
+              <div class="field">
+                <label for="work-experience">work experience</label>
+                {{ form.work_experience }}
+              </div>
+              <div class="field">
+                <label for="date-of-employment">date of employment</label>
+                {{ form.date_of_employment }}
+              </div>
+              <div class="field">
+                <label for="employee-status">employee status</label>
+                {{ form.employee_status }}
+              </div>
+
+              <h3>Captured Image:</h3>
+              <input type="hidden" name="employee_image" id="imageInput" value="" />
+              {{form.employee_image }}
+              <img id="capturedImage" src="" alt="Captured Image" width="200" />
+
+              {% if form.errors %}
+              <ul>
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                    <li>{{ field }}: {{ errors}}</li>
+                    {% endfor %}
+                {% endfor %}
+              </ul>
+              {% endif%}
+
+              <div class="buttons">
+                <div class="camera_button">
+                  <button type="button" name="captured_image" id="captureButton" >TAKE A PICTURE</button>
+                  <img src="{% static 'images/camera.png' %}" alt="Camera" />
+                </div>
+                <input class="submit" type="submit" value="SUBMIT" />
+              </div>
+
             </div>
-            <img src="{% static 'images/clients_logo.png' %}" alt="Toto's Car Tinting Shop">
+          </form>
         </div>
-        
+      </div>
+      <div class="logos">
+        <div class="logo_container">
+          <img src="{% static 'images/logo_icon.png'%}" alt="" />
+          <p class="logo_name">REGISTERING EMPLOYEE</p>
+        </div>
+        <img
+          src="{% static 'images/clients_logo.png' %}"
+          alt="Toto's Car Tinting Shop"
+        />
+      </div>
     </div>
-</body>
+
+    <script>
+        document.getElementById("captureButton").addEventListener("click", function() {
+            let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+            fetch("/payroll_system/capture_image/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": csrfToken
+                },
+                body: "capture_request=true"
+            })
+            .then(response => response.json())  // Convert response to JSON
+            .then(data => {
+                if (data.success === true) {  // Check for explicit `true`
+                    alert("Image captured successfully!");
+                    document.getElementById("preview").src = data.image_url;
+                    document.getElementById("preview").style.display = "block";
+
+                    // Populate hidden input with image path
+                    document.getElementById("employee_image_input").value = data.image_url;
+                } else {
+                    alert("Error: " + (data.error || "Unknown error occurred."));
+                }
+            })
+            .catch(error => {
+                console.error("AJAX Error:", error);
+                alert("Failed to communicate with the server.");
+            });
+        });
+    </script>
+  </body>
 </html>

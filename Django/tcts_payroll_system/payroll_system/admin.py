@@ -8,7 +8,7 @@ class AdminAdmin(admin.ModelAdmin):
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
                      'barangay', 'postal_address', 'highest_education', 'work_experience', 'date_of_employment',
-                     'employee_status', 'absences')
+                     'employee_status', 'absences', 'employee_image')
 
 class PayrollAdmin(admin.ModelAdmin):
     list_display = ('payroll_id', 'rate', 'incentives', 'payroll_status', 'deductions', 'salary', 'cash_advance', 'under_time',

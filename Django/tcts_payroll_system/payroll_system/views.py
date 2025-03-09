@@ -8,6 +8,8 @@ from .models import Employee, Payroll
 from .face_recognition_attendance import recognize_face
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
+from .camera_capture import capture_image  # Import OpenCV function
+from django.http import JsonResponse
 
 @csrf_protect  # Ensure CSRF protection
 def time_in_out(request):
@@ -44,16 +46,28 @@ def dashboard(request):
 @login_required
 def employee_registration(request):
     if request.method == "POST":
-        form = EmployeeForm(request.POST)
+        form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            employee = form.save(commit=False)  # Save without committing
+
+            # Get the captured image path from the form
+            captured_image_path = request.POST.get("employee_image")
+            if captured_image_path:
+                employee.employee_image = captured_image_path
+
+            employee.save()  # Save employee record
             return redirect('/payroll_system/employee_registration')
     else:
         form = EmployeeForm()
-    context = {
-        'form': form,
-    }
-    return render(request, 'payroll_system/employee_registration.html', context)
+
+    return render(request, 'payroll_system/employee_registration.html', {'form': form})
+
+def capture_image_view(request):
+    
+    response = capture_image(request)  # `capture_image` returns a JsonResponse
+
+    return response  # Directly return JsonResponse instead of checking dict
+
 
 @login_required
 def employees(request):
