@@ -1,13 +1,13 @@
 .body{
     height: 100%;
 }
+
 .container{
     position: absolute;
     height: fit-content;
     width: 85%;
     
-    margin: 70px 0 0 12%;
-    padding: 0 20px 0 20px; 
+    padding: 10px 12px; 
     z-index: 8;
 
     display: flex;
@@ -30,7 +30,8 @@
 }
 
 .profile .top .employee_pic{
-    margin: 20px;
+    margin: 20px 15px 20px 25px;
+    width: 12%;
 }
 
 .profile .top .employee_pic img{
@@ -141,19 +142,19 @@
 .info_content2 .postal_address h1,
 .info_content2 .education h1{
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-family: 'League Spartan';
     font-weight: 800;
     color: rgba(30, 30, 30, 0.40);
 }
 
-.info_content1 .gender p,
-.info_content1 .date_of_birth p,
-.info_content1 .contact_number p,
-.info_content1 .emergency_contact p,
-.info_content2 .barangay p,
-.info_content2 .postal_address p,
-.info_content2 .education p{
+.info_content1 .gender,
+.info_content1 .date_of_birth,
+.info_content1 .contact_number,
+.info_content1 .emergency_contact,
+.info_content2 .barangay,
+.info_content2 .postal_address,
+.info_content2 .education{
     margin: 0;
     font-size: 1rem;
     font-family: 'Inter';
@@ -198,15 +199,15 @@
 .info_content2 .date_of_employment h1,
 .info_content2 .employee_status h1{
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-family: 'League Spartan';
     font-weight: 800;
     color: rgba(30, 30, 30, 0.40)
 }
 
-.info_content1 .work_experience p,
-.info_content2 .date_of_employment p,
-.info_content2 .employee_status p{
+.info_content1 .work_experience,
+.info_content2 .date_of_employment,
+.info_content2 .employee_status{
     margin: 0;
     font-size: 1rem;
     font-family: 'Inter';
@@ -292,8 +293,8 @@
 .left .statistic_2 .img img,
 .left .statistic_3 .img img,
 .left .statistic_4 .img img{
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
 }
 
 .left .statistic_1 .text,
@@ -309,7 +310,7 @@
 .left .statistic_4 .text h2{
     margin: 2.5px 0;
     font-family: 'League Spartan';
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .left .statistic_1 .text p,
@@ -368,10 +369,10 @@
 }
 
 .right .table table tr th{
-    padding: 10px;
+    padding: 12px 0 10px;
     
     font-family: 'League Spartan';
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 800;
 }
 

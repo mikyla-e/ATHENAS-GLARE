@@ -3,6 +3,8 @@ import numpy as np
 import face_recognition
 from django.utils.timezone import now
 from .models import Employee, Attendance
+from datetime import datetime
+import pytz
 
 # Load and encode registered faces
 def load_registered_faces():
@@ -37,8 +39,13 @@ def compare_faces(known_encoding, captured_encoding):
 
 # Mark attendance (time in/out)
 def mark_attendance(employee):
-    today = now().date()
-    current_time = now().time()
+    timezone_ph = pytz.timezone("Asia/Manila")
+    time_in_ph = datetime.now(timezone_ph)
+    
+    today = time_in_ph.strftime("%Y-%m-%d")
+    current_time = time_in_ph.strftime("%H:%M:%S")
+    # today = now().date()
+    # current_time = now().time()
 
     attendance, created = Attendance.objects.get_or_create(employee_id_fk=employee, date=today)
 

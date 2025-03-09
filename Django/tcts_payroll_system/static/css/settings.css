@@ -3,48 +3,56 @@
     
 }
 .container{
+    padding: 12px;
     position: absolute;
-    height: 100%;
+    height: fit-content;
     width: 85%;
-    margin: 80px 0 0 12%;
-    padding: 0 20px 0 20px; 
+
+    display: flex;
+    flex-direction: column;
+    
     z-index: 8;
 }
 
-.manage_user, .about_us{
+.manage_user{
+    margin: 0 0 5px;
     position: relative;
     background-color: white;
     width: 100%;
     border-radius: 15px;
+    border: none;
     display: flex;
     align-items: center;
-
-    margin: 10px 0;
-    padding: 20px 0;
 }
 
 
 .manage_user .user {
     width: 100%;
     height: 100%;
-    padding: 0 20px;
     background: none;
     cursor: pointer;
 
-    text-align: left;
-
-    border: none;
     border-radius: 15px;
+    border: none;
+    display: flex;
+    align-items: center;
+
+    padding: 20px 0;
+}
+
+.manage_user .user .content{
+    padding: 0 20px;
     display: flex;
     align-items: center;
 }
 
-.manage_user .user img{
-    height: 40px;
+.manage_user .user .content img{
+    height: 35px;
+    margin-left: -1.25px;
 }
 
-.manage_user .user h1{
-    margin: 0 10px;
+.manage_user .user .content h1{
+    margin: 2px 10px 0;
     color: #1e1e1e;
     font-family: 'League Spartan';
     font-weight: 800;
@@ -150,7 +158,15 @@ a{
 }
 
 a .about_us{
+    position: relative;
+    background-color: white;
     width: 100%;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+
+    margin: 5px 0;
+    padding: 20px 0;
 }
 
 a .about_us .content{
@@ -161,11 +177,11 @@ a .about_us .content{
 }
 
 a .about_us .content img{
-    height: 34px;
+    height: 32.5px;
 }
 
 a .about_us .content h1{
-    margin: 0 10px;
+    margin: 2px 12.5px 0;
     color: #1e1e1e;
     font-family: 'League Spartan';
     font-weight: 800;
@@ -182,26 +198,31 @@ form button{
     display: flex;
     align-items: center;
 
-    margin: 10px 0;
+    margin: 5px 0;
     padding: 20px 0;
 }
 
-form button .logout{
+form button:hover{
+    cursor: pointer;
+}
+
+form button{
     width: 100%;
 }
 
-form button .logout .content{
+form button .content{
+    width: 100%;
     padding: 0 20px;
     display: flex;
     align-items: center;
 }
 
-form button .logout .content img{
-    height: 40px;
+form button .content img{
+    height: 35px;
 }
 
-form button .logout .content h1{
-    margin: 0 10px;
+form button .content h1{
+    margin: 2px 10px 0;
     color: #1e1e1e;
     font-family: 'League Spartan';
     font-weight: 800;
