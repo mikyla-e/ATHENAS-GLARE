@@ -1,112 +1,122 @@
-@media screen and (max-width: 1920px){
-    html, body{
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        background-color: #EFEDE6;
-    }
-
-    header{
-        position: fixed;
-        top: 0;
-        background-color: #1e1e1e;
-        color: #f8d146;
-
-        margin-left: 11.8%;
-        padding: 0 20px 0 20px;
-        height: 60px;
-        width: 100%;
-        font-family: 'League Spartan';
-
-        z-index: 9;
-    }
-    
-    nav{
-        position: fixed;
-        left: 0;
-        background-color: #FFF;
-        height: 100%;
-        width: 12%;
-        z-index: 10;
-    }
-
-    nav .logo{
-        height: 8%;
-
-    }
-
-    nav .logo .logo-group{
-        padding: 12px 0 12px 15px;
-        display: flex;
-        overflow: hidden;
-    }
-
-    nav .logo .logo-group .logo-picture{
-
-    }
-    
-    nav .logo .logo-group .logo-name{
-        margin: 5px 0 5px 12px;
-    }
-
-    nav .logo .logo-group .logo-name p{
-        margin: 0;
-        text-align: left;
-        color: #1e1e1e;
-        font-family: 'League Spartan';
-        font-size: 120%;
-        font-weight: 900;
-    }
-
-    nav .menu{
-        height: fit-content;
-    }
-
-    nav .menu ul{
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    nav .menu ul .menu-dashboard,
-    nav .menu ul .menu-payroll,
-    nav .menu ul .menu-employees,
-    nav .menu ul .menu-settings{
-        margin: 0;
-        padding: 10px 20px;
-        overflow: hidden;
-        
-    }
-
-    nav .menu ul .menu-dashboard a,
-    nav .menu ul .menu-payroll a,
-    nav .menu ul .menu-employees a,
-    nav .menu ul .menu-settings a{
-        text-decoration: none;
-        display: flex;
-    }
-
-    nav .menu ul .menu-dashboard a .link,
-    nav .menu ul .menu-payroll a .link,
-    nav .menu ul .menu-employees a .link,
-    nav .menu ul .menu-settings a .link{
-        margin: 8px;
-
-        text-decoration: none;
-        text-align: left;
-        color: #1e1e1e;
-        font-family: 'Roboto';
-        font-size: 100%;
-        font-weight: 700;
-    }
-
-    #focused{
-        background: linear-gradient(89.98deg, rgba(248, 209, 70, 0), rgba(248, 209, 70, 0.6) 23%, #f8d146 66%, #f5b93f);
-    }
-
-    #focused .link{
-        color: #fff;
-    }
+html, body{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    background-color: #EFEDE6;
 }
 
+header{
+    position: fixed;
+    top: 0;
+    background-color: #1e1e1e;
+    color: #f8d146;
 
+    margin-left: 11.8%;
+    padding: 0 20px;
+    height: 70px;
+    width: 100%;
+    font-family: 'League Spartan';
+
+    display: flex;
+    align-items: end;
+
+    z-index: 9;
+}
+
+header h1{
+    margin: 10px 0;
+}
+
+nav{
+    position: fixed;
+    left: 0;
+    background-color: #FFF;
+    height: 100%;
+    width: 12%;
+    z-index: 10;
+}
+
+nav .logo{
+    height: 70px;
+}
+
+nav .logo .logo-group{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+nav .logo .logo-group .logo-picture{
+
+}
+
+nav .logo .logo-group .logo-picture img{
+
+}
+
+nav .logo .logo-group .logo-name{
+    margin: 5px 0 5px 12px;
+}
+
+nav .logo .logo-group .logo-name p{
+    margin: 0;
+    text-align: left;
+    color: #1e1e1e;
+    font-family: 'League Spartan';
+    font-size: 120%;
+    font-weight: 900;
+}
+
+nav .menu{
+    height: fit-content;
+}
+
+nav .menu ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav .menu ul .menu-dashboard,
+nav .menu ul .menu-payroll,
+nav .menu ul .menu-employees,
+nav .menu ul .menu-settings{
+    margin: 0;
+    padding: 10px 20px;
+    overflow: hidden;
+    
+}
+
+nav .menu ul .menu-dashboard a,
+nav .menu ul .menu-payroll a,
+nav .menu ul .menu-employees a,
+nav .menu ul .menu-settings a{
+    text-decoration: none;
+    display: flex;
+}
+
+nav .menu ul .menu-dashboard a .link,
+nav .menu ul .menu-payroll a .link,
+nav .menu ul .menu-employees a .link,
+nav .menu ul .menu-settings a .link{
+    margin: 8px;
+
+    text-decoration: none;
+    text-align: left;
+    color: #1e1e1e;
+    font-family: 'Roboto';
+    font-size: 100%;
+    font-weight: 700;
+}
+
+#focused{
+    background: linear-gradient(89.98deg, rgba(248, 209, 70, 0), rgba(248, 209, 70, 0.6) 23%, #f8d146 66%, #f5b93f);
+}
+
+#focused .link{
+    color: #fff;
+}
+
+@media screen and (max-width: 1920px){}

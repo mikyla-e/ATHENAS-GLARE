@@ -9,7 +9,7 @@
     display: flex;
     flex-direction: column;
 
-    margin: 80px 0 0 12%;
+    margin: 80px 0 0 12%;   
     padding: 0 20px 0 20px; 
     z-index: 8;
 }
@@ -286,18 +286,21 @@
 }
 
 .content_2 .payday .payday_date button{
-    height: 32px;
-    width: 32px;
+    height: 27.5px;
+    width: 27.5px;
     border: none;
 
-    background: url('../pictures/icons/calendar_icon.png') no-repeat;
+    background: url('../images/calendar_icon.png') no-repeat;
     background-size: contain;
     
 }
 
 .content_2 .payday .payday_date button:hover{
-    background: url('../pictures/icons/calendar_icon_hover.png') no-repeat;
+    background: url('../images/calendar_icon_hover.png') no-repeat;
     background-size: contain;
+
+    transition: 0.5s;
+    cursor: pointer;
 }
 
 .content_2 .incentives{
@@ -317,6 +320,10 @@
     align-items: center;
     gap: 5%;
 
+}
+
+.content_2 .incentives .edit_incentives:hover{
+    cursor: pointer;
 }
 
 .content_2 .incentives .edit_incentives p{

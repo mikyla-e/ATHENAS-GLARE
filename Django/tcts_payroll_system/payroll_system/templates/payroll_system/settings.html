@@ -102,8 +102,10 @@
         <div class="container">
             <div class="manage_user">
                 <button class="user" onclick="toggleDropdown()">
-                    <img src="{% static 'images/user_icon.png' %}" alt="">
-                    <h1>Manage User</h1>
+                    <div class="content">
+                        <img src="{% static 'images/user_icon.png' %}" alt="">
+                        <h1>Manage User</h1>
+                    </div>
                 </button>
                 <div class="dropdown-content">
                     <div class="form">
@@ -112,13 +114,11 @@
                             <div class="change_username">
                                 <label for="username">Change Username</label>
                                 {{ form.username }}
-                                <!-- <input type="text" name="username" id="username" placeholder="insert username here"> -->
                             </div>
 
                             <div class="change_password">
                                 <label for="password">Change Password</label>
                                 {{ form.password }}
-                                <!-- <input type="password" name="password" id="password" placeholder="insert password here"> -->
                             </div>
 
                             <div class="save_btn">
@@ -140,11 +140,9 @@
             <form method="post" action="{% url 'users:logout' %}">
                 {% csrf_token %}
                 <button type="submit">
-                    <div class="logout">
-                        <div class="content">
-                            <img src="{% static 'images/logout_icon.png' %}" alt="">
-                            <h1>Logout</h1>
-                        </div>
+                    <div class="content">
+                        <img src="{% static 'images/logout_icon.png' %}" alt="">
+                        <h1>Logout</h1>
                     </div>
                 </button>
             </form>
