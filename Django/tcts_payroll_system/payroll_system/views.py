@@ -1,3 +1,4 @@
+import os
 from contextlib import redirect_stderr
 from http.client import HTTPResponse
 from django.shortcuts import render, redirect
@@ -10,6 +11,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from .camera_capture import capture_image  # Import OpenCV function
 from django.http import JsonResponse
+from django.core.files.base import ContentFile
 
 @csrf_protect  # Ensure CSRF protection
 def time_in_out(request):
@@ -48,25 +50,18 @@ def employee_registration(request):
     if request.method == "POST":
         form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
-            employee = form.save(commit=False)  # Save without committing
-
-            # Get the captured image path from the form
-            captured_image_path = request.POST.get("employee_image")
-            if captured_image_path:
-                employee.employee_image = captured_image_path
-
-            employee.save()  # Save employee record
+            employee = form.save()  # This will save the file automatically
             return redirect('/payroll_system/employee_registration')
     else:
         form = EmployeeForm()
 
     return render(request, 'payroll_system/employee_registration.html', {'form': form})
 
-def capture_image_view(request):
+# def capture_image_view(request):
     
-    response = capture_image(request)  # `capture_image` returns a JsonResponse
+#     response = capture_image(request)  # `capture_image` returns a JsonResponse
 
-    return response  # Directly return JsonResponse instead of checking dict
+#     return response  # Directly return JsonResponse instead of checking dict
 
 
 @login_required

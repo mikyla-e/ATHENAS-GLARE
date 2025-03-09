@@ -1,4 +1,5 @@
 import cv2
+import os
 import numpy as np
 import face_recognition
 from django.utils.timezone import now
@@ -8,25 +9,33 @@ import pytz
 
 # Load and encode registered faces
 def load_registered_faces():
-    registered_faces = {}  # Store encoded faces
-
-    for employee in Employee.objects.all():
-        if not employee.employee_image:  # Skip employees without images
-            print(f"Skipping {employee.first_name} (No image uploaded)")
-            continue  
-
-        image_path = employee.employee_image.path
-        image = face_recognition.load_image_file(image_path)
-        
-        # Get the face encoding (assuming only one face per image)
-        face_encodings = face_recognition.face_encodings(image)
-
-        if not face_encodings:  # Ensure a face was found
-            print(f"Warning: No face detected in {employee.first_name}'s image.")
-            continue
-
-        registered_faces[str(employee.employee_id)] = face_encodings[0]  # Store the first encoding
-
+    registered_faces = {}
+    employees = Employee.objects.all()
+    
+    for employee in employees:
+        if employee.employee_image:
+            print(f"Employee ID: {employee.employee_id}, Image path: {employee.employee_image.name}")
+            try:
+                # Get the actual path from the database
+                image_path = employee.employee_image.path
+                
+                # Debug info
+                print(f"Loading face for employee {employee.employee_id} from {image_path}")
+                
+                # Check if the file exists
+                if os.path.exists(image_path):
+                    image = face_recognition.load_image_file(image_path)
+                    encodings = face_recognition.face_encodings(image)
+                    
+                    if len(encodings) > 0:
+                        registered_faces[str(employee.employee_id)] = encodings[0]
+                    else:
+                        print(f"No face found in image for employee employee_id: {employee.id}")
+                else:
+                    print(f"Image does not exist at path: {image_path}")
+            except Exception as e:
+                print(f"Error processing image for employee {employee.employee_id}: {str(e)}")
+    
     return registered_faces
 
 
