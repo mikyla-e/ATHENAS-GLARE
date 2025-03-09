@@ -2,28 +2,25 @@
     height: 100%;
     
 }
+
 .container{
+    padding: 10px;
     display: flex;
     flex-direction: column;
     position: absolute;
-    height: 100%;
-    width: 85%;
-    gap: 5px;
-    margin: 80px 0 0 12%;
-    padding: 0 20px 0 20px; 
-    z-index: 8;
-    /* border: solid; */
+    height: fit-content;
+
+    border: 2px solid #1e1e1e;
 }
 
 .top{
-    height: 20%;
-    /* border: solid; */
-    position: relative;
-    width: 100%;
     display: flex;
-    margin-top: 10px;
-    justify-content: space-between;
+    gap: 10px;
+    height: 175px;
+    width: 100%;
 }
+
+/* to edit below */
 
 .total_emp{
     display: flex;
@@ -37,6 +34,7 @@
     background-color: #1E1E1E;
     color: white;
 }
+
 .div1{
     display: flex;
     margin: 10px;
