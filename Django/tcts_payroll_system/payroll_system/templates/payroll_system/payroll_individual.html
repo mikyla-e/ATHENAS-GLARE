@@ -102,13 +102,21 @@
                         
                         <div class="employee_status">
                             <div class="name">
-                                <p>Employee Name</p>
+                                <p>{{ employee.first_name }} {{ employee.last_name }}</p>
                             </div>
                             <div class="attendance">
-                                <p>Attendance Status</p>
+                                {% for attendance in employee.attendances.all %}
+                                    <p>{{ attendance.active_status }}</p>
+                                {% empty %}
+                                    <p>None</p>
+                                {% endfor %}
                             </div>
                             <div class="payroll">
-                                <p>Payroll Status</p>
+                                {% for payroll in employee.payrolls.all %}
+                                    <p>{{ payroll.payroll_status }}</p>
+                                {% empty %}
+                                    <p>None</p>
+                                {% endfor %}
                             </div>
                         </div>  
                     </div>
@@ -123,29 +131,39 @@
     
                 <div class="div1">
                     <table class="table-1">
-                        <th>Rate per day</th>
-                        <th>No. of Attendance during the week</th>
-                        <th>Total Payment Amount</th>
-                        <th>Date of Pay</th>
-                        <th></th>
+                        <tr>
+                            <th>Rate per day</th>
+                            <th>No. of Attendance during the week</th>
+                            <th>Deductions</th>
+                            <th>Total Payment Amount</th>
+                            <th>Date of Pay</th>
+                            <th></th>
+                        </tr>
                         <tr>
                             {% for payroll in employee.payrolls.all %}
                             <td>{{ payroll.rate }}</td>
                                 {% for attendance in employee.attendances.all %}
                                 <td>{{ attendance.date }}</td>
                                 {% endfor %}
+                            <td>0</td>
                             <td>{{ payroll.salary }}</td>
                             <td>{{ payroll.payment_date }}</td>
-                            {% endfor %}
                             <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
+                            {% empty %}
+                            <td>0.00</td>
+                            <td>N/A</td>
+                            <td>0.00</td>
+                            <td>0.00</td>
+                            <td>N/A</td>
+                            <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
+                            {% endfor %}
                         </tr>
-                        
                     </table>
                 </div>
     
                 <div class="div2">
                     <div class="tableheader">
-                        <p style="margin: 15px;">Summary of Employee's Past Payroll Records</p>
+                        <p style="margin: 15px;">Summary of Past Payroll Records</p>
                     </div>
                     <table>
                         <th>Rate per day</th>
@@ -154,7 +172,6 @@
                         <th>Total Deduction</th>
                         <th>Total Payment Amount</th>
                         <th>Date of Pay</th>
-                        <th>Remarks</th>
                         <tr>
                             {% for payroll in employee.payrolls.all %}
                             <td>{{ payroll.rate }}</td>
@@ -163,8 +180,14 @@
                             <td>{{ payroll.deductions }}</td>
                             <td>{{ payroll.salary }}</td>
                             <td>{{ payroll.payment_date }}</td>
+                            {% empty %}
+                            <td>0.00</td>
+                            <td>N/A</td>
+                            <td>0.00</td>
+                            <td>0.00</td>
+                            <td>0.00</td>
+                            <td>N/A</td>
                             {% endfor %}
-                            <td>remarks</td>
                         </tr>
                     </table>
                 </div>

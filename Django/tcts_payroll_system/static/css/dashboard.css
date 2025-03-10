@@ -236,17 +236,16 @@
 .table2 td:nth-child(even) {
     background-color: #ececec;
 }
-#donutchart {
-    width: 400px;
+#donutchart, #columnchart_values {
+    width: 100%;
+    width: 45%;
     height: 250px;
-    border-radius: 20px;
+    /* border: solid; */
     overflow: hidden;
-}
-#columnchart_values {
-    width: 400px;
-    height: 250px;
-    border-radius: 20px;
-    overflow: hidden;
+    background: white;
+    border-radius: 10px;
+    /* padding: 10px; */
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 

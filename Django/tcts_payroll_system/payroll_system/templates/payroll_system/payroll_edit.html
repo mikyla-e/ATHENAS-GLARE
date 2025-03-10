@@ -16,15 +16,7 @@
             <div class="logo">
                 <div class="logo-group">
                     <div class="logo-picture">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="41" viewBox="0 0 40 41" fill="none">
-                            <circle cx="20.1019" cy="20.412" r="19.7037" fill="url(#paint0_linear_170_70)"/>
-                            <defs>
-                            <linearGradient id="paint0_linear_170_70" x1="20.1019" y1="0.708332" x2="20.1019" y2="40.1157" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#F8D146"/>
-                                <stop offset="1" stop-color="#F5B93F"/>
-                            </linearGradient>
-                            </defs>
-                        </svg>
+                        <img src="{% static 'images/logo_icon.png' %}" alt="">
                     </div>
                     <div class="logo-name">
                         <p>PAYROLL</p>
@@ -98,35 +90,43 @@
 
         <div class="system_content">
             <div class="container">
-                <div class="register_container">
-                    <form action="" class="register_field" method="POST">
-                        {% csrf_token %}
-                        <div class="fields_1">
-                            <div class="field">
-                                <label for="employee_rate">employee rate</label>
-                                <!-- <input type="text" name="employee-rate" id="employee-rate" placeholder="ex. Php 10, 000.00"> -->
-                                {{ form.rate }}
-                            </div>
-                            <div class="field">
-                                <!-- readonly lng toh dapat, kasi set ung date of payment every saturday, pwd ba un? -->
-                                <label for="payment_date">date of payment</label>
-                                {{ form.payment_date }}
-                            </div>
-                            <div class="field">
-                                <!-- readonly lng toh dapat, kasi set ung date of payment every saturday, pwd ba un? -->
-                                <label for="payment_date">date of payment</label>
-                                <!-- {{ form.payment_date }} -->
-                            </div>
-                        </div>
-                        
-                        <div class="fields_2">
-                            <div class="buttons">
-                                <a href="{% url 'payroll_system:payrolls' %}"><button class="cancel">CANCEL</button></a>
-                                <input class="submit" type="submit" value="SAVE">
-                            </div>
-                        </div>
-                        
-                    </form>
+                <div class="profile-picture">
+                    <img src="{% static 'images/profile_picture.png' %}" alt="">
+                    <div class="employee_name">
+                        <h1>
+                            {{ employee.first_name }} {{ employee.last_name }}
+                        </h1>
+                    </div>
+                </div>
+                <div class="edit_container">
+                    <table>
+                        <tr>
+                            <th>Rate per Day</th>
+                            <th>Deductions</th>
+                            <th>Date of Pay</th>
+                            <th>Payroll Status</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <form class="edit_field" method="POST">
+                                {% csrf_token %}
+                                <td><input type="text" name="rate_per_day" placeholder="Edit Rate per Day" id="rate_per_day"></td>
+                                <td><input type="text" name="deductions" placeholder="Edit Deductions" id="deductions"></td>
+                                <td><input type="text" name="date_of_pay" placeholder="Edit Date of Pay" id="date_of_pay"></td>
+                                <td>
+                                    <select name="payroll_status" id="payroll_status">
+                                        <option value="" hidden>Processed</option>
+                                        <option value="Processed">Processed</option>
+                                        <option value="Pending">Pending</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="button" value="">
+                                    <input type="submit" value="">
+                                </td>
+                            </form>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>

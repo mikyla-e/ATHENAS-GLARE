@@ -192,7 +192,8 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="6">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                                <td colspan="5">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                                <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                             </tr>
                             {% endfor %}
                         {% endfor %}

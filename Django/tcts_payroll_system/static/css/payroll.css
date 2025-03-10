@@ -147,6 +147,9 @@
 .content_1 .statistics .payroll_status{
     border-left: 2px solid #F8D14630;
 
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .content_1 .statistics .payroll_status .title{
@@ -161,7 +164,7 @@
 }
 
 .content_1 .statistics .payroll_status .content{
-    margin: 10px 0;
+    margin: 0;
     display: flex;
     flex-wrap: nowrap;
 }
@@ -170,6 +173,9 @@
     width: 100%;
     padding: 0 10px 0 5px;
     border-right: 2px solid #F8D14630;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 
     background: -webkit-linear-gradient(#F8D146, #F5B93F);
     -webkit-background-clip: text;
@@ -186,12 +192,16 @@
     margin: 0;
     font-size: 2.5rem;
     font-family: 'Roboto';
+    line-height: 80%
 }
 
 .content_1 .statistics .payroll_status .content .pending{
     width: 100%;
     padding: 0 5px 0 10px;
     border-left: 2px solid #F8D14630;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 
     color: #DC4646;
 }   
@@ -206,6 +216,7 @@
     margin: 0;
     font-size: 2.5rem;
     font-family: 'Roboto';
+    line-height: 80%
 }   
 
 
@@ -342,7 +353,7 @@
     height: 45px;
     display: flex;
     justify-content: space-around;
-    margin: 20px 0 5px;
+    margin: 15px 0 5px;
 }
 
 .search_filter .search{
@@ -432,7 +443,7 @@
 
 
 .table{
-    margin: 10px 0 50px;
+    margin: 0 0 50px;
     width: 100%;
     height: 80%;
 }
