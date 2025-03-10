@@ -46,6 +46,7 @@ class PayrollForm(ModelForm):
         model = Payroll
         fields = ('rate', 'incentives', 'payment_date')
         # widgets = {
-        #     'rate' = forms.TextInput(widgets=forms.TextInput(attrs={'class': widgets}))
+        #     'rate' : forms.TextInput(widgets=forms.TextInput(attrs={'class': widgets})),
+            
         # }
         
