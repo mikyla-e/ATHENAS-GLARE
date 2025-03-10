@@ -36,6 +36,10 @@ class Employee(models.Model):
         FULLTIME = 'Full Time', _('Full Time')
         PARTTIME = 'Part Time', _('Part Time')
 
+    class ActiveStatus(models.TextChoices):
+        ACTIVE = 'Active', _('Active')
+        INACTIVE = 'Inactive', _('Inactive')
+
     employee_id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=100, null=False)
     last_name = models.CharField(max_length=100, null=False)
@@ -50,6 +54,7 @@ class Employee(models.Model):
     date_of_employment = models.DateField(default=timezone.now)
     days_worked = models.IntegerField(default=0, null=False)
     employee_status = models.CharField(max_length=9, choices=EmployeeStatus.choices, null=True)
+    active_status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
     absences = models.IntegerField(default=0, null=False)
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
 
@@ -62,7 +67,7 @@ class Employee(models.Model):
         self.days_worked = self.attendances.filter(
             date__gte=first_day,
             date__lte=today,
-            active_status='Active'
+            attendance_status='PRESENT'
         ).count()
         
         # Calculate business days
@@ -72,21 +77,21 @@ class Employee(models.Model):
             if day.weekday() < 5:
                 workdays_so_far += 1
             day += timedelta(days=1)
-        
+
         self.absences = workdays_so_far - self.days_worked
         self.save()
 
 class Attendance(models.Model):
-    class ActiveStatus(models.TextChoices):
-        ACTIVE = 'Active', _('Active')
-        INACTIVE = 'Inactive', _('Inactive')
+    class AttendanceStatus(models.TextChoices):
+        PRESENT = 'Present', _('Present')
+        ABSENT = 'Absent', _('Absent')
     
     attendance_id = models.AutoField(primary_key=True)
     time_in = models.TimeField(null=True, blank=True)  
     time_out = models.TimeField(null=True, blank=True)  
     date = models.DateField(default=timezone.now,null=False)
     hours_worked = models.FloatField(default=0, null=False)  
-    active_status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
+    attendance_status = models.CharField(max_length=8, choices=AttendanceStatus.choices, default=AttendanceStatus.PRESENT)
     remarks = models.CharField(max_length=255, null=True, blank=True)  
     employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendances')
 
@@ -98,7 +103,7 @@ class Attendance(models.Model):
             worked_hours = (time_out_dt - time_in_dt).total_seconds() / 3600  # Convert seconds to hours
             self.hours_worked = round(worked_hours, 2)
             self.save()
-
+        
 class Payroll(models.Model):
     class PayrollStatus(models.TextChoices):
         PENDING = 'PENDING', _('Pending')

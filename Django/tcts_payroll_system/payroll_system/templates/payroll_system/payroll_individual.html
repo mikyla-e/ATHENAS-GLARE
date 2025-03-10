@@ -97,7 +97,7 @@
                 <div class="container-1">
                     <div class="employee_info">
                         <div class="profile-picture">
-                            <img src="{% static 'images/profile_picture.png' %}" alt="">
+                            <img src="{{ employee.employee_image.url }}" alt="">
                         </div>
                         
                         <div class="employee_status">
@@ -105,11 +105,13 @@
                                 <p>{{ employee.first_name }} {{ employee.last_name }}</p>
                             </div>
                             <div class="attendance">
-                                {% for attendance in employee.attendances.all %}
-                                    <p>{{ attendance.active_status }}</p>
-                                {% empty %}
-                                    <p>None</p>
-                                {% endfor %}
+                                <p>
+                                    {% if employee.active_status %}
+                                        Active
+                                    {% else %}
+                                        Inactive
+                                    {% endif %}
+                                </p>
                             </div>
                             <div class="payroll">
                                 {% for payroll in employee.payrolls.all %}
@@ -139,25 +141,21 @@
                             <th>Date of Pay</th>
                             <th></th>
                         </tr>
-                        <tr>
-                            {% for payroll in employee.payrolls.all %}
-                            <td>{{ payroll.rate }}</td>
-                                {% for attendance in employee.attendances.all %}
-                                <td>{{ attendance.date }}</td>
-                                {% endfor %}
-                            <td>0</td>
-                            <td>{{ payroll.salary }}</td>
-                            <td>{{ payroll.payment_date }}</td>
-                            <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
-                            {% empty %}
-                            <td>0.00</td>
-                            <td>N/A</td>
-                            <td>0.00</td>
-                            <td>0.00</td>
-                            <td>N/A</td>
-                            <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
-                            {% endfor %}
-                        </tr>
+                            {% if current_payroll %}
+                                <td>{{ current_payroll.rate }}</td>
+                                <td>{{ attendance_count }}</td>
+                                <td>{{ current_payroll.deductions }}</td>
+                                <td>{{ current_payroll.salary }}</td>
+                                <td>{{ current_payroll.payment_date }}</td>
+                                <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
+                            {% else %}
+                                <td>0.00</td>
+                                <td>{{ attendance_count|default:"0" }}</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>N/A</td>
+                                <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
+                            {% endif %}
                     </table>
                 </div>
     
@@ -175,7 +173,11 @@
                         <tr>
                             {% for payroll in employee.payrolls.all %}
                             <td>{{ payroll.rate }}</td>
-                            <td>6</td>
+                            <td>
+                                {% with attendance_count=employee.attendances.count %}
+                                    {{ attendance_count|default:"0" }}
+                                {% endwith %}
+                            </td>
                             <td>{{ payroll.incentives }}</td>
                             <td>{{ payroll.deductions }}</td>
                             <td>{{ payroll.salary }}</td>

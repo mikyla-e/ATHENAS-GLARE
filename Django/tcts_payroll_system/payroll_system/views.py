@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Max, OuterRef, Subquery
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -7,6 +7,7 @@ from .forms import EmployeeForm, PayrollForm
 from .models import Employee, Payroll, Attendance
 from .face_recognition_attendance import recognize_face
 from django.utils import timezone
+from django.utils.timezone import now
 
 @csrf_protect  # Ensure CSRF protection
 def time_in_out(request):
@@ -87,7 +88,7 @@ def employee_profile(request, employee_id):
     latest_attendance = employee.attendances.order_by('-date').first()
     if latest_attendance:
         latest_attendance.calculate_hours_worked()  # Ensure hours are updated
-        
+
     latest_payroll = employee.payrolls.order_by('-payment_date').first()
     payroll_status = latest_payroll.payroll_status if latest_payroll else "No Payroll Data"
     
@@ -109,24 +110,77 @@ def payrolls(request):
 
 @login_required
 def payroll_individual(request, employee_id):
-    employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
-    context = {
-        'employee' : employee,
-    }
-    return render(request, 'payroll_system/payroll_individual.html', context)
+    employee = get_object_or_404(Employee.objects.prefetch_related('payrolls', 'attendances'), employee_id=employee_id)
+
+    # Get latest payroll
+    current_payroll = employee.payrolls.order_by('-payment_date').first()
+
+    # Count attendance records
+    attendance_count = employee.attendances.count()
+
+    # Check attendance records for today's active status
+    today = now().date()
+    latest_time_log = Attendance.objects.filter(employee_id_fk=employee, date=today).order_by('-time_in').first()
+
+    # Determine active status
+    employee.active_status = False
+    if latest_time_log and latest_time_log.time_in and not latest_time_log.time_out:
+        employee.active_status = True
+
+    # Save updated active_status in database
+    employee.save(update_fields=['active_status'])
+
+    return render(request, 'payroll_system/payroll_individual.html', {
+        'employee': employee,
+        'current_payroll': current_payroll,
+        'attendance_count': attendance_count
+    })
+
 
 @login_required
 def payroll_edit(request, employee_id):
-    employee = Employee.objects.prefetch_related('payrolls').get(employee_id = employee_id)
-    payroll = Payroll.objects.get(employee_id_fk=employee)
-    if request.method == "POST":
+    employee = Employee.objects.get(employee_id=employee_id)
+    today = timezone.now().date()
+    
+    # Try to get an active payroll, or create a new one
+    try:
+        payroll = Payroll.objects.get(
+            employee_id_fk=employee,
+            payment_date__gte=today
+        )
+    except Payroll.DoesNotExist:
+        # No active payroll - create a new one
+        payroll = Payroll(employee_id_fk=employee)
+        
+        # Set payment date to one week from today
+        payroll.payment_date = today + timezone.timedelta(days=7)
+        
+        # Copy data from the most recent payroll if it exists
+        try:
+            prev_payroll = Payroll.objects.filter(
+                employee_id_fk=employee
+            ).latest('payment_date')
+            
+            # Copy relevant fields
+            payroll.rate = prev_payroll.rate
+            payroll.incentives = prev_payroll.incentives
+            # Add any other fields you need to copy
+        except Payroll.DoesNotExist:
+            # First payroll for this employee, use defaults
+            pass
+    
+    if request.method == 'POST':
         form = PayrollForm(request.POST, instance=payroll)
         if form.is_valid():
             form.save()
-            return redirect('/payroll_system/payrolls')
+            return redirect('payroll_system:payroll_individual', employee_id=employee_id)
     else:
         form = PayrollForm(instance=payroll)
-    context = { 'employee': employee, 'form': form}
+    
+    context = {
+        'form': form,
+        'employee': employee
+    }
     return render(request, 'payroll_system/payroll_edit.html', context)
 
 @login_required
