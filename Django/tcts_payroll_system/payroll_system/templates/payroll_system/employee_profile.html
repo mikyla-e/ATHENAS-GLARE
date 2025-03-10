@@ -95,14 +95,11 @@
                 <div class="profile">
                     <div class="top">
                         <div class="employee_pic">
-                            <img src="{% static 'images/employee_img.png' %}" alt="Employee Image">
+                            <img src="{{ employee.employee_image.url }}" alt="Employee Image">
                         </div>
                         <div class="employee_info1">
                             <div class="employee_name">
                                 <h1>{{ employee.first_name }} {{ employee.last_name }} <span>{{ employee.employee_id }}</span></h1>
-                            </div>
-                            <div class="employee_role">
-                                <h3>Employee Position/Role</h3>
                             </div>
                             <div class="line">
                                 <div class="details">DETAILS</div>
@@ -186,7 +183,7 @@
                                 </div>
                                 <div class="text">
                                     <h2>PAYROLL STATUS</h2>
-                                    <p>{{ payroll.payroll_status }}</p>
+                                    <p>{{ payroll_status }}</p>
                                 </div>
                             </div>
                             <div class="statistic_2">
@@ -195,7 +192,7 @@
                                 </div>
                                 <div class="text">
                                     <h2>LAST ATTENDANCE</h2>
-                                    <p>{{ attendance.date }}</p>
+                                    {{ latest_attendance.date }}
                                 </div>
                             </div>
                             <div class="statistic_3">
@@ -213,7 +210,7 @@
                                 </div>
                                 <div class="text">
                                     <h2>DAYS WORKED</h2>
-                                    <p>XX Days</p>
+                                    <p>{{ employee.days_worked}} Days</p>
     
                                 </div>
                             </div>
@@ -232,7 +229,7 @@
                                         <td>{{ attendance.date }}</td>
                                         <td>{{ attendance.time_in }}</td>
                                         <td>{{ attendance.time_out }}</td>
-                                        <td>XX</td>
+                                        <td>{{ attendance.hours_worked }} hours</td>
                                     </tr>
                                     {% empty %}
                                     <tr>

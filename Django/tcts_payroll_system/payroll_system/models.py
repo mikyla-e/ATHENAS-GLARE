@@ -1,8 +1,18 @@
+import os
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+from datetime import timedelta, datetime
 
 # Create your models here.
+def rename_employee_image(instance, filename):
+    # Get file extension
+    ext = filename.split('.')[-1]
+    # Create a sanitized name
+    sanitized_name = slugify(os.path.splitext(filename)[0])
+    # Return the new path
+    return f'employee_images/{sanitized_name}.{ext}'
 
 class Admin(models.Model):
     admin_id = models.IntegerField(primary_key=True)
@@ -38,9 +48,33 @@ class Employee(models.Model):
     highest_education = models.CharField(max_length=20, choices=HighestEducation.choices, null=True)
     work_experience = models.CharField(max_length=2083, null=True)
     date_of_employment = models.DateField(default=timezone.now)
+    days_worked = models.IntegerField(default=0, null=False)
     employee_status = models.CharField(max_length=9, choices=EmployeeStatus.choices, null=True)
     absences = models.IntegerField(default=0, null=False)
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
+
+    def update_attendance_stats(self):
+        """Update attendance statistics for the current month"""
+        today = timezone.now().date()
+        first_day = today.replace(day=1)
+        
+        # Count days worked
+        self.days_worked = self.attendances.filter(
+            date__gte=first_day,
+            date__lte=today,
+            active_status='Active'
+        ).count()
+        
+        # Calculate business days
+        workdays_so_far = 0
+        day = first_day
+        while day <= today:
+            if day.weekday() < 5:
+                workdays_so_far += 1
+            day += timedelta(days=1)
+        
+        self.absences = workdays_so_far - self.days_worked
+        self.save()
 
 class Attendance(models.Model):
     class ActiveStatus(models.TextChoices):
@@ -55,6 +89,15 @@ class Attendance(models.Model):
     active_status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
     remarks = models.CharField(max_length=255, null=True, blank=True)  
     employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendances')
+
+    def calculate_hours_worked(self):
+        """Calculate hours worked for the day"""
+        if self.time_in and self.time_out:
+            time_in_dt = datetime.combine(self.date, self.time_in)
+            time_out_dt = datetime.combine(self.date, self.time_out)
+            worked_hours = (time_out_dt - time_in_dt).total_seconds() / 3600  # Convert seconds to hours
+            self.hours_worked = round(worked_hours, 2)
+            self.save()
 
 class Payroll(models.Model):
     class PayrollStatus(models.TextChoices):

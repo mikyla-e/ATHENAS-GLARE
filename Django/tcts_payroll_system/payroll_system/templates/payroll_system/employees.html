@@ -151,27 +151,29 @@
                         <th>LAST ATTENDANCE</th>
                         <th></th>
                         
-                    {% for employee in employees %}
-                        <tr class="emp1">
-                            <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                            <td>{{ employee.employee_id }}</td>
-                            <td>{{ employee.contact_number}}</td>
-                            <td>{{ employee.employee_status }}</td>
-                        {% for payroll in employee.payrolls.all %}
-                            <td>{{ payroll.payroll_status }}</td>
-                        {% empty %}
-                            <td>No Payroll Data</td>
+                        {% for employee in employees %}
+                            <tr class="emp1">
+                                <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                                <td>{{ employee.employee_id }}</td>
+                                <td>{{ employee.contact_number}}</td>
+                                <td>{{ employee.employee_status }}</td>
+                            {% for payroll in employee.payrolls.all %}
+                                <td>{{ payroll.payroll_status }}</td>
+                            {% empty %}
+                                <td>No Payroll Data</td>
+                            {% endfor %}
+                                <td>
+                                    {% if employee.latest_attendance_date %}
+                                        {{ employee.latest_attendance_date }}
+                                    {% else %}
+                                        No Attendance Data
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}">MORE</a>
+                                </td>
+                            </tr>
                         {% endfor %}
-                        {% for attendance in employee.attendances.all %}
-                            <td>{{ attendance.date }}</td>
-                        {% empty %}
-                            <td>No Attendance Data</td>
-                        {% endfor %}
-                            <td>
-                                <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}">MORE</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
                     </table>
                     <div class="button">
                         <a href="{% url 'payroll_system:employee_registration' %}"><button class="addemployeebutton">ADD EMPLOYEE +</button></a>
