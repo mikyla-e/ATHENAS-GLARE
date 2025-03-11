@@ -22,8 +22,9 @@
 }
 
 .profile-picture img{
-    width: 17.5%;
-    height: auto;
+    width: 110px;
+    height: 110px;
+    border-radius: 55px;
 }
 
 .profile-picture .employee_name{
@@ -92,6 +93,8 @@ table tr td:last-child{
     border-right: none;
 }
 
+
+table tr td input[type=number],
 table tr td input[type=text]{
     height: 100%;
     width: 80%;
@@ -103,9 +106,25 @@ table tr td input[type=text]{
     border: none;
 }
 
+table tr td select{
+    height: 100%;
+    width: 80%;
+    background: none;
+    padding: 20px 0;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+    border: none;
+
+    -webkit-appearance: none;
+}
+
+table tr td select:focus,
+table tr td input[type=number]:focus,
 table tr td input[type=text]:focus{
     outline: none;
 }
+
 
 table tr td input[type=submit]{
     height: 40px;
