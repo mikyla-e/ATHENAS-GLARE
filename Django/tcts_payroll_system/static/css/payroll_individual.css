@@ -224,3 +224,133 @@ tr:last-child td {
     background-color: #f2f2f2;
 }
 
+.background{
+    margin: 0;
+    position: fixed;
+    width: 90%;
+    height: 100%;
+
+    background-color: rgba(30, 30, 30, 0.5);
+    visibility: hidden;
+    opacity: 0;
+    
+    transition: opacity 0.2s ease-in-out;
+    
+    z-index: 9;
+}
+
+.background.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+ .background .edit_incentives_popup {
+    width: 40%;
+    height: fit-content;
+    padding: 25px 35px;
+
+    position: absolute;
+    top: 15%;
+    right: 52.5%;
+    transform: translate(50%, 50%);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+
+    border-radius: 10px;
+    
+    background-color: white;
+    
+    z-index: 10;
+    overflow: hidden;
+}
+
+.edit_incentives_popup h1{
+    margin: 0;
+    font-family: 'League Spartan';
+    font-size: 2rem;
+    font-weight: 500;
+
+    background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.edit_incentives_popup h1 span{
+    font-weight: 700;
+}
+
+.edit_incentives_popup form{
+    display: flex;
+    flex-direction: column;
+
+}
+
+.edit_incentives_popup form .incentives_field{
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.edit_incentives_popup form .incentives_field label{
+    margin: 0 10px;
+    font-family: 'League Spartan';
+}
+
+.edit_incentives_popup form .incentives_field input[type=text]{
+    margin: 8px;
+    padding: 10px 15px;
+    border: none;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+
+    background-color: rgba(111, 81, 21, 0.10);
+    height: 30px;
+    border-radius: 10px;
+}
+
+.edit_incentives_popup form .buttons{
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    gap: 10px;
+}
+
+.edit_incentives_popup form .buttons input[type=button]{
+    border: none;
+    border-radius: 100px;
+
+    padding: 10px 7.5%;
+
+    font-family: 'Roboto';
+    font-size: 1rem;
+    font-weight: 700;
+    
+    background: linear-gradient(180deg, #DC4646 0%, #DC4646 100%);
+    color: #fff;
+}
+
+.edit_incentives_popup form .buttons input[type=button]:hover{
+    cursor: pointer;
+}
+
+.edit_incentives_popup form .buttons input[type=submit]{
+    border: none;
+    border-radius: 100px;
+
+    padding: 10px 7.5%;
+
+    font-family: 'Roboto';
+    font-size: 1rem;
+    font-weight: 700;
+    
+    background: linear-gradient(180deg, #F8D146 0%, #F5B93F 100%);
+    color: #fff;
+}
+
+.edit_incentives_popup form .buttons input[type=submit]:hover{
+    cursor: pointer;
+}

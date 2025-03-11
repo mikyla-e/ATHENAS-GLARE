@@ -125,7 +125,7 @@
                     
                     <div class="buttons">
                         <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}"><button class="check-employee">check employee profile >></button></a>
-                        <a href=""><button class="edit-employee">EDIT EMPLOYEE INCENTIVES</button></a>
+                        <button class="edit-employee" onclick="editIncentives()">EDIT EMPLOYEE INCENTIVES</button>
                     </div>
                 </div>
                 
@@ -194,7 +194,36 @@
                     </table>
                 </div>
             </div>
+
+            <div class="background" id="background">
+                <div class="edit_incentives_popup" id="editIncentivesPopup">
+                    <h1>Edit for <span>{{ employee.first_name }} {{ employee.last_name }}</span>.</h1>
+                    <form method="post">
+                        <div class="incentives_field">
+                            <label for="incentives">Incentives</label>
+                            <input type="text" name="incentives" id="incentives" placeholder="ex. 1000.00">
+                        </div>
+
+                        <div class="buttons">
+                            <input type="button" value="Cancel" onclick="cancelEditIncentives()">
+                            <input type="submit" value="Save">
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </div>
     </div>
 </body>
+<script>
+    function editIncentives(){
+        const bg = document.getElementById("background");
+        bg.classList.add("show");
+    }
+
+    function cancelEditIncentives(){
+        const bg = document.getElementById("background");
+        bg.classList.remove("show");
+    }
+</script>
 </html>
