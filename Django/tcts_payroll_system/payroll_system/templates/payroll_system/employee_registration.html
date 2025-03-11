@@ -74,13 +74,13 @@
                 <label for="postal-address">postal address</label>
                 {{ form.postal_address }}
               </div>
-            </div>
-
-            <div class="fields_2">
               <div class="field">
                 <label for="education">highest education attainment</label>
                 {{ form.highest_education }}
               </div>
+            </div>
+
+            <div class="fields_2">
               <div class="field">
                 <label for="work-experience">work experience</label>
                 {{ form.work_experience }}
@@ -121,7 +121,6 @@
               <div class="buttons">
                 <div class="camera_button">
                   <button type="button" id="captureButton">TAKE A PICTURE</button>
-                  <img src="{% static 'images/camera.png' %}" alt="Camera" />
                 </div>
                 <input class="submit" type="submit" value="SUBMIT" />
               </div>
