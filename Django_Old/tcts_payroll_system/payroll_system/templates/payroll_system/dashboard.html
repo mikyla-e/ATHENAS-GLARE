@@ -1,0 +1,294 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/template.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="body">
+        <nav>
+            <!-- logo -->
+            <div class="logo">
+                <div class="logo-group">
+                    <div class="logo-picture">
+                        <img src="{% static 'images/logo_icon.png' %}" alt="">
+                    </div>
+                    <div class="logo-name">
+                        <p>PAYROLL</p>
+                        <p>SYSTEM</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- nav menu -->
+            <div class="menu">
+                <ul>
+                    <li class="menu-dashboard" id="focused">
+                        <a href="">
+                            <img src="{% static 'images/dashboard_icon_focused.png' %}" alt="">
+                            <div class="link">DASHBOARD</div>
+                        </a>
+                    </li>
+                    <li class="menu-payroll">
+                        <a href="{% url 'payroll_system:payrolls' %}">
+                            <img src="{% static 'images/payroll_icon.png' %}" alt="">
+                            <div class="link">PAYROLL</div>
+                        </a>
+                    </li>
+                    <li class="menu-employees">
+                        <a href="{% url 'payroll_system:employees' %}">
+                            <img src="{% static 'images/employee_icon.png' %}" alt="">
+                            <div class="link">EMPLOYEES</div>
+                        </a>
+                        
+                    </li>
+                    <li class="menu-settings">
+                        <a href="{% url 'payroll_system:settings' %}">
+                            <img src="{% static 'images/settings_icon.png' %}" alt="">
+                            <div class="link">SETTINGS</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <header>
+            <h1>DASHBOARD</h1>
+        </header>
+    
+        <div class="system_content">
+            <div class="container">
+                <div class="total_emp">
+                    <div class="emp_statistics">
+                        <div class="content">
+                            <div class="title">
+                                <h2>TOTAL EMPLOYEES</h2>
+                                <p>in the company</p>
+                            </div>
+                            
+                            <p class="stats">{{ total_employees }}</p>
+                        </div>
+                        <div class="vertical-line"></div>
+                        <div class="content">
+                            <div class="title">
+                                <h2>ACTIVE EMPLOYEES</h2>
+                                <p>within the week</p>
+                            </div>
+                            <p class="stats">{{ avg_active_employees }}</p>
+                        </div>
+                    </div>
+                </div>
+                    
+                <div class="payroll_stats">
+                    <div class="content1">
+                        <h1 class="payroll_status">PAYROLL STATUS</h1>
+                        <div class="processed">
+                            <h2>PROCESSED</h2>
+                            <p>{{ processed_payroll_count }}</p>   
+                        </div>
+                        <div class="horizontal_line"></div>
+                        <div class="pending">
+                            <h2>PENDING</h2>
+                            <p>{{ pending_payroll_count }}</p>
+                        </div>
+                    </div>
+
+                    <div class="content2">
+                        <div class="total_payroll">
+                            <p>TOTAL PAYROLL</p>
+                            <h1>{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</h1> 
+                        </div>
+                        <div class="next_payday">
+                            <h1>{{ next_payday|default:"N/A" }}</h1>
+                            <p>NEXT PAYDAY</p>    
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="time">
+                    <div class="top_content">
+                        <div class="weather">
+                            <p>it is WEATHER</p>
+                            <img src="{% static 'images/weather_icon.png' %}" alt="">
+                        </div>
+                        <h1>10:00PM</h1>
+                    </div>
+                    <div class="bottom_content">
+                        <p>SAT | FEB 1, 2025</p>
+                        <h1>GMT +8</h1>
+                    </div>
+                </div>
+
+                <div class="table">
+                    <table class="table-1">
+                        <th style="font-weight: bold;">RECENT HISTORY</th>
+                        <tr>
+                            <td>
+                                <p class="history">Added a new employee!</p>
+                                <p class="history_time">01:20pm</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="history">Added a new employee!</p>
+                                <p class="history_time">01:20pm</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="history">Added a new employee!</p>
+                                <p class="history_time">01:20pm</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="history">Added a new employee!</p>
+                                <p class="history_time">01:20pm</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="history">Added a new employee!</p>
+                                <p class="history_time">01:20pm</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="history">Added a new employee!</p>
+                                <p class="history_time">01:20pm</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="history">Added a new employee!</p>
+                                <p class="history_time">01:20pm</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="history">Added a new employee!</p>
+                                <p class="history_time">01:20pm</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div id="donutchart"></div>
+                <div id="columnchart_values"></div>
+
+                <div class="table2">
+                    <table class="table-2">
+                        <th style="color: #1E1E1E;">EMPLOYEE</th>
+                        <th style="color: #1E1E1E;">PAYMENT AMOUNT</th>
+                        <th style="color: #1E1E1E;">STATUS</th>
+                        <th style="color: #1E1E1E;">LAST ATTENDANCE</th>
+    
+                        <tr>
+                            <td>Viktor Greg Lim</td>
+                            <td>₱2,450</td>
+                            <td>Active</td>
+                            <td>Feb. 24, 2025</td>
+                        </tr>
+                        <tr>
+                            <td>Juliana Mikyla Escudero</td>
+                            <td>₱2,450</td>
+                            <td>Active</td>
+                            <td>Feb. 24, 2025</td>
+                        </tr>
+                        <tr>
+                            <td>Ejay Rulona</td>
+                            <td>₱2,450</td>
+                            <td>Active</td>
+                            <td>Feb. 24, 2025</td>
+                        </tr>
+                        <tr>
+                            <td>Aaron Jess Flores</td>
+                            <td>₱2,450</td>
+                            <td>Active</td>
+                            <td>Feb. 24, 2025</td>
+                        </tr>
+                        <tr>
+                            <td>Lady Melodiluz Galope</td>
+                            <td>₱2,450</td>
+                            <td>Active</td>
+                            <td>Feb. 24, 2025</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+        google.charts.load("current", {packages:["corechart"]});
+        google.charts.setOnLoadCallback(drawChart);
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable([
+            ['Task', 'Hours per Day'],
+            ['Present', 11],
+            ['Absent', 2]
+            ]);
+
+            var options = {
+            title: 'ATTENDANCE',
+            pieHole: 0.4,
+            colors: ['#F5B93F', '#DC4646'],
+            chartArea: { width: '80%', height: '80%' },
+            height: 250,
+            width: 500
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+            chart.draw(data, options);
+        }
+    </script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+        google.charts.load("current", {packages:['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+        function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+        ["Element", "Density", { role: "style" } ],
+        ["Jan. 1", 8.94, "#1E1E1E"],
+        ["Jan. 8", 10.49, "#F5B93F"],
+        ["Jan. 15", 19.30, "1E1E1E"],
+        ["Jan. 22", 21.45, "color: #F5B93F"]
+        ]);
+
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1,
+                        { calc: "stringify",
+                        sourceColumn: 1,
+                        type: "string",
+                        role: "annotation" },
+                        2]);
+
+        var options = {
+        title: "PAYROLL per payday",
+        width: 450,
+        height: 250,
+        bar: {groupWidth: "95%"},
+        legend: { position: "none" },
+        };
+        var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+        chart.draw(view, options);
+    }
+</script>
+
+    
+</html>

@@ -1,0 +1,78 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+    <link rel="stylesheet" href="{% static 'css/template.css' %}">
+    <link rel="stylesheet" href="{% static 'css/about.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="body">
+        <nav>
+            <!-- logo -->
+            <div class="logo">
+                <div class="logo-group">
+                    <div class="logo-picture">
+                        <img src="{% static 'images/logo_icon.png' %}" alt="">
+                    </div>
+                    <div class="logo-name">
+                        <p>PAYROLL</p>
+                        <p>SYSTEM</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- nav menu -->
+            <div class="menu">
+                <ul>
+                    <li class="menu-dashboard">
+                        <a href="{% url 'payroll_system:dashboard' %}">
+                            <img src="{% static 'images/dashboard_icon.png' %}" alt="">
+                            <div class="link">DASHBOARD</div>
+                        </a>
+                    </li>
+                    <li class="menu-payroll">
+                        <a href="{% url 'payroll_system:payrolls' %}">
+                            <img src="{% static 'images/payroll_icon.png' %}" alt="">
+                            <div class="link">PAYROLL</div>
+                        </a>
+                    </li>
+                    <li class="menu-employees">
+                        <a href="{% url 'payroll_system:employees' %}">
+                            <img src="{% static 'images/employee_icon.png' %}" alt="">
+                            <div class="link">EMPLOYEES</div>
+                        </a>
+                        
+                    </li>
+                    <li class="menu-settings" id="focused">
+                        <a href="{% url 'payroll_system:settings' %}">
+                            <img src="{% static 'images/settings_icon_focused.png' %}" alt="">
+                            <div class="link">SETTINGS</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Header --> 
+        <header>
+            <h1>ABOUT US</h1>
+        </header>
+
+        <!-- Content -->
+         <div class="system_content">
+            <div class="container">
+                <p>At Toto's Car Tinting Shop, we specialize in high-quality window tinting solutions for vehicles, homes, and businesses.
+                    With years of experience in the industry, our expert team is dedicated to enhancing your comfort, privacy, and style with premium-grade tinting films.</p>
+                <p>We take pride in our precision, attention to detail, and commitment to customer satisfaction.
+                    Whether you're looking to improve your car’s aesthetics, reduce heat and glare, or add an extra layer of security to your property, we have the perfect tinting solution for you.</p>
+                <p>Our mission is to provide top-tier service with the latest technology and best materials, ensuring long-lasting results that exceed expectations.</p>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
