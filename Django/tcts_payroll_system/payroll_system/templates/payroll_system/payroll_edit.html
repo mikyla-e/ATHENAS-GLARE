@@ -110,16 +110,10 @@
                         <tr>
                             <form class="edit_field" method="POST">
                                 {% csrf_token %}
-                                <td><input type="text" name="rate_per_day" placeholder="Edit Rate per Day" id="rate_per_day"></td>
-                                <td><input type="text" name="deductions" placeholder="Edit Deductions" id="deductions"></td>
-                                <td><input type="text" name="date_of_pay" placeholder="Edit Date of Pay" id="date_of_pay"></td>
-                                <td>
-                                    <select name="payroll_status" id="payroll_status">
-                                        <option value="" hidden>Processed</option>
-                                        <option value="Processed">Processed</option>
-                                        <option value="Pending">Pending</option>
-                                    </select>
-                                </td>
+                                <td>{{ form.rate }}</td>
+                                <td>{{ form.deductions }}</td>
+                                <td>{{ form.payment_date }}</td>
+                                <td>{{ form.payroll_status }}</td>
                                 <td>
                                     <input type="button" value="">
                                     <input type="submit" value="">

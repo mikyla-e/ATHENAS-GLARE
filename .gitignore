@@ -6,3 +6,4 @@ Django/tcts_payroll_system/db.sqlite3
 *.pyc
 Django/tcts_payroll_system/payroll_system/__pycache__/urls.cpython-312.pyc
 Django/tcts_payroll_system/payroll_system/__pycache__/views.cpython-312.pyc
+*.pyc

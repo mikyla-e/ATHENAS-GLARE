@@ -11,7 +11,6 @@ class AdminForm(ModelForm):
             'password': forms.PasswordInput()
         }
         
-
 class EmployeeForm(ModelForm):
     class Meta:
         model = Employee
@@ -22,7 +21,7 @@ class EmployeeForm(ModelForm):
             'first_name': forms.TextInput(),
             'last_name': forms.TextInput(),
             'gender': forms.Select(),
-            'date_of_birth': forms.TextInput(),
+            'date_of_birth': forms.DateInput(),
             'contact_number': forms.TextInput(),
             'emergency_contact': forms.TextInput(),
             'barangay': forms.TextInput(),
@@ -44,9 +43,11 @@ class EmployeeForm(ModelForm):
 class PayrollForm(ModelForm):
     class Meta:
         model = Payroll
-        fields = ('rate', 'incentives', 'payment_date')
-        # widgets = {
-        #     'rate' : forms.TextInput(widgets=forms.TextInput(attrs={'class': widgets})),
-            
-        # }
+        fields = ('rate', 'deductions', 'payment_date', 'payroll_status')
+        widgets = {
+            'rate': forms.NumberInput(),
+            'deductions': forms.NumberInput(),
+            'payment_date': forms.DateInput(),
+            'payroll_status': forms.Select()
+        }
         

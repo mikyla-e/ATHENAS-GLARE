@@ -145,23 +145,24 @@
                             <th>STATUS</th>
                             <th></th>
                         </tr>
-    
-                        {% for employee in employees %}
-                            {% for payroll in employee.payrolls.all %}
-                            <tr>
-                                <td>{{ employee.first_name }} {{ employee.first_name }}</td>
-                                <td>{{ payroll.rate }}</td>
-                                <td>{{ payroll.deductions }}</td>
-                                <td>{{ payroll.salary }}</td>
-                                <td>{{ payroll.payroll_status }}</td>
-                                <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="5">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                                <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
-                            </tr>
-                            {% endfor %}
+                        {% for data in employee_data %}
+                            {% with employee=data.employee latest_payroll=data.latest_payroll %}
+                                {% if latest_payroll %}
+                                <tr>
+                                    <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                                    <td>{{ latest_payroll.rate }}</td>
+                                    <td>{{ latest_payroll.deductions }}</td>
+                                    <td>{{ latest_payroll.salary }}</td>
+                                    <td>{{ latest_payroll.payroll_status }}</td>
+                                    <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                                    <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                                </tr>
+                                {% endif %}
+                            {% endwith %}
                         {% endfor %}
                     </table>
                 </div>

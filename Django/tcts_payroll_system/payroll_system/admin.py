@@ -15,7 +15,7 @@ class PayrollAdmin(admin.ModelAdmin):
                      'payment_date')
     
 class AttendanceAdmin(admin.ModelAdmin):
-    list_display = ('attendance_id', 'time_in', 'time_out', 'date', 'hours_worked', 'remarks')
+    list_display = ('attendance_id', 'time_in', 'time_out', 'date', 'hours_worked', 'attendance_status','remarks')
 
 admin.site.register(Admin, AdminAdmin)
 admin.site.register(Employee, EmployeeAdmin)

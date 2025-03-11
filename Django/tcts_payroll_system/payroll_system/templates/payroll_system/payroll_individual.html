@@ -114,11 +114,11 @@
                                 </p>
                             </div>
                             <div class="payroll">
-                                {% for payroll in employee.payrolls.all %}
-                                    <p>{{ payroll.payroll_status }}</p>
-                                {% empty %}
+                                {% if current_payroll %}
+                                    <p>{{ current_payroll.payroll_status }}</p>
+                                {% else %}
                                     <p>None</p>
-                                {% endfor %}
+                                {% endif %}
                             </div>
                         </div>  
                     </div>
@@ -171,25 +171,25 @@
                         <th>Total Payment Amount</th>
                         <th>Date of Pay</th>
                         <tr>
-                            {% for payroll in employee.payrolls.all %}
-                            <td>{{ payroll.rate }}</td>
+                        {% if current_payroll %}
+                            <td>{{ current_payroll.rate }}</td>
                             <td>
                                 {% with attendance_count=employee.attendances.count %}
                                     {{ attendance_count|default:"0" }}
                                 {% endwith %}
                             </td>
-                            <td>{{ payroll.incentives }}</td>
-                            <td>{{ payroll.deductions }}</td>
-                            <td>{{ payroll.salary }}</td>
-                            <td>{{ payroll.payment_date }}</td>
-                            {% empty %}
+                            <td>{{ current_payroll.incentives }}</td>
+                            <td>{{ current_payroll.deductions }}</td>
+                            <td>{{ current_payroll.salary }}</td>
+                            <td>{{ current_payroll.payment_date }}</td>
+                        {% else %}
                             <td>0.00</td>
                             <td>N/A</td>
                             <td>0.00</td>
                             <td>0.00</td>
                             <td>0.00</td>
                             <td>N/A</td>
-                            {% endfor %}
+                        {% endif %}
                         </tr>
                     </table>
                 </div>

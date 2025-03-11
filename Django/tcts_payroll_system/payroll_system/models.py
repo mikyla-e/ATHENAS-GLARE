@@ -67,7 +67,7 @@ class Employee(models.Model):
         self.days_worked = self.attendances.filter(
             date__gte=first_day,
             date__lte=today,
-            attendance_status='PRESENT'
+            attendance_status=Attendance.AttendanceStatus.PRESENT
         ).count()
         
         # Calculate business days
@@ -79,7 +79,7 @@ class Employee(models.Model):
             day += timedelta(days=1)
 
         self.absences = workdays_so_far - self.days_worked
-        self.save()
+        self.save(update_fields=['days_worked', 'absences'])
 
 class Attendance(models.Model):
     class AttendanceStatus(models.TextChoices):

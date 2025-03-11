@@ -47,7 +47,7 @@ def employee_registration(request):
         form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
             employee = form.save()  # This will save the file automatically
-            return redirect('/payroll_system/employee_registration')
+            return redirect('/payroll_system/payroll_individual')
     else:
         form = EmployeeForm()
 
@@ -83,6 +83,9 @@ def employee_profile(request, employee_id):
     
     # Update the attendance stats
     employee.update_attendance_stats()
+    employee.refresh_from_db()
+
+    employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
     
      # Get latest attendance and calculate hours worked
     latest_attendance = employee.attendances.order_by('-date').first()
@@ -102,9 +105,19 @@ def employee_profile(request, employee_id):
 
 @login_required
 def payrolls(request):
-    employees = Employee.objects.prefetch_related('payrolls').all()
+    employees = Employee.objects.all()
+    
+    # Create a list with employees and their latest payroll
+    employee_data = []
+    for employee in employees:
+        latest_payroll = employee.payrolls.order_by('-payment_date').first()
+        employee_data.append({
+            'employee': employee,
+            'latest_payroll': latest_payroll
+        })
+    
     context = {
-        'employees': employees
+        'employee_data': employee_data
     }
     return render(request, 'payroll_system/payroll.html', context)
 
@@ -176,10 +189,14 @@ def payroll_edit(request, employee_id):
             return redirect('payroll_system:payroll_individual', employee_id=employee_id)
     else:
         form = PayrollForm(instance=payroll)
+
+     # Get the latest payroll for display purposes
+    latest_payroll = employee.payrolls.order_by('-payment_date').first()
     
     context = {
         'form': form,
-        'employee': employee
+        'employee': employee,
+        'latest_payroll': latest_payroll
     }
     return render(request, 'payroll_system/payroll_edit.html', context)
 
