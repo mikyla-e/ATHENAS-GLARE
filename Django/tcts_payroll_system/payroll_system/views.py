@@ -186,3 +186,7 @@ def payroll_edit(request, employee_id):
 @login_required
 def settings(request):
     return render(request, 'payroll_system/settings.html')
+
+@login_required
+def about(request):
+    return render(request, 'payroll_system/about.html')

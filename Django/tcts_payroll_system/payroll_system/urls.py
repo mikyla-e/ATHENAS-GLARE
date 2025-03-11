@@ -14,4 +14,5 @@ urlpatterns = [
     path('payroll_individual/<int:employee_id>/', views.payroll_individual, name='payroll_individual'),
     path('payroll_edit/<int:employee_id>/', views.payroll_edit , name='payroll_edit'),
     path('settings/', views.settings, name='settings'),
+    path('about/', views.about, name='about'),
 ]
