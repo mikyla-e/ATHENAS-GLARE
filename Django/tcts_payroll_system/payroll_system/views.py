@@ -120,6 +120,12 @@ def payrolls(request):
     employee_data = []
     for employee in employees:
         latest_payroll = employee.payrolls.order_by('-payment_date').first()
+
+        if latest_payroll:
+            attendance_count = employee.attendances.count()
+            latest_payroll.salary = latest_payroll.rate * attendance_count
+
+
         employee_data.append({
             'employee': employee,
             'latest_payroll': latest_payroll
@@ -149,6 +155,8 @@ def payroll_individual(request, employee_id):
 
     # Save updated active_status in database
     employee.save(update_fields=['active_status'])
+
+    current_payroll.salary = current_payroll.rate * attendance_count
 
     return render(request, 'payroll_system/payroll_individual.html', {
         'employee': employee,

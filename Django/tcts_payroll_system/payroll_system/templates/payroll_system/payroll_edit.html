@@ -75,7 +75,7 @@
                     <table>
                         <tr>
                             <th>Rate per Day</th>
-                            <th>Deductions</th>
+                            <!-- <th>Deductions</th> -->
                             <th>Date of Pay</th>
                             <th>Payroll Status</th>
                             <th></th>
@@ -84,7 +84,7 @@
                             <form class="edit_field" method="POST">
                                 {% csrf_token %}
                                 <td>{{ form.rate }}</td>
-                                <td>{{ form.deductions }}</td>
+                                <!-- <td>{{ form.deductions }}</td> -->
                                 <td>{{ form.payment_date }}</td>
                                 <td>{{ form.payroll_status }}</td>
                                 <td>

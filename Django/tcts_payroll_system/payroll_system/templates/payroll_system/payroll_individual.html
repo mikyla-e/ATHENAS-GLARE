@@ -106,7 +106,7 @@
                         <tr>
                             <th>Rate per day</th>
                             <th>No. of Attendance during the week</th>
-                            <th>Deductions</th>
+                            <!-- <th>Deductions</th> -->
                             <th>Total Payment Amount</th>
                             <th>Date of Pay</th>
                             <th></th>
@@ -114,14 +114,14 @@
                             {% if current_payroll %}
                                 <td>{{ current_payroll.rate }}</td>
                                 <td>{{ attendance_count }}</td>
-                                <td>{{ current_payroll.deductions }}</td>
+                                <!-- <td>{{ current_payroll.deductions }}</td> -->
                                 <td>{{ current_payroll.salary }}</td>
                                 <td>{{ current_payroll.payment_date }}</td>
                                 <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
                             {% else %}
                                 <td>0.00</td>
                                 <td>{{ attendance_count|default:"0" }}</td>
-                                <td>0.00</td>
+                                <!-- <td>0.00</td> -->
                                 <td>0.00</td>
                                 <td>N/A</td>
                                 <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
@@ -137,7 +137,7 @@
                         <th>Rate per day</th>
                         <th>No. of attendance during the week</th>
                         <th>Incentives</th>
-                        <th>Total Deduction</th>
+                        <!-- <th>Total Deduction</th> -->
                         <th>Total Payment Amount</th>
                         <th>Date of Pay</th>
                         <tr>
@@ -149,14 +149,14 @@
                                 {% endwith %}
                             </td>
                             <td>{{ current_payroll.incentives }}</td>
-                            <td>{{ current_payroll.deductions }}</td>
+                            <!-- <td>{{ current_payroll.deductions }}</td> -->
                             <td>{{ current_payroll.salary }}</td>
                             <td>{{ current_payroll.payment_date }}</td>
                         {% else %}
                             <td>0.00</td>
                             <td>N/A</td>
                             <td>0.00</td>
-                            <td>0.00</td>
+                            <!-- <td>0.00</td> -->
                             <td>0.00</td>
                             <td>N/A</td>
                         {% endif %}
