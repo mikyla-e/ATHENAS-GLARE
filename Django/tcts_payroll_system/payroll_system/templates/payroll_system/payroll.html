@@ -69,8 +69,10 @@
                             <div class="total_payroll">
                                 <div class="title"><h1>TOTAL PAYROLL</h1></div>
                                 <div class="content">
-                                    <p class="amount">PHP XX,XXX.XX</p>
-                                    <p class="percentage">XX.X%</p>
+                                    <p class="amount">{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</p>
+                                    <p class="percentage {% if payroll_percentage > 0 %}positive{% elif payroll_percentage < 0 %}negative{% endif %}">
+                                        {% if payroll_percentage > 0 %}+{% endif %}{{ payroll_percentage|floatformat:1 }}%
+                                    </p>
                                 </div>
                             </div>
                             <div class="avg_rate">
@@ -78,8 +80,10 @@
                                     <h1>AVG RATE OF EMPLOYEES</h1>
                                 </div>
                                 <div class="content">
-                                    <p class="amount">PHP XX,XXX.XX</p>
-                                    <p class="percentage">XX.X%</p>
+                                    <p class="amount">{% if avg_rate == "No rate data" %} No rate data {% else %} ₱{{ avg_rate|floatformat:2 }} {% endif %}</p>
+                                    <p class="percentage {% if rate_percentage > 0 %}positive{% elif rate_percentage < 0 %}negative{% endif %}">
+                                        {% if rate_percentage > 0 %}+{% endif %}{{ rate_percentage|floatformat:1 }}%
+                                    </p>
                                 </div>
                             </div>
                             <div class="payroll_status">
@@ -89,11 +93,11 @@
                                 <div class="content">
                                     <div class="processed">
                                         <h1>PROCESSED</h1>
-                                        <p>XX</p>
+                                        <p>{{ processed_payroll_count }}</p>  
                                     </div>
                                     <div class="pending">
                                         <h1>PENDING</h1>
-                                        <p>XX</p>
+                                        <p>{{ pending_payroll_count }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -139,7 +143,7 @@
                     <table>
                         <tr>
                             <th>EMPLOYEE</th>
-                            <th>RATE PER MONTH</th>
+                            <th>RATE PER DAY</th>
                             <!-- <th>DEDUCTIONS</th> -->
                             <th>PAYMENT AMOUNT</th>
                             <th>STATUS</th>

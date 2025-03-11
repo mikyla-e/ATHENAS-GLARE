@@ -49,10 +49,9 @@ class EmployeeForm(ModelForm):
 class PayrollForm(ModelForm):
     class Meta:
         model = Payroll
-        fields = ('rate', 'deductions', 'payment_date', 'payroll_status')
+        fields = ('rate', 'payment_date', 'payroll_status')
         widgets = {
             'rate': forms.NumberInput(),
-            'deductions': forms.NumberInput(),
             'payment_date': forms.DateInput(),
             'payroll_status': forms.Select()
         }

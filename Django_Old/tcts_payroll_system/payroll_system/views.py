@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from .forms import EmployeeForm, PayrollForm
-from .models import Employee, Payroll, Attendance
+from .models import Employee, Payroll, Attendance, History
 from .face_recognition_attendance import recognize_face
 from django.utils import timezone
 from django.utils.timezone import now, timedelta

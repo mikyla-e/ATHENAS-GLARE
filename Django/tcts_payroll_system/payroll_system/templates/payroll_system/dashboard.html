@@ -72,7 +72,7 @@
                                 <p>in the company</p>
                             </div>
                             
-                            <p class="stats">XX</p>
+                            <p class="stats">{{ total_employees }}</p>
                         </div>
                         <div class="vertical-line"></div>
                         <div class="content">
@@ -80,7 +80,7 @@
                                 <h2>ACTIVE EMPLOYEES</h2>
                                 <p>within the week</p>
                             </div>
-                            <p class="stats">XX</p>
+                            <p class="stats">{{ avg_active_employees }}</p>
                         </div>
                     </div>
                 </div>
@@ -90,22 +90,22 @@
                         <h1 class="payroll_status">PAYROLL STATUS</h1>
                         <div class="processed">
                             <h2>PROCESSED</h2>
-                            <p>XX</p>   
+                            <p>{{ processed_payroll_count }}</p>   
                         </div>
                         <div class="horizontal_line"></div>
                         <div class="pending">
                             <h2>PENDING</h2>
-                            <p>XX</p>
+                            <p>{{ pending_payroll_count }}</p>
                         </div>
                     </div>
 
                     <div class="content2">
                         <div class="total_payroll">
                             <p>TOTAL PAYROLL</p>
-                            <h1>90,000.00</h1>  
+                            <h1>{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</h1>
                         </div>
                         <div class="next_payday">
-                            <h1>02/24/25</h1>
+                            <h1>{{ next_payday|default:"N/A" }}</h1>
                             <p>NEXT PAYDAY</p>    
                         </div>
                     </div>
@@ -142,6 +142,11 @@
                             </td>
                         </tr>
                         {% endfor %}
+                        <tr>
+                            <td>
+                                
+                            </td>
+                        </tr>
                     </table>
                 </div>
 
