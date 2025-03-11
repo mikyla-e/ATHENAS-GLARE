@@ -63,6 +63,77 @@ body{
     margin: 5px 0;
 }
 
+.container .register_container .register_field .fields_2 .field .employee_picture{
+    display: flex;
+}
+
+.employee_picture .webcam-container{
+    width: 100%;
+    margin: 8px;
+    display: flex;
+    gap: 10px;
+}
+
+.employee_picture .webcam-container #video{
+    border-radius: 20px;
+}
+
+.employee_picture .webcam-container #capturedImage{
+    margin: 0;
+    width: 50%;
+    height: 100%;
+
+    border-radius: 20px;
+}
+
+.field .button{
+    display: flex;
+    justify-content: space-between;
+    gap: 5%;
+    margin: 15px 8px;
+}
+
+.field .button #captureButton{
+    border: none;
+    border-radius: 100px;
+    width: 100%;
+    padding: 10px 20px;
+
+    font-family: 'Roboto';
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: start;
+    background-color: #1e1e1e;
+    color: #fff;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.field .button #captureButton p{
+    margin: 0;
+}
+
+.field .button #captureButton img{
+    width: 30px;
+    height: 30px;
+}
+
+.field .button input[type=submit]{
+    border: none;
+    border-radius: 100px;
+
+    padding: 15px 7.5%;
+
+    font-family: 'Roboto';
+    font-size: 1rem;
+    font-weight: 700;
+    
+    background: linear-gradient(180deg, #F8D146 0%, #F5B93F 100%);
+    color: #fff;
+}
+
 .container .register_container .register_field .fields_1 .field label,
 .container .register_container .register_field .fields_2 .field label{
     margin: 0 20px;
@@ -115,56 +186,6 @@ body{
     resize: none
 }
 
-.container .register_container .register_field .fields_2 .buttons{
-    
-    display: flex;
-    justify-content: space-between;
-    gap: 5%;
-    margin: 15px 8px;
-}
-
-.container .register_container .register_field .fields_2 .buttons .camera_button{
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-.container .register_container .register_field .fields_2 .buttons .camera_button input[type=button]{
-    border: none;
-    border-radius: 100px;
-    width: 100%;
-
-    padding: 15px 70px 15px 25px;
-
-    font-family: 'Roboto';
-    font-size: 1.3rem;
-    font-weight: 700;
-    text-align: start;
-    background-color: #1e1e1e;
-    color: #fff;
-}
-
-.container .register_container .register_field .fields_2 .buttons .camera_button img{
-    position: relative;
-    width: 40px;
-    margin-left: -18%;
-}
-
-.container .register_container .register_field .fields_2 .buttons input[type=submit]{
-    border: none;
-    border-radius: 100px;
-
-    padding: 15px 7.5%;
-
-    font-family: 'Roboto';
-    font-size: 1rem;
-    font-weight: 700;
-    
-    background: linear-gradient(180deg, #F8D146 0%, #F5B93F 100%);
-    color: #fff;
-}
-
-
 
 .container .logos{
     display: flex;
@@ -186,7 +207,7 @@ body{
     font-weight: 900;
 }
 
-.container .logos img{
+.container .logos .client_logo{
     max-width: 200px;
     max-height: 200px;
     filter: drop-shadow(2px 2px 0 #222);

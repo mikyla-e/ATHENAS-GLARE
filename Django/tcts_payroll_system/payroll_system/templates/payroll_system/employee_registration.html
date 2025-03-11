@@ -94,36 +94,42 @@
                 {{ form.employee_status }}
               </div>
 
-              <h3>Capture Employee Image:</h3>
-              
-              <!-- Webcam capture elements -->
-              <div class="webcam-container" >
-                <video id="video" autoplay playsinline></video>
-                <canvas id="canvas"></canvas>
-                <img id="capturedImage" src="" alt="Captured Image" />
+              <div class="field">  
+                <label for="employee_image">employee image</label>
+                <div class="employee_picture">
+                    <!-- Webcam capture elements -->
+                    <div class="webcam-container" >
+                      <video id="video" autoplay playsinline></video>
+                      <canvas id="canvas"></canvas>
+                      <img id="capturedImage" src="" alt="Captured Image"/>
+                    </div>
+                    
+                    <!-- Hide the original file input but keep it in the form for file submission -->
+                    <div style="display: none;">
+                      {{ form.employee_image }}
+                    </div>
+                </div>
+
+                <div class="button">
+                  <button type="button" id="captureButton">
+                    <p>TAKE A PICTURE</p>
+                    <img src="{% static 'images/camera.png' %}" alt="">
+                  </button>
+                  <input class="submit" type="submit" value="SUBMIT" />
+                </div>
               </div>
+
               
-              <!-- Hide the original file input but keep it in the form for file submission -->
-              <div style="display: none;">
-                {{ form.employee_image }}
-              </div>
 
               {% if form.errors %}
-              <ul>
-                {% for field, errors in form.errors.items %}
-                    {% for error in errors %}
-                    <li>{{ field }}: {{ errors}}</li>
-                    {% endfor %}
-                {% endfor %}
-              </ul>
-              {% endif%}
-
-              <div class="buttons">
-                <div class="camera_button">
-                  <button type="button" id="captureButton">TAKE A PICTURE</button>
-                </div>
-                <input class="submit" type="submit" value="SUBMIT" />
-              </div>
+                <ul>
+                  {% for field, errors in form.errors.items %}
+                      {% for error in errors %}
+                      <li>{{ field }}: {{ errors}}</li>
+                      {% endfor %}
+                  {% endfor %}
+                </ul>
+                {% endif%}
 
             </div>
           </form>
@@ -134,7 +140,7 @@
           <img src="{% static 'images/logo_icon.png'%}" alt="" />
           <p class="logo_name">REGISTERING EMPLOYEE</p>
         </div>
-        <img
+        <img class="client_logo"
           src="{% static 'images/clients_logo.png' %}"
           alt="Toto's Car Tinting Shop"
         />

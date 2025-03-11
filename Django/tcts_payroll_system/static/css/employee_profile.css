@@ -130,7 +130,7 @@
 .info_content2 .postal_address h1,
 .info_content2 .education h1{
     margin: 0;
-    font-size: 1rem;
+    font-size: .9rem;
     font-family: 'League Spartan';
     font-weight: 800;
     color: rgba(30, 30, 30, 0.40);
@@ -187,7 +187,7 @@
 .info_content2 .date_of_employment h1,
 .info_content2 .employee_status h1{
     margin: 0;
-    font-size: 1rem;
+    font-size: .9rem;
     font-family: 'League Spartan';
     font-weight: 800;
     color: rgba(30, 30, 30, 0.40)
