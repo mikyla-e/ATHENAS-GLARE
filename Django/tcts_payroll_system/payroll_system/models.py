@@ -5,15 +5,17 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta, datetime
 
-# Create your models here.
 def rename_employee_image(instance, filename):
+    
     # Get file extension
     ext = filename.split('.')[-1]
-    # Create a sanitized name
+    
     sanitized_name = slugify(os.path.splitext(filename)[0])
+    
     # Return the new path
     return f'employee_images/{sanitized_name}.{ext}'
 
+# Create your models here.
 class Admin(models.Model):
     admin_id = models.IntegerField(primary_key=True)
     username = models.CharField(max_length=100, null=False)
@@ -59,11 +61,11 @@ class Employee(models.Model):
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
 
     def update_attendance_stats(self):
-        """Update attendance statistics for the current month"""
+        
+        # Update attendance statistics for the current month
         today = timezone.now().date()
         first_day = today.replace(day=1)
         
-        # Count days worked
         self.days_worked = self.attendances.filter(
             date__gte=first_day,
             date__lte=today,
@@ -96,7 +98,8 @@ class Attendance(models.Model):
     employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendances')
 
     def calculate_hours_worked(self):
-        """Calculate hours worked for the day"""
+        
+        # Calculate hours worked for the day
         if self.time_in and self.time_out:
             time_in_dt = datetime.combine(self.date, self.time_in)
             time_out_dt = datetime.combine(self.date, self.time_out)

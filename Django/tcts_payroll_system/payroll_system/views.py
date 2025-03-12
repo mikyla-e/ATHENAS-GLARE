@@ -1,13 +1,13 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Max, OuterRef, Subquery
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_protect
-from .forms import EmployeeForm, PayrollForm
-from .models import Employee, Payroll, Attendance
-from .face_recognition_attendance import recognize_face
+from django.db.models import OuterRef, Subquery
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.utils.timezone import now
+from django.views.decorators.csrf import csrf_protect
+from .forms import EmployeeForm, PayrollForm
+from .face_recognition_attendance import recognize_face
+from .models import Employee, Payroll, Attendance
 
 @csrf_protect  # Ensure CSRF protection
 def time_in_out(request):
@@ -16,7 +16,7 @@ def time_in_out(request):
 
         if not employee_id:
             messages.error(request, "Employee ID cannot be empty.")
-            return redirect("/payroll_system/time_in_out")  # Redirect to avoid resubmission issues
+            return redirect("/payroll_system/time_in_out")
 
         try:
             employee = Employee.objects.get(employee_id=employee_id)
@@ -46,7 +46,7 @@ def employee_registration(request):
     if request.method == "POST":
         form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
-            employee = form.save()  # This will save the file automatically
+            employee = form.save()
             return redirect('payroll_system:payroll_individual', employee_id = employee.employee_id)
     else:
         form = EmployeeForm()
@@ -55,6 +55,7 @@ def employee_registration(request):
 
 @login_required
 def employees(request):
+    
     # Get the latest attendance for each employee using a subquery
     latest_attendance_subquery = (
         Attendance.objects
@@ -67,7 +68,7 @@ def employees(request):
     latest_payroll_subquery = (
         Payroll.objects
         .filter(employee_id_fk=OuterRef('pk'))
-        .order_by('-payment_date')  # Assuming there's a created_at or similar timestamp field
+        .order_by('-payment_date')
         .values('payroll_status')[:1]
     )
     
@@ -90,13 +91,12 @@ def employees(request):
 def employee_profile(request, employee_id):
     employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
     
-    # Update the attendance stats
     employee.update_attendance_stats()
     employee.refresh_from_db()
 
     employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
     
-     # Get latest attendance and calculate hours worked
+    # Get latest attendance and calculate hours worked
     latest_attendance = employee.attendances.order_by('-date').first()
     if latest_attendance:
         latest_attendance.calculate_hours_worked()  # Ensure hours are updated
@@ -132,12 +132,10 @@ def payrolls(request):
 
 @login_required
 def payroll_individual(request, employee_id):
-    employee = get_object_or_404(Employee.objects.prefetch_related('payrolls', 'attendances'), employee_id=employee_id)
+    employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
 
-    # Get latest payroll
     current_payroll = employee.payrolls.order_by('-payment_date').first()
 
-    # Count attendance records
     attendance_count = employee.attendances.count()
 
     # Check attendance records for today's active status
@@ -164,7 +162,7 @@ def payroll_edit(request, employee_id):
     employee = Employee.objects.get(employee_id=employee_id)
     today = timezone.now().date()
     
-    # Try to get an active payroll, or create a new one
+    # Get an active payroll, or create a new one
     try:
         payroll = Payroll.objects.get(
             employee_id_fk=employee,
@@ -186,7 +184,7 @@ def payroll_edit(request, employee_id):
             # Copy relevant fields
             payroll.rate = prev_payroll.rate
             payroll.incentives = prev_payroll.incentives
-            # Add any other fields you need to copy
+            payroll.payroll_status = prev_payroll.payroll_status
         except Payroll.DoesNotExist:
             # First payroll for this employee, use defaults
             pass
@@ -199,7 +197,7 @@ def payroll_edit(request, employee_id):
     else:
         form = PayrollForm(instance=payroll)
 
-     # Get the latest payroll for display purposes
+    # Get the latest payroll for display purposes
     latest_payroll = employee.payrolls.order_by('-payment_date').first()
     
     context = {
