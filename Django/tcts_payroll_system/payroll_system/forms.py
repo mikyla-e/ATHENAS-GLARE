@@ -40,6 +40,12 @@ class EmployeeForm(ModelForm):
             raise forms.ValidationError('Contact number must be exactly 11 digits')
         return contact_number
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make image required only for new employees (not for updates)
+        if not self.instance.pk:  # If this is a new employee
+            self.fields['employee_image'].required = True
+    
 class PayrollForm(ModelForm):
     class Meta:
         model = Payroll

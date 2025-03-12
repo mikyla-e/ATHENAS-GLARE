@@ -47,28 +47,37 @@ def employee_registration(request):
         form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
             employee = form.save()  # This will save the file automatically
-            return redirect('/payroll_system/payroll_individual')
+            return redirect('payroll_system:payroll_individual', employee_id = employee.employee_id)
     else:
         form = EmployeeForm()
 
     return render(request, 'payroll_system/employee_registration.html', {'form': form})
 
 @login_required
-
 def employees(request):
     # Get the latest attendance for each employee using a subquery
     latest_attendance_subquery = (
         Attendance.objects
         .filter(employee_id_fk=OuterRef('pk'))
-        .order_by('-date')  # The minus sign sorts by date descending (newest first)
-        .values('date')[:1]  # Limit to 1 result
+        .order_by('-date')
+        .values('date')[:1]
     )
     
-    # Add the latest attendance date to each employee
+    # Get the latest payroll for each employee using a subquery
+    latest_payroll_subquery = (
+        Payroll.objects
+        .filter(employee_id_fk=OuterRef('pk'))
+        .order_by('-payment_date')  # Assuming there's a created_at or similar timestamp field
+        .values('payroll_status')[:1]
+    )
+    
+    # Add the latest attendance date and latest payroll status to each employee
     employees = (
         Employee.objects
-        .prefetch_related('payrolls')
-        .annotate(latest_attendance_date=Subquery(latest_attendance_subquery))
+        .annotate(
+            latest_attendance_date=Subquery(latest_attendance_subquery),
+            latest_payroll_status=Subquery(latest_payroll_subquery)
+        )
         .all()
     )
     
