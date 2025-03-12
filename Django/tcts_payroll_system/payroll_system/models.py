@@ -128,4 +128,3 @@ class History(models.Model):
     history_id = models.AutoField(primary_key=True)
     description = models.CharField(max_length=255, null=False)
     date_time = models.DateTimeField(default=timezone.now, null=False)
-    admin_id_fk = models.ForeignKey(Admin, on_delete=models.CASCADE)

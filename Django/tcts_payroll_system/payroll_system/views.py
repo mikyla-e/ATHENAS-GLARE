@@ -7,7 +7,7 @@ from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_protect
 from .forms import EmployeeForm, PayrollForm
 from .face_recognition_attendance import recognize_face
-from .models import Employee, Payroll, Attendance
+from .models import Employee, Payroll, Attendance, History
 
 @csrf_protect  # Ensure CSRF protection
 def time_in_out(request):
@@ -39,7 +39,38 @@ def time_in_out(request):
 
 @login_required
 def dashboard(request):
-    return render(request, 'payroll_system/dashboard.html')
+    
+    latest_attendance_subquery = (
+        Attendance.objects
+        .filter(employee_id_fk=OuterRef('pk'))
+        .order_by('-date')
+        .values('date')[:1]
+    )
+
+    latest_payroll_subquery = (
+        Payroll.objects
+        .filter(employee_id_fk=OuterRef('pk'))
+        .order_by('-payment_date')
+        .values('payroll_status')[:1]
+    )
+
+    recent_employees = (
+        Employee.objects
+        .annotate(
+            latest_attendance_date=Subquery(latest_attendance_subquery),
+            latest_payroll_status=Subquery(latest_payroll_subquery)
+        )
+        .order_by('-date_of_employment')[:5]
+    )
+
+    histories = History.objects.order_by('-date_time')
+
+     
+    context = { 
+        'histories': histories,
+        'employees': recent_employees
+    }
+    return render(request, 'payroll_system/dashboard.html', context)
 
 @login_required
 def employee_registration(request):
@@ -47,6 +78,9 @@ def employee_registration(request):
         form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
             employee = form.save()
+
+            History.objects.create(description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was added.")
+
             return redirect('payroll_system:payroll_individual', employee_id = employee.employee_id)
     else:
         form = EmployeeForm()
@@ -201,6 +235,9 @@ def payroll_edit(request, employee_id):
         form = PayrollForm(request.POST, instance=payroll)
         if form.is_valid():
             form.save()
+
+            History.objects.create(description=f"Payroll for {employee.first_name} {employee.last_name} ({employee.employee_id}) was updated.")
+
             return redirect('payroll_system:payroll_individual', employee_id=employee_id)
     else:
         form = PayrollForm(instance=payroll)

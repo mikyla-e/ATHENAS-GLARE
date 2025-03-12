@@ -128,59 +128,20 @@
                 <div class="table">
                     <table class="table-1">
                         <th style="font-weight: bold;">RECENT HISTORY</th>
+                        {% for history in histories %}
                         <tr>
                             <td>
-                                <p class="history">Added a new employee!</p>
-                                <p class="history_time">01:20pm</p>
+                                <p class="history">{{ history.description }}</p>
+                                <p class="history_time">{{ history.date_time }}</p>
                             </td>
                         </tr>
+                        {% empty %}
                         <tr>
                             <td>
-                                <p class="history">Added a new employee!</p>
-                                <p class="history_time">01:20pm</p>
+                                <p>No logs found.</p>
                             </td>
                         </tr>
-                        <tr>
-                            <td>
-                                <p class="history">Added a new employee!</p>
-                                <p class="history_time">01:20pm</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p class="history">Added a new employee!</p>
-                                <p class="history_time">01:20pm</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p class="history">Added a new employee!</p>
-                                <p class="history_time">01:20pm</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p class="history">Added a new employee!</p>
-                                <p class="history_time">01:20pm</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p class="history">Added a new employee!</p>
-                                <p class="history_time">01:20pm</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p class="history">Added a new employee!</p>
-                                <p class="history_time">01:20pm</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </table>
                 </div>
 
@@ -194,36 +155,30 @@
                         <th style="color: #1E1E1E;">STATUS</th>
                         <th style="color: #1E1E1E;">LAST ATTENDANCE</th>
     
+                        {% for employee in employees %}
                         <tr>
-                            <td>Viktor Greg Lim</td>
-                            <td>₱2,450</td>
-                            <td>Active</td>
-                            <td>Feb. 24, 2025</td>
+                            <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                            <td>{{ employee.total_payment }}</td>
+                            <td>
+                                {% if employee.active_status == "Active" %}
+                                    Active
+                                {% else %}
+                                    Inactive
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if employee.latest_attendance_date %}
+                                        {{ employee.latest_attendance_date }}
+                                {% else %}
+                                    No Attendance Data
+                                {% endif %}
+                            </td>
                         </tr>
+                        {% empty %}
                         <tr>
-                            <td>Juliana Mikyla Escudero</td>
-                            <td>₱2,450</td>
-                            <td>Active</td>
-                            <td>Feb. 24, 2025</td>
+                            <td colspan="4">No employees found.</td>
                         </tr>
-                        <tr>
-                            <td>Ejay Rulona</td>
-                            <td>₱2,450</td>
-                            <td>Active</td>
-                            <td>Feb. 24, 2025</td>
-                        </tr>
-                        <tr>
-                            <td>Aaron Jess Flores</td>
-                            <td>₱2,450</td>
-                            <td>Active</td>
-                            <td>Feb. 24, 2025</td>
-                        </tr>
-                        <tr>
-                            <td>Lady Melodiluz Galope</td>
-                            <td>₱2,450</td>
-                            <td>Active</td>
-                            <td>Feb. 24, 2025</td>
-                        </tr>
+                        {% endfor %}
                         <tr>
                             <td></td>
                         </tr>

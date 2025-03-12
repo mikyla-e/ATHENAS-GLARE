@@ -98,8 +98,6 @@ def recognize_face(employee_id):
             face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
             for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
-                # Draw rectangle around face
-                cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
                 
                 # Check if face matches the registered employee
                 if compare_faces(registered_faces[employee_id], face_encoding):
@@ -107,8 +105,8 @@ def recognize_face(employee_id):
                     
                     # Display employee name in green
                     name = employee_names[employee_id]
-                    cv2.putText(frame, name, (left, top - 10), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+                    cv2.putText(frame, name, (left, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
                     
                     if consecutive_matches >= required_matches:
                         try:
@@ -124,8 +122,8 @@ def recognize_face(employee_id):
                     consecutive_matches = 0  # Reset on any non-match
                     
                     # Display "Unknown" in red
-                    cv2.putText(frame, "Unknown", (left, top - 10), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
+                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+                    cv2.putText(frame, "Unknown", (left, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
         
         cv2.imshow("Face Recognition Attendance", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
