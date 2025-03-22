@@ -114,13 +114,16 @@
                 <div class="time">
                     <div class="top_content">
                         <div class="weather">
-                            <p>it is WEATHER</p>
+                            <p>WEATHER</p>
                             <img src="{% static 'images/weather_icon.png' %}" alt="">
                         </div>
-                        <h1>10:00PM</h1>
+                        <div class="number_time"><h1 id="philippines-time"></h1></div>
+                        
                     </div>
                     <div class="bottom_content">
-                        <p>SAT | FEB 1, 2025</p>
+                        <p id="philippines-day"></p>
+                        <p> |</p>
+                        <p id="philippines-date"></p>
                         <h1>GMT +8</h1>
                     </div>
                 </div>
@@ -249,6 +252,70 @@
         chart.draw(view, options);
     }
 </script>
+<script>
+    function updateDay() {
+            // Get the current day of the week in the Philippines
+            const options = { timeZone: 'Asia/Manila', weekday: 'long' };
+            const phDay = new Date().toLocaleDateString('en-US', options);
 
+            // Display the day
+            document.getElementById("philippines-day").textContent = phDay;
+        }
+
+        // Call the function immediately
+        updateDay();
+
+    function updateTime() {
+            // Get current time in the Philippines (Asia/Manila)
+            const options = { 
+                timeZone: 'Asia/Manila', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true // Use 12-hour format (AM/PM)
+            };
+
+            const phTime = new Date().toLocaleTimeString('en-US', options);
+
+            // Display the time
+            document.getElementById("philippines-time").textContent = phTime;
+            }
+
+            // Update time every second
+            setInterval(updateTime, 1000);
+
+            // Call the function immediately
+            updateTime();
+
+
+            function updateDate() {
+            // Get the current date and format it to Month, Day, Year
+            const options = { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' };
+            const philippineDate = new Date().toLocaleDateString('en-US', options);
+
+            // Update the text inside the <p> tag with the ID "philippines-date"
+            document.getElementById("philippines-date").textContent = philippineDate;
+        }
+
+        // Call the function once when the page loads
+        updateDate();
+
+        function displayWeek() {
+            const weekNumber = getWeekNumber(new Date());
+            document.getElementById("philippines-week").textContent = "Philippines Current Week: " + weekNumber;
+        }
+
+        displayWeek();
+        
+    // Get the current date
+    const today = new Date();
+
+    // Format the date
+    const month = today.toLocaleString('default', { month: 'long' }); // Full month name
+    const day = today.getDate(); // Day of the month
+    const year = today.getFullYear(); // Year
+
+    // Display the date
+    document.getElementById("current-date").textContent = month + " " + day + ", " + year;
+</script>
     
 </html>
