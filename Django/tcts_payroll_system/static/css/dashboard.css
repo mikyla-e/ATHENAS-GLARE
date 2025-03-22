@@ -3,6 +3,11 @@
     
 }
 
+#philippines-time{
+    text-align: center;
+    font-size: 4em;
+}
+
 .container{
     padding: 15px;
     grid-gap: 10px;
@@ -310,7 +315,7 @@
 
 .time .top_content h1{
     margin: 10px 0 0;
-    font-size: clamp(3em, 6em , 10em);
+    font-size: 5em;
     line-height: 80%;
 }
 
@@ -322,14 +327,16 @@
 
 .time .bottom_content p{
     margin: 0;
-    font-size: 1.6rem;
-    /* font-size: clamp(1.25em, 1.6rem, 5em);*/
+    font-size: 1.2rem;
     font-weight: bold;
+}
+.number_time{
+    font-size: 1.2em;   
 }
 
 .time .bottom_content h1{
     margin: 0;
-    font-size: clamp(1em, 2em, 5em);
+    font-size: 2em;
     font-family: "Roboto";
     line-height: 70%;
 

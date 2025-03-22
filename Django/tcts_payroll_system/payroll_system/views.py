@@ -54,7 +54,7 @@ def dashboard(request):
         .values('rate')[:1]
     )
 
-     # Total Employees
+    # Total Employees
     total_employees = Employee.objects.count()
 
     # Get current week range (Monday to Sunday)
@@ -99,21 +99,21 @@ def dashboard(request):
     today = now().date()
     next_payday = Payroll.objects.filter(payment_date__gt=today).aggregate(Min('payment_date'))['payment_date__min']
 
+    # Modified: Get employees ordered by most recent time-in (attendance date)
     recent_employees = (
         Employee.objects
         .annotate(
             latest_attendance_date=Subquery(latest_attendance_subquery),
             latest_payroll=Subquery(latest_payroll_subquery)
         )
-        .order_by('-date_of_employment')[:5]
+        .order_by('-latest_attendance_date', 'last_name')[:5] # Order by most recent attendance date
     )
 
-    histories = History.objects.order_by('-date_time')[:8]
+    # Modified: Limit history to 7 rows instead of 8
+    histories = History.objects.order_by('-date_time')[:7]
 
     for employee in recent_employees:
         employee.total_payment = (employee.latest_payroll or 0) * employee.attendances.count()
-
-    
      
     context = { 
         'histories': histories,
@@ -122,8 +122,8 @@ def dashboard(request):
         'avg_active_employees': round(avg_active_employees),
         'processed_payroll_count': processed_payroll_count,
         'pending_payroll_count': pending_payroll_count,
-        'total_payroll': total_payroll,  # Added this line
-        'next_payday': next_payday,      # Added this line
+        'total_payroll': total_payroll,
+        'next_payday': next_payday,
     }
     return render(request, 'payroll_system/dashboard.html', context)
 
