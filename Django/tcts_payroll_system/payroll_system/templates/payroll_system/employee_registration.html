@@ -67,12 +67,20 @@
                 {{ form.emergency_contact }}
               </div>
               <div class="field">
-                <label for="barangay">barangay</label>
-                {{ form.barangay }}
+                <label for="region">region</label>
+                {{ form.region }}
               </div>
               <div class="field">
-                <label for="postal-address">postal address</label>
-                {{ form.postal_address }}
+                <label for="province">province</label>
+                {{ form.province }}
+              </div>
+              <div class="field">
+                <label for="municipality">municipality</label>
+                {{ form.municipality }}
+              </div>
+              <div class="field">
+                <label for="barangay">barangay</label>
+                {{ form.barangay }}
               </div>
               <div class="field">
                 <label for="education">highest education attainment</label>
@@ -129,7 +137,7 @@
                       {% endfor %}
                   {% endfor %}
                 </ul>
-                {% endif%}
+              {% endif%}
 
             </div>
           </form>
@@ -201,6 +209,84 @@
             console.log("Image captured and file created");
           }, 'image/jpeg', 0.95); // High quality JPEG
         });
+      });
+
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        // function getCsrfToken() {
+        //     return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        // }
+
+        // // Then modify your fetch call
+        // fetch(url, {
+        //     headers: {
+        //         'X-CSRFToken': getCsrfToken(),
+        //     }
+        // })
+
+        function setupDependentDropdown(parentSelector, childSelector, locationType) {
+        const parentDropdown = document.querySelector(`select[name="${parentSelector}"]`);
+        const childDropdown = document.querySelector(`select[name="${childSelector}"]`);
+        
+        console.log(`Setup: ${parentSelector} -> ${childSelector}, Elements found:`, !!parentDropdown, !!childDropdown);
+        
+        if (!parentDropdown || !childDropdown) return;
+        
+        parentDropdown.addEventListener('change', function() {
+            const parentId = this.value;
+            console.log(`${parentSelector} changed to ${parentId}`);
+            
+            // Clear the child dropdown
+            childDropdown.innerHTML = '<option value="">---------</option>';
+            
+            // If parent has a value, fetch children
+            if (parentId) {
+                const url = "{% url 'payroll_system:get_location_data' %}" + `?type=${locationType}&parent_id=${parentId}`;
+                console.log(`Fetching from: ${url}`);
+                
+                fetch(url)
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(`Received ${data.length} items:`, data);
+                        if (Array.isArray(data)) {
+                            data.forEach(item => {
+                                const option = document.createElement('option');
+                                option.value = item.id;
+                                option.textContent = item.name;
+                                childDropdown.appendChild(option);
+                            });
+                        } else {
+                            console.error('Expected array but got:', data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        // Show error message in the child dropdown
+                        const option = document.createElement('option');
+                        option.textContent = 'Error loading data';
+                        childDropdown.appendChild(option);
+                    });
+                }
+            });
+        }
+          
+          // Set up the chain of dependent dropdowns
+          setupDependentDropdown('region', 'province', 'provinces');
+          setupDependentDropdown('province', 'municipality', 'municipalities');
+          setupDependentDropdown('municipality', 'barangay', 'barangays');
+          
+          // If editing an existing record, trigger changes to load initial values
+        const regionDropdown = document.querySelector('region');
+        if (regionDropdown && regionDropdown.value) {
+            // Dispatch a change event to load provinces
+            regionDropdown.dispatchEvent(new Event('change'));
+        }
       });
     </script>
   </body>

@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta, datetime
+from ph_geography.models import Barangay
 
 def rename_employee_image(instance, filename):
     
@@ -20,6 +21,53 @@ class Admin(models.Model):
     admin_id = models.IntegerField(primary_key=True)
     username = models.CharField(max_length=100, null=False)
     password = models.CharField(max_length=100, null=False)
+
+class Region(models.Model):
+    name = models.CharField(max_length=100)
+    code = models.CharField(max_length=20, null=True, blank=True)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ['name']
+
+class Province(models.Model):
+    name = models.CharField(max_length=100)
+    code = models.CharField(max_length=20, null=True, blank=True)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name='provinces')
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ['name']
+
+class Municipality(models.Model):
+    name = models.CharField(max_length=100)
+    code = models.CharField(max_length=20, null=True, blank=True)
+    province = models.ForeignKey(Province, on_delete=models.CASCADE, related_name='municipalities')
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ['name']
+
+class Barangay(models.Model):
+    name = models.CharField(max_length=100)
+    code = models.CharField(max_length=20, null=True, blank=True)
+    municipality = models.ForeignKey(Municipality, on_delete=models.CASCADE, related_name='barangays')
+    
+    def __str__(self):
+        return self.name
+    
+    def get_full_address(self):
+        return f"{self.name}, {self.municipality.name}, {self.municipality.province.name}, {self.municipality.province.region.name}"
+    
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = "Barangays"
 
 class Employee(models.Model):
     class Gender(models.TextChoices):
@@ -50,8 +98,13 @@ class Employee(models.Model):
     date_of_birth = models.DateField(null=True)
     contact_number = models.CharField(max_length=15, null=True)
     emergency_contact = models.CharField(max_length=15, null=True)
-    barangay = models.CharField(max_length=100, null=True)
-    postal_address = models.IntegerField(null=True)
+    
+    # Separate address fields
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, related_name='employees')
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, related_name='employees')
+    municipality = models.ForeignKey(Municipality, on_delete=models.SET_NULL, null=True, related_name='employees')
+    barangay = models.ForeignKey(Barangay, on_delete=models.SET_NULL, null=True, related_name='employees')
+
     highest_education = models.CharField(max_length=20, choices=HighestEducation.choices, null=True)
     work_experience = models.CharField(max_length=2083, null=True)
     date_of_employment = models.DateField(default=timezone.now)
@@ -61,8 +114,26 @@ class Employee(models.Model):
     absences = models.IntegerField(default=0, null=False)
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
 
-    def update_attendance_stats(self):
+    def __str__(self):
+        if self.barangay:
+            return f"{self.first_name} {self.last_name} - {self.get_full_address()}"
+        return f"{self.first_name} {self.last_name}"
+
+    def get_full_address(self):
+        address_parts = []
         
+        if self.barangay:
+            address_parts.append(self.barangay.name)
+        if self.municipality:
+            address_parts.append(self.municipality.name)
+        if self.province:
+            address_parts.append(self.province.name)
+        if self.region:
+            address_parts.append(self.region.name)
+            
+        return ", ".join(address_parts) if address_parts else "No address provided"
+
+    def update_attendance_stats(self):
         # Update attendance statistics for the current month
         today = timezone.now().date()
         first_day = today.replace(day=1)
@@ -70,14 +141,14 @@ class Employee(models.Model):
         self.days_worked = self.attendances.filter(
             date__gte=first_day,
             date__lte=today,
-            attendance_status=Attendance.AttendanceStatus.PRESENT
+            attendance_status='Present'  # Assuming this is the correct status value
         ).count()
         
         # Calculate business days
         workdays_so_far = 0
         day = first_day
         while day <= today:
-            if day.weekday() < 5:
+            if day.weekday() < 5:  # Monday to Friday
                 workdays_so_far += 1
             day += timedelta(days=1)
 

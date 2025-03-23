@@ -6,7 +6,7 @@ app_name = 'payroll_system'
 
 urlpatterns = [
     path('time_in_out/', views.time_in_out, name='time_in_out'),
-    path('dashboard/', views.dashboard, name='dashboard'), 
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('employee_registration/', views.employee_registration, name='employee_registration'),
     path('employees/', views.employees, name='employees'),
     path('employee_profile/<int:employee_id>/', views.employee_profile, name='employee_profile'),
@@ -15,4 +15,5 @@ urlpatterns = [
     path('payroll_edit/<int:employee_id>/', views.payroll_edit , name='payroll_edit'),
     path('settings/', views.settings, name='settings'),
     path('about/', views.about, name='about'),
+    path('get-location-data/', views.get_location_data, name='get_location_data'), 
 ]

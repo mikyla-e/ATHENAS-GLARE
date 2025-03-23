@@ -2,6 +2,7 @@ import datetime
 from django import forms
 from django.forms import ModelForm
 from .models import Admin, Employee, Payroll
+from ph_geography.models import Region, Province, Municipality, Barangay
 
 class AdminForm(ModelForm):
     class Meta:
@@ -16,7 +17,7 @@ class EmployeeForm(ModelForm):
     class Meta:
         model = Employee
         fields = ('first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
-                   'barangay', 'postal_address', 'highest_education', 'work_experience', 'date_of_employment',
+                   'region', 'province', 'municipality', 'barangay', 'highest_education', 'work_experience', 'date_of_employment',
                    'employee_status', 'employee_image')
         widgets = {
             'first_name': forms.TextInput(),
@@ -26,8 +27,10 @@ class EmployeeForm(ModelForm):
             'date_of_birth': forms.DateInput(),
             'contact_number': forms.TextInput(),
             'emergency_contact': forms.TextInput(),
-            'barangay': forms.TextInput(),
-            'postal_address': forms.TextInput(),
+            'region': forms.Select(attrs={'id': 'region'}),
+            'province': forms.Select(attrs={'id': 'province'}),
+            'municipality': forms.Select(attrs={'id': 'municipality'}),
+            'barangay': forms.Select(attrs={'id': 'barangay'}),
             'highest_education': forms.Select(),
             'work_experience': forms.Textarea(),
             'date_of_employment': forms.DateInput(),
@@ -35,15 +38,76 @@ class EmployeeForm(ModelForm):
             'employee_image': forms.ClearableFileInput(),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Make image required only for new employees (not for updates)
+        if not self.instance.pk:
+            self.fields['employee_image'].required = True
+        
+        # Always load all regions
+        self.fields['region'].queryset = Region.objects.all()
+        
+        # Get form data if it exists
+        form_data = kwargs.get('data')
+        
+        # For initial load or if there's an instance
+        if self.instance.pk or not form_data:
+            # If we have an instance with saved data
+            if self.instance.pk:
+                # Set querysets based on current selections
+                if self.instance.region:
+                    self.fields['province'].queryset = Province.objects.filter(region=self.instance.region)
+                
+                if self.instance.province:
+                    self.fields['municipality'].queryset = Municipality.objects.filter(
+                        province=self.instance.province
+                    )
+                
+                if self.instance.municipality:
+                    self.fields['barangay'].queryset = Barangay.objects.filter(
+                        municipality=self.instance.municipality
+                    )
+            else:
+                # For initial form load with no data
+                self.fields['province'].queryset = Province.objects.none()
+                self.fields['municipality'].queryset = Municipality.objects.none()
+                self.fields['barangay'].queryset = Barangay.objects.none()
+        
+        # For form submissions (POST) - populate dropdowns based on form data
+        elif form_data:
+            # If region is selected, filter provinces
+            region_id = form_data.get('region')
+            if region_id:
+                self.fields['province'].queryset = Province.objects.filter(region_id=region_id)
+            else:
+                self.fields['province'].queryset = Province.objects.none()
+            
+            # If province is selected, filter municipalities
+            province_id = form_data.get('province')
+            if province_id:
+                self.fields['municipality'].queryset = Municipality.objects.filter(province_id=province_id)
+            else:
+                self.fields['municipality'].queryset = Municipality.objects.none()
+            
+            # If municipality is selected, filter barangays
+            municipality_id = form_data.get('municipality')
+            if municipality_id:
+                self.fields['barangay'].queryset = Barangay.objects.filter(municipality_id=municipality_id)
+            else:
+                self.fields['barangay'].queryset = Barangay.objects.none()
+
     def clean(self):
         cleaned_data = super().clean()
         required_fields = ['first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 
-                           'emergency_contact', 'barangay', 'postal_address', 'highest_education', 
-                           'work_experience', 'date_of_employment', 'employee_status']
+                           'emergency_contact', 'region', 'province', 'municipality', 'barangay',
+                           'highest_education', 'work_experience', 'date_of_employment', 
+                           'employee_status']
 
         # Check if all required fields are filled
-        if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
-            raise forms.ValidationError("All fields must be filled.")
+        missing_fields = [field for field in required_fields if not cleaned_data.get(field)]
+        if missing_fields:
+            raise forms.ValidationError(f"The following fields must be filled: {', '.join(missing_fields)}")
 
         return cleaned_data
 
@@ -77,12 +141,6 @@ class EmployeeForm(ModelForm):
 
     def clean_emergency_contact(self):
         return self.validate_contact_number(self.cleaned_data.get('emergency_contact', ''))
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Make image required only for new employees (not for updates)
-        if not self.instance.pk:
-            self.fields['employee_image'].required = True
     
 class PayrollForm(ModelForm):
     class Meta:

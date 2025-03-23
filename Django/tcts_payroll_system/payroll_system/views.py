@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max, OuterRef, Subquery, Count, Sum, Min, Avg
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
@@ -8,6 +9,7 @@ from django.views.decorators.csrf import csrf_protect
 from .forms import EmployeeForm, PayrollForm
 from .face_recognition_attendance import recognize_face
 from .models import Employee, Payroll, Attendance, History
+from ph_geography.models import Region, Province, Municipality, Barangay
 
 @csrf_protect  # Ensure CSRF protection
 def time_in_out(request):
@@ -126,6 +128,33 @@ def dashboard(request):
         'next_payday': next_payday,
     }
     return render(request, 'payroll_system/dashboard.html', context)
+
+def get_location_data(request):
+    """Single view to handle all location-related AJAX requests"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    try:
+        location_type = request.GET.get('type')
+        parent_id = request.GET.get('parent_id')
+        
+        logger.info(f"Request received: type={location_type}, parent_id={parent_id}")
+        
+        if location_type == 'provinces':
+            data = list(Province.objects.filter(region_id=parent_id).values('id', 'name'))
+        elif location_type == 'municipalities':
+            data = list(Municipality.objects.filter(province_id=parent_id).values('id', 'name'))
+        elif location_type == 'barangays':
+            data = list(Barangay.objects.filter(municipality_id=parent_id).values('id', 'name'))
+        else:
+            data = []
+        
+        logger.info(f"Returning {len(data)} items")
+        return JsonResponse(data, safe=False)
+    
+    except Exception as e:
+        logger.error(f"Error in get_location_data: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
 
 @login_required
 def employee_registration(request):
