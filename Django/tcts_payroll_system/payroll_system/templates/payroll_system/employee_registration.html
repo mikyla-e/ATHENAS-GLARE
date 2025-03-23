@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -214,14 +214,14 @@
       
       document.addEventListener('DOMContentLoaded', function() {
         function setupDependentDropdown(parentSelector, childSelector, locationType) {
-        const parentDropdown = document.querySelector(`select[name="${parentSelector}"]`);
-        const childDropdown = document.querySelector(`select[name="${childSelector}"]`);
-        
-        console.log(`Setup: ${parentSelector} -> ${childSelector}, Elements found:`, !!parentDropdown, !!childDropdown);
-        
-        if (!parentDropdown || !childDropdown) return;
-        
-        parentDropdown.addEventListener('change', function() {
+          const parentDropdown = document.querySelector(`select[name="${parentSelector}"]`);
+          const childDropdown = document.querySelector(`select[name="${childSelector}"]`);
+          
+          console.log(`Setup: ${parentSelector} -> ${childSelector}, Elements found:`, !!parentDropdown, !!childDropdown);
+          
+          if (!parentDropdown || !childDropdown) return;
+          
+          parentDropdown.addEventListener('change', function() {
             const parentId = this.value;
             console.log(`${parentSelector} changed to ${parentId}`);
             
@@ -229,7 +229,7 @@
             childDropdown.innerHTML = '<option value="">---------</option>';
             
             // If parent has a value, fetch children
-            if (parentId) {
+              if (parentId) {
                 const url = "{% url 'payroll_system:get_location_data' %}" + `?type=${locationType}&parent_id=${parentId}`;
                 console.log(`Fetching from: ${url}`);
                 
@@ -261,22 +261,22 @@
                         option.textContent = 'Error loading data';
                         childDropdown.appendChild(option);
                     });
-                }
-            });
+            }
+          });
         }
           
-          // Set up the chain of dependent dropdowns
-          setupDependentDropdown('region', 'province', 'provinces');
-          setupDependentDropdown('province', 'municipality', 'municipalities');
-          setupDependentDropdown('municipality', 'barangay', 'barangays');
-          
-          // If editing an existing record, trigger changes to load initial values
+        // Set up the chain of dependent dropdowns
+        setupDependentDropdown('region', 'province', 'provinces');
+        setupDependentDropdown('province', 'municipality', 'municipalities');
+        setupDependentDropdown('municipality', 'barangay', 'barangays');
+        
+        // If editing an existing record, trigger changes to load initial values
         const regionDropdown = document.querySelector('region');
         if (regionDropdown && regionDropdown.value) {
             // Dispatch a change event to load provinces
             regionDropdown.dispatchEvent(new Event('change'));
         }
-      });
+    	});
     </script>
   </body>
 </html>

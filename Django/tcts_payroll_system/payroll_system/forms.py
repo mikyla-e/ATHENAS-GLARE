@@ -171,7 +171,4 @@ class PayrollForm(ModelForm):
         payment_date = self.cleaned_data.get('payment_date')
         if payment_date:
             self.validate_date_format(str(payment_date))
-        return payment_date
-        
-    
-        
+        return payment_date    
