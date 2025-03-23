@@ -87,9 +87,9 @@
                     <div class="container_2">
                         <div class="search_filter" >
                             <div class="search">
-                                <form method="post">
+                                <form method="get" action="{% url 'payroll_system:employees' %}">
                                     <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt=""></button>
-                                    <input type="text" placeholder="Search">
+                                    <input type="text" name="q" placeholder="Search" value="{{ request.GET.q }}">
                                 </form>
                             </div>
                             <div class="filter">
