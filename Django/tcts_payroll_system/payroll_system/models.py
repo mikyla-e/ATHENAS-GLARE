@@ -44,6 +44,7 @@ class Employee(models.Model):
 
     employee_id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=100, null=False)
+    middle_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=False)
     gender = models.CharField(max_length=6, choices=Gender.choices, null=False)
     date_of_birth = models.DateField(null=True)

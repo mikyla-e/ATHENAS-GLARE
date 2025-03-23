@@ -347,7 +347,7 @@ def payroll_individual(request, employee_id):
     # Save updated active_status in database
     employee.save(update_fields=['active_status'])
 
-    current_payroll.salary = current_payroll.rate * attendance_count
+    # current_payroll.salary = current_payroll.rate * attendance_count
 
     return render(request, 'payroll_system/payroll_individual.html', {
         'employee': employee,
