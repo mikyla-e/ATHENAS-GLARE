@@ -78,18 +78,35 @@ def dashboard(request):
     avg_active_employees = total_active_counts / days_counted
     
     # Payroll Status: Count employees with "Processed" payroll
-    processed_payroll_count = (
-        Employee.objects.filter(payrolls__payroll_status='PROCESSED')
-        .distinct()
-        .count()
-    )
+    # processed_payroll_count = (
+    #     Employee.objects.filter(payrolls__payroll_status='PROCESSED')
+    #     .distinct()
+    #     .count()
+    # )
 
     # Payroll Status: Count employees with "Pending" payroll
-    pending_payroll_count = (
-        Employee.objects.filter(payrolls__payroll_status='PENDING')
-        .distinct()
-        .count()
+    # pending_payroll_count = (
+    #     Employee.objects.filter(payrolls__payroll_status='PENDING')
+    #     .distinct()
+    #     .count()
+    # )
+
+    #(new)
+    latest_payroll_subquery = (
+    Payroll.objects.filter(employee_id_fk=OuterRef('pk'))
+    .order_by('-payment_date')
+    .values('payroll_status')[:1]
     )
+    
+    employees_with_latest_payroll = Employee.objects.annotate(
+    latest_payroll_status=Subquery(latest_payroll_subquery)
+    )
+    
+    processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
+    
+    pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
+    
+    #(new end)
     
     # Calculate Total Payroll (Sum of all processed salaries)
     total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']
@@ -259,18 +276,35 @@ def payrolls(request):
     avg_active_employees = total_active_counts / days_counted
 
     # Payroll Status: Count employees with "Processed" payroll
-    processed_payroll_count = (
-        employees.filter(payrolls__payroll_status='PROCESSED')
-        .distinct()
-        .count()
-    )
+    # processed_payroll_count = (
+    #     employees.filter(payrolls__payroll_status='PROCESSED')
+    #     .distinct()
+    #     .count()
+    # )
 
     # Payroll Status: Count employees with "Pending" payroll
-    pending_payroll_count = (
-        employees.filter(payrolls__payroll_status='PENDING')
-        .distinct()
-        .count()
+    # pending_payroll_count = (
+    #     employees.filter(payrolls__payroll_status='PENDING')
+    #     .distinct()
+    #     .count()
+    # )
+
+    # Get the latest payroll for each employee using a subquery (new)
+    latest_payroll_subquery = (
+        Payroll.objects
+        .filter(employee_id_fk=OuterRef('pk'))
+        .order_by('-payment_date')
+        .values('payroll_status')[:1]
     )
+
+    # Count employees by their latest payroll status
+    employees_with_latest_payroll = Employee.objects.annotate(latest_payroll_status=Subquery(latest_payroll_subquery))
+
+    processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
+
+    pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
+    
+    #(new end)
 
     # Calculate Total Payroll (Sum of all processed salaries)
     total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']

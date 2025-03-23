@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('payroll_system', '0022_employee_middle_name'),
-        ('ph_geography', '0002_alter_barangay_id_alter_barangay_is_urban_and_more'),
+        ('ph_geography', '0001_initial'),
     ]
 
     operations = [
