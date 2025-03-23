@@ -9,3 +9,8 @@ Django/tcts_payroll_system/payroll_system/__pycache__/views.cpython-312.pyc
 *.pyc
 /face_recognition
 Django/tcts_payroll_system/db.sqlite3
+*.pyc
+/Django/tcts_payroll_system/payroll_system/__pycache__
+/Django/tcts_payroll_system/tcts_payroll_system/__pycache__
+/Django/tcts_payroll_system/users/__pycache__
+*.pyc
