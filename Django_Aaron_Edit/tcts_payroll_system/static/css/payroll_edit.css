@@ -1,0 +1,210 @@
+.body{
+    height: 100%;
+}
+
+.container{
+    padding: 12px;
+    position: absolute;
+    height: fit-content;
+    width: 85%;
+
+    display: flex;
+    flex-direction: column;
+    
+    z-index: 8;
+}
+
+.container .profile-picture{
+    width: 40%;
+    margin: 20px 40px;
+    display: flex;
+    align-items: end;
+}
+
+.profile-picture img{
+    width: 110px;
+    height: 110px;
+    border-radius: 55px;
+}
+
+.profile-picture .employee_name{
+    margin: 0 15px;
+    
+}
+
+.profile-picture .employee_name h1{
+    font-family: 'League Spartan';
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+.container .edit_container{
+    margin: 0 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.container .edit_container table{
+    width: 100%;
+
+    background-color: #fff;
+    text-align: center;
+    
+    border: none;
+    border-radius: 15px;
+    border-spacing: 0;
+    border-collapse: collapse;
+
+    overflow: hidden;
+}
+
+table tr{
+    border-bottom: 2px solid rgba(30, 30, 30, 0.20);
+}
+
+table tr:first-child{
+    border-bottom: 3px solid rgba(30, 30, 30, 0.20);
+}
+
+table tr td:nth-child(odd){
+    background-color: #f2f2f2;
+}
+
+table tr:last-child{
+    border-bottom: none;
+}
+
+table tr th{
+    padding: 15px 0 12.5px;
+    
+    font-family: 'League Spartan';
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+table tr td{
+    text-align: center;
+    font-size: 1rem;
+    font-family: 'Inter';
+    border-right: 2px solid rgba(30, 30, 30, 0.20);
+}
+
+table tr td:last-child{
+    border-right: none;
+}
+
+
+table tr td input[type=number],
+table tr td input[type=text]{
+    height: 100%;
+    width: 80%;
+    background: none;
+    padding: 20px 0;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+    border: none;
+}
+
+table tr td select{
+    height: 100%;
+    width: 80%;
+    background: none;
+    padding: 20px 0;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+    border: none;
+
+    -webkit-appearance: none;
+}
+
+table tr td select:focus,
+table tr td input[type=number]:focus,
+table tr td input[type=text]:focus{
+    outline: none;
+}
+
+
+table tr td input[type=submit]{
+    height: 40px;
+    width: 40px;
+    padding: 20px 0;
+
+    background-image: url('../images/save_icon.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: none;
+}
+
+table tr td input[type=submit]:hover{
+    transition: 0.3s;
+    cursor: pointer;
+    background-image: url('../images/save_icon_hover.png');
+}
+
+table tr td input[type=button]{
+    height: 40px;
+    width: 40px;
+    padding: 20px 0;
+
+    background-image: url('../images/cancel_icon.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: none;
+}
+
+table tr td input[type=button]:hover{
+    transition: 0.3s;
+    cursor: pointer;
+    background-image: url('../images/cancecl_icon_hover.png');
+}
+
+table tr td select#payroll_status{
+    height: 100%;
+    width: 80%;
+    background: none;
+    padding: 20px 0;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+    border: none;
+    outline: none;
+    scroll-behavior: smooth;
+    -webkit-appearance: none;
+;
+}
+
+/* th{
+    font-family: 'League Spartan';
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    padding: 15px 12.5px 12.5px;
+    border-bottom: 3px solid rgba(30, 30, 30, 0.20);
+}
+
+td{
+    padding: 14px;
+    
+    text-align: center;
+    font-size: 1rem;
+    font-family: 'Inter';
+
+    border-bottom: 2px solid rgba(30, 30, 30, 0.20);
+    border-left: 2px solid rgba(30, 30, 30, 0.20);
+}
+
+td:first-child{
+    border-left: none;
+}
+
+tr:last-child td{
+    border-bottom: none;
+}
+
+td:nth-child(odd){
+    background-color: #f2f2f2;
+} */
+
+@media screen and (max-width: 1920px){}

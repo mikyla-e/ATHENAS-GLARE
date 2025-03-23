@@ -1,0 +1,132 @@
+
+body{
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    /* background-image: linear-gradient(90deg, #fff 47.5%, #ffffff00 100%), url('../pictures/login_background.jpg'); */
+    background-image: linear-gradient(90deg, #fff 47.5%, #ffffff00 100%), url('../images/bg_nosrs.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: #1e1e1e;
+}
+
+.container{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.container .logo_container{
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 30px;
+    gap: 10px;
+}
+
+.container .logo_container .logo_name{
+    margin: 0;
+    font-family: 'League Spartan';
+    font-size: 1.25rem;
+    font-weight: 900;
+}
+
+
+
+.container .login_container{
+    max-height: 70%;
+
+    margin: 0 100px;
+    
+}
+
+.container .login_container .login_title{
+    margin: 50px 0;
+}
+
+.container .login_container .login_title .input-your-id{
+    margin: 10px 0;
+    font-family: 'Roboto';
+    font-size: 2.3rem;
+    font-weight: 800;
+    letter-spacing: 6px;
+    color: #1e1e1e;
+}
+
+.container .login_container .login_title .to-time-in-out{
+    margin: 10px 0;
+    font-family: 'League Spartan';
+    font-size: 4rem;
+    background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+.container .login_container .login_field{
+    margin: 50px 0;
+
+}
+
+.container .login_container .login_field label{
+    margin: 20px;
+    font-family: 'Inter';
+    font-size: .9rem;
+    font-weight: 600;
+    color: #1e1e1e;
+}
+
+.container .login_container .login_field input[type=text]{
+    margin: 8px;
+    padding: 10px 15px;
+    border: none;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+
+    background-color: rgba(111, 81, 21, 0.10);
+    width: 32%;
+    height: 30px;
+    border-radius: 20px;
+}
+
+.container .login_container .login_field .login_buttons{
+    display: flex;
+    justify-content: space-evenly;
+    width: 35%;
+    margin: 40px 8px;
+}
+
+.container .login_container .login_field .login_buttons input[type=submit]{
+    border: none;
+    border-radius: 100px;
+
+    padding: 15px 7.5%;
+
+    font-family: 'Roboto';
+    font-size: 1rem;
+    font-weight: 700;
+    
+    background: linear-gradient(180deg, #F8D146 0%, #F5B93F 100%);
+    color: #fff;
+}
+
+.container .clientlogo_img{
+    display: grid;
+    justify-content: end;
+
+}
+
+.container .clientlogo_img img{
+    max-width: 200px;
+    max-height: 200px;
+    filter: drop-shadow(1px 1px 1px #222);
+}
+
+@media screen and (max-width: 1920px){}

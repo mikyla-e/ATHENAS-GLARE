@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registering Employees...</title>
+    <link rel="stylesheet" href="{% static 'css/template.css' %}">
+    <link rel="stylesheet" href="{% static 'css/payroll_edit.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="body">
+        <nav>
+            <!-- logo -->
+            <div class="logo">
+                <div class="logo-group">
+                    <div class="logo-picture">
+                        <img src="{% static 'images/logo_icon.png' %}" alt="">
+                    </div>
+                    <div class="logo-name">
+                        <p>PAYROLL</p>
+                        <p>SYSTEM</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- nav menu -->
+            <div class="menu">
+                <ul>
+                    <li class="menu-dashboard">
+                        <a href="{% url 'payroll_system:dashboard' %}">
+                            <img src="{% static 'images/dashboard_icon.png' %}" alt="">
+                            <div class="link">DASHBOARD</div>
+                        </a>
+                    </li>
+                    <li class="menu-payroll" id="focused">
+                        <a href="{% url 'payroll_system:payrolls' %}">
+                            <img src="{% static 'images/payroll_icon_focused.png' %}" alt="">
+                            <div class="link">PAYROLL</div>
+                        </a>
+                    </li>
+                    <li class="menu-employees">
+                        <a href="{% url 'payroll_system:employees' %}">
+                            <img src="{% static 'images/employee_icon.png' %}" alt="">
+                            <div class="link">EMPLOYEES</div>
+                        </a>
+                        
+                    </li>
+                    <li class="menu-settings">
+                        <a href="{% url 'payroll_system:settings' %}">
+                            <img src="{% static 'images/settings_icon.png' %}" alt="">
+                            <div class="link">SETTINGS</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <header>
+            <h1>Editing {{ employee.first_name }} {{ employee.last_name }}'s Payroll</h1>
+        </header>
+
+        <div class="system_content">
+            <div class="container">
+                <div class="profile-picture">
+                    <img src="{{ employee.employee_image.url }}" alt="">
+                    <div class="employee_name">
+                        <h1>
+                            {{ employee.first_name }} {{ employee.last_name }}
+                        </h1>
+                    </div>
+                </div>
+                <div class="edit_container">
+                    <table>
+                        <tr>
+                            <th>Rate per Day</th>
+                            <!-- <th>Deductions</th> -->
+                            <th>Date of Pay</th>
+                            <th>Payroll Status</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <form class="edit_field" method="POST">
+                                {% csrf_token %}
+                                <td>{{ form.rate }}</td>
+                                <!-- <td>{{ form.deductions }}</td> -->
+                                <td>{{ form.payment_date }}</td>
+                                <td>{{ form.payroll_status }}</td>
+                                <td>
+                                    <a href=""><input type="button" value=""></a>
+                                    <input type="submit" value="">
+                                </td>
+                            </form>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

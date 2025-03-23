@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registering Employees...</title>
+    <link rel="stylesheet" href="{% static 'css/employee_registration.css' %}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Add these styles for the webcam UI */
+      .webcam-container {
+        margin-bottom: 20px;
+      }
+      #video {
+        width: 320px;
+        height: 240px;
+        background-color: #eee;
+        border: 1px solid #ccc;
+      }
+      #canvas {
+        display: none;
+      }
+      #capturedImage {
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="register_container">
+        <div class="register_title">
+          <p>Welcome, new employee!</p>
+        </div>
+        <div>
+          <form class="register_field" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="fields_1">
+              <div class="field">
+                <label for="first-name">first name</label>
+                {{ form.first_name }}
+              </div>
+              <div class="field">
+                <label for="last-name">last name</label>
+                {{ form.last_name }}
+              </div>
+              <div class="field">
+                <label for="gender">gender</label>
+                {{ form.gender}}
+              </div>
+              <div class="field">
+                <label for="date-of-birth">date of birth</label>
+                {{ form.date_of_birth }}
+              </div>
+              <div class="field">
+                <label for="contact-number">contact number</label>
+                {{ form.contact_number }}
+              </div>
+              <div class="field">
+                <label for="emergency-contact">emergency contact</label>
+                {{ form.emergency_contact }}
+              </div>
+              <div class="field">
+                <label for="barangay">barangay</label>
+                {{ form.barangay }}
+              </div>
+              <div class="field">
+                <label for="postal-address">postal address</label>
+                {{ form.postal_address }}
+              </div>
+              <div class="field">
+                <label for="education">highest education attainment</label>
+                {{ form.highest_education }}
+              </div>
+            </div>
+
+            <div class="fields_2">
+              <div class="field">
+                <label for="work-experience">work experience</label>
+                {{ form.work_experience }}
+              </div>
+              <div class="field">
+                <label for="date-of-employment">date of employment</label>
+                {{ form.date_of_employment }}
+              </div>
+              <div class="field">
+                <label for="employee-status">employee status</label>
+                {{ form.employee_status }}
+              </div>
+
+              <div class="field">  
+                <label for="employee_image">employee image</label>
+                <div class="employee_picture">
+                    <!-- Webcam capture elements -->
+                    <div class="webcam-container" >
+                      <video id="video" autoplay playsinline></video>
+                      <canvas id="canvas"></canvas>
+                      <img id="capturedImage" src="" alt="Captured Image"/>
+                    </div>
+                    
+                    <!-- Hide the original file input but keep it in the form for file submission -->
+                    <div style="display: none;">
+                      {{ form.employee_image }}
+                    </div>
+                </div>
+
+                <div class="button">
+                  <button type="button" id="captureButton">
+                    <p>TAKE A PICTURE</p>
+                    <img src="{% static 'images/camera.png' %}" alt="">
+                  </button>
+                  <input class="submit" type="submit" value="SUBMIT" />
+                </div>
+              </div>
+
+              
+
+              {% if form.errors %}
+                <ul>
+                  {% for field, errors in form.errors.items %}
+                      {% for error in errors %}
+                      <li>{{ field }}: {{ errors}}</li>
+                      {% endfor %}
+                  {% endfor %}
+                </ul>
+                {% endif%}
+
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="logos">
+        <div class="logo_container">
+          <img src="{% static 'images/logo_icon.png'%}" alt="" />
+          <p class="logo_name">REGISTERING EMPLOYEE</p>
+        </div>
+        <img class="client_logo"
+          src="{% static 'images/clients_logo.png' %}"
+          alt="Toto's Car Tinting Shop"
+        />
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Get elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const capturedImage = document.getElementById('capturedImage');
+        const captureButton = document.getElementById('captureButton');
+        const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
+
+        // Initialize webcam
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+              video.srcObject = stream;
+              video.play();
+            })
+            .catch(function(error) {
+              console.error('Could not access webcam:', error);
+              alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
+            });
+        } else {
+          alert('Your browser does not support webcam access. Please try a different browser.');
+        }
+
+        // Capture button click handler
+        captureButton.addEventListener('click', function() {
+          // Set canvas dimensions to match video
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          
+          // Draw the video frame to the canvas
+          const context = canvas.getContext('2d');
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          // Convert canvas to image
+          const dataURL = canvas.toDataURL('image/jpeg');
+          capturedImage.src = dataURL;
+          capturedImage.style.display = 'block';
+          
+          // Convert canvas content to a File object for form submission
+          canvas.toBlob(function(blob) {
+            // Create a File object from the Blob
+            const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
+            
+            // Create a FileList-like object
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(imageFile);
+            
+            // Set the file to the file input
+            fileInput.files = dataTransfer.files;
+            
+            console.log("Image captured and file created");
+          }, 'image/jpeg', 0.95); // High quality JPEG
+        });
+      });
+    </script>
+  </body>
+</html>

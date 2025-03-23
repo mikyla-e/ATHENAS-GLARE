@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll</title>
+    <link rel="stylesheet" href="{% static 'css/template.css' %}">
+    <link rel="stylesheet" href="{% static 'css/payroll.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="body">
+        <nav>
+            <!-- logo -->
+            <div class="logo">
+                <div class="logo-group">
+                    <div class="logo-picture">
+                        <img src="{% static 'images/logo_icon.png' %}" alt="">
+                    </div>
+                    <div class="logo-name">
+                        <p>PAYROLL</p>
+                        <p>SYSTEM</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- nav menu -->
+            <div class="menu">
+                <ul>
+                    <li class="menu-dashboard">
+                        <a href="{% url 'payroll_system:dashboard' %}">
+                            <img src="{% static 'images/dashboard_icon.png' %}" alt="">
+                            <div class="link">DASHBOARD</div>
+                        </a>
+                    </li>
+                    <li class="menu-payroll" id="focused">
+                        <a href="{% url 'payroll_system:payrolls' %}">
+                            <img src="{% static 'images/payroll_icon_focused.png' %}" alt="">
+                            <div class="link">PAYROLL</div>
+                        </a>
+                    </li>
+                    <li class="menu-employees">
+                        <a href="{% url 'payroll_system:employees' %}">
+                            <img src="{% static 'images/employee_icon.png' %}" alt="">
+                            <div class="link">EMPLOYEES</div>
+                        </a>
+                        
+                    </li>
+                    <li class="menu-settings">
+                        <a href="{% url 'payroll_system:settings' %}">
+                            <img src="{% static 'images/settings_icon.png' %}" alt="">
+                            <div class="link">SETTINGS</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <header>
+            <h1>PAYROLL</h1>
+        </header>
+
+        <div class="system_content">
+            <div class="container">
+                <div class="top">
+                    <div class="content_1">
+                        <div class="statistics">
+                            <div class="total_payroll">
+                                <div class="title"><h1>TOTAL PAYROLL</h1></div>
+                                <div class="content">
+                                    <p class="amount">{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</p>
+                                    <p class="percentage {% if payroll_percentage > 0 %}positive{% elif payroll_percentage < 0 %}negative{% endif %}">
+                                        {% if payroll_percentage > 0 %}+{% endif %}{{ payroll_percentage|floatformat:1 }}%
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="avg_rate">
+                                <div class="title">
+                                    <h1>AVG RATE OF EMPLOYEES</h1>
+                                </div>
+                                <div class="content">
+                                    <p class="amount">{% if avg_rate == "No rate data" %} No rate data {% else %} ₱{{ avg_rate|floatformat:2 }} {% endif %}</p>
+                                    <p class="percentage {% if rate_percentage > 0 %}positive{% elif rate_percentage < 0 %}negative{% endif %}">
+                                        {% if rate_percentage > 0 %}+{% endif %}{{ rate_percentage|floatformat:1 }}%
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="payroll_status">
+                                <div class="title">
+                                    <h1>PAYROLL STATUS</h1>
+                                </div>
+                                <div class="content">
+                                    <div class="processed">
+                                        <h1>PROCESSED</h1>
+                                        <p>{{ processed_payroll_count }}</p>  
+                                    </div>
+                                    <div class="pending">
+                                        <h1>PENDING</h1>
+                                        <p>{{ pending_payroll_count }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content_2">
+                        <div class="payday">
+                            <div class="payday_title">
+                                <p>PAYDAY DATE</p>
+                            </div>
+                            <div class="payday_date">
+                                <p>XX/XX/XXXX, SAT</p>
+                                <button onclick=""></button>
+                            </div>
+                        </div>
+                        <div class="incentives">
+                            <button class="edit_incentives" onclick="editIncentives()">
+                                <p>EDIT ALL EMPLOYEES' INCENTIVES</p>
+                                <img src="{% static 'images/edit_icon.png' %}" alt="">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search_filter">
+                    <div class="search">
+                        <form class="form" method="post">
+                            <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt=""></button>
+                            <input type="text" placeholder="Search...">    
+                        </form>
+                    </div>
+                    <div class="filter_sort">
+                        <div class="filter">
+                            Filter by
+                        </div>
+                        <div class="sort">
+                            Sort by
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table">
+                    <table>
+                        <tr>
+                            <th>EMPLOYEE</th>
+                            <th>RATE PER DAY</th>
+                            <!-- <th>DEDUCTIONS</th> -->
+                            <th>PAYMENT AMOUNT</th>
+                            <th>STATUS</th>
+                            <th></th>
+                        </tr>
+                        {% for data in employee_data %}
+                            {% with employee=data.employee latest_payroll=data.latest_payroll %}
+                                {% if latest_payroll %}
+                                <tr>
+                                    <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                                    <td>{{ latest_payroll.rate }}</td>
+                                    <!-- <td>{{ latest_payroll.deductions }}</td> -->
+                                    <td>{{ latest_payroll.salary }}</td>
+                                    <td>{{ latest_payroll.payroll_status }}</td>
+                                    <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                                    <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                                </tr>
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+            <div class="background" id="background">
+                <div class="edit_incentives_popup" id="editIncentivesPopup">
+                    <h1>Edit for <span>all employees</span>.</h1>
+                    <form method="post">
+                        <div class="incentives_field">
+                            <label for="incentives">Incentives</label>
+                            <input type="text" name="incentives" id="incentives" placeholder="ex. 1000.00">
+                        </div>
+
+                        <div class="buttons">
+                            <input type="button" value="Cancel" onclick="cancelEditIncentives()">
+                            <input type="submit" value="Save">
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+<script>
+    function editIncentives(){
+        const bg = document.getElementById("background");
+        bg.classList.add("show");
+    }
+
+    function cancelEditIncentives(){
+        const bg = document.getElementById("background");
+        bg.classList.remove("show");
+    }
+</script>
+</html>
