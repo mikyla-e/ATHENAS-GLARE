@@ -213,17 +213,6 @@
 
       
       document.addEventListener('DOMContentLoaded', function() {
-        // function getCsrfToken() {
-        //     return document.querySelector('[name=csrfmiddlewaretoken]').value;
-        // }
-
-        // // Then modify your fetch call
-        // fetch(url, {
-        //     headers: {
-        //         'X-CSRFToken': getCsrfToken(),
-        //     }
-        // })
-
         function setupDependentDropdown(parentSelector, childSelector, locationType) {
         const parentDropdown = document.querySelector(`select[name="${parentSelector}"]`);
         const childDropdown = document.querySelector(`select[name="${childSelector}"]`);
