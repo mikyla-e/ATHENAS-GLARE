@@ -13,3 +13,4 @@ Django/tcts_payroll_system/db.sqlite3
 /Django/tcts_payroll_system/payroll_system/__pycache__
 /Django/tcts_payroll_system/tcts_payroll_system/__pycache__
 /Django/tcts_payroll_system/users/__pycache__
+*.pyc
