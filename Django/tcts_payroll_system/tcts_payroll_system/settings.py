@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'payroll_system',
     'users',
+    # 'ph_geography',
 ]
 
 MIDDLEWARE = [
