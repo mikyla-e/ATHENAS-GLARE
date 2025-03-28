@@ -3,11 +3,6 @@
     
 }
 
-#philippines-time{
-    text-align: center;
-    font-size: 4em;
-}
-
 .container{
     padding: 15px;
     grid-gap: 10px;
@@ -16,7 +11,7 @@
     display: grid;
     grid-template-areas: 
         'empstats empstats empstats empstats paystats paystats paystats paystats weathertime weathertime weathertime weathertime'
-        'historytbl historytbl historytbl empchart empchart empchart empchart paychart paychart paychart paychart paychart'
+        'historytbl historytbl historytbl empchart empchart empchart paychart paychart paychart paychart paychart paychart'
         'historytbl historytbl historytbl previewtbl previewtbl previewtbl previewtbl previewtbl previewtbl previewtbl previewtbl previewtbl';
 
     grid-template-rows: 175px auto auto;
@@ -83,6 +78,7 @@
     font-size: clamp(1.2em, 1em, 5em);
     font-family: 'League Spartan';
     font-weight: 800;
+    text-align: end;
     color: white;
 }
 
@@ -229,9 +225,9 @@
 .payroll_stats .content2 .total_payroll h1{
     margin: 0;
     font-family: 'Inter';
-    font-size: 2.25rem;
-    /* font-size: clamp(1.2em, 2.5em, 5em); */
+    font-size: clamp(1.2em, 2.5em, 5em);
     font-weight: 500;
+    text-align: end;
     line-height: 90%;
     color: #1E1E1E;
 }
@@ -241,6 +237,7 @@
     font-family: 'Roboto';
     /* font-size: clamp(1.2em, 1em, 5em); */
     font-weight: 700;
+    text-align: end;
     color: #fff;
 }
 
@@ -255,28 +252,25 @@
 .payroll_stats .content2 .next_payday h1{
     margin: 0;
     font-family: 'Inter';
-    font-size: 2rem;
-    /* font-size: clamp(0.5em, 2em, 4.5em); */
+    font-size: clamp(1.2em, 2em, 5em);
     font-weight: 500;
-    line-height: 90%;
+    text-align: end;
+    line-height: 100%;
     color: #1E1E1E;
 }
 
 .payroll_stats .content2 .next_payday p{
     margin: 5px 0;
     font-family: 'Roboto';
-    font-size: 1rem;
-    /* font-size: clamp(.8em, 1em, 4.5em); */
+    font-size: 1em;
     font-weight: 700;
+    text-align: end;
     color: #fff;
 }
 
 
 .time{
     grid-area: weathertime;
-    /* height: 100%;
-    width: 30%;
-    /* min-height: 150px;*/
     
     font-family: "League Spartan";
     display: flex;
@@ -313,10 +307,15 @@
     line-height: 80%;
 }
 
-.time .top_content h1{
+.time .top_content .number_time{
+    
+}
+
+.time .top_content .number_time h1{
     margin: 10px 0 0;
-    font-size: 5em;
     line-height: 80%;
+    text-align: center;
+    font-size: 4em;
 }
 
 .time .bottom_content{
@@ -329,9 +328,6 @@
     margin: 0;
     font-size: 1.2rem;
     font-weight: bold;
-}
-.number_time{
-    font-size: 1.2em;   
 }
 
 .time .bottom_content h1{
@@ -414,22 +410,37 @@
     flex-wrap: wrap; 
 }*/
 
-#donutchart {
-    /* width: 100%;
-    width: 45%;
-    height: 250px;*/
+.donut_chart {
+    width: 100%;
+    height: 100%;
     grid-area: empchart;
+
+    display: flex;
+    justify-content: center; 
+    overflow: hidden;
 
     overflow: hidden;
     background: white;
     border-radius: 10px;
 }
 
-#columnchart_values{
+.donut_chart #donut{
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+}
+
+.bar_chart{
     grid-area: paychart;
     overflow: hidden;
     background: white;
     border-radius: 10px;
+}
+
+.bar_chart #bar{
+    width: 100%;
+    height: 100%;
+    padding: 15px;
 }
 
 .table2 table {
@@ -472,4 +483,164 @@
 
 .table2 tr:nth-child(even) {
     background-color: #f2f2f2;
+}
+
+@media screen and (max-width: 1550px){
+    .total_emp .emp_statistics .content .title{
+        margin: 0 5px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: end;
+        gap: 5px;
+    }
+    
+    .total_emp .emp_statistics .content .title h2{
+        margin: 0;
+        font-size: clamp(1.2em, 1em, 5em);
+        font-family: 'League Spartan';
+        font-weight: 800;
+        text-align: end;
+        color: white;
+    }
+    
+    .total_emp .emp_statistics .content .title p{
+        margin: 0;
+        font-family: 'League Spartan';
+        font-weight: 300;
+        color: white;
+    }
+
+    .payroll_stats .content2 .total_payroll{
+        height: fit-content;
+        width: auto;
+        margin: 5px 10px;
+        display: flex;
+        align-items: end;
+        flex-direction: column;
+    }
+    
+    .payroll_stats .content2 .total_payroll h1{
+        margin: 0;
+        font-family: 'Inter';
+        font-size: clamp(0.1rem, 2.5vw, 5rem);
+        font-weight: 500;
+        text-align: end;
+        line-height: 90%;
+        color: #1E1E1E;
+    }
+    
+    .payroll_stats .content2 .total_payroll p{
+        margin: 5px 0;
+        font-family: 'Roboto';
+        /* font-size: clamp(1.2em, 1em, 5em); */
+        font-weight: 700;
+        text-align: end;
+        color: #fff;
+    }
+    
+    .payroll_stats .content2 .next_payday{
+        height: fit-content;
+        width: 90%;
+        margin: 5px 10px;
+        display: flex;
+        align-items: end;
+        flex-direction: column;
+    }
+    
+    .payroll_stats .content2 .next_payday h1{
+        margin: 0;
+        font-family: 'Inter';
+        font-size: clamp(0.1rem, 2vw, 5rem);
+        font-weight: 500;
+        text-align: end;
+        line-height: 100%;
+        color: #1E1E1E;
+    }
+    
+    .payroll_stats .content2 .next_payday p{
+        margin: 5px 0;
+        font-family: 'Roboto';
+        font-size: 1em;
+        font-weight: 700;
+        text-align: end;
+        color: #fff;
+    }
+    
+    .time .top_content{
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+    }
+    
+    .time .top_content .weather{
+        margin: 0 5px 0 0;
+        width: 100%;
+        display: flex;
+        justify-content: end;
+        align-items: end;
+    }
+    
+    .time .top_content .weather img{
+        height: 30px;
+        width: 30px;
+    
+    }
+    
+    .time .top_content .weather p{
+        margin: 5px 5px 0 7.5px;
+        font-size: clamp(.5em, 2.5vw, 3em);
+        font-weight: 600;
+        line-height: 80%;
+    }
+    
+    .time .top_content h1{
+        margin: 10px 0 0;
+        line-height: 80%;
+    }
+    
+    .time .top_content .number_time{
+        font-size: clamp(.5em, 1.4vw, 2em);
+    }
+    
+    .time .bottom_content{
+        display: flex;
+        justify-content: right;
+        gap: 6px;
+    }
+    
+    .time .bottom_content p{
+        margin: 0;
+        font-size: clamp(.1em, 1.5vw, 2.5em);
+        font-weight: bold;
+    }
+    
+    .time .bottom_content h1{
+        margin: 0;
+        font-size: clamp(.5em, 2vw, 2em);
+        font-family: "Roboto";
+        line-height: 70%;
+    
+        background: -webkit-linear-gradient(#F8D146, #F5B93F);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+}
+
+@media screen and (max-width: 900px){
+    .container{
+        padding: 15px;
+        grid-gap: 10px;
+        z-index: 8;
+    
+        display: grid;
+        grid-template-areas: 
+            'empstats empstats empstats empstats empstats weathertime weathertime weathertime weathertime weathertime'
+            'paystats paystats paystats paystats paystats empchart empchart empchart empchart empchart'
+            'historytbl historytbl historytbl historytbl paychart paychart paychart paychart paychart paychart'
+            'historytbl historytbl historytbl historytbl previewtbl previewtbl previewtbl previewtbl previewtbl previewtbl';
+    
+        grid-template-rows: 20% 20% 20% auto;
+        grid-template-columns: 8% 8% 8% 8% 16% 8% 8% 8% 8% auto;
+    }
 }

@@ -114,7 +114,7 @@
                 <div class="time">
                     <div class="top_content">
                         <div class="weather">
-                            <p>WEATHER</p>
+                            <p>it is WEATHER</p>
                             <img src="{% static 'images/weather_icon.png' %}" alt="">
                         </div>
                         <div class="number_time"><h1 id="philippines-time"></h1></div>
@@ -122,7 +122,7 @@
                     </div>
                     <div class="bottom_content">
                         <p id="philippines-day"></p>
-                        <p> |</p>
+                        <p>|</p>
                         <p id="philippines-date"></p>
                         <h1>GMT +8</h1>
                     </div>
@@ -152,9 +152,112 @@
                         </tr>
                     </table>
                 </div>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-                <div id="donutchart"></div>
-                <div id="columnchart_values"></div>
+                <div class="donut_chart">
+                    <canvas id="donut"></canvas>
+                </div>
+
+                <script>
+                    const donutChart = document.getElementById('donut');
+                    
+                    const donutLabels = ["Present", "Absent"];
+                    const donutData = [100, 40];
+
+                    const donutColor = ["#F8D146","#DC4646"];
+
+                    const attendance = new Chart(donutChart, {
+                        type: "doughnut",
+                        data: {
+                            labels: donutLabels,
+                            datasets: [{
+                                backgroundColor: donutColor,
+                                data: donutData,
+                                borderWidth: 0
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            cutout: "40%",
+                            layout: {
+                                padding: 0
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        boxWidth: 15,
+                                        padding: 5,
+                                        font: {
+                                            size: 14
+                                        }
+                                    }
+                                    
+                                },
+                                title: {
+                                    display: true,
+                                    text: "ATTENDANCE",
+                                    color: "#1E1E1E",
+                                    align: 'start',
+                                    padding: {
+                                        top: 0,
+                                        bottom: 10
+                                    },
+                                    font: {
+                                        size: 16
+                                    }
+                                }
+                            }
+                            
+                        }
+                    });
+                </script>
+
+                <div class="bar_chart">
+                    <canvas id="bar"></canvas>
+                </div>
+                <script>
+                    const barChart = document.getElementById('bar');
+                    
+                    const barLabels = ["Jan 1", "Jan 8", "Jan 15", "Jan 22", "Jan 28"];
+                    const barData = [100, 40, 21, 98, 68];
+
+                    const barColor = ["#F8D146","#F8D146","#F8D146","#F8D146","#F8D146"];
+
+                    const payroll_chart = new Chart(barChart, {
+                        type: "bar",
+                        data: {
+                            labels: barLabels,
+                            datasets: [{
+                                label: "Payroll",
+                                backgroundColor: barColor,
+                                data: barData,
+                                borderWidth: 1
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            layout: {
+                                padding: 0
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: "PAYROLL PER WEEK",
+                                    color: "#1E1E1E",
+                                    align: 'start',
+                                    padding: {
+                                        top: 0,
+                                        bottom: 10
+                                    },
+                                    font: {
+                                        size: 16
+                                    }
+                                }
+                            }
+                            
+                        }
+                    });
+                </script>
 
                 <div class="table2">
                     <table class="table-2">
@@ -196,7 +299,8 @@
         </div>
     </div>
 </body>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<!-- <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
         google.charts.load("current", {packages:["corechart"]});
         google.charts.setOnLoadCallback(drawChart);
@@ -251,7 +355,7 @@
         var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
         chart.draw(view, options);
     }
-</script>
+</script> -->
 <script>
     function updateDay() {
             // Get the current day of the week in the Philippines

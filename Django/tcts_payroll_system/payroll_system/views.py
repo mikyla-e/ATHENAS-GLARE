@@ -447,6 +447,8 @@ def payrolls(request):
         if latest_payroll:
             attendance_count = employee.attendances.count()
             latest_payroll.salary = latest_payroll.rate * attendance_count
+        else:
+            pass
         
         employee_data.append({
             'employee': employee,
