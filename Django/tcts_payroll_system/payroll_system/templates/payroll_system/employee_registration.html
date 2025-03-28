@@ -1,7 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en"
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registering Employees...</title>
@@ -11,272 +11,270 @@
       rel="stylesheet"
     />
     <style>
-      /* Add these styles for the webcam UI */
-      .webcam-container {
+    /* Add these styles for the webcam UI */
+    .webcam-container {
         margin-bottom: 20px;
-      }
-      #video {
+    }
+    #video {
         width: 320px;
         height: 240px;
         background-color: #eee;
         border: 1px solid #ccc;
-      }
-      #canvas {
+    }
+    #canvas {
         display: none;
-      }
-      #capturedImage {
+    }
+    #capturedImage {
         margin-top: 10px;
         border: 1px solid #ddd;
         display: none;
-      }
+    }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
-      <div class="register_container">
-        <div class="register_title">
-          <p>Welcome, new employee!</p>
-        </div>
-        <div>
-          <form class="register_field" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="fields_1">
-              <div class="field">
-                <label for="first-name">first name</label>
-                {{ form.first_name }}
-              </div>
-              <div class="field">
-                <label for="last-name">last name</label>
-                {{ form.last_name }}
-              </div>
-              <div class="field">
-                <label for="gender">gender</label>
-                {{ form.gender}}
-              </div>
-              <div class="field">
-                <label for="date-of-birth">date of birth</label>
-                {{ form.date_of_birth }}
-              </div>
-              <div class="field">
-                <label for="contact-number">contact number</label>
-                {{ form.contact_number }}
-              </div>
-              <div class="field">
-                <label for="emergency-contact">emergency contact</label>
-                {{ form.emergency_contact }}
-              </div>
-              <div class="field">
-                <label for="region">region</label>
-                {{ form.region }}
-              </div>
-              <div class="field">
-                <label for="province">province</label>
-                {{ form.province }}
-              </div>
-              <div class="field">
-                <label for="municipality">municipality</label>
-                {{ form.municipality }}
-              </div>
-              <div class="field">
-                <label for="barangay">barangay</label>
-                {{ form.barangay }}
-              </div>
-              <div class="field">
-                <label for="education">highest education attainment</label>
-                {{ form.highest_education }}
-              </div>
+        <div class="register_container">
+            <div class="register_title">
+            <p>Welcome, new employee!</p>
             </div>
+            <div>
+                <form class="register_field" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
 
-            <div class="fields_2">
-              <div class="field">
-                <label for="work-experience">work experience</label>
-                {{ form.work_experience }}
-              </div>
-              <div class="field">
-                <label for="date-of-employment">date of employment</label>
-                {{ form.date_of_employment }}
-              </div>
-              <div class="field">
-                <label for="employee-status">employee status</label>
-                {{ form.employee_status }}
-              </div>
-
-              <div class="field">  
-                <label for="employee_image">employee image</label>
-                <div class="employee_picture">
-                    <!-- Webcam capture elements -->
-                    <div class="webcam-container" >
-                      <video id="video" autoplay playsinline></video>
-                      <canvas id="canvas"></canvas>
-                      <img id="capturedImage" src="" alt="Captured Image"/>
+                    <div class="fields_1">
+                        <div class="field">
+                            <label for="first-name">first name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="field">
+                            <label for="last-name">last name</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="field">
+                            <label for="gender">gender</label>
+                            {{ form.gender}}
+                        </div>
+                        <div class="field">
+                            <label for="date-of-birth">date of birth</label>
+                            {{ form.date_of_birth }}
+                        </div>
+                        <div class="field">
+                            <label for="contact-number">contact number</label>
+                            {{ form.contact_number }}
+                        </div>
+                        <div class="field">
+                            <label for="emergency-contact">emergency contact</label>
+                            {{ form.emergency_contact }}
+                        </div>
+                        <div class="field">
+                            <label for="region">region</label>
+                            {{ form.region }}
+                        </div>
+                        <div class="field">
+                            <label for="province">province</label>
+                            {{ form.province }}
+                        </div>
+                        <div class="field">
+                            <label for="municipality">municipality</label>
+                            {{ form.municipality }}
+                        </div>
+                        <div class="field">
+                            <label for="barangay">barangay</label>
+                            {{ form.barangay }}
+                        </div>
+                        <div class="field">
+                            <label for="education">highest education attainment</label>
+                            {{ form.highest_education }}
+                        </div>
                     </div>
-                    
-                    <!-- Hide the original file input but keep it in the form for file submission -->
-                    <div style="display: none;">
-                      {{ form.employee_image }}
+
+                    <div class="fields_2">
+                        <div class="field">
+                            <label for="work-experience">work experience</label>
+                            {{ form.work_experience }}
+                        </div>
+                        <div class="field">
+                            <label for="date-of-employment">date of employment</label>
+                            {{ form.date_of_employment }}
+                        </div>
+                        <div class="field">
+                            <label for="employee-status">employee status</label>
+                            {{ form.employee_status }}
+                        </div>
+
+                        <div class="field">  
+                            <label for="employee_image">employee image</label>
+                            <div class="employee_picture">
+                                <!-- Webcam capture elements -->
+                                <div class="webcam-container" >
+                                    <video id="video" autoplay playsinline></video>
+                                    <canvas id="canvas"></canvas>
+                                    <img id="capturedImage" src="" alt="Captured Image"/>
+                                </div>
+                                
+                                <!-- Hide the original file input but keep it in the form for file submission -->
+                                <div style="display: none;">
+                                    {{ form.employee_image }}
+                                </div>
+                            </div>
+
+                            <div class="button">
+                                <button type="button" id="captureButton">
+                                    <p>TAKE A PICTURE</p>
+                                    <img src="{% static 'images/camera.png' %}" alt="">
+                                </button>
+                                <input class="submit" type="submit" value="SUBMIT" />
+                            </div>
+                        </div>
+
+                        {% if form.errors %}
+                            <ul>
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                <li>{{ field }}: {{ errors}}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            </ul>
+                        {% endif%}
+
                     </div>
-                </div>
-
-                <div class="button">
-                  <button type="button" id="captureButton">
-                    <p>TAKE A PICTURE</p>
-                    <img src="{% static 'images/camera.png' %}" alt="">
-                  </button>
-                  <input class="submit" type="submit" value="SUBMIT" />
-                </div>
-              </div>
-
-              
-
-              {% if form.errors %}
-                <ul>
-                  {% for field, errors in form.errors.items %}
-                      {% for error in errors %}
-                      <li>{{ field }}: {{ errors}}</li>
-                      {% endfor %}
-                  {% endfor %}
-                </ul>
-              {% endif%}
-
+                </form>
             </div>
-          </form>
         </div>
-      </div>
-      <div class="logos">
-        <div class="logo_container">
-          <img src="{% static 'images/logo_icon.png'%}" alt="" />
-          <p class="logo_name">REGISTERING EMPLOYEE</p>
+        <div class="logos">
+            <div class="logo_container">
+            <img src="{% static 'images/logo_icon.png'%}" alt="" />
+            <p class="logo_name">REGISTERING EMPLOYEE</p>
+            </div>
+            <img class="client_logo"
+            src="{% static 'images/clients_logo.png' %}"
+            alt="Toto's Car Tinting Shop"
+            />
         </div>
-        <img class="client_logo"
-          src="{% static 'images/clients_logo.png' %}"
-          alt="Toto's Car Tinting Shop"
-        />
-      </div>
     </div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // Get elements
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const capturedImage = document.getElementById('capturedImage');
-        const captureButton = document.getElementById('captureButton');
-        const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const capturedImage = document.getElementById('capturedImage');
+            const captureButton = document.getElementById('captureButton');
+            const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
 
-        // Initialize webcam
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(stream) {
-              video.srcObject = stream;
-              video.play();
-            })
-            .catch(function(error) {
-              console.error('Could not access webcam:', error);
-              alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
+            // Initialize webcam
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+                })
+                .catch(function(error) {
+                console.error('Could not access webcam:', error);
+                alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
+                });
+            } else {
+            alert('Your browser does not support webcam access. Please try a different browser.');
+            }
+
+            // Capture button click handler
+            captureButton.addEventListener('click', function() {
+                // Set canvas dimensions to match video
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                // Draw the video frame to the canvas
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Convert canvas to image
+                const dataURL = canvas.toDataURL('image/jpeg');
+                capturedImage.src = dataURL;
+                capturedImage.style.display = 'block';
+            
+                // Convert canvas content to a File object for form submission
+                canvas.toBlob(function(blob) {
+                    // Create a File object from the Blob
+                    const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
+                    
+                    // Create a FileList-like object
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(imageFile);
+                    
+                    // Set the file to the file input
+                    fileInput.files = dataTransfer.files;
+                    
+                    console.log("Image captured and file created");
+                }, 'image/jpeg', 0.95); // High quality JPEG
             });
-        } else {
-          alert('Your browser does not support webcam access. Please try a different browser.');
-        }
-
-        // Capture button click handler
-        captureButton.addEventListener('click', function() {
-          // Set canvas dimensions to match video
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          
-          // Draw the video frame to the canvas
-          const context = canvas.getContext('2d');
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          
-          // Convert canvas to image
-          const dataURL = canvas.toDataURL('image/jpeg');
-          capturedImage.src = dataURL;
-          capturedImage.style.display = 'block';
-          
-          // Convert canvas content to a File object for form submission
-          canvas.toBlob(function(blob) {
-            // Create a File object from the Blob
-            const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
-            
-            // Create a FileList-like object
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(imageFile);
-            
-            // Set the file to the file input
-            fileInput.files = dataTransfer.files;
-            
-            console.log("Image captured and file created");
-          }, 'image/jpeg', 0.95); // High quality JPEG
         });
-      });
 
       
-      document.addEventListener('DOMContentLoaded', function() {
-        function setupDependentDropdown(parentSelector, childSelector, locationType) {
-          const parentDropdown = document.querySelector(`select[name="${parentSelector}"]`);
-          const childDropdown = document.querySelector(`select[name="${childSelector}"]`);
-          
-          console.log(`Setup: ${parentSelector} -> ${childSelector}, Elements found:`, !!parentDropdown, !!childDropdown);
-          
-          if (!parentDropdown || !childDropdown) return;
-          
-          parentDropdown.addEventListener('change', function() {
-            const parentId = this.value;
-            console.log(`${parentSelector} changed to ${parentId}`);
+        document.addEventListener('DOMContentLoaded', function() {
+            function setupDependentDropdown(parentSelector, childSelector, locationType) {
+                const parentDropdown = document.querySelector(`select[name="${parentSelector}"]`);
+                const childDropdown = document.querySelector(`select[name="${childSelector}"]`);
             
-            // Clear the child dropdown
-            childDropdown.innerHTML = '<option value="">---------</option>';
+                console.log(`Setup: ${parentSelector} -> ${childSelector}, Elements found:`, !!parentDropdown, !!childDropdown);
             
-            // If parent has a value, fetch children
-              if (parentId) {
-                const url = "{% url 'payroll_system:get_location_data' %}" + `?type=${locationType}&parent_id=${parentId}`;
-                console.log(`Fetching from: ${url}`);
-                
-                fetch(url)
-                    .then(response => {
-                        console.log('Response status:', response.status);
-                        if (!response.ok) {
-                            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log(`Received ${data.length} items:`, data);
-                        if (Array.isArray(data)) {
-                            data.forEach(item => {
+                if (!parentDropdown || !childDropdown) return;
+            
+                parentDropdown.addEventListener('change', function() {
+                    const parentId = this.value;
+                    console.log(`${parentSelector} changed to ${parentId}`);
+                    
+                    // Clear the child dropdown
+                    childDropdown.innerHTML = '<option value="">---------</option>';
+                    
+                    // If parent has a value, fetch children
+                    if (parentId) {
+                        const url = "{% url 'payroll_system:get_location_data' %}" + `?type=${locationType}&parent_id=${parentId}`;
+                        console.log(`Fetching from: ${url}`);
+                        
+                        fetch(url)
+                            .then(response => {
+                                console.log('Response status:', response.status);
+                                if (!response.ok) {
+                                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                console.log(`Received ${data.length} items:`, data);
+                                if (Array.isArray(data)) {
+                                    data.forEach(item => {
+                                        const option = document.createElement('option');
+                                        option.value = item.id;
+                                        option.textContent = item.name;
+                                        childDropdown.appendChild(option);
+                                    });
+                                } else {
+                                    console.error('Expected array but got:', data);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching data:', error);
+                                // Show error message in the child dropdown
                                 const option = document.createElement('option');
-                                option.value = item.id;
-                                option.textContent = item.name;
+                                option.textContent = 'Error loading data';
                                 childDropdown.appendChild(option);
                             });
-                        } else {
-                            console.error('Expected array but got:', data);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        // Show error message in the child dropdown
-                        const option = document.createElement('option');
-                        option.textContent = 'Error loading data';
-                        childDropdown.appendChild(option);
-                    });
+                    }
+                });
             }
-          });
-        }
-          
-        // Set up the chain of dependent dropdowns
-        setupDependentDropdown('region', 'province', 'provinces');
-        setupDependentDropdown('province', 'municipality', 'municipalities');
-        setupDependentDropdown('municipality', 'barangay', 'barangays');
-        
-        // If editing an existing record, trigger changes to load initial values
-        const regionDropdown = document.querySelector('region');
-        if (regionDropdown && regionDropdown.value) {
-            // Dispatch a change event to load provinces
-            regionDropdown.dispatchEvent(new Event('change'));
-        }
-    	});
+            
+            // Set up the chain of dependent dropdowns
+            setupDependentDropdown('region', 'province', 'provinces');
+            setupDependentDropdown('province', 'municipality', 'municipalities');
+            setupDependentDropdown('municipality', 'barangay', 'barangays');
+            
+            // If editing an existing record, trigger changes to load initial values
+            const regionDropdown = document.querySelector('region');
+            if (regionDropdown && regionDropdown.value) {
+                // Dispatch a change event to load provinces
+                regionDropdown.dispatchEvent(new Event('change'));
+            }
+        });
     </script>
-  </body>
+</body>
 </html>
