@@ -14,6 +14,26 @@ class AdminForm(ModelForm):
         }
         
 class EmployeeForm(ModelForm):
+    region = forms.CharField(
+        label='Region', 
+        widget=forms.TextInput(attrs={'list': 'region-list', 'autocomplete': 'off'}),
+        required=True
+    )
+    province = forms.CharField(
+        label='Province', 
+        widget=forms.TextInput(attrs={'list': 'province-list', 'autocomplete': 'off'}),
+        required=True
+    )
+    municipality = forms.CharField(
+        label='Municipality', 
+        widget=forms.TextInput(attrs={'list': 'municipality-list', 'autocomplete': 'off'}),
+        required=True
+    )
+    barangay = forms.CharField(
+        label='Barangay', 
+        widget=forms.TextInput(attrs={'list': 'barangay-list', 'autocomplete': 'off'}),
+        required=True
+    )
     class Meta:
         model = Employee
         fields = ('first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
@@ -24,16 +44,16 @@ class EmployeeForm(ModelForm):
             'last_name': forms.TextInput(),
             'middle_name': forms.TextInput(),
             'gender': forms.Select(),
-            'date_of_birth': forms.DateInput(),
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
             'contact_number': forms.TextInput(),
             'emergency_contact': forms.TextInput(),
-            'region': forms.Select(attrs={'id': 'region'}),
-            'province': forms.Select(attrs={'id': 'province'}),
-            'municipality': forms.Select(attrs={'id': 'municipality'}),
-            'barangay': forms.Select(attrs={'id': 'barangay'}),
+            'region': forms.TextInput(),
+            'province': forms.TextInput(),
+            'municipality': forms.TextInput(),
+            'barangay': forms.TextInput(),
             'highest_education': forms.Select(),
             'work_experience': forms.Textarea(),
-            'date_of_employment': forms.DateInput(),
+            'date_of_employment': forms.DateInput(attrs={'type': 'date'}),
             'employee_status': forms.Select(),
             'employee_image': forms.ClearableFileInput(),
         }
@@ -45,57 +65,40 @@ class EmployeeForm(ModelForm):
         if not self.instance.pk:
             self.fields['employee_image'].required = True
         
-        # Always load all regions
-        self.fields['region'].queryset = Region.objects.all()
+        # Populate datalist options dynamically
+        self.fields['region'].initial = self.instance.region.name if self.instance.region else ''
         
-        # Get form data if it exists
-        form_data = kwargs.get('data')
-        
-        # For initial load or if there's an instance
-        if self.instance.pk or not form_data:
-            # If we have an instance with saved data
-            if self.instance.pk:
-                # Set querysets based on current selections
-                if self.instance.region:
-                    self.fields['province'].queryset = Province.objects.filter(region=self.instance.region)
+        # Prepare choices
+        self.region_choices = list(Region.objects.values_list('name', flat=True))
+        self.province_choices = []
+        self.municipality_choices = []
+        self.barangay_choices = []
+
+        # If editing an existing employee, populate cascading choices
+        if self.instance.pk:
+            if self.instance.region:
+                self.province_choices = list(Province.objects.filter(
+                    region=self.instance.region
+                ).values_list('name', flat=True))
                 
-                if self.instance.province:
-                    self.fields['municipality'].queryset = Municipality.objects.filter(
-                        province=self.instance.province
-                    )
+                # Set initial province input
+                self.fields['province'].initial = self.instance.province.name if self.instance.province else ''
+            
+            if self.instance.province:
+                self.municipality_choices = list(Municipality.objects.filter(
+                    province=self.instance.province
+                ).values_list('name', flat=True))
                 
-                if self.instance.municipality:
-                    self.fields['barangay'].queryset = Barangay.objects.filter(
-                        municipality=self.instance.municipality
-                    )
-            else:
-                # For initial form load with no data
-                self.fields['province'].queryset = Province.objects.none()
-                self.fields['municipality'].queryset = Municipality.objects.none()
-                self.fields['barangay'].queryset = Barangay.objects.none()
-        
-        # For form submissions (POST) - populate dropdowns based on form data
-        elif form_data:
-            # If region is selected, filter provinces
-            region_id = form_data.get('region')
-            if region_id:
-                self.fields['province'].queryset = Province.objects.filter(region_id=region_id)
-            else:
-                self.fields['province'].queryset = Province.objects.none()
+                # Set initial municipality input
+                self.fields['municipality'].initial = self.instance.municipality.name if self.instance.municipality else ''
             
-            # If province is selected, filter municipalities
-            province_id = form_data.get('province')
-            if province_id:
-                self.fields['municipality'].queryset = Municipality.objects.filter(province_id=province_id)
-            else:
-                self.fields['municipality'].queryset = Municipality.objects.none()
-            
-            # If municipality is selected, filter barangays
-            municipality_id = form_data.get('municipality')
-            if municipality_id:
-                self.fields['barangay'].queryset = Barangay.objects.filter(municipality_id=municipality_id)
-            else:
-                self.fields['barangay'].queryset = Barangay.objects.none()
+            if self.instance.municipality:
+                self.barangay_choices = list(Barangay.objects.filter(
+                    municipality=self.instance.municipality
+                ).values_list('name', flat=True))
+                
+                # Set initial barangay input
+                self.fields['barangay'].initial = self.instance.barangay.name if self.instance.barangay else ''
 
     def clean(self):
         cleaned_data = super().clean()

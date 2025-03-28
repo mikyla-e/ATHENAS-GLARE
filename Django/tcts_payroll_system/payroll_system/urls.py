@@ -15,5 +15,5 @@ urlpatterns = [
     path('payroll_edit/<int:employee_id>/', views.payroll_edit , name='payroll_edit'),
     path('settings/', views.settings, name='settings'),
     path('about/', views.about, name='about'),
-    path('get-location-data/', views.get_location_data, name='get_location_data'), 
+    path('get-address-options/', views.get_address_options, name='get_address_options'), 
 ]

@@ -1,14 +1,16 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Max, OuterRef, Subquery, Count, Sum, Min, Avg
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_GET
 from .forms import EmployeeForm, PayrollForm
 from .face_recognition_attendance import recognize_face
-from .models import Employee, Payroll, Attendance, History
+from .models import Employee, Payroll, Attendance, History, Region, Province, Municipality, Barangay
 from ph_geography.models import Region, Province, Municipality, Barangay
 
 @csrf_protect  # Ensure CSRF protection
@@ -146,32 +148,111 @@ def dashboard(request):
     }
     return render(request, 'payroll_system/dashboard.html', context)
 
-def get_location_data(request):
-    """Single view to handle all location-related AJAX requests"""
-    import logging
-    logger = logging.getLogger(__name__)
+@require_GET
+def get_address_options(request):
+    """
+    Fetch address options based on the given parameters.
     
+    Supports fetching:
+    - Provinces by region
+    - Municipalities by region and province
+    - Barangays by region, province, and municipality
+    """
+    # Extract query parameters
+    level = request.GET.get('level', '')
+    region_name = request.GET.get('region', '')
+    province_name = request.GET.get('province', '')
+    municipality_name = request.GET.get('municipality', '')
+
+    # Validate inputs
+    if not level:
+        return JsonResponse({
+            'error': 'Level parameter is required',
+            'options': []
+        }, status=400)
+
     try:
-        location_type = request.GET.get('type')
-        parent_id = request.GET.get('parent_id')
-        
-        logger.info(f"Request received: type={location_type}, parent_id={parent_id}")
-        
-        if location_type == 'provinces':
-            data = list(Province.objects.filter(region_id=parent_id).values('id', 'name'))
-        elif location_type == 'municipalities':
-            data = list(Municipality.objects.filter(province_id=parent_id).values('id', 'name'))
-        elif location_type == 'barangays':
-            data = list(Barangay.objects.filter(municipality_id=parent_id).values('id', 'name'))
+        # Fetch options based on the level
+        if level == 'province':
+            # Provinces for a region
+            if not region_name:
+                return JsonResponse({
+                    'error': 'Region name is required',
+                    'options': []
+                }, status=400)
+            
+            # Use .filter() to handle case-insensitive matching
+            region = Region.objects.filter(name__iexact=region_name).first()
+            if not region:
+                return JsonResponse({
+                    'error': f'Region not found: {region_name}',
+                    'options': []
+                }, status=404)
+            
+            provinces = list(Province.objects.filter(region=region).values_list('name', flat=True))
+            return JsonResponse(provinces, safe=False)
+
+        elif level == 'municipality':
+            # Municipalities for a region and province
+            if not region_name or not province_name:
+                return JsonResponse({
+                    'error': 'Region and province names are required',
+                    'options': []
+                }, status=400)
+            
+            region = Region.objects.filter(name__iexact=region_name).first()
+            province = Province.objects.filter(
+                name__iexact=province_name, 
+                region=region
+            ).first()
+            
+            if not region or not province:
+                return JsonResponse({
+                    'error': f'Region or Province not found: {region_name}, {province_name}',
+                    'options': []
+                }, status=404)
+            
+            municipalities = list(Municipality.objects.filter(province=province).values_list('name', flat=True))
+            return JsonResponse(municipalities, safe=False)
+
+        elif level == 'barangay':
+            # Barangays for a region, province, and municipality
+            if not all([region_name, province_name, municipality_name]):
+                return JsonResponse({
+                    'error': 'Region, province, and municipality names are required',
+                    'options': []
+                }, status=400)
+            
+            region = Region.objects.filter(name__iexact=region_name).first()
+            province = Province.objects.filter(
+                name__iexact=province_name, 
+                region=region
+            ).first()
+            municipality = Municipality.objects.filter(
+                name__iexact=municipality_name, 
+                province=province
+            ).first()
+            
+            if not all([region, province, municipality]):
+                return JsonResponse({
+                    'error': f'Address components not found: {region_name}, {province_name}, {municipality_name}',
+                    'options': []
+                }, status=404)
+            
+            barangays = list(Barangay.objects.filter(municipality=municipality).values_list('name', flat=True))
+            return JsonResponse(barangays, safe=False)
+
         else:
-            data = []
-        
-        logger.info(f"Returning {len(data)} items")
-        return JsonResponse(data, safe=False)
-    
+            return JsonResponse({
+                'error': f'Invalid level: {level}',
+                'options': []
+            }, status=400)
+
     except Exception as e:
-        logger.error(f"Error in get_location_data: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({
+            'error': f'An unexpected error occurred: {str(e)}',
+            'options': []
+        }, status=500)
 
 @login_required
 def employee_registration(request):
