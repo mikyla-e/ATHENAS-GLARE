@@ -152,7 +152,7 @@ body{
     font-family: 'Inter';
     font-size: 1rem;
 
-    background-color: rgba(111, 81, 21, 0.10);
+    background-color: #fff;
     height: 30px;
     border-radius: 20px;
 }
@@ -165,7 +165,7 @@ body{
     font-family: 'Inter';
     font-size: 1rem;
 
-    background-color: rgba(111, 81, 21, 0.10);
+    background-color: #fff;
     min-height: 150px;
     border-radius: 20px;
     resize: none
@@ -180,7 +180,22 @@ body{
     font-family: 'Inter';
     font-size: 1rem;
 
-    background-color: rgba(111, 81, 21, 0.10);
+    background-color: #fff;
+    height: 50px;
+    border-radius: 20px;
+    resize: none
+}
+
+.container .register_container .register_field .fields_1 .field input[type=date],
+.container .register_container .register_field .fields_2 .field input[type=date]{
+    margin: 8px;
+    padding: 2px 15px;
+    border: none;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+
+    background-color: #fff;
     height: 50px;
     border-radius: 20px;
     resize: none

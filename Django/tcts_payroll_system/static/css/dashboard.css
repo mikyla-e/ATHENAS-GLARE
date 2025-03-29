@@ -412,7 +412,6 @@
 
 .donut_chart {
     width: 100%;
-    height: 100%;
     grid-area: empchart;
 
     display: flex;

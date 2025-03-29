@@ -1,11 +1,12 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en"
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registering Employees...</title>
     <link rel="stylesheet" href="{% static 'css/employee_registration.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/template.css' %}">
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
@@ -32,150 +33,198 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="register_container">
-            <div class="register_title">
-            <p>Welcome, new employee!</p>
-            </div>
-            <div>
-                <form class="register_field" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-
-                    <div class="fields_1">
-                        <div class="field">
-                            <label for="first-name">first name</label>
-                            {{ form.first_name }}
-                        </div>
-                        <div class="field">
-                            <label for="last-name">last name</label>
-                            {{ form.last_name }}
-                        </div>
-                        <div class="field">
-                            <label for="gender">gender</label>
-                            {{ form.gender}}
-                        </div>
-                        <div class="field">
-                            <label for="date-of-birth">date of birth</label>
-                            {{ form.date_of_birth }}
-                        </div>
-                        <div class="field">
-                            <label for="contact-number">contact number</label>
-                            {{ form.contact_number }}
-                        </div>
-                        <div class="field">
-                            <label for="emergency-contact">emergency contact</label>
-                            {{ form.emergency_contact }}
-                        </div>
-                        <div class="field">
-                            <label for="id_region">region</label>
-                            {{ form.region }}
-                            <datalist id="region-list">
-                                {% for region in form.region_choices %}
-                                    <option value="{{ region }}">
-                                {% endfor %}
-                            </datalist>
-                        </div>
-                        <div class="field">
-                            <label for="id_province">province</label>
-                            {{ form.province }}
-                            <datalist id="province-list">
-                                {% if form.province_choices %}
-                                    {% for province in form.province_choices %}
-                                        <option value="{{ province }}">
-                                    {% endfor %}
-                                {% endif %}
-                            </datalist>
-                        </div>
-                        <div class="field">
-                            <label for="id_municipality">city</label>
-                            {{ form.municipality }}
-                            <datalist id="municipality-list">
-                                {% if form.municipality_choices %}
-                                    {% for municipality in form.municipality_choices %}
-                                        <option value="{{ municipality }}">
-                                    {% endfor %}
-                                {% endif %}
-                            </datalist>
-                        </div>
-                        <div class="field">
-                            <label for="id_barangay">barangay</label>
-                            {{ form.barangay }}
-                            <datalist id="barangay-list">
-                                {% if form.barangay_choices %}
-                                    {% for barangay in form.barangay_choices %}
-                                        <option value="{{ barangay }}">
-                                    {% endfor %}
-                                {% endif %}
-                            </datalist>
-                        </div>
-                        <div class="field">
-                            <label for="education">highest education attainment</label>
-                            {{ form.highest_education }}
-                        </div>
+    <div class="body">
+        <nav>
+            <!-- logo -->
+            <div class="logo">
+                <div class="logo-group">
+                    <div class="logo-picture">
+                        <img src="{% static 'images/logo_icon.png' %}" alt="">
                     </div>
+                    <div class="logo-name">
+                        <p>PAYROLL</p>
+                        <p>SYSTEM</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- nav menu -->
+            <div class="menu">
+                <ul>
+                    <li class="menu-dashboard">
+                        <a href="{% url 'payroll_system:dashboard' %}">
+                            <img src="{% static 'images/dashboard_icon.png' %}" alt="">
+                            <div class="link">DASHBOARD</div>
+                        </a>
+                    </li>
+                    <li class="menu-payroll">
+                        <a href="{% url 'payroll_system:payrolls' %}">
+                            <img src="{% static 'images/payroll_icon.png' %}" alt="">
+                            <div class="link">PAYROLL</div>
+                        </a>
+                    </li>
+                    <li class="menu-employees" id="focused">
+                        <a href="{% url 'payroll_system:employees' %}">
+                            <img src="{% static 'images/employee_icon_focused.png' %}" alt="">
+                            <div class="link">EMPLOYEES</div>
+                        </a>
+                    </li>
+                    <li class="menu-jobs">
+                        <a href="">
+                            <img src="{% static 'images/employee_icon.png' %}" alt="">
+                            <div class="link">JOBS</div>
+                        </a>
+                    </li>
+                    <li class="menu-settings">
+                        <a href="{% url 'payroll_system:settings' %}">
+                            <img src="{% static 'images/settings_icon.png' %}" alt="">
+                            <div class="link">SETTINGS</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
 
-                    <div class="fields_2">
-                        <div class="field">
-                            <label for="work-experience">work experience</label>
-                            {{ form.work_experience }}
-                        </div>
-                        <div class="field">
-                            <label for="date-of-employment">date of employment</label>
-                            {{ form.date_of_employment }}
-                        </div>
-                        <div class="field">
-                            <label for="employee-status">employee status</label>
-                            {{ form.employee_status }}
+        <header>
+            <h1>EMPLOYEES</h1>
+        </header>
+
+        <div class="system_content">
+            <div class="container">
+            <div class="register_container">
+                <div class="register_title">
+                <p>Adding new employee!</p>
+                </div>
+                <div>
+                    <form class="register_field" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="fields_1">
+                            <div class="field">
+                                <label for="first-name">first name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="field">
+                                <label for="last-name">last name</label>
+                                {{ form.last_name }}
+                            </div>
+                            <div class="field">
+                                <label for="gender">gender</label>
+                                {{ form.gender}}
+                            </div>
+                            <div class="field">
+                                <label for="date-of-birth">date of birth</label>
+                                {{ form.date_of_birth }}
+                            </div>
+                            <div class="field">
+                                <label for="contact-number">contact number</label>
+                                {{ form.contact_number }}
+                            </div>
+                            <div class="field">
+                                <label for="emergency-contact">emergency contact</label>
+                                {{ form.emergency_contact }}
+                            </div>
+                            <div class="field">
+                                <label for="id_region">region</label>
+                                {{ form.region }}
+                                <datalist id="region-list">
+                                    {% for region in form.region_choices %}
+                                        <option value="{{ region }}">
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            <div class="field">
+                                <label for="id_province">province</label>
+                                {{ form.province }}
+                                <datalist id="province-list">
+                                    {% if form.province_choices %}
+                                        {% for province in form.province_choices %}
+                                            <option value="{{ province }}">
+                                        {% endfor %}
+                                    {% endif %}
+                                </datalist>
+                            </div>
+                            <div class="field">
+                                <label for="id_municipality">city</label>
+                                {{ form.municipality }}
+                                <datalist id="municipality-list">
+                                    {% if form.municipality_choices %}
+                                        {% for municipality in form.municipality_choices %}
+                                            <option value="{{ municipality }}">
+                                        {% endfor %}
+                                    {% endif %}
+                                </datalist>
+                            </div>
+                            <div class="field">
+                                <label for="id_barangay">barangay</label>
+                                {{ form.barangay }}
+                                <datalist id="barangay-list">
+                                    {% if form.barangay_choices %}
+                                        {% for barangay in form.barangay_choices %}
+                                            <option value="{{ barangay }}">
+                                        {% endfor %}
+                                    {% endif %}
+                                </datalist>
+                            </div>
+                            <div class="field">
+                                <label for="education">highest education attainment</label>
+                                {{ form.highest_education }}
+                            </div>
                         </div>
 
-                        <div class="field">  
-                            <label for="employee_image">employee image</label>
-                            <div class="employee_picture">
-                                <!-- Webcam capture elements -->
-                                <div class="webcam-container" >
-                                    <video id="video" autoplay playsinline></video>
-                                    <canvas id="canvas"></canvas>
-                                    <img id="capturedImage" src="" alt="Captured Image"/>
+                        <div class="fields_2">
+                            <div class="field">
+                                <label for="work-experience">work experience</label>
+                                {{ form.work_experience }}
+                            </div>
+                            <div class="field">
+                                <label for="date-of-employment">date of employment</label>
+                                {{ form.date_of_employment }}
+                            </div>
+                            <div class="field">
+                                <label for="employee-status">employee status</label>
+                                {{ form.employee_status }}
+                            </div>
+
+                            <div class="field">  
+                                <label for="employee_image">employee image</label>
+                                <div class="employee_picture">
+                                    <!-- Webcam capture elements -->
+                                    <div class="webcam-container" >
+                                        <video id="video" autoplay playsinline></video>
+                                        <canvas id="canvas"></canvas>
+                                        <img id="capturedImage" src="" alt="Captured Image"/>
+                                    </div>
+                                    
+                                    <!-- Hide the original file input but keep it in the form for file submission -->
+                                    <div style="display: none;">
+                                        {{ form.employee_image }}
+                                    </div>
                                 </div>
-                                
-                                <!-- Hide the original file input but keep it in the form for file submission -->
-                                <div style="display: none;">
-                                    {{ form.employee_image }}
+
+                                <div class="button">
+                                    <button type="button" id="captureButton">
+                                        <p>TAKE A PICTURE</p>
+                                        <img src="{% static 'images/camera.png' %}" alt="">
+                                    </button>
+                                    <input class="submit" type="submit" value="SUBMIT" />
                                 </div>
                             </div>
 
-                            <div class="button">
-                                <button type="button" id="captureButton">
-                                    <p>TAKE A PICTURE</p>
-                                    <img src="{% static 'images/camera.png' %}" alt="">
-                                </button>
-                                <input class="submit" type="submit" value="SUBMIT" />
-                            </div>
-                        </div>
-
-                        {% if form.errors %}
-                            <ul>
-                            {% for field, errors in form.errors.items %}
-                                {% for error in errors %}
-                                <li>{{ field }}: {{ errors}}</li>
+                            {% if form.errors %}
+                                <ul>
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                    <li>{{ field }}: {{ errors}}</li>
+                                    {% endfor %}
                                 {% endfor %}
-                            {% endfor %}
-                            </ul>
-                        {% endif%}
+                                </ul>
+                            {% endif%}
 
-                    </div>
-                </form>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
-        <div class="logos">
-            <div class="logo_container">
-            <img src="{% static 'images/logo_icon.png'%}" alt="" />
-            <p class="logo_name">REGISTERING EMPLOYEE</p>
-            </div>
-            <img class="client_logo"
-            src="{% static 'images/clients_logo.png' %}"
-            alt="Toto's Car Tinting Shop"
-            />
         </div>
     </div>
 
