@@ -12,6 +12,7 @@ from .forms import EmployeeForm, PayrollForm
 from .face_recognition_attendance import recognize_face
 from .models import Employee, Payroll, Attendance, History, Region, Province, Municipality, Barangay
 from ph_geography.models import Region, Province, Municipality, Barangay
+from django.http import JsonResponse
 
 @csrf_protect  # Ensure CSRF protection
 def time_in_out(request):
@@ -271,35 +272,49 @@ def employee_registration(request):
 
 @login_required
 def employees(request):
-    
-    # Get the latest attendance for each employee using a subquery
+    #new
+    query = request.GET.get('q', '')
+
+    # Get latest attendance for each employee using a subquery
     latest_attendance_subquery = (
         Attendance.objects
         .filter(employee_id_fk=OuterRef('pk'))
         .order_by('-date')
         .values('date')[:1]
     )
-    
-    # Get the latest payroll for each employee using a subquery
+
+    # Get latest payroll status for each employee using a subquery
     latest_payroll_subquery = (
         Payroll.objects
         .filter(employee_id_fk=OuterRef('pk'))
         .order_by('-payment_date')
         .values('payroll_status')[:1]
     )
-    
-    # Add the latest attendance date and latest payroll status to each employee
-    employees = (
-        Employee.objects
-        .annotate(
-            latest_attendance_date=Subquery(latest_attendance_subquery),
-            latest_payroll_status=Subquery(latest_payroll_subquery)
-        )
-        .all()
+
+    # Base QuerySet with annotations
+    employees = Employee.objects.annotate(
+        latest_attendance_date=Subquery(latest_attendance_subquery),
+        latest_payroll_status=Subquery(latest_payroll_subquery)
     )
+
+    # Apply search filter if query exists
+    if query:
+        employees = employees.filter(
+            first_name__icontains=query
+        ) | employees.filter(
+            last_name__icontains=query
+        ) | employees.filter(
+            employee_id__icontains=query
+        )
+
+    # Handle AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  
+        data = list(employees.values('first_name', 'last_name', 'employee_id', 'contact_number', 'employee_status', 'latest_payroll_status', 'latest_attendance_date'))
+        return JsonResponse({'employees': data})
     
     context = {
-        'employees': employees
+        'employees': employees,
+        'query': query #new
     }
     return render(request, 'payroll_system/employees.html', context)
 
@@ -332,9 +347,62 @@ def employee_profile(request, employee_id):
 def payrolls(request):
     # Get all employees with prefetched payroll data for efficiency
     employees = Employee.objects.prefetch_related('payrolls', 'attendances').all()
-
+    
+    #new
+    query = request.GET.get('q', '')
+    
+    latest_attendance_subquery = (
+        Attendance.objects
+        .filter(employee_id_fk=OuterRef('pk'))
+        .order_by('-date')
+        .values('date')[:1]
+    )
+    
+    # Get the latest payroll for each employee using a subquery (new)
+    latest_payroll_subquery = (
+        Payroll.objects
+        .filter(employee_id_fk=OuterRef('pk'))
+        .order_by('-payment_date')
+        .values('payroll_status')[:1]
+    )
+    
+    employees = Employee.objects.annotate(
+        latest_attendance_date=Subquery(latest_attendance_subquery),
+        latest_payroll_status=Subquery(latest_payroll_subquery)
+    )
+    
+    if query:
+        employees = employees.filter(
+            first_name__icontains=query
+        ) | employees.filter(
+            last_name__icontains=query
+        ) | employees.filter(
+            employee_id__icontains=query
+        )
+    
     # Total Employees
     total_employees = employees.count()
+    
+    # Count employees with different payroll statuses
+    processed_payroll_count = employees.filter(latest_payroll_status='PROCESSED').count()
+    pending_payroll_count = employees.filter(latest_payroll_status='PENDING').count()
+    
+    # Get payroll data for each employee
+    employee_data = []
+    for employee in employees:
+        latest_payroll = employee.payrolls.order_by('-payment_date').first()
+        
+        # Calculate salary based on attendance count
+        if latest_payroll:
+            attendance_count = employee.attendances.count()
+            latest_payroll.salary = latest_payroll.rate * attendance_count
+        
+        employee_data.append({
+            'employee': employee,
+            'latest_payroll': latest_payroll
+        })
+    
+    #new (end)
 
     # Get current week range (Monday to Sunday)
     today = now().date()
@@ -355,28 +423,6 @@ def payrolls(request):
     total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
     days_counted = len(active_employees_per_day) or 1  # Avoid division by zero
     avg_active_employees = total_active_counts / days_counted
-
-    # Payroll Status: Count employees with "Processed" payroll
-    # processed_payroll_count = (
-    #     employees.filter(payrolls__payroll_status='PROCESSED')
-    #     .distinct()
-    #     .count()
-    # )
-
-    # Payroll Status: Count employees with "Pending" payroll
-    # pending_payroll_count = (
-    #     employees.filter(payrolls__payroll_status='PENDING')
-    #     .distinct()
-    #     .count()
-    # )
-
-    # Get the latest payroll for each employee using a subquery (new)
-    latest_payroll_subquery = (
-        Payroll.objects
-        .filter(employee_id_fk=OuterRef('pk'))
-        .order_by('-payment_date')
-        .values('payroll_status')[:1]
-    )
 
     # Count employees by their latest payroll status
     employees_with_latest_payroll = Employee.objects.annotate(latest_payroll_status=Subquery(latest_payroll_subquery))
@@ -447,8 +493,6 @@ def payrolls(request):
         if latest_payroll:
             attendance_count = employee.attendances.count()
             latest_payroll.salary = latest_payroll.rate * attendance_count
-        else:
-            pass
         
         employee_data.append({
             'employee': employee,
@@ -457,6 +501,7 @@ def payrolls(request):
 
     # Pass all data to the template
     context = {
+        'employee': employee,
         'employee_data': employee_data,  # List of employees with their latest payroll
         'total_employees': total_employees,
         'avg_active_employees': round(avg_active_employees),
@@ -469,6 +514,7 @@ def payrolls(request):
         'previous_avg_rate': previous_avg_rate,
         'rate_percentage': rate_percentage,
         'avg_rate': current_avg_rate,
+        'query': query,
     }
 
     return render(request, 'payroll_system/payroll.html', context)

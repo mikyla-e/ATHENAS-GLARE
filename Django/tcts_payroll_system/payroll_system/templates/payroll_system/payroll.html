@@ -45,12 +45,7 @@
                             <img src="{% static 'images/employee_icon.png' %}" alt="">
                             <div class="link">EMPLOYEES</div>
                         </a>
-                    </li>
-                    <li class="menu-jobs">
-                        <a href="">
-                            <img src="{% static 'images/employee_icon.png' %}" alt="">
-                            <div class="link">JOBS</div>
-                        </a>
+                        
                     </li>
                     <li class="menu-settings">
                         <a href="{% url 'payroll_system:settings' %}">
@@ -129,9 +124,9 @@
 
                 <div class="search_filter">
                     <div class="search">
-                        <form class="form" method="post">
+                        <form method="get" action="{% url 'payroll_system:payrolls' %}">
                             <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt=""></button>
-                            <input type="text" placeholder="Search...">    
+                            <input type="text" name="q" placeholder="Search by name or ID" value="{{ query }}">
                         </form>
                     </div>
                     <div class="filter_sort">
@@ -143,6 +138,7 @@
                         </div>
                     </div>
                 </div>
+                
                 
                 <div class="table">
                     <table>

@@ -92,11 +92,11 @@
                     <div class="container_2">
                         <div class="search_filter" >
                             <div class="search">
-                                <form method="get" action="{% url 'payroll_system:employees' %}">
-                                    <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt=""></button>
-                                    <input type="text" name="q" placeholder="Search" value="{{ request.GET.q }}">
+                                <form id="search-form">
+                                    <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt="Search"></button>
+                                    <input type="text" id="search-input" name="q" placeholder="Search by name or ID">
                                 </form>
-                            </div>
+                            </div>                            
                             <div class="filter">
                                 <button>
                                     <p>Filter by</p>   
@@ -155,5 +155,58 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchForm = document.getElementById("search-form");
+            const searchInput = document.getElementById("search-input");
+            const employeeTable = document.querySelector(".table table tbody");
+        
+            searchForm.addEventListener("submit", function(event) {
+                event.preventDefault();  // Prevent the form from reloading the page
+                fetchEmployees(searchInput.value);
+            });
+        
+            searchInput.addEventListener("keyup", function() {
+                fetchEmployees(searchInput.value);
+            });
+        
+            function fetchEmployees(query) {
+                fetch(`{% url 'payroll_system:employees' %}?q=${query}`, {
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"  // Identifies this as an AJAX request
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    employeeTable.innerHTML = "";  // Clear existing table rows
+        
+                    if (data.employees.length === 0) {
+                        employeeTable.innerHTML = `<tr><td colspan="7">No employees found</td></tr>`;
+                        return;
+                    }
+        
+                    data.employees.forEach(employee => {
+                        let row = `
+                            <tr class="emp1">
+                                <td>${employee.first_name} ${employee.last_name}</td>
+                                <td>${employee.employee_id}</td>
+                                <td>${employee.contact_number || 'N/A'}</td>
+                                <td>${employee.employee_status}</td>
+                                <td>${employee.latest_payroll_status || 'No Payroll Data'}</td>
+                                <td>${employee.latest_attendance_date || 'No Attendance Data'}</td>
+                                <td>
+                                    <a href="/payroll_system/employee_profile/${employee.employee_id}">MORE</a>
+                                </td>
+                            </tr>
+                        `;
+                        employeeTable.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error("Error fetching employees:", error));
+            }
+        });
+        </script>
+        
 </body>
 </html>
