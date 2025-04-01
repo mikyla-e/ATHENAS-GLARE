@@ -158,7 +158,7 @@
                 
                 
                 <div class="table">
-                    <table>
+                    {% comment %} <table>
                         <tr>
                             <th>EMPLOYEE</th>
                             <th>RATE PER DAY</th>
@@ -186,7 +186,40 @@
                                 {% endif %}
                             {% endwith %}
                         {% endfor %}
+                    </table> {% endcomment %}
+
+                    <table id="myTable" class="display">
+                        <thead>
+                            <th>EMPLOYEE</th>
+                            <th>RATE PER DAY</th>
+                            <!-- <th>DEDUCTIONS</th> -->
+                            <th>PAYMENT AMOUNT</th>
+                            <th>STATUS</th>
+                            <th></th>
+                        </thead>
+                        <tbody>
+                            {% for data in employee_data %}
+                            {% with employee=data.employee latest_payroll=data.latest_payroll %}
+                                {% if latest_payroll %}
+                                <tr>
+                                    <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                                    <td>{{ latest_payroll.rate }}</td>
+                                    <!-- <td>{{ latest_payroll.deductions }}</td> -->
+                                    <td>{{ latest_payroll.salary }}</td>
+                                    <td>{{ latest_payroll.payroll_status }}</td>
+                                    <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                                    <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                                </tr>
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+                        </tbody>
                     </table>
+
                 </div>
             </div>
 
@@ -209,16 +242,28 @@
 
         </div>
     </div>
-</body>
-<script>
-    function editIncentives(){
-        const bg = document.getElementById("background");
-        bg.classList.add("show");
-    }
+    <!--Jquery File-->
+    <script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
 
-    function cancelEditIncentives(){
-        const bg = document.getElementById("background");
-        bg.classList.remove("show");
-    }
+    <!--Datatables-->
+    <script src="{% static 'css/dataTables.js' %}"></script>
+
+    <script>
+        $(document).ready( function () {
+            $('#myTable').DataTable();
+        } );
+    </script>
+</body>
+
+<script>
+function editIncentives(){
+    const bg = document.getElementById("background");
+    bg.classList.add("show");
+}
+
+function cancelEditIncentives(){
+    const bg = document.getElementById("background");
+    bg.classList.remove("show");
+}
 </script>
 </html>
