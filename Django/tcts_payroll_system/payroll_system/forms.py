@@ -1,6 +1,7 @@
-import datetime
 from django import forms
 from django.forms import ModelForm
+from django.utils import timezone
+from datetime import datetime, timedelta, date
 from .models import Admin, Employee, Payroll
 from ph_geography.models import Region, Province, Municipality, Barangay
 
@@ -75,6 +76,15 @@ class EmployeeForm(ModelForm):
         super().__init__(*args, **kwargs)
         self._setup_location_fields()
         self._setup_image_field()
+        
+        # Set custom attributes for the date picker
+        self.fields['date_of_birth'].widget = forms.DateInput(
+            attrs={
+                'type': 'date',
+                'max': timezone.now().date().isoformat(),  # Set max date to today
+                'value': '',  # No default value when form loads
+            }
+        )
 
     def _setup_location_fields(self):
         """Initialize location fields and their choices."""
@@ -100,6 +110,20 @@ class EmployeeForm(ModelForm):
             self.fields['municipality_name'].initial = self.instance.municipality.name
         if self.instance.barangay:
             self.fields['barangay_name'].initial = self.instance.barangay.name
+
+    # def _setup_date_fields(self):
+    #     """Set up date fields with appropriate defaults and constraints."""
+    #     # Calculate date 18 years ago for date_of_birth field
+    #     eighteen_years_ago = datetime.datetime.now().date() - datetime.timedelta(days=365*18)
+        
+    #     # Set max attribute to today (can't be born in the future)
+    #     today = datetime.datetime.now().date().isoformat()
+        
+    #     # Update the date_of_birth widget attributes
+    #     self.fields['date_of_birth'].widget.attrs.update({
+    #         'max': today,
+    #         'value': eighteen_years_ago.isoformat()  # Default to 18 years ago
+    #     })
 
     def _populate_cascading_choices(self):
         """Populate cascading choices for existing instances."""
@@ -132,6 +156,23 @@ class EmployeeForm(ModelForm):
             datetime.datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:
             raise forms.ValidationError("Invalid date format. Use 'YYYY-MM-DD'.")
+        
+    def clean_date_of_birth(self):
+        """Validate that employee is at least 18 years old"""
+        date_of_birth = self.cleaned_data.get('date_of_birth')
+        if date_of_birth:
+            # Calculate age without using dateutil
+            today = timezone.now().date()
+            age = today.year - date_of_birth.year
+            
+            # Adjust age if birthday hasn't occurred yet this year
+            if (today.month, today.day) < (date_of_birth.month, date_of_birth.day):
+                age -= 1
+            
+            if age < 18:
+                raise forms.ValidationError("Employee must be at least 18 years old.")
+        
+        return date_of_birth
 
     def clean_date_of_birth(self):
         date_of_birth = self.cleaned_data.get('date_of_birth')

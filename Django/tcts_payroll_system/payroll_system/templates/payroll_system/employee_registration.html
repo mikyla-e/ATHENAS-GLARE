@@ -322,6 +322,27 @@
             });
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the date of birth input field
+            const dobInput = document.querySelector('input[name="date_of_birth"]');
+            
+            if (dobInput) {
+                // Calculate date 18 years ago
+                const today = new Date();
+                const defaultDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+                
+                // Format as YYYY-MM-DD for the date input
+                const defaultDateStr = defaultDate.toISOString().split('T')[0];
+                
+                // Set the default date when the input is clicked but not yet filled
+                dobInput.addEventListener('focus', function() {
+                    if (!this.value) {
+                        // Only set default if no value is already selected
+                        this.valueAsDate = defaultDate;
+                    }
+                });
+            }
+        });
       
         document.addEventListener('DOMContentLoaded', function() {
             // Get all inputs and datalists
@@ -330,21 +351,10 @@
             const municipalityInput = document.getElementById('id_municipality_name');
             const barangayInput = document.getElementById('id_barangay_name');
             
-            // Create datalists if they don't exist
-            function ensureDatalist(id) {
-                let list = document.getElementById(id);
-                if (!list) {
-                    list = document.createElement('datalist');
-                    list.id = id;
-                    document.body.appendChild(list);
-                }
-                return list;
-            }
-            
-            const regionList = ensureDatalist('region-list');
-            const provinceList = ensureDatalist('province-list');
-            const municipalityList = ensureDatalist('municipality-list');
-            const barangayList = ensureDatalist('barangay-list');
+            const regionList = document.getElementById('region-list');
+            const provinceList = document.getElementById('province-list');
+            const municipalityList = document.getElementById('municipality-list');
+            const barangayList = document.getElementById('barangay-list');
             
             // Reset dependent fields
             function resetDependentFields(startingFrom) {
@@ -382,7 +392,7 @@
                 .then(response => response.json())
                 .then(regions => {
                     regionList.innerHTML = regions.map(region => 
-                        `<option value="${region}"></option>`
+                        `<option value="${region.trim()}"></option>` // Trim spaces
                     ).join('');
                 })
                 .catch(error => console.error('Error loading regions:', error));
