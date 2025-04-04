@@ -149,11 +149,12 @@
     gap: 20px;
 }
 
-.client_form form .submit input[type=button]{
+.client_form form .submit a input[type=button]{
     border: none;
     border-radius: 100px;
+    height: 50px;
 
-    padding: 15px 5%;
+    padding: 0 50px;
 
     font-family: 'Roboto';
     font-size: 1rem;
@@ -163,11 +164,12 @@
     color: #F8D146;
 }
 
-.client_form form .submit input[type=submit]{
+.client_form form .submit a input[type=submit]{
     border: none;
     border-radius: 100px;
+    height: 50px;
 
-    padding: 15px 5%;
+    padding: 0 50px;
 
     font-family: 'Roboto';
     font-size: 1rem;

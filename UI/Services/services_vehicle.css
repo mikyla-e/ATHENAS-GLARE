@@ -75,14 +75,14 @@ form .form span{
     width: 95%;
     background-color: rgba(69, 50, 13, 0.30);;
     border-radius: 100px;
-    margin: 20px 20px;
+    margin: 10px 20px;
 }
 
 form .form .employee_form{
     display: flex;
     flex-direction: column;
     width: 50%;
-    margin: 10px 20px;
+    margin: 15px 20px;
 }
 
 form .form .employee_form label{
@@ -126,11 +126,16 @@ form .submit{
     gap: 20px;
 }
 
-form .submit input[type=button]{
+form .submit a{
+
+}
+
+form .submit a input[type=button]{
     border: none;
     border-radius: 100px;
+    height: 50px;
 
-    padding: 15px 5%;
+    padding: 0 50px;
 
     font-family: 'Roboto';
     font-size: 1rem;
@@ -140,11 +145,12 @@ form .submit input[type=button]{
     color: #F8D146;
 }
 
-form .submit input[type=submit]{
+form .submit a input[type=submit]{
     border: none;
     border-radius: 100px;
+    height: 50px;
 
-    padding: 15px 5%;
+    padding: 0 50px;
 
     font-family: 'Roboto';
     font-size: 1rem;
