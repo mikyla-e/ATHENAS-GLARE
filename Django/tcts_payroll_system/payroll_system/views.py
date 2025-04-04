@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_GET
 from .forms import EmployeeForm, PayrollForm
 from .face_recognition_attendance import recognize_face
-from .models import Employee, Payroll, Attendance, History, Region, Province, Municipality, Barangay
+from .models import Employee, Payroll, Attendance, History
 from ph_geography.models import Region, Province, Municipality, Barangay
 from django.http import JsonResponse
 
@@ -150,6 +150,15 @@ def dashboard(request):
     return render(request, 'payroll_system/dashboard.html', context)
 
 @require_GET
+def get_regions(request):
+    """Fetch all active regions."""
+    try:
+        regions = list(Region.objects.filter(is_active=True).values_list('name', flat=True))
+        return JsonResponse(regions, safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@require_GET
 def get_address_options(request):
     """
     Fetch address options based on the given parameters.
@@ -164,12 +173,14 @@ def get_address_options(request):
     region_name = request.GET.get('region', '')
     province_name = request.GET.get('province', '')
     municipality_name = request.GET.get('municipality', '')
+    
+    print(f"get_address_options called with level={level}, region={region_name}, province={province_name}, municipality={municipality_name}")
 
     # Validate inputs
     if not level:
+        print("Error: Level parameter is missing")
         return JsonResponse({
-            'error': 'Level parameter is required',
-            'options': []
+            'error': 'Level parameter is required'
         }, status=400)
 
     try:
@@ -177,97 +188,129 @@ def get_address_options(request):
         if level == 'province':
             # Provinces for a region
             if not region_name:
+                print("Error: Region name is missing")
                 return JsonResponse({
-                    'error': 'Region name is required',
-                    'options': []
+                    'error': 'Region name is required'
                 }, status=400)
             
             # Use .filter() to handle case-insensitive matching
-            region = Region.objects.filter(name__iexact=region_name).first()
+            region = Region.objects.filter(name__iexact=region_name, is_active=True).first()
             if not region:
+                print(f"Error: Region not found: {region_name}")
                 return JsonResponse({
-                    'error': f'Region not found: {region_name}',
-                    'options': []
+                    'error': f'Region not found: {region_name}'
                 }, status=404)
             
-            provinces = list(Province.objects.filter(region=region).values_list('name', flat=True))
+            provinces = list(Province.objects.filter(region=region, is_active=True).values_list('name', flat=True))
+            print(f"Returning {len(provinces)} provinces for region {region_name}")
             return JsonResponse(provinces, safe=False)
 
         elif level == 'municipality':
-            # Municipalities for a region and province
+            # Rest of the code with added debug prints
             if not region_name or not province_name:
+                print("Error: Region or province name is missing")
                 return JsonResponse({
-                    'error': 'Region and province names are required',
-                    'options': []
+                    'error': 'Region and province names are required'
                 }, status=400)
             
-            region = Region.objects.filter(name__iexact=region_name).first()
+            region = Region.objects.filter(name__iexact=region_name, is_active=True).first()
+            if not region:
+                print(f"Error: Region not found: {region_name}")
+                return JsonResponse({
+                    'error': f'Region not found: {region_name}'
+                }, status=404)
+                
             province = Province.objects.filter(
                 name__iexact=province_name, 
-                region=region
+                region=region,
+                is_active=True
             ).first()
-            
-            if not region or not province:
+            if not province:
+                print(f"Error: Province not found: {province_name} in region {region_name}")
                 return JsonResponse({
-                    'error': f'Region or Province not found: {region_name}, {province_name}',
-                    'options': []
+                    'error': f'Province not found: {province_name}'
                 }, status=404)
             
-            municipalities = list(Municipality.objects.filter(province=province).values_list('name', flat=True))
+            municipalities = list(Municipality.objects.filter(
+                province=province,
+                is_active=True
+            ).values_list('name', flat=True))
+            print(f"Returning {len(municipalities)} municipalities for province {province_name}")
             return JsonResponse(municipalities, safe=False)
 
         elif level == 'barangay':
-            # Barangays for a region, province, and municipality
+            # Rest of the code with added debug prints
             if not all([region_name, province_name, municipality_name]):
+                print("Error: Region, province, or municipality name is missing")
                 return JsonResponse({
-                    'error': 'Region, province, and municipality names are required',
-                    'options': []
+                    'error': 'Region, province, and municipality names are required'
                 }, status=400)
             
-            region = Region.objects.filter(name__iexact=region_name).first()
+            region = Region.objects.filter(name__iexact=region_name, is_active=True).first()
+            if not region:
+                print(f"Error: Region not found: {region_name}")
+                return JsonResponse({
+                    'error': f'Region not found: {region_name}'
+                }, status=404)
+                
             province = Province.objects.filter(
                 name__iexact=province_name, 
-                region=region
+                region=region,
+                is_active=True
             ).first()
+            if not province:
+                print(f"Error: Province not found: {province_name} in region {region_name}")
+                return JsonResponse({
+                    'error': f'Province not found: {province_name}'
+                }, status=404)
+                
             municipality = Municipality.objects.filter(
                 name__iexact=municipality_name, 
-                province=province
+                province=province,
+                is_active=True
             ).first()
-            
-            if not all([region, province, municipality]):
+            if not municipality:
+                print(f"Error: Municipality not found: {municipality_name} in province {province_name}")
                 return JsonResponse({
-                    'error': f'Address components not found: {region_name}, {province_name}, {municipality_name}',
-                    'options': []
+                    'error': f'Municipality not found: {municipality_name}'
                 }, status=404)
             
-            barangays = list(Barangay.objects.filter(municipality=municipality).values_list('name', flat=True))
+            barangays = list(Barangay.objects.filter(
+                municipality=municipality,
+                is_active=True
+            ).values_list('name', flat=True))
+            print(f"Returning {len(barangays)} barangays for municipality {municipality_name}")
             return JsonResponse(barangays, safe=False)
 
         else:
+            print(f"Error: Invalid level: {level}")
             return JsonResponse({
-                'error': f'Invalid level: {level}',
-                'options': []
+                'error': f'Invalid level: {level}'
             }, status=400)
 
     except Exception as e:
+        print(f"Unexpected error: {str(e)}")
         return JsonResponse({
-            'error': f'An unexpected error occurred: {str(e)}',
-            'options': []
+            'error': f'An unexpected error occurred: {str(e)}'
         }, status=500)
 
 @login_required
 def employee_registration(request):
     if request.method == "POST":
+        print("Raw POST data:", request.POST)  # Debug what's actually being submitted
         form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
+            print("Region instance type:", type(form.cleaned_data['region']))
+            print("Region instance:", form.cleaned_data['region'])
             employee = form.save()
-
-            History.objects.create(description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was added.")
-
-            return redirect('payroll_system:payroll_individual', employee_id = employee.employee_id)
+            History.objects.create(
+                description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was added."
+            )
+            return redirect('payroll_system:payroll_individual', employee_id=employee.employee_id)
+        else:
+            print("Form errors:", form.errors)  # Debug validation errors
     else:
         form = EmployeeForm()
-
     return render(request, 'payroll_system/employee_registration.html', {'form': form})
 
 @login_required

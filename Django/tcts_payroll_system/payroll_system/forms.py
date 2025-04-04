@@ -14,30 +14,47 @@ class AdminForm(ModelForm):
         }
         
 class EmployeeForm(ModelForm):
-    region = forms.CharField(
-        label='Region', 
-        widget=forms.TextInput(attrs={'list': 'region-list', 'autocomplete': 'off'}),
+    region_name = forms.CharField(
+        label='Region',
+        widget=forms.TextInput(attrs={
+            'list': 'region-list',
+            'autocomplete': 'off',
+            'class': 'location-field'
+        }),
         required=True
     )
-    province = forms.CharField(
-        label='Province', 
-        widget=forms.TextInput(attrs={'list': 'province-list', 'autocomplete': 'off'}),
+    province_name = forms.CharField(
+        label='Province',
+        widget=forms.TextInput(attrs={
+            'list': 'province-list', 
+            'autocomplete': 'off',
+            'class': 'location-field'
+        }),
         required=True
     )
-    municipality = forms.CharField(
-        label='Municipality', 
-        widget=forms.TextInput(attrs={'list': 'municipality-list', 'autocomplete': 'off'}),
+    municipality_name = forms.CharField(
+        label='Municipality',
+        widget=forms.TextInput(attrs={
+            'list': 'municipality-list',
+            'autocomplete': 'off',
+            'class': 'location-field'
+        }),
         required=True
     )
-    barangay = forms.CharField(
-        label='Barangay', 
-        widget=forms.TextInput(attrs={'list': 'barangay-list', 'autocomplete': 'off'}),
+    barangay_name = forms.CharField(
+        label='Barangay',
+        widget=forms.TextInput(attrs={
+            'list': 'barangay-list',
+            'autocomplete': 'off',
+            'class': 'location-field'
+        }),
         required=True
     )
+    
     class Meta:
         model = Employee
-        fields = ('first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
-                   'region', 'province', 'municipality', 'barangay', 'highest_education', 'work_experience', 'date_of_employment',
+        fields = ('first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
+                   'highest_education', 'work_experience', 'date_of_employment',
                    'employee_status', 'employee_image')
         widgets = {
             'first_name': forms.TextInput(),
@@ -47,10 +64,6 @@ class EmployeeForm(ModelForm):
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
             'contact_number': forms.TextInput(),
             'emergency_contact': forms.TextInput(),
-            'region': forms.TextInput(),
-            'province': forms.TextInput(),
-            'municipality': forms.TextInput(),
-            'barangay': forms.TextInput(),
             'highest_education': forms.Select(),
             'work_experience': forms.Textarea(),
             'date_of_employment': forms.DateInput(attrs={'type': 'date'}),
@@ -60,59 +73,58 @@ class EmployeeForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._setup_location_fields()
+        self._setup_image_field()
+
+    def _setup_location_fields(self):
+        """Initialize location fields and their choices."""
+        if self.instance.pk:
+            self._set_initial_location_values()
         
-        # Make image required only for new employees (not for updates)
-        if not self.instance.pk:
-            self.fields['employee_image'].required = True
-        
-        # Populate datalist options dynamically
-        self.fields['region'].initial = self.instance.region.name if self.instance.region else ''
-        
-        # Prepare choices
-        self.region_choices = list(Region.objects.values_list('name', flat=True))
+        # Populate region choices from the library model
+        self.region_choices = Region.objects.filter(is_active=True).values_list('name', flat=True)
         self.province_choices = []
         self.municipality_choices = []
         self.barangay_choices = []
 
-        # If editing an existing employee, populate cascading choices
-        if self.instance.pk:
-            if self.instance.region:
-                self.province_choices = list(Province.objects.filter(
-                    region=self.instance.region
-                ).values_list('name', flat=True))
-                
-                # Set initial province input
-                self.fields['province'].initial = self.instance.province.name if self.instance.province else ''
+        if self.instance.pk and self.instance.region:
+            self._populate_cascading_choices()
+
+    def _set_initial_location_values(self):
+        """Set initial values for location fields when editing."""
+        if self.instance.region:
+            self.fields['region_name'].initial = self.instance.region.name
+        if self.instance.province:
+            self.fields['province_name'].initial = self.instance.province.name
+        if self.instance.municipality:
+            self.fields['municipality_name'].initial = self.instance.municipality.name
+        if self.instance.barangay:
+            self.fields['barangay_name'].initial = self.instance.barangay.name
+
+    def _populate_cascading_choices(self):
+        """Populate cascading choices for existing instances."""
+        if self.instance.region:
+            self.province_choices = Province.objects.filter(
+                region=self.instance.region, 
+                is_active=True
+            ).values_list('name', flat=True)
             
-            if self.instance.province:
-                self.municipality_choices = list(Municipality.objects.filter(
-                    province=self.instance.province
-                ).values_list('name', flat=True))
-                
-                # Set initial municipality input
-                self.fields['municipality'].initial = self.instance.municipality.name if self.instance.municipality else ''
+        if self.instance.province:
+            self.municipality_choices = Municipality.objects.filter(
+                province=self.instance.province, 
+                is_active=True
+            ).values_list('name', flat=True)
             
-            if self.instance.municipality:
-                self.barangay_choices = list(Barangay.objects.filter(
-                    municipality=self.instance.municipality
-                ).values_list('name', flat=True))
-                
-                # Set initial barangay input
-                self.fields['barangay'].initial = self.instance.barangay.name if self.instance.barangay else ''
+        if self.instance.municipality:
+            self.barangay_choices = Barangay.objects.filter(
+                municipality=self.instance.municipality, 
+                is_active=True
+            ).values_list('name', flat=True)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        required_fields = ['first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 
-                           'emergency_contact', 'region', 'province', 'municipality', 'barangay',
-                           'highest_education', 'work_experience', 'date_of_employment', 
-                           'employee_status']
-
-        # Check if all required fields are filled
-        missing_fields = [field for field in required_fields if not cleaned_data.get(field)]
-        if missing_fields:
-            raise forms.ValidationError(f"The following fields must be filled: {', '.join(missing_fields)}")
-
-        return cleaned_data
+    def _setup_image_field(self):
+        """Make image required only for new employees."""
+        if not self.instance.pk:
+            self.fields['employee_image'].required = True
 
     def validate_date_format(self, date_str):
         """Helper function to validate 'YYYY-MM-DD' format."""
@@ -144,6 +156,84 @@ class EmployeeForm(ModelForm):
 
     def clean_emergency_contact(self):
         return self.validate_contact_number(self.cleaned_data.get('emergency_contact', ''))
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # Get location names from form fields
+        region_name = cleaned_data.get('region_name')
+        province_name = cleaned_data.get('province_name')
+        municipality_name = cleaned_data.get('municipality_name')
+        barangay_name = cleaned_data.get('barangay_name')
+        
+        # Validate locations exist but don't store references
+        if region_name:
+            region = Region.objects.filter(name__iexact=region_name, is_active=True).first()
+            if not region:
+                self.add_error('region_name', f'Region "{region_name}" not found')
+        
+        if province_name and region_name:
+            region = Region.objects.filter(name__iexact=region_name, is_active=True).first()
+            if region:
+                province = Province.objects.filter(
+                    name__iexact=province_name, 
+                    region=region,
+                    is_active=True
+                ).first()
+                if not province:
+                    self.add_error('province_name', f'Province "{province_name}" not found in {region_name}')
+            
+        if municipality_name and province_name and region_name:
+            region = Region.objects.filter(name__iexact=region_name, is_active=True).first()
+            if region:
+                province = Province.objects.filter(
+                    name__iexact=province_name, 
+                    region=region,
+                    is_active=True
+                ).first()
+                if province:
+                    municipality = Municipality.objects.filter(
+                        name__iexact=municipality_name,
+                        province=province,
+                        is_active=True
+                    ).first()
+                    if not municipality:
+                        self.add_error('municipality_name', f'Municipality "{municipality_name}" not found in {province_name}')
+            
+        if barangay_name and municipality_name and province_name and region_name:
+            region = Region.objects.filter(name__iexact=region_name, is_active=True).first()
+            if region:
+                province = Province.objects.filter(
+                    name__iexact=province_name, 
+                    region=region,
+                    is_active=True
+                ).first()
+                if province:
+                    municipality = Municipality.objects.filter(
+                        name__iexact=municipality_name,
+                        province=province,
+                        is_active=True
+                    ).first()
+                    if municipality:
+                        barangay = Barangay.objects.filter(
+                            name__iexact=barangay_name,
+                            municipality=municipality,
+                            is_active=True
+                        ).first()
+                        if not barangay:
+                            self.add_error('barangay_name', f'Barangay "{barangay_name}" not found in {municipality_name}')
+            
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # No need to set foreign key references
+        # Just let the form's normal save mechanism handle the CharFields
+        
+        if commit:
+            instance.save()
+        return instance
     
 class PayrollForm(ModelForm):
     class Meta:

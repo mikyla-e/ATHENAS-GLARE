@@ -16,4 +16,5 @@ urlpatterns = [
     path('settings/', views.settings, name='settings'),
     path('about/', views.about, name='about'),
     path('get-address-options/', views.get_address_options, name='get_address_options'), 
+    path('get-regions/', views.get_regions, name='get-regions'),
 ]

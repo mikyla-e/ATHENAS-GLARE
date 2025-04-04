@@ -117,12 +117,16 @@
                                 {{ form.first_name }}
                             </div>
                             <div class="field">
+                                <label for="middle-name">middle name</label>
+                                {{ form.middle_name }}
+                            </div>
+                            <div class="field">
                                 <label for="last-name">last name</label>
                                 {{ form.last_name }}
                             </div>
                             <div class="field">
                                 <label for="gender">gender</label>
-                                {{ form.gender}}
+                                {{ form.gender }}
                             </div>
                             <div class="field">
                                 <label for="date-of-birth">date of birth</label>
@@ -137,46 +141,68 @@
                                 {{ form.emergency_contact }}
                             </div>
                             <div class="field">
-                                <label for="id_region">region</label>
-                                {{ form.region }}
+                                <label for="id_region_name">Region</label>
+                                <input type="text" class="location-field" id="id_region_name" 
+                                    name="region_name" list="region-list" autocomplete="off"
+                                    value="{{ form.region_name.value|default_if_none:'' }}">
                                 <datalist id="region-list">
                                     {% for region in form.region_choices %}
                                         <option value="{{ region }}">
                                     {% endfor %}
                                 </datalist>
+                                {% if form.region_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.region_name.errors|join:", " }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="field">
-                                <label for="id_province">province</label>
-                                {{ form.province }}
+                                <label for="id_province_name">province</label>
+                                <input type="text" class="location-field" id="id_province_name" 
+                                    name="province_name" list="province-list" autocomplete="off"
+                                    value="{{ form.province_name.value|default_if_none:'' }}">
                                 <datalist id="province-list">
-                                    {% if form.province_choices %}
-                                        {% for province in form.province_choices %}
-                                            <option value="{{ province }}">
-                                        {% endfor %}
-                                    {% endif %}
+                                    {% for province in form.province_choices %}
+                                        <option value="{{ province }}">
+                                    {% endfor %}
                                 </datalist>
+                                {% if form.province_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.province_name.errors|join:", " }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="field">
-                                <label for="id_municipality">city</label>
-                                {{ form.municipality }}
+                                <label for="id_municipality_name">municipality</label>
+                                <input type="text" class="location-field" id="id_municipality_name" 
+                                    name="municipality_name" list="municipality-list" autocomplete="off"
+                                    value="{{ form.municipality_name.value|default_if_none:'' }}">
                                 <datalist id="municipality-list">
-                                    {% if form.municipality_choices %}
-                                        {% for municipality in form.municipality_choices %}
-                                            <option value="{{ municipality }}">
-                                        {% endfor %}
-                                    {% endif %}
+                                    {% for municipality in form.municipality_choices %}
+                                        <option value="{{ municipality }}">
+                                    {% endfor %}
                                 </datalist>
+                                {% if form.municipality_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.municipality_name.errors|join:", " }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="field">
-                                <label for="id_barangay">barangay</label>
-                                {{ form.barangay }}
+                                <label for="id_barangay_name">barangay</label>
+                                <input type="text" class="location-field" id="id_barangay_name" 
+                                    name="barangay_name" list="barangay-list" autocomplete="off"
+                                    value="{{ form.barangay_name.value|default_if_none:'' }}">
                                 <datalist id="barangay-list">
-                                    {% if form.barangay_choices %}
-                                        {% for barangay in form.barangay_choices %}
-                                            <option value="{{ barangay }}">
-                                        {% endfor %}
-                                    {% endif %}
+                                    {% for barangay in form.barangay_choices %}
+                                        <option value="{{ barangay }}">
+                                    {% endfor %}
                                 </datalist>
+                                {% if form.barangay_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.barangay_name.errors|join:", " }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="field">
                                 <label for="education">highest education attainment</label>
@@ -298,93 +324,97 @@
 
       
         document.addEventListener('DOMContentLoaded', function() {
-            const regionInput = document.getElementById('id_region');
-            const provinceInput = document.getElementById('id_province');
-            const municipalityInput = document.getElementById('id_municipality');
-            const barangayInput = document.getElementById('id_barangay');
-
-            const provinceList = document.getElementById('province-list');
-            const municipalityList = document.getElementById('municipality-list');
-            const barangayList = document.getElementById('barangay-list');
-
-            // Function to reset and clear dependent fields
+            // Get all inputs and datalists
+            const regionInput = document.getElementById('id_region_name');
+            const provinceInput = document.getElementById('id_province_name');
+            const municipalityInput = document.getElementById('id_municipality_name');
+            const barangayInput = document.getElementById('id_barangay_name');
+            
+            // Create datalists if they don't exist
+            function ensureDatalist(id) {
+                let list = document.getElementById(id);
+                if (!list) {
+                    list = document.createElement('datalist');
+                    list.id = id;
+                    document.body.appendChild(list);
+                }
+                return list;
+            }
+            
+            const regionList = ensureDatalist('region-list');
+            const provinceList = ensureDatalist('province-list');
+            const municipalityList = ensureDatalist('municipality-list');
+            const barangayList = ensureDatalist('barangay-list');
+            
+            // Reset dependent fields
             function resetDependentFields(startingFrom) {
                 if (startingFrom === 'region') {
                     provinceInput.value = '';
                     provinceList.innerHTML = '';
-                }
-                
-                if (startingFrom === 'region' || startingFrom === 'province') {
                     municipalityInput.value = '';
                     municipalityList.innerHTML = '';
-                }
-                
-                if (startingFrom === 'region' || startingFrom === 'province' || startingFrom === 'municipality') {
+                    barangayInput.value = '';
+                    barangayList.innerHTML = '';
+                } else if (startingFrom === 'province') {
+                    municipalityInput.value = '';
+                    municipalityList.innerHTML = '';
+                    barangayInput.value = '';
+                    barangayList.innerHTML = '';
+                } else if (startingFrom === 'municipality') {
                     barangayInput.value = '';
                     barangayList.innerHTML = '';
                 }
             }
-
-            // Function to fetch address options
-            function fetchAddressOptions(level, params) {
-                // Check if any required parameter is empty
-                if (Object.values(params).some(value => !value)) {
-                    return Promise.resolve([]);
-                }
-
-                // Construct query string
-                const queryParams = new URLSearchParams({
-                    level: level,
-                    ...params
-                });
-
-                return fetch(`/payroll_system/get-address-options/?${queryParams}`)
-                    .then(response => {
-                        // Check if the response is OK
-                        if (!response.ok) {
-                            // Silently handle error without alerting
-                            console.error('Failed to fetch address options');
-                            return [];
-                        }
-                        return response.json();
-                    })
+            
+            // Fetch data from API
+            function fetchData(url, params) {
+                const queryString = new URLSearchParams(params).toString();
+                return fetch(`${url}?${queryString}`)
+                    .then(response => response.json())
                     .catch(error => {
-                        console.error('Error fetching address options:', error.message);
+                        console.error('Error fetching data:', error);
                         return [];
                     });
             }
-
-            // Region to Province Listener
+            
+            // Load regions on page load
+            fetch('/payroll_system/get-regions/')
+                .then(response => response.json())
+                .then(regions => {
+                    regionList.innerHTML = regions.map(region => 
+                        `<option value="${region}"></option>`
+                    ).join('');
+                })
+                .catch(error => console.error('Error loading regions:', error));
+            
+            // Region change event
             regionInput.addEventListener('change', function() {
-                const selectedRegion = this.value;
-                
-                // Reset dependent fields
+                const region = this.value.trim();
                 resetDependentFields('region');
-
-                // Only fetch if region is not empty
-                if (selectedRegion) {
-                    fetchAddressOptions('province', { region: selectedRegion })
-                        .then(provinces => {
-                            provinceList.innerHTML = provinces.map(province => 
-                                `<option value="${province}"></option>`
-                            ).join('');
-                        });
+                
+                if (region) {
+                    fetchData('/payroll_system/get-address-options/', {
+                        level: 'province',
+                        region: region
+                    }).then(provinces => {
+                        provinceList.innerHTML = provinces.map(province => 
+                            `<option value="${province}"></option>`
+                        ).join('');
+                    });
                 }
             });
-
-            // Province to Municipality Listener
+            
+            // Province change event
             provinceInput.addEventListener('change', function() {
-                const selectedProvince = this.value;
-                const selectedRegion = regionInput.value;
-                
-                // Reset dependent fields
+                const province = this.value.trim();
+                const region = regionInput.value.trim();
                 resetDependentFields('province');
-
-                // Only fetch if both region and province are not empty
-                if (selectedRegion && selectedProvince) {
-                    fetchAddressOptions('municipality', { 
-                        region: selectedRegion, 
-                        province: selectedProvince 
+                
+                if (region && province) {
+                    fetchData('/payroll_system/get-address-options/', {
+                        level: 'municipality',
+                        region: region,
+                        province: province
                     }).then(municipalities => {
                         municipalityList.innerHTML = municipalities.map(municipality => 
                             `<option value="${municipality}"></option>`
@@ -392,22 +422,20 @@
                     });
                 }
             });
-
-            // Municipality to Barangay Listener
+            
+            // Municipality change event
             municipalityInput.addEventListener('change', function() {
-                const selectedMunicipality = this.value;
-                const selectedProvince = provinceInput.value;
-                const selectedRegion = regionInput.value;
-                
-                // Reset dependent fields
+                const municipality = this.value.trim();
+                const province = provinceInput.value.trim();
+                const region = regionInput.value.trim();
                 resetDependentFields('municipality');
-
-                // Only fetch if region, province, and municipality are not empty
-                if (selectedRegion && selectedProvince && selectedMunicipality) {
-                    fetchAddressOptions('barangay', { 
-                        region: selectedRegion, 
-                        province: selectedProvince,
-                        municipality: selectedMunicipality
+                
+                if (region && province && municipality) {
+                    fetchData('/payroll_system/get-address-options/', {
+                        level: 'barangay',
+                        region: region,
+                        province: province,
+                        municipality: municipality
                     }).then(barangays => {
                         barangayList.innerHTML = barangays.map(barangay => 
                             `<option value="${barangay}"></option>`
@@ -415,6 +443,14 @@
                     });
                 }
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Template script loaded');
+            console.log('Region list:', document.getElementById('region-list'));
+            console.log('Province list:', document.getElementById('province-list'));
+            console.log('Municipality list:', document.getElementById('municipality-list'));
+            console.log('Barangay list:', document.getElementById('barangay-list'));
         });
     </script>
 </body>

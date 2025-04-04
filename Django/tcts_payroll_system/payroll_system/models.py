@@ -4,7 +4,6 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta, datetime
-from ph_geography.models import Barangay
 
 def rename_employee_image(instance, filename):
     
@@ -21,53 +20,6 @@ class Admin(models.Model):
     admin_id = models.IntegerField(primary_key=True)
     username = models.CharField(max_length=100, null=False)
     password = models.CharField(max_length=100, null=False)
-
-class Region(models.Model):
-    name = models.CharField(max_length=100)
-    code = models.CharField(max_length=20, null=True, blank=True)
-    
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        ordering = ['name']
-
-class Province(models.Model):
-    name = models.CharField(max_length=100)
-    code = models.CharField(max_length=20, null=True, blank=True)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name='provinces')
-    
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        ordering = ['name']
-
-class Municipality(models.Model):
-    name = models.CharField(max_length=100)
-    code = models.CharField(max_length=20, null=True, blank=True)
-    province = models.ForeignKey(Province, on_delete=models.CASCADE, related_name='municipalities')
-    
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        ordering = ['name']
-
-class Barangay(models.Model):
-    name = models.CharField(max_length=100)
-    code = models.CharField(max_length=20, null=True, blank=True)
-    municipality = models.ForeignKey(Municipality, on_delete=models.CASCADE, related_name='barangays')
-    
-    def __str__(self):
-        return self.name
-    
-    def get_full_address(self):
-        return f"{self.name}, {self.municipality.name}, {self.municipality.province.name}, {self.municipality.province.region.name}"
-    
-    class Meta:
-        ordering = ['name']
-        verbose_name_plural = "Barangays"
 
 class Employee(models.Model):
     class Gender(models.TextChoices):
@@ -100,13 +52,13 @@ class Employee(models.Model):
     emergency_contact = models.CharField(max_length=15, null=True)
     
     # Separate address fields
-    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, related_name='employees')
-    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, related_name='employees')
-    municipality = models.ForeignKey(Municipality, on_delete=models.SET_NULL, null=True, related_name='employees')
-    barangay = models.ForeignKey(Barangay, on_delete=models.SET_NULL, null=True, related_name='employees')
+    region = models.CharField(max_length=255, null=False, default='')
+    province = models.CharField(max_length=255, null=False, default='')
+    municipality = models.CharField(max_length=255, null=False, default='')
+    barangay = models.CharField(max_length=255, null=False, default='')
 
     highest_education = models.CharField(max_length=20, choices=HighestEducation.choices, null=True)
-    work_experience = models.CharField(max_length=2083, null=True)
+    work_experience = models.CharField(max_length=2083, null=True, blank=True)
     date_of_employment = models.DateField(default=timezone.now)
     days_worked = models.IntegerField(default=0, null=False)
     employee_status = models.CharField(max_length=9, choices=EmployeeStatus.choices, null=True)
