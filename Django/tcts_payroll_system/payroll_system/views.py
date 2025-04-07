@@ -645,6 +645,14 @@ def payroll_edit(request, employee_id):
     return render(request, 'payroll_system/payroll_edit.html', context)
 
 @login_required
+def services(request):
+    return render(request, 'payroll_system/services.html')
+
+@login_required
+def services_client(request):
+    return render(request, 'payroll_system/services_client.html')
+
+@login_required
 def settings(request):
     return render(request, 'payroll_system/settings.html')
 

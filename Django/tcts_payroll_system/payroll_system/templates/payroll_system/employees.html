@@ -12,6 +12,13 @@
     <!--Datatables-->
     <link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
 
+    <!-- Add these in the <head> -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
+
+    <!-- Add this before your closing </body> -->
+    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+
+
 </head>
 <body>
     <div class="body">
@@ -51,7 +58,7 @@
                         </a>
                     </li>
                     <li class="menu-object">
-                        <a href="">
+                        <a href="{% url 'payroll_system:services' %}">
                             <img src="{% static 'images/services_icon.png' %}" alt="">
                             <div class="link">SERVICES</div>
                         </a>
@@ -184,7 +191,9 @@
 
     <script>
         $(document).ready( function () {
-            $('#myTable').DataTable();
+            $('#myTable').DataTable({
+                responsive: true
+            });
         } );
     </script>
 </body>
