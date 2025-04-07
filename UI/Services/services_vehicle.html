@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirming Client</title>
     <link rel="stylesheet" href="../template.css">
-    <link rel="stylesheet" href="services_client.css">
+    <link rel="stylesheet" href="services_vehicle.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -80,74 +80,49 @@
     
         <div class="system_content">
             <div class="container">
-                <div class="old_client">
-                    <p>Old Client?</p>
-                    <div class="search">
-                        <form class="form" method="post">
-                            <button type="submit"><img src="../pictures/icons/search_icon.png" alt=""></button>
-                            <input type="text" placeholder="Search...">    
-                        </form>
+                <form action="" method="post">
+                    <div class="form">
+                        <div class="vehicle_form">
+                            <div class="field_1">
+                                <div class="field">
+                                    <label for="vehicle-brand">vehicle brand</label>
+                                    <input type="text" name="" id="">
+                                    <!-- {{ form.first_name }} -->
+                                </div>
+                                <div class="field">
+                                    <label for="vehicle-model">vehicle model</label>
+                                    <input type="text" name="" id="">
+                                    <!-- {{ form.first_name }} -->
+                                </div>
+                            </div>
+                            <div class="field_2">
+                                <div class="field">
+                                    <label for="vehicle-color">vehicle color</label>
+                                    <input type="text" name="" id="">
+                                    <!-- {{ form.first_name }} -->
+                                </div>
+                                <div class="field">
+                                    <label for="plate-number">plate number</label>
+                                    <input type="text" name="" id="">
+                                    <!-- {{ form.first_name }} -->
+                                </div>
+                            </div>
+                        </div>
+                        <span></span>
+                        <div class="employee_form">
+                            <label for="assigned-employee">assigned employee</label>
+                            <input type="text" name="" id="">
+                        </div>
                     </div>
-                </div>
-                <span></span> <!--Horizontal Line-->
-                <div class="client_form">
-                    <form action="" method="post">
-                        <div class="form">
-                            <div class="form_1">
-                                <div class="field">
-                                    <label for="first-name">first name</label>
-                                    <input type="text" name="" id="">
-                                    <!-- {{ form.first_name }} -->
-                                </div>
-                                <div class="field">
-                                    <label for="middle-name">middle name</label>
-                                    <input type="text" name="" id="">
-                                    <!-- {{ form.middle_name }} -->
-                                </div>
-                                <div class="field">
-                                    <label for="last-name">last name</label>
-                                    <input type="text" name="" id="">
-                                    <!-- {{ form.last_name }} -->
-                                </div>
-                                <div class="field">
-                                    <label for="gender">gender</label>
-                                    <input type="text" name="" id="">
-                                    <!-- {{ form.last_name }} -->
-                                </div>
-                            </div>
-                            <div class="form_2">
-                                <div class="field">
-                                    <label for="region">region</label>
-                                    <input type="text" name="" id="">
-                                    <!-- {{ form.first_name }} -->
-                                </div>
-                                <div class="field">
-                                    <label for="province">province</label>
-                                    <input type="text" name="" id="">
-                                    <!-- {{ form.middle_name }} -->
-                                </div>
-                                <div class="field">
-                                    <label for="municipality">municipality</label>
-                                    <input type="text" name="" id="">
-                                    <!-- {{ form.last_name }} -->
-                                </div>
-                                <div class="field">
-                                    <label for="barangay">barangay</label>
-                                    <input type="text" name="" id="">
-                                    <!-- {{ form.last_name }} -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="submit">
-                            <a href="">
-                                <input type="button" value="Cancel">
-                            </a>
-                            <a href="">
-                                <input type="submit" value="Confirm Client">
-                            </a>
-                        </div>
-                    </form>
-                </div>
+                    <div class="submit">
+                        <a href="">
+                            <input type="button" value="Back">
+                        </a>
+                        <a href="">
+                            <input type="submit" value="Assign Task">
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
