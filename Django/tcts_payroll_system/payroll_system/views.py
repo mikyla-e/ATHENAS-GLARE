@@ -300,8 +300,6 @@ def employee_registration(request):
         print("Raw POST data:", request.POST)  # Debug what's actually being submitted
         form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
-            print("Region instance type:", type(form.cleaned_data['region']))
-            print("Region instance:", form.cleaned_data['region'])
             employee = form.save()
             History.objects.create(
                 description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was added."
