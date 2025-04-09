@@ -5,90 +5,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payroll</title>
-    <link rel="stylesheet" href="{% static 'css/template.css' %}">
+    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
     <link rel="stylesheet" href="{% static 'css/payroll.css' %}">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
     <!--Datatables-->
     <link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
-
-    <!-- Add these in the <head> -->
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
-
-    <!-- Add this before your closing </body> -->
     <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
     
 </head>
-<body>
-    <div class="body">
-        <nav>
-            <!-- logo -->
-            <div class="logo">
-                <div class="logo-group">
-                    <div class="logo-picture">
-                        <img src="{% static 'images/logo_icon.png' %}" alt="">
-                    </div>
-                    <div class="logo-name">
-                        <p>PAYROLL</p>
-                        <p>SYSTEM</p>
-                    </div>
+<body class="bg-[#EFEDE6]">
+    <nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
+        <div class="bg-[#FFFFFF] cols-span-1 row-span-1">
+            <div class="h-[70px] flex flex-wrap justify-center place-items-center md:gap-2" id="logo">
+                <div class="-mb-2 md:mb-0" id="logo-picture">
+                    <img class="h-8 md:h-10" src="{% static 'images/logo_icon.png' %}" alt="">
+                </div>
+                <div class="text-[#1E1E1E] text-xs/3 md:text-lg/5 font-[League Spartan] font-extrabold" id="logo-name">
+                    <p class="text-center md:text-left ">PAYROLL</p>
+                    <p class="text-center md:text-left">SYSTEM</p>
                 </div>
             </div>
-            
-            <!-- nav menu -->
-            <div class="menu">
-                <ul>
-                    <li class="menu-object">
-                        <a href="{% url 'payroll_system:dashboard' %}">
-                            <img src="{% static 'images/dashboard_icon.png' %}" alt="">
-                            <div class="link">DASHBOARD</div>
-                        </a>
-                    </li>
-                    <li class="menu-object" id="focused">
-                        <a href="{% url 'payroll_system:payrolls' %}">
-                            <img src="{% static 'images/payroll_icon_focused.png' %}" alt="">
-                            <div class="link">PAYROLL</div>
-                        </a>
-                    </li>
-                    <li class="menu-object">
-                        <a href="{% url 'payroll_system:employees' %}">
-                            <img src="{% static 'images/employee_icon.png' %}" alt="">
-                            <div class="link">EMPLOYEES</div>
-                        </a>
-                    </li>
-                    <li class="menu-object">
-                        <a href="{% url 'payroll_system:services' %}">
-                            <img src="{% static 'images/services_icon.png' %}" alt="">
-                            <div class="link">SERVICES</div>
-                        </a>
-                    </li>
-                    <li class="menu-object">
-                        <a href="">
-                            <img src="{% static 'images/status_icon.png' %}" alt="">
-                            <div class="link">STATUS</div>
-                        </a>
-                    </li>
-                    <li class="menu-object">
-                        <a href="">
-                            <img src="{% static 'images/customers_icon.png' %}" alt="">
-                            <div class="link">CUSTOMERS</div>
-                        </a>
-                    </li>
-                    <li class="menu-object">
-                        <a href="{% url 'payroll_system:settings' %}">
-                            <img src="{% static 'images/settings_icon.png' %}" alt="">
-                            <div class="link">SETTINGS</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        </div>
+        <div class="overflow-hidden" id="menu">
+            <ul class="h-auto w-[80px] md:w-[190px]">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:dashboard' %}">
+                        <img class="w-auto h-auto" src="{% static 'images/dashboard_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">DASHBOARD</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
+                        <img class="w-auto h-auto" src="{% static 'images/payroll_icon_focused.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
+                        <img class="w-auto h-auto" src="{% static 'images/employee_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
+                        <img class="w-auto h-auto" src="{% static 'images/services_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="#">
+                        <img class="w-auto h-auto" src="{% static 'images/status_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">STATUS</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="#">
+                        <img class="w-auto h-auto" src="{% static 'images/customers_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:settings' %}">
+                        <img class="w-auto h-auto" src="{% static 'images/settings_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SETTINGS</div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-        <header>
-            <h1>PAYROLL</h1>
-        </header>
+    <div class="h-dvh w-full grid grid-cols-[80px_1fr] md:grid-cols-[190px_1fr] grid-rows-[70px_1fr] z-25">
+        <div class="bg-[#FFFFFF] row-span-2">
 
-        <div class="system_content">
+        </div>
+        
+        <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
+            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">PAYROLL</h1>
+        </div>
+
+        <div class="size-full" id="thing">
             <div class="container">
                 <div class="top">
                     <div class="content_1">
@@ -148,7 +147,7 @@
                         </div>
                     </div>
                 </div>
-
+    
                 <div class="search_filter">
                     <div class="search">
                         <form method="get" action="{% url 'payroll_system:payrolls' %}">
@@ -197,7 +196,7 @@
                             {% endwith %}
                         {% endfor %}
                     </table> {% endcomment %}
-
+    
                     <table id="myTable" class="display">
                         <thead>
                             <th>EMPLOYEE</th>
@@ -229,30 +228,11 @@
                         {% endfor %}
                         </tbody>
                     </table>
-
                 </div>
             </div>
-
-            <div class="background" id="background">
-                <div class="edit_incentives_popup" id="editIncentivesPopup">
-                    <h1>Edit for <span>all employees</span>.</h1>
-                    <form method="post">
-                        <div class="incentives_field">
-                            <label for="incentives">Incentives</label>
-                            <input type="text" name="incentives" id="incentives" placeholder="ex. 1000.00">
-                        </div>
-
-                        <div class="buttons">
-                            <input type="button" value="Cancel" onclick="cancelEditIncentives()">
-                            <input type="submit" value="Save">
-                        </div>
-                    </form>
-                </div>
-            </div>
-
         </div>
     </div>
-    <!--Jquery File-->
+    
     <script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
 
     <!--Datatables-->
@@ -265,17 +245,17 @@
             });
         } );
     </script>
+
+    <script>
+        function editIncentives(){
+            const bg = document.getElementById("background");
+            bg.classList.add("show");
+        }
+        
+        function cancelEditIncentives(){
+            const bg = document.getElementById("background");
+            bg.classList.remove("show");
+        }
+    </script>
 </body>
-
-<script>
-function editIncentives(){
-    const bg = document.getElementById("background");
-    bg.classList.add("show");
-}
-
-function cancelEditIncentives(){
-    const bg = document.getElementById("background");
-    bg.classList.remove("show");
-}
-</script>
 </html>

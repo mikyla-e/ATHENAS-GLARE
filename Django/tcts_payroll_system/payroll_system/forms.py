@@ -183,7 +183,7 @@ class PayrollForm(ModelForm):
     def validate_date_format(self, date_str):
         """Helper function to validate 'YYYY-MM-DD' format."""
         try:
-            datetime.datetime.strptime(date_str, "%Y-%m-%d")
+            datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:
             raise forms.ValidationError("Invalid date format. Use 'YYYY-MM-DD'.")
 
