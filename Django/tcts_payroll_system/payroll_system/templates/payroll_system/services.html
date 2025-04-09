@@ -1,12 +1,12 @@
-{% load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us</title>
+    <title>Services</title>
     <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/about.css' %}">
+    <link rel="stylesheet" href="{% static 'css/services.css' %}">
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -44,9 +44,9 @@
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
                     </a>
                 </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
                     <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/services_icon.png' %}" alt="">
+                        <img class="w-auto h-auto" src="{% static 'images/services_icon_focused.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
                     </a>
                 </li>
@@ -62,9 +62,9 @@
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
                     </a>
                 </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
                     <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:settings' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/settings_icon_focused.png' %}" alt="">
+                        <img class="w-auto h-auto" src="{% static 'images/settings_icon.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">SETTINGS</div>
                     </a>
                 </li>
@@ -78,16 +78,48 @@
         </div>
         
         <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">ABOUT US</h1>
+            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">SERVICES</h1>
         </div>
 
         <div class="size-full" id="thing">
-            <div class="py-5 px-10 text-justify font-[Roboto] text-lg">
-                <p>At Toto's Car Tinting Shop, we specialize in high-quality window tinting solutions for vehicles, homes, and businesses.
-                    With years of experience in the industry, our expert team is dedicated to enhancing your comfort, privacy, and style with premium-grade tinting films.</p>
-                <p>We take pride in our precision, attention to detail, and commitment to customer satisfaction.
-                    Whether you're looking to improve your car’s aesthetics, reduce heat and glare, or add an extra layer of security to your property, we have the perfect tinting solution for you.</p>
-                <p>Our mission is to provide top-tier service with the latest technology and best materials, ensuring long-lasting results that exceed expectations.</p>
+            <div class="button">
+                <button class="add-services"><a href="{% url 'payroll_system:services_client' %}">ADD SERVICES +</a></button>
+            </div>
+
+            <div class="services">
+                <div class="service">
+                    <a href="services_client.html">
+                        <div class="picture">
+                            <img src="{% static 'images/bg_norsrs.png' %}" alt="">
+                        </div>
+                        <div class="title">
+                            <p>Title</p>
+                            <img src="../pictures/icons/next_icon.png" alt="">
+                        </div>
+                    </a>
+                </div>
+                <div class="service">
+                    <a href="services_client.html">
+                        <div class="picture">
+                            <img src="../pictures/bg_nosrs.png" alt="">
+                        </div>
+                        <div class="title">
+                            <p>Title</p>
+                            <img src="../pictures/icons/next_icon.png" alt="">
+                        </div>
+                    </a>
+                </div>
+                <div class="service">
+                    <a href="services_client.html">
+                        <div class="picture">
+                            <img src="../pictures/bg_nosrs.png" alt="">
+                        </div>
+                        <div class="title">
+                            <p>Title</p>
+                            <img src="../pictures/icons/next_icon.png" alt="">
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </div>

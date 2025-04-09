@@ -301,8 +301,6 @@ def employee_registration(request):
         print("Raw POST data:", request.POST)  # Debug what's actually being submitted
         form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
-            print("Region instance type:", type(form.cleaned_data['region']))
-            print("Region instance:", form.cleaned_data['region'])
             employee = form.save()
             History.objects.create(
                 description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was added."
@@ -644,6 +642,14 @@ def payroll_edit(request, employee_id):
         'latest_payroll': latest_payroll
     }
     return render(request, 'payroll_system/payroll_edit.html', context)
+
+@login_required
+def services(request):
+    return render(request, 'payroll_system/services.html')
+
+@login_required
+def services_client(request):
+    return render(request, 'payroll_system/services_client.html')
 
 @login_required
 def settings(request):

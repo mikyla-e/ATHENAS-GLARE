@@ -1,12 +1,12 @@
-{% load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us</title>
-    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/about.css' %}">
+    <title>Confirming Client</title>
+    <link rel="stylesheet" href="{% static 'css/template.css' %}">
+    <link rel="stylesheet" href="{% static 'css/services_client.css' %}">
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -44,9 +44,9 @@
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
                     </a>
                 </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
                     <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/services_icon.png' %}" alt="">
+                        <img class="w-auto h-auto" src="{% static 'images/services_icon_focused.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
                     </a>
                 </li>
@@ -62,9 +62,9 @@
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
                     </a>
                 </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
                     <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:settings' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/settings_icon_focused.png' %}" alt="">
+                        <img class="w-auto h-auto" src="{% static 'images/settings_icon.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">SETTINGS</div>
                     </a>
                 </li>
@@ -78,16 +78,73 @@
         </div>
         
         <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">ABOUT US</h1>
+            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">SERVICES</h1>
         </div>
 
         <div class="size-full" id="thing">
-            <div class="py-5 px-10 text-justify font-[Roboto] text-lg">
-                <p>At Toto's Car Tinting Shop, we specialize in high-quality window tinting solutions for vehicles, homes, and businesses.
-                    With years of experience in the industry, our expert team is dedicated to enhancing your comfort, privacy, and style with premium-grade tinting films.</p>
-                <p>We take pride in our precision, attention to detail, and commitment to customer satisfaction.
-                    Whether you're looking to improve your car’s aesthetics, reduce heat and glare, or add an extra layer of security to your property, we have the perfect tinting solution for you.</p>
-                <p>Our mission is to provide top-tier service with the latest technology and best materials, ensuring long-lasting results that exceed expectations.</p>
+            <div class="old_client">
+                <p>Old Client?</p>
+                <div class="search">
+                    <form class="form" method="post">
+                        <button type="submit"><img src="../pictures/icons/search_icon.png" alt=""></button>
+                        <input type="text" placeholder="Search...">    
+                    </form>
+                </div>
+            </div>
+            <span></span> <!--Horizontal Line-->
+            <div class="client_form">
+                <form action="" method="post">
+                    <div class="form">
+                        <div class="form_1">
+                            <div class="field">
+                                <label for="first-name">first name</label>
+                                <input type="text" name="" id="">
+                                <!-- {{ form.first_name }} -->
+                            </div>
+                            <div class="field">
+                                <label for="middle-name">middle name</label>
+                                <input type="text" name="" id="">
+                                <!-- {{ form.middle_name }} -->
+                            </div>
+                            <div class="field">
+                                <label for="last-name">last name</label>
+                                <input type="text" name="" id="">
+                                <!-- {{ form.last_name }} -->
+                            </div>
+                            <div class="field">
+                                <label for="gender">gender</label>
+                                <input type="text" name="" id="">
+                                <!-- {{ form.last_name }} -->
+                            </div>
+                        </div>
+                        <div class="form_2">
+                            <div class="field">
+                                <label for="region">region</label>
+                                <input type="text" name="" id="">
+                                <!-- {{ form.first_name }} -->
+                            </div>
+                            <div class="field">
+                                <label for="province">province</label>
+                                <input type="text" name="" id="">
+                                <!-- {{ form.middle_name }} -->
+                            </div>
+                            <div class="field">
+                                <label for="municipality">municipality</label>
+                                <input type="text" name="" id="">
+                                <!-- {{ form.last_name }} -->
+                            </div>
+                            <div class="field">
+                                <label for="barangay">barangay</label>
+                                <input type="text" name="" id="">
+                                <!-- {{ form.last_name }} -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="submit">
+                        <input type="button" value="Cancel">
+                        <input type="submit" value="Confirm Client">
+                    </div>
+                </form>
             </div>
         </div>
     </div>

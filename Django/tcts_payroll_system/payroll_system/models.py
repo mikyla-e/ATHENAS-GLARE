@@ -51,7 +51,7 @@ class Employee(models.Model):
     contact_number = models.CharField(max_length=15, null=True)
     emergency_contact = models.CharField(max_length=15, null=True)
     
-    # Separate address fields
+    # Address fields as strings
     region = models.CharField(max_length=255, null=False, default='')
     province = models.CharField(max_length=255, null=False, default='')
     municipality = models.CharField(max_length=255, null=False, default='')
@@ -68,22 +68,8 @@ class Employee(models.Model):
 
     def __str__(self):
         if self.barangay:
-            return f"{self.first_name} {self.last_name} - {self.get_full_address()}"
+            return f"{self.first_name} {self.last_name} - {self.barangay}, {self.municipality}, {self.province}, {self.region}"
         return f"{self.first_name} {self.last_name}"
-
-    def get_full_address(self):
-        address_parts = []
-        
-        if self.barangay:
-            address_parts.append(self.barangay.name)
-        if self.municipality:
-            address_parts.append(self.municipality.name)
-        if self.province:
-            address_parts.append(self.province.name)
-        if self.region:
-            address_parts.append(self.region.name)
-            
-        return ", ".join(address_parts) if address_parts else "No address provided"
 
     def update_attendance_stats(self):
         # Update attendance statistics for the current month

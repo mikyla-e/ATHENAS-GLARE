@@ -1,0 +1,8 @@
+#focused{
+    color: #FFFFFF !important;
+    background: linear-gradient(89.98deg, rgba(248, 209, 70, 0), rgba(248, 209, 70, 0.6) 23%, #f8d146 66%, #f5b93f);
+}
+
+#thing{
+    border: 1px solid black; /*to be deleted*/
+}

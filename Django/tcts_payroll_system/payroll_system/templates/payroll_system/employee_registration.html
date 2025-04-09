@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registering Employees...</title>
     <link rel="stylesheet" href="{% static 'css/employee_registration.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/template.css' %}">
+    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
@@ -32,77 +34,77 @@
     }
     </style>
 </head>
-<body>
-    <div class="body">
-        <nav>
-            <!-- logo -->
-            <div class="logo">
-                <div class="logo-group">
-                    <div class="logo-picture">
-                        <img src="{% static 'images/logo_icon.png' %}" alt="">
-                    </div>
-                    <div class="logo-name">
-                        <p>PAYROLL</p>
-                        <p>SYSTEM</p>
-                    </div>
+<body class="bg-[#EFEDE6]">
+    <nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
+        <div class="bg-[#FFFFFF] cols-span-1 row-span-1">
+            <div class="h-[70px] flex flex-wrap justify-center place-items-center md:gap-2" id="logo">
+                <div class="-mb-2 md:mb-0" id="logo-picture">
+                    <img class="h-8 md:h-10" src="{% static 'images/logo_icon.png' %}" alt="">
+                </div>
+                <div class="text-[#1E1E1E] text-xs/3 md:text-lg/5 font-[League Spartan] font-extrabold" id="logo-name">
+                    <p class="text-center md:text-left ">PAYROLL</p>
+                    <p class="text-center md:text-left">SYSTEM</p>
                 </div>
             </div>
-            
-            <!-- nav menu -->
-            <div class="menu">
-                <ul>
-                    <li class="menu-object">
-                        <a href="{% url 'payroll_system:dashboard' %}">
-                            <img src="{% static 'images/dashboard_icon.png' %}" alt="">
-                            <div class="link">DASHBOARD</div>
-                        </a>
-                    </li>
-                    <li class="menu-object">
-                        <a href="{% url 'payroll_system:payrolls' %}">
-                            <img src="{% static 'images/payroll_icon.png' %}" alt="">
-                            <div class="link">PAYROLL</div>
-                        </a>
-                    </li>
-                    <li class="menu-object" id="focused">
-                        <a href="{% url 'payroll_system:employees' %}">
-                            <img src="{% static 'images/employee_icon_focused.png' %}" alt="">
-                            <div class="link">EMPLOYEES</div>
-                        </a>
-                    </li>
-                    <li class="menu-object">
-                        <a href="">
-                            <img src="{% static 'images/services_icon.png' %}" alt="">
-                            <div class="link">SERVICES</div>
-                        </a>
-                    </li>
-                    <li class="menu-object">
-                        <a href="">
-                            <img src="{% static 'images/status_icon.png' %}" alt="">
-                            <div class="link">STATUS</div>
-                        </a>
-                    </li>
-                    <li class="menu-object">
-                        <a href="">
-                            <img src="{% static 'images/customers_icon.png' %}" alt="">
-                            <div class="link">CUSTOMERS</div>
-                        </a>
-                    </li>
-                    <li class="menu-object">
-                        <a href="{% url 'payroll_system:settings' %}">
-                            <img src="{% static 'images/settings_icon.png' %}" alt="">
-                            <div class="link">SETTINGS</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        </div>
+        <div class="overflow-hidden" id="menu">
+            <ul class="h-auto w-[80px] md:w-[190px]">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:dashboard' %}">
+                        <img class="w-auto h-auto" src="{% static 'images/dashboard_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">DASHBOARD</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
+                        <img class="w-auto h-auto" src="{% static 'images/payroll_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
+                        <img class="w-auto h-auto" src="{% static 'images/employee_icon_focused.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
+                        <img class="w-auto h-auto" src="{% static 'images/services_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="#">
+                        <img class="w-auto h-auto" src="{% static 'images/status_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">STATUS</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="#">
+                        <img class="w-auto h-auto" src="{% static 'images/customers_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
+                    </a>
+                </li>
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:settings' %}">
+                        <img class="w-auto h-auto" src="{% static 'images/settings_icon.png' %}" alt="">
+                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SETTINGS</div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-        <header>
-            <h1>EMPLOYEES</h1>
-        </header>
+    <div class="h-dvh w-full grid grid-cols-[80px_1fr] md:grid-cols-[190px_1fr] grid-rows-[70px_1fr] z-25">
+        <div class="bg-[#FFFFFF] row-span-2">
 
-        <div class="system_content">
-            <div class="container">
+        </div>
+        
+        <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
+            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">EMPLOYEES</h1>
+        </div>
+
+        <div class="size-full" id="thing">
             <div class="register_container">
                 <div class="register_title">
                 <p>Adding new employee!</p>
@@ -264,194 +266,196 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get elements
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            const capturedImage = document.getElementById('capturedImage');
-            const captureButton = document.getElementById('captureButton');
-            const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get elements
+                const video = document.getElementById('video');
+                const canvas = document.getElementById('canvas');
+                const capturedImage = document.getElementById('capturedImage');
+                const captureButton = document.getElementById('captureButton');
+                const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
 
-            // Initialize webcam
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
-                video.srcObject = stream;
-                video.play();
-                })
-                .catch(function(error) {
-                console.error('Could not access webcam:', error);
-                alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
+                // Initialize webcam
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+                    })
+                    .catch(function(error) {
+                    console.error('Could not access webcam:', error);
+                    alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
+                    });
+                } else {
+                alert('Your browser does not support webcam access. Please try a different browser.');
+                }
+
+                // Capture button click handler
+                captureButton.addEventListener('click', function() {
+                    // Set canvas dimensions to match video
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    // Draw the video frame to the canvas
+                    const context = canvas.getContext('2d');
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // Convert canvas to image
+                    const dataURL = canvas.toDataURL('image/jpeg');
+                    capturedImage.src = dataURL;
+                    capturedImage.style.display = 'block';
+                
+                    // Convert canvas content to a File object for form submission
+                    canvas.toBlob(function(blob) {
+                        // Create a File object from the Blob
+                        const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
+                        
+                        // Create a FileList-like object
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(imageFile);
+                        
+                        // Set the file to the file input
+                        fileInput.files = dataTransfer.files;
+                        
+                        console.log("Image captured and file created");
+                    }, 'image/jpeg', 0.95); // High quality JPEG
                 });
-            } else {
-            alert('Your browser does not support webcam access. Please try a different browser.');
-            }
-
-            // Capture button click handler
-            captureButton.addEventListener('click', function() {
-                // Set canvas dimensions to match video
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                
-                // Draw the video frame to the canvas
-                const context = canvas.getContext('2d');
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                // Convert canvas to image
-                const dataURL = canvas.toDataURL('image/jpeg');
-                capturedImage.src = dataURL;
-                capturedImage.style.display = 'block';
-            
-                // Convert canvas content to a File object for form submission
-                canvas.toBlob(function(blob) {
-                    // Create a File object from the Blob
-                    const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
-                    
-                    // Create a FileList-like object
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(imageFile);
-                    
-                    // Set the file to the file input
-                    fileInput.files = dataTransfer.files;
-                    
-                    console.log("Image captured and file created");
-                }, 'image/jpeg', 0.95); // High quality JPEG
             });
-        });
 
-      
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all inputs and datalists
-            const regionInput = document.getElementById('id_region_name');
-            const provinceInput = document.getElementById('id_province_name');
-            const municipalityInput = document.getElementById('id_municipality_name');
-            const barangayInput = document.getElementById('id_barangay_name');
-            
-            // Create datalists if they don't exist
-            function ensureDatalist(id) {
-                let list = document.getElementById(id);
-                if (!list) {
-                    list = document.createElement('datalist');
-                    list.id = id;
-                    document.body.appendChild(list);
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get the date of birth input field
+                const dobInput = document.querySelector('input[name="date_of_birth"]');
+                
+                if (dobInput) {
+                    // Calculate date 18 years ago
+                    const today = new Date();
+                    const defaultDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+                    
+                    // Format as YYYY-MM-DD for the date input
+                    const defaultDateStr = defaultDate.toISOString().split('T')[0];
+                    
+                    // Set the default date when the input is clicked but not yet filled
+                    dobInput.addEventListener('focus', function() {
+                        if (!this.value) {
+                            // Only set default if no value is already selected
+                            this.valueAsDate = defaultDate;
+                        }
+                    });
                 }
-                return list;
-            }
-            
-            const regionList = ensureDatalist('region-list');
-            const provinceList = ensureDatalist('province-list');
-            const municipalityList = ensureDatalist('municipality-list');
-            const barangayList = ensureDatalist('barangay-list');
-            
-            // Reset dependent fields
-            function resetDependentFields(startingFrom) {
-                if (startingFrom === 'region') {
-                    provinceInput.value = '';
-                    provinceList.innerHTML = '';
-                    municipalityInput.value = '';
-                    municipalityList.innerHTML = '';
-                    barangayInput.value = '';
-                    barangayList.innerHTML = '';
-                } else if (startingFrom === 'province') {
-                    municipalityInput.value = '';
-                    municipalityList.innerHTML = '';
-                    barangayInput.value = '';
-                    barangayList.innerHTML = '';
-                } else if (startingFrom === 'municipality') {
-                    barangayInput.value = '';
-                    barangayList.innerHTML = '';
+            });
+        
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get all inputs and datalists
+                const regionInput = document.getElementById('id_region_name');
+                const provinceInput = document.getElementById('id_province_name');
+                const municipalityInput = document.getElementById('id_municipality_name');
+                const barangayInput = document.getElementById('id_barangay_name');
+                
+                const regionList = document.getElementById('region-list');
+                const provinceList = document.getElementById('province-list');
+                const municipalityList = document.getElementById('municipality-list');
+                const barangayList = document.getElementById('barangay-list');
+                
+                // Reset dependent fields
+                function resetDependentFields(startingFrom) {
+                    if (startingFrom === 'region') {
+                        provinceInput.value = '';
+                        provinceList.innerHTML = '';
+                        municipalityInput.value = '';
+                        municipalityList.innerHTML = '';
+                        barangayInput.value = '';
+                        barangayList.innerHTML = '';
+                    } else if (startingFrom === 'province') {
+                        municipalityInput.value = '';
+                        municipalityList.innerHTML = '';
+                        barangayInput.value = '';
+                        barangayList.innerHTML = '';
+                    } else if (startingFrom === 'municipality') {
+                        barangayInput.value = '';
+                        barangayList.innerHTML = '';
+                    }
                 }
-            }
-            
-            // Fetch data from API
-            function fetchData(url, params) {
-                const queryString = new URLSearchParams(params).toString();
-                return fetch(`${url}?${queryString}`)
+                
+                // Fetch data from API
+                function fetchData(url, params) {
+                    const queryString = new URLSearchParams(params).toString();
+                    return fetch(`${url}?${queryString}`)
+                        .then(response => response.json())
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                            return [];
+                        });
+                }
+                
+                // Load regions on page load
+                fetch('/payroll_system/get-regions/')
                     .then(response => response.json())
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        return [];
-                    });
-            }
-            
-            // Load regions on page load
-            fetch('/payroll_system/get-regions/')
-                .then(response => response.json())
-                .then(regions => {
-                    regionList.innerHTML = regions.map(region => 
-                        `<option value="${region}"></option>`
-                    ).join('');
-                })
-                .catch(error => console.error('Error loading regions:', error));
-            
-            // Region change event
-            regionInput.addEventListener('change', function() {
-                const region = this.value.trim();
-                resetDependentFields('region');
-                
-                if (region) {
-                    fetchData('/payroll_system/get-address-options/', {
-                        level: 'province',
-                        region: region
-                    }).then(provinces => {
-                        provinceList.innerHTML = provinces.map(province => 
-                            `<option value="${province}"></option>`
+                    .then(regions => {
+                        regionList.innerHTML = regions.map(region => 
+                            `<option value="${region.trim()}"></option>` // Trim spaces
                         ).join('');
-                    });
-                }
-            });
-            
-            // Province change event
-            provinceInput.addEventListener('change', function() {
-                const province = this.value.trim();
-                const region = regionInput.value.trim();
-                resetDependentFields('province');
+                    })
+                    .catch(error => console.error('Error loading regions:', error));
                 
-                if (region && province) {
-                    fetchData('/payroll_system/get-address-options/', {
-                        level: 'municipality',
-                        region: region,
-                        province: province
-                    }).then(municipalities => {
-                        municipalityList.innerHTML = municipalities.map(municipality => 
-                            `<option value="${municipality}"></option>`
-                        ).join('');
-                    });
-                }
-            });
-            
-            // Municipality change event
-            municipalityInput.addEventListener('change', function() {
-                const municipality = this.value.trim();
-                const province = provinceInput.value.trim();
-                const region = regionInput.value.trim();
-                resetDependentFields('municipality');
+                // Region change event
+                regionInput.addEventListener('change', function() {
+                    const region = this.value.trim();
+                    resetDependentFields('region');
+                    
+                    if (region) {
+                        fetchData('/payroll_system/get-address-options/', {
+                            level: 'province',
+                            region: region
+                        }).then(provinces => {
+                            provinceList.innerHTML = provinces.map(province => 
+                                `<option value="${province}"></option>`
+                            ).join('');
+                        });
+                    }
+                });
                 
-                if (region && province && municipality) {
-                    fetchData('/payroll_system/get-address-options/', {
-                        level: 'barangay',
-                        region: region,
-                        province: province,
-                        municipality: municipality
-                    }).then(barangays => {
-                        barangayList.innerHTML = barangays.map(barangay => 
-                            `<option value="${barangay}"></option>`
-                        ).join('');
-                    });
-                }
+                // Province change event
+                provinceInput.addEventListener('change', function() {
+                    const province = this.value.trim();
+                    const region = regionInput.value.trim();
+                    resetDependentFields('province');
+                    
+                    if (region && province) {
+                        fetchData('/payroll_system/get-address-options/', {
+                            level: 'municipality',
+                            region: region,
+                            province: province
+                        }).then(municipalities => {
+                            municipalityList.innerHTML = municipalities.map(municipality => 
+                                `<option value="${municipality}"></option>`
+                            ).join('');
+                        });
+                    }
+                });
+                
+                // Municipality change event
+                municipalityInput.addEventListener('change', function() {
+                    const municipality = this.value.trim();
+                    const province = provinceInput.value.trim();
+                    const region = regionInput.value.trim();
+                    resetDependentFields('municipality');
+                    
+                    if (region && province && municipality) {
+                        fetchData('/payroll_system/get-address-options/', {
+                            level: 'barangay',
+                            region: region,
+                            province: province,
+                            municipality: municipality
+                        }).then(barangays => {
+                            barangayList.innerHTML = barangays.map(barangay => 
+                                `<option value="${barangay}"></option>`
+                            ).join('');
+                        });
+                    }
+                });
             });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Template script loaded');
-            console.log('Region list:', document.getElementById('region-list'));
-            console.log('Province list:', document.getElementById('province-list'));
-            console.log('Municipality list:', document.getElementById('municipality-list'));
-            console.log('Barangay list:', document.getElementById('barangay-list'));
-        });
-    </script>
+        </script>
+    </div>
 </body>
 </html>
