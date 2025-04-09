@@ -1,0 +1,129 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status</title>
+    <link rel="stylesheet" href="{% static 'css/template.css' %}">
+    <link rel="stylesheet" href="{% static 'css/status.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="body">
+        <nav>
+            <!-- logo -->
+            <div class="logo">
+                <div class="logo-group">
+                    <div class="logo-picture">
+                        <img src="{% static 'images/logo_icon.png' %}" alt="">
+                    </div>
+                    <div class="logo-name">
+                        <p>PAYROLL</p>
+                        <p>SYSTEM</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- nav menu -->
+            <div class="menu">
+                <ul>
+                    <li class="menu-object">
+                        <a href="{% url 'payroll_system:dashboard' %}">
+                            <img src="{% static 'images/dashboard_icon.png' %}" alt="">
+                            <div class="link">DASHBOARD</div>
+                        </a>
+                    </li>
+                    <li class="menu-object">
+                        <a href="{% url 'payroll_system:payrolls' %}">
+                            <img src="{% static 'images/payroll_icon.png' %}" alt="">
+                            <div class="link">PAYROLL</div>
+                        </a>
+                    </li>
+                    <li class="menu-object">
+                        <a href="{% url 'payroll_system:employees' %}">
+                            <img src="{% static 'images/employee_icon.png' %}" alt="">
+                            <div class="link">EMPLOYEES</div>
+                        </a>
+                    </li>
+                    <li class="menu-object">
+                        <a href="{% url 'payroll_system:status' %}">
+                            <img src="{% static 'images/services_icon.png' %}" alt="">
+                            <div class="link">SERVICES</div>
+                        </a>
+                    </li>
+                    <li class="menu-object" id="focused">
+                        <a href="">
+                            <img src="{% static 'images/status_icon_focused.png' %}" alt="">
+                            <div class="link">STATUS</div>
+                        </a>
+                    </li>
+                    <li class="menu-object">
+                        <a href="">
+                            <img src="{% static 'images/customers_icon.png' %}" alt="">
+                            <div class="link">CUSTOMERS</div>
+                        </a>
+                    </li>
+                    <li class="menu-object">
+                        <a href="{% url 'payroll_system:settings' %}">
+                            <img src="{% static 'images/settings_icon.png' %}" alt="">
+                            <div class="link">SETTINGS</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Header --> 
+        <header>
+            <h1>STATUS</h1>
+        </header>
+
+        <!-- Content -->
+         <div class="system_content">
+            <div class="container">
+                <div class="card">
+                    <div class="content">
+                        <div class="card-content">
+                        <p>Client Name</p>
+                        <span></span>
+                        <p>Vehicle Detail</p>
+                        <p class="card-assign">Assign to: Employee Name</p><br>
+                        <p></p>
+                    </div>
+                    <div class="card">
+                        <p class="card-assignn">Service Detail</p>
+                    </div>
+                    </div>
+                    <div class="card-content2">
+                        <p class="complete">Complete</p>
+                        <span></span>
+                        <a href=""><img src="{% static 'images/cancecl_icon_hover.png' %}" alt="">
+                        </div></a>
+                </div>
+
+                <div class="card">
+                    <div class="content">
+                        <div class="card-content">
+                        <p>Client Name</p>
+                        <span></span>
+                        <p>Vehicle Detail</p>
+                        <p class="card-assign">Assign to: Employee Name</p><br>
+                        <p></p>
+                    </div>
+                    <div class="card">
+                        <p class="card-assignn">Service Detail</p>
+                    </div>
+                    </div>
+                    <div class="card-content2">
+                        <p class="complete">Complete</p>
+                        <span></span>
+                        <a href=""><img src="{% static 'images/cancecl_icon_hover.png' %}" alt=""></a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

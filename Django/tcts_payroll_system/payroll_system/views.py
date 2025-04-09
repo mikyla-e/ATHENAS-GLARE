@@ -15,6 +15,7 @@ from ph_geography.models import Region, Province, Municipality, Barangay
 from django.http import JsonResponse
 
 @csrf_protect  # Ensure CSRF protection
+
 def time_in_out(request):
     if request.method == "POST":
         employee_id = request.POST.get("employee-id", "").strip()  # Handle empty input
@@ -651,3 +652,7 @@ def settings(request):
 @login_required
 def about(request):
     return render(request, 'payroll_system/about.html')
+
+@login_required
+def status(request):
+    return render(request, 'status.html')

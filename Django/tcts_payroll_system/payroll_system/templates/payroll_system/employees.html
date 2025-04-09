@@ -12,6 +12,13 @@
     <!--Datatables-->
     <link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
 
+
+    <style>
+
+        .dt-search {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="body">
@@ -57,7 +64,7 @@
                         </a>
                     </li>
                     <li class="menu-object">
-                        <a href="">
+                        <a href="{% url 'payroll_system:status' %}">
                             <img src="{% static 'images/status_icon.png' %}" alt="">
                             <div class="link">STATUS</div>
                         </a>
@@ -110,7 +117,7 @@
                             <div class="search">
                                 <form method="get" action="{% url 'payroll_system:payrolls' %}">
                                     <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt="Search"></button>
-                                    <input type="text" name="q" placeholder="Search by name or ID" value="{{ query }}">
+                                    <input type="text" name="q" id="search-input" placeholder="Search by name or ID" value="{{ query }}">
                                 </form>
                             </div>
                             <div class="filter">
@@ -183,9 +190,19 @@
     <script src="{% static 'css/dataTables.js' %}"></script>
 
     <script>
+        let table;
+
         $(document).ready( function () {
-            $('#myTable').DataTable();
+            table = $('#myTable').DataTable();
         } );
+
+        $("#search-input").on('change', (e) => {
+            console.log(e.currentTarget.value)
+            table.search(function (d) {
+                return d.includes(e.currentTarget.value);
+            })
+            .draw();
+        });
     </script>
 </body>
 </html>

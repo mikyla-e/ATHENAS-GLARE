@@ -7,181 +7,194 @@
     <link rel="stylesheet" href="../template.css">
     <link rel="stylesheet" href="payroll_individual.css">
     <link rel="icon" href="../pictures/clients_logo.png">
+    <!-- <script src="https://cdn.tailwindcss.com/"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="body">
         <nav>
-            <!-- logo -->
-            <div class="logo">
-                <div class="logo-group">
-                    <div class="logo-picture">
-                        <img src="../pictures/icons/logo_icon.png" alt="">
-                    </div>
-                    <div class="logo-name">
-                        <p>PAYROLL</p>
-                        <p>SYSTEM</p>
+                <!-- logo -->
+                <div class="logo">
+                    <div class="logo-group">
+                        <div class="logo-picture">
+                            <img src="../pictures/icons/logo_icon.png" alt="">
+                        </div>
+                        <div class="logo-name">
+                            <p>PAYROLL</p>
+                            <p>SYSTEM</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- nav menu -->
-            <div class="menu">
-                <ul>
-                    <li class="menu-dashboard">
-                        <a href="../Dashboard/dashboard.html">
-                            <img src="../pictures/icons/dashboard_icon.png" alt="">
-                            <div class="link">DASHBOARD</div>
-                        </a>
-                    </li>
-                    <li class="menu-payroll" id="focused">
-                        <a href="payroll.html">
-                            <img src="../pictures/icons/payroll_icon_focused.png" alt="">
-                            <div class="link">PAYROLL</div>
-                        </a>
-                    </li>
-                    <li class="menu-employees">
-                        <a href="../Employees/employees.html">
-                            <img src="../pictures/icons/employee_icon.png" alt="">
-                            <div class="link">EMPLOYEES</div>
-                        </a>
-                        
-                    </li>
-                    <li class="menu-settings">
-                        <a href="../Settings/settings.html">
-                            <img src="../pictures/icons/settings_icon.png" alt="">
-                            <div class="link">SETTINGS</div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+                
+                <!-- nav menu -->
+                <div class="menu">
+                    <ul>
+                        <li class="menu-dashboard">
+                            <a href="../Dashboard/dashboard.html">
+                                <img src="../pictures/icons/dashboard_icon.png" alt="">
+                                <div class="link">DASHBOARD</div>
+                            </a>
+                        </li>
+                        <li class="menu-payroll" id="focused">
+                            <a href="payroll.html">
+                                <img src="../pictures/icons/payroll_icon_focused.png" alt="">
+                                <div class="link">PAYROLL</div>
+                            </a>
+                        </li>
+                        <li class="menu-employees">
+                            <a href="../Employees/employees.html">
+                                <img src="../pictures/icons/employee_icon.png" alt="">
+                                <div class="link">EMPLOYEES</div>
+                            </a>
+                            
+                        </li>
+                        <li class="menu-settings">
+                            <a href="../Settings/settings.html">
+                                <img src="../pictures/icons/settings_icon.png" alt="">
+                                <div class="link">SETTINGS</div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
-        <!-- Header -->
-        <header>
-            <h1>PAYROLL</h1>
-        </header>
+            <!-- Header -->
+            <header>
+                <h1>PAYROLL</h1>
+            </header>
 
-        <div class="system_content">
-            <div class="container">
-                <div class="container-1">
-                    <div class="employee_info">
-                        <div class="profile-picture">
-                            <img src="../pictures/icons/profile_picture.png" alt="">
+            <div class="system_content">
+                <div class="container">
+                    <div class="container-1">
+                        <div class="employee_info">
+                            <div class="profile-picture">
+                                <img src="../pictures/icons/profile_picture.png" alt="">
+                            </div>
+                            
+                            <div class="employee_status">
+                                <div class="name">
+                                    <p>Employee Name</p>
+                                </div>
+                                <div class="attendance">
+                                    <p>Attendance Status</p>
+                                </div>
+                                <div class="payroll">
+                                    <p>Payroll Status</p>
+                                </div>
+                            </div>  
                         </div>
                         
-                        <div class="employee_status">
-                            <div class="name">
-                                <p>Employee Name</p>
-                            </div>
-                            <div class="attendance">
-                                <p>Attendance Status</p>
-                            </div>
-                            <div class="payroll">
-                                <p>Payroll Status</p>
-                            </div>
-                        </div>  
+                        <div class="buttons">
+                            <a href=""><button class="check-employee">check employee profile >></button></a>
+                            <a href=""><button class="edit-employee">EDIT EMPLOYEE INCENTIVES</button></a>
+                        </div>
                     </div>
                     
-                    <div class="buttons">
-                        <a href=""><button class="check-employee">check employee profile >></button></a>
-                        <a href=""><button class="edit-employee">EDIT EMPLOYEE INCENTIVES</button></a>
+                    
+
+                    <div class="div1">
+                        <table class="table-1">
+                            <tr>
+                                <th>Rate per Day</th>
+                                <th>No. of Attendance during the week</th>
+                                <th>Total Payment Amount</th>
+                                <th>Date of Pay</th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td>sdadsa</td>
+                                <td>dsadas</td>
+                                <td>asdad</td>
+                                <td>asdad</td>
+                                <a href=""><td><img class="edit-icon" src="../pictures/icons/payroll_edit_icon.png" alt=""></td></a>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="div2">
+                        <div class="tableheader">
+                            <p style="margin: 15px;">SUMMARY</p>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rate per day</th>
+                                    <th>No. of attendance during the week</th>
+                                    <th>Incentives</th>
+                                    <th>Total Deduction</th>
+                                    <th>Total Payment Amount</th>
+                                    <th>Date of Pay</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>500</td>
+                                    <td>6</td>
+                                    <td>3000</td>
+                                    <td>500</td>
+                                    <td>8000</td>
+                                    <td>02-23-25</td>
+                                    <td>testing</td>
+                                </tr>
+                                <tr>
+                                    <td>500</td>
+                                    <td>6</td>
+                                    <td>3000</td>
+                                    <td>500</td>
+                                    <td>8000</td>
+                                    <td>02-24-25</td>
+                                    <td>random</td>
+                                </tr>
+                                <tr>
+                                    <td>500</td>
+                                    <td>6</td>
+                                    <td>3000</td>
+                                    <td>500</td>
+                                    <td>8000</td>
+                                    <td>02-25-25</td>
+                                    <td>idunno</td>
+                                </tr>
+                                <tr>
+                                    <td>500</td>
+                                    <td>5</td>
+                                    <td>3000</td>
+                                    <td>500</td>
+                                    <td>8000</td>
+                                    <td>02-26-25</td>
+                                    <td>idunno</td>
+                                </tr>
+                                <tr>
+                                    <td>500</td>
+                                    <td>5</td>
+                                    <td>3000</td>
+                                    <td>500</td>
+                                    <td>8000</td>
+                                    <td>02-27-25</td>
+                                    <td>idunno</td>
+                                </tr>
+                                <tr>
+                                    <td>500</td>
+                                    <td>5</td>
+                                    <td>3000</td>
+                                    <td>500</td>
+                                    <td>8000</td>
+                                    <td>02-28-25</td>
+                                    <td>idunno</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                
-                
+            </div>  
+        </div>
+    </div>  
 
-                <div class="div1">
-                    <table class="table-1">
-                        <tr>
-                            <th>Rate per Day</th>
-                            <th>No. of Attendance during the week</th>
-                            <th>Total Payment Amount</th>
-                            <th>Date of Pay</th>
-                            <th></th>
-                        </tr>
-                        <tr>
-                            <td>sdadsa</td>
-                            <td>dsadas</td>
-                            <td>asdad</td>
-                            <td>asdad</td>
-                            <a href=""><td><img class="edit-icon" src="../pictures/icons/payroll_edit_icon.png" alt=""></td></a>
-                        </tr>
-                    </table>
-                </div>
-
-                <div class="div2">
-                    <div class="tableheader">
-                        <p style="margin: 15px;">SUMMARY</p>
-                    </div>
-                    <table>
-                        <tr>
-                            <th>Rate per day</th>
-                            <th>No. of attendance during the week</th>
-                            <th>Incentives</th>
-                            <th>Total Deduction</th>
-                            <th>Total Payment Amount</th>
-                            <th>Date of Pay</th>
-                            <th>Remarks</th>
-                        </tr>
-                        <tr>
-                            <td>500</td>
-                            <td>6</td>
-                            <td>3000</td>
-                            <td>500</td>
-                            <td>8000</td>
-                            <td>02-23-25</td>
-                            <td>idunno</td>
-                        </tr>
-                        <tr>
-                            <td>500</td>
-                            <td>6</td>
-                            <td>3000</td>
-                            <td>500</td>
-                            <td>8000</td>
-                            <td>02-24-25</td>
-                            <td>idunno</td>
-                        </tr>
-                        <tr>
-                            <td>500</td>
-                            <td>6</td>
-                            <td>3000</td>
-                            <td>500</td>
-                            <td>8000</td>
-                            <td>02-25-25</td>
-                            <td>idunno</td>
-                        </tr>
-                        <tr>
-                            <td>500</td>
-                            <td>5</td>
-                            <td>3000</td>
-                            <td>500</td>
-                            <td>8000</td>
-                            <td>02-26-25</td>
-                            <td>idunno</td>
-                        </tr>
-                        <tr>
-                            <td>500</td>
-                            <td>5</td>
-                            <td>3000</td>
-                            <td>500</td>
-                            <td>8000</td>
-                            <td>02-27-25</td>
-                            <td>idunno</td>
-                        </tr>
-                        <tr>
-                            <td>500</td>
-                            <td>5</td>
-                            <td>3000</td>
-                            <td>500</td>
-                            <td>8000</td>
-                            <td>02-28-25</td>
-                            <td>idunno</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>  
-    </div>
+    <script>
+        let table = new DataTable('#main-table');
+    </script>
 </body>
 </html>
