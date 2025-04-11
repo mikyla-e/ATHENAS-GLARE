@@ -634,8 +634,16 @@ def services(request):
     return render(request, 'payroll_system/services.html')
 
 @login_required
+def services_add(request):
+    return render(request, 'payroll_system/services_add.html')
+
+@login_required
 def services_client(request):
     return render(request, 'payroll_system/services_client.html')
+
+@login_required
+def services_vehicle(request):
+    return render(request, 'payroll_system/services_vehicle.html')
 
 @login_required
 def status(request):

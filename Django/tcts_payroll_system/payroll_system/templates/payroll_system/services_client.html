@@ -93,56 +93,61 @@
             </div>
             <span></span> <!--Horizontal Line-->
             <div class="client_form">
-                <form action="" method="post">
+                <form action="{% url 'payroll_system:services_vehicle' %}" method="post">
+                    {% csrf_token %}
                     <div class="form">
                         <div class="form_1">
                             <div class="field">
                                 <label for="first-name">first name</label>
                                 <input type="text" name="" id="">
-                                <!-- {{ form.first_name }} -->
+                                {{ form.first_name }}
                             </div>
                             <div class="field">
                                 <label for="middle-name">middle name</label>
                                 <input type="text" name="" id="">
-                                <!-- {{ form.middle_name }} -->
+                                {{ form.middle_name }}
                             </div>
                             <div class="field">
                                 <label for="last-name">last name</label>
                                 <input type="text" name="" id="">
-                                <!-- {{ form.last_name }} -->
+                                {{ form.last_name }}
                             </div>
                             <div class="field">
                                 <label for="gender">gender</label>
                                 <input type="text" name="" id="">
-                                <!-- {{ form.last_name }} -->
+                                {{ form.last_name }} 
                             </div>
                         </div>
                         <div class="form_2">
                             <div class="field">
                                 <label for="region">region</label>
                                 <input type="text" name="" id="">
-                                <!-- {{ form.first_name }} -->
+                                {{ form.first_name }}
                             </div>
                             <div class="field">
                                 <label for="province">province</label>
                                 <input type="text" name="" id="">
-                                <!-- {{ form.middle_name }} -->
+                                {{ form.middle_name }}
                             </div>
                             <div class="field">
                                 <label for="municipality">municipality</label>
                                 <input type="text" name="" id="">
-                                <!-- {{ form.last_name }} -->
+                                {{ form.last_name }}
                             </div>
                             <div class="field">
                                 <label for="barangay">barangay</label>
                                 <input type="text" name="" id="">
-                                <!-- {{ form.last_name }} -->
+                                {{ form.last_name }}
                             </div>
                         </div>
                     </div>
                     <div class="submit">
-                        <input type="button" value="Cancel">
-                        <input type="submit" value="Confirm Client">
+                        <a href="{% url 'payroll_system:services' %}">
+                            <input type="button" value="Cancel">
+                        </a>
+                        <a href="{% url 'payroll_system:services_vehicle' %}">
+                            <input type="submit" value="Confirm Client">
+                        </a>
                     </div>
                 </form>
             </div>

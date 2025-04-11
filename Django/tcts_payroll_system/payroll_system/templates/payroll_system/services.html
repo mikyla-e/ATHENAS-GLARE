@@ -83,12 +83,12 @@
 
         <div class="size-full py-4 px-3" id="thing">
             <div class="button">
-                <button class="add-services"><a href="{% url 'payroll_system:services_client' %}">ADD SERVICES +</a></button>
+                <button class="add-services"><a href="{% url 'payroll_system:services_add' %}">ADD SERVICES +</a></button>
             </div>
 
             <div class="services">
                 <div class="service">
-                    <a href="services_client.html">
+                    <a href="{% url 'payroll_system:services_client' %}">
                         <div class="picture">
                             <img src="{% static 'images/bg_norsrs.png' %}" alt="">
                         </div>
@@ -99,7 +99,7 @@
                     </a>
                 </div>
                 <div class="service">
-                    <a href="services_client.html">
+                    <a href="{% url 'payroll_system:services_client' %}">
                         <div class="picture">
                             <img src="../pictures/bg_nosrs.png" alt="">
                         </div>
@@ -110,7 +110,7 @@
                     </a>
                 </div>
                 <div class="service">
-                    <a href="services_client.html">
+                    <a href="{% url 'payroll_system:services_client' %}">
                         <div class="picture">
                             <img src="../pictures/bg_nosrs.png" alt="">
                         </div>

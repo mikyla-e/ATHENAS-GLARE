@@ -99,7 +99,8 @@
         </div>
 
         <div class="size-full py-4 px-3" id="thing">
-            <form action="" method="post">
+            <form action="{% url 'payroll_system:services_client' %}" method="post">
+                {% csrf_token %}
                 <div class="flex flex-wrap lg:flex-nowrap gap-5 lg:gap-11" id="form">
 
                     <div class="w-full h-75 sm:h-100 lg:w-[70%] bg-[#FFFFFF] rounded-xl overflow-hidden shadow-md" id="services">
@@ -143,7 +144,9 @@
 
                     <div class="w-full lg:w-[30%] h-100 flex lg:flex-col justify-end items-start gap-5 lg:justify-center lg:items-center lg:gap-10" id="buttons">
                         <div class="w-[50%] sm:w-[30%] lg:w-[90%]" id="cancel">
+                            <a href="{% url 'payroll_system:services' %}">
                             <input class="h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#F8D146]" type="button" value="CANCEL" id="cancel-button">
+                            <a/>
                         </div>
                         <div class="w-[50%] sm:w-[40%] lg:w-[90%]" id="add">
                             <input class="hidden sm:block h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#1e1e1e]" type="submit" value="ADD SERVICES" id="add-button">

@@ -82,27 +82,28 @@
         </div>
 
         <div class="size-full py-4 px-3" id="thing">
-            <form action="" method="post">
+            <form action="{% url 'payroll_system:services' %}" method="post">
+                {% csrf_token %}
                 <div class="form">
                     <div class="vehicle_form">
                         <div class="field_1">
                             <div class="field">
                                 <label for="vehicle-brand">vehicle brand</label>
-                                <!-- {{ form.vehicle-brand }} -->
+                                {% comment %} <!--{{ form.vehicle-brand }}--> {% endcomment %}
                             </div>
                             <div class="field">
                                 <label for="vehicle-model">vehicle model</label>
-                                <!-- {{ form.vehicle-model }} -->
+                                {% comment %} <!--{{ form.vehicle-model }}--> {% endcomment %}
                             </div>
                         </div>
                         <div class="field_2">
                             <div class="field">
                                 <label for="vehicle-color">vehicle color</label>
-                                <!-- {{ form.vehicle-color }} -->
+                                {% comment %} <!--{{ form.vehicle-color }}--> {% endcomment %}
                             </div>
                             <div class="field">
                                 <label for="plate-number">plate number</label>
-                                <!-- {{ form.plate-number }} -->
+                                {% comment %} <!--{{ form.plate-number }}--> {% endcomment %}
                             </div>
                         </div>
                     </div>
@@ -113,10 +114,10 @@
                     </div>
                 </div>
                 <div class="submit">
-                    <a href="">
+                    <a href="{% url 'payroll_system:services_client' %}">
                         <input type="button" value="Back">
                     </a>
-                    <a href="">
+                    <a href="{% url 'payroll_system:services' %}">
                         <input type="submit" value="Assign Task">
                     </a>
                 </div>
