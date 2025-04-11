@@ -97,11 +97,12 @@
         <div class="size-full py-4 px-3" id="thing">
             <div class="container">
                 <div class="search">
-                    <form method="get" action="{% url 'payroll_system:payrolls' %}">
-                        <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt="Search"></button>
-                        <input type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
-                    </form>
+                    <div class="search-box">
+                        <button type="button"><img src="{% static 'images/search_icon.png' %}" alt="Search"></button>
+                        <input type="text" id="search-input" placeholder="Search">
+                    </div>
                 </div>
+                
 
                 <div class="table">
                     <table class="" id="employee-table">
@@ -158,16 +159,15 @@
     <script>
         let table;
 
-        $(document).ready( function () {
-            table = $('#employee-table').DataTable();
-        } );
+        $(document).ready(function () {
+            table = $('#employee-table').DataTable({
+                responsive: true
+            });
 
-        $("#search-input").on('change', (e) => {
-            console.log(e.currentTarget.value)
-            table.search(function (d) {
-                return d.includes(e.currentTarget.value);
-            })
-            .draw();
+            //bind to search api
+            $('#search-input').on('keyup', function () {
+                table.search(this.value).draw();
+            });
         });
     </script>
 </body>

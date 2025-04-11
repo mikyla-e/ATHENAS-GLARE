@@ -157,41 +157,11 @@
                 </div>
     
                 <div class="search">
-                    <form method="get" action="{% url 'payroll_system:payrolls' %}">
-                        <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt=""></button>
-                        <input type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
-                    </form>
-                </div>
-                
-                <!-- {% comment %} <table>
-                    <tr>
-                        <th>EMPLOYEE</th>
-                        <th>RATE PER DAY</th>
-                        <!-- <th>DEDUCTIONS</th>
-                        <th>PAYMENT AMOUNT</th>
-                        <th>STATUS</th>
-                        <th></th>
-                    </tr>
-                    {% for data in employee_data %}
-                        {% with employee=data.employee latest_payroll=data.latest_payroll %}
-                            {% if latest_payroll %}
-                            <tr>
-                                <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                                <td>{{ latest_payroll.rate }}</td>
-                                <!-- <td>{{ latest_payroll.deductions }}</td>
-                                <td>{{ latest_payroll.salary }}</td>
-                                <td>{{ latest_payroll.payroll_status }}</td>
-                                <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                                <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
-                            </tr>
-                            {% endif %}
-                        {% endwith %}
-                    {% endfor %}
-                </table> {% endcomment %} -->
+                    <div class="search-box">
+                        <button type="button"><img src="{% static 'images/search_icon.png' %}" alt="Search"></button>
+                        <input type="text" id="search-input" placeholder="Search">
+                    </div>
+                </div>                
 
                 <table class="" id="payroll-table">
                     <thead>
@@ -233,19 +203,18 @@
 
     <script>
         let table;
-
-        $(document).ready( function () {
-            table = $('#payroll-table').DataTable();
-        } );
-
-        $("#search-input").on('change', (e) => {
-            console.log(e.currentTarget.value)
-            table.search(function (d) {
-                return d.includes(e.currentTarget.value);
-            })
-            .draw();
+    
+        $(document).ready(function () {
+            table = $('#payroll-table').DataTable({
+                responsive: true
+            });
+    
+            // Make search input work with DataTables
+            $('#search-input').on('keyup', function () {
+                table.search(this.value).draw();
+            });
         });
-    </script>
+    </script>    
 
     <script>
         function editIncentives(){
