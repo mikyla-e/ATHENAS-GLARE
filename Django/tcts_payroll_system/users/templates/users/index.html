@@ -4,11 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Admin Login</title>
     <link rel="stylesheet" href="{% static 'css/admin_login.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
+    {% for message in messages %}
+        <div class="flex gap-3 bg-[#fffbeb80] p-5 message {{ message.tags }}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="#f7c028" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+            </svg>              
+            <p class="text-[#8f4311]">{{ message }}</p>
+        </div>
+    {% endfor %}
+    
     <div class="container">
         <div class="logo_container">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">

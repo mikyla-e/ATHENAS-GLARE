@@ -4,25 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employees</title>
+    <title>Confirming Client</title>
     <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/employees.css' %}">
+    <link rel="stylesheet" href="{% static 'css/services_vehicle.css' %}">
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
-    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
-
-    <style>
-        .dt-length{
-            display: none;
-        }
-        .dt-search {
-            display: none;
-        }
-    </style>
 </head>
 <body class="bg-[#EFEDE6]">
     <nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
@@ -51,15 +38,15 @@
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
                     </a>
                 </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
                     <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/employee_icon_focused.png' %}" alt="">
+                        <img class="w-auto h-auto" src="{% static 'images/employee_icon.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
                     </a>
                 </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
                     <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/services_icon.png' %}" alt="">
+                        <img class="w-auto h-auto" src="{% static 'images/services_icon_focused.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
                     </a>
                 </li>
@@ -91,87 +78,50 @@
         </div>
         
         <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">EMPLOYEES</h1>
+            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">SERVICES</h1>
         </div>
 
         <div class="size-full py-4 px-3" id="thing">
-            <div class="container">
-                <div class="search">
-                    <form method="get" action="{% url 'payroll_system:payrolls' %}">
-                        <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt="Search"></button>
-                        <input type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
-                    </form>
-                </div>
-
-                <div class="table">
-                    <table class="" id="employee-table">
-                        <thead>
-                            <tr>
-                                <th>EMPLOYEE NAME</th>
-                                <th>ID</th>
-                                <th>CONTACT NUMBER</th>
-                                <th>EMPLOYMENT STATUS</th>
-                                <th>PAYROLL STATUS</th>
-                                <th>LAST ATTENDANCE</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for employee in employees %}
-                            <tr class="emp1">
-                                <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                                <td>{{ employee.employee_id }}</td>
-                                <td>{{ employee.contact_number}}</td>
-                                <td>{{ employee.employee_status }}</td>
-                                <td>
-                                    {% if employee.latest_payroll_status %}
-                                        {{ employee.latest_payroll_status }}
-                                    {% else %}
-                                        No Payroll Data
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if employee.latest_attendance_date %}
-                                        {{ employee.latest_attendance_date }}
-                                    {% else %}
-                                        No Attendance Data
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}">MORE</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <div class="button">
-                        <a href="{% url 'payroll_system:employee_registration' %}"><button class="addemployeebutton">ADD EMPLOYEE +</button></a>
+            <form action="" method="post">
+                <div class="form">
+                    <div class="vehicle_form">
+                        <div class="field_1">
+                            <div class="field">
+                                <label for="vehicle-brand">vehicle brand</label>
+                                <!-- {{ form.vehicle-brand }} -->
+                            </div>
+                            <div class="field">
+                                <label for="vehicle-model">vehicle model</label>
+                                <!-- {{ form.vehicle-model }} -->
+                            </div>
+                        </div>
+                        <div class="field_2">
+                            <div class="field">
+                                <label for="vehicle-color">vehicle color</label>
+                                <!-- {{ form.vehicle-color }} -->
+                            </div>
+                            <div class="field">
+                                <label for="plate-number">plate number</label>
+                                <!-- {{ form.plate-number }} -->
+                            </div>
+                        </div>
+                    </div>
+                    <span></span>
+                    <div class="employee_form">
+                        <label for="assigned-employee">assigned employee</label>
+                        <input type="text" name="" id="">
                     </div>
                 </div>
-            </div>
+                <div class="submit">
+                    <a href="">
+                        <input type="button" value="Back">
+                    </a>
+                    <a href="">
+                        <input type="submit" value="Assign Task">
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
-
-    <script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
-    <script src="{% static 'css/dataTables.js' %}"></script>
-
-    <script>
-        let table;
-
-        $(document).ready( function () {
-            table = $('#employee-table').DataTable();
-        } );
-
-        $("#search-input").on('change', (e) => {
-            console.log(e.currentTarget.value)
-            table.search(function (d) {
-                return d.includes(e.currentTarget.value);
-            })
-            .draw();
-        });
-    </script>
 </body>
-
-{{ redirect_to_login_immediately }}
-
 </html>

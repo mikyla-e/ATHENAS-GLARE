@@ -14,7 +14,7 @@
     z-index: 8;
 }
 
-.container .profile-picture{
+.profile-picture{
     width: 40%;
     margin: 20px 40px;
     display: flex;
@@ -38,13 +38,13 @@
     margin: 0;
 }
 
-.container .edit_container{
+.edit_container{
     margin: 0 40px;
     display: flex;
     flex-direction: column;
 }
 
-.container .edit_container table{
+ .edit_container table{
     width: 100%;
 
     background-color: #fff;

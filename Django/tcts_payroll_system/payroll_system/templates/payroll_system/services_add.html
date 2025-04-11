@@ -4,12 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services</title>
-    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/services.css' %}">
-
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../template_new.css">
+    <title>Add Services</title>
+
+    <style>
+        #buttons #cancel #cancel-button{
+            background-color: #1e1e1e;
+        }
+
+        #buttons #cancel #cancel-button:hover{
+            opacity: .8;
+        }
+
+        #buttons #add #add-button{
+            background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
+        }
+
+        #buttons #add #add-button:hover{
+            opacity: .8;
+        }
+    </style>
 </head>
 <body class="bg-[#EFEDE6]">
     <nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
@@ -39,7 +56,7 @@
                     </a>
                 </li>
                 <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
+                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% static 'images/employee_icon.png' %}">
                         <img class="w-auto h-auto" src="{% static 'images/employee_icon.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
                     </a>
@@ -82,49 +99,61 @@
         </div>
 
         <div class="size-full py-4 px-3" id="thing">
-            <div class="button">
-                <button class="add-services"><a href="{% url 'payroll_system:services_client' %}">ADD SERVICES +</a></button>
-            </div>
+            <form action="" method="post">
+                <div class="flex flex-wrap lg:flex-nowrap gap-5 lg:gap-11" id="form">
 
-            <div class="services">
-                <div class="service">
-                    <a href="services_client.html">
-                        <div class="picture">
-                            <img src="{% static 'images/bg_norsrs.png' %}" alt="">
+                    <div class="w-full h-75 sm:h-100 lg:w-[70%] bg-[#FFFFFF] rounded-xl overflow-hidden shadow-md" id="services">
+                        <div class="relative h-[70%] flex justify-center items-center bg-[#1E1E1E30]" id="photo">
+
+                            <div class="absolute flex justify-center items-center z-10">
+                                <input class="hidden" type="file" accept="image/*" onchange="loadImage(event)" name="services-photo" id="services-photo">
+                                <input class="px-4 py-2 rounded cursor-pointer text-[#FFFFFF] text-center text-xl font-bold" type="button" value="Choose File" onclick="document.getElementById('services-photo').click()">
+
+                                <!-- <input class="text-[#FFFFFF] text-center text-xl font-bold" type="file" accept="image/*" onchange="loadImage(event)" name="services-photo" id="services-photo"> -->
+                            </div>
+                            
+                            <div class="relative size-full">
+                                <div class="absolute size-full bg-[#1E1E1E30] z-5"></div>
+                                <img class="hidden size-full object-cover" src="" alt=""  id="imagePreview">
+                            </div>
+                            
+
+                            <script>
+                                var loadImage = function(event) {
+                                    const image = document.getElementById('imagePreview');
+                                    const file = event.target.files[0];
+
+                                    if (file) {
+                                    image.src = URL.createObjectURL(file);
+                                    image.classList.remove('hidden');
+
+                                    image.onload = () => {
+                                        URL.revokeObjectURL(image.src); // free memory
+                                    };
+                                    }
+                                };
+                            </script>
+
                         </div>
-                        <div class="title">
-                            <p>Title</p>
-                            <img src="../pictures/icons/next_icon.png" alt="">
+                        <div class="h-[30%] py-5 px-10 flex flex-col gap-1" id="title">
+                            <p class="text-[#1E1E1E4D] text-sm font-[League Spartan] font-bold">TITLE</p>
+                            <input class="w-full outline-none text-lg" type="text" name="services-title" id="services-title" placeholder="Enter Title" autocomplete="off">
                         </div>
-                    </a>
+                    </div>
+
+                    <div class="w-full lg:w-[30%] h-100 flex lg:flex-col justify-end items-start gap-5 lg:justify-center lg:items-center lg:gap-10" id="buttons">
+                        <div class="w-[50%] sm:w-[30%] lg:w-[90%]" id="cancel">
+                            <input class="h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#F8D146]" type="button" value="CANCEL" id="cancel-button">
+                        </div>
+                        <div class="w-[50%] sm:w-[40%] lg:w-[90%]" id="add">
+                            <input class="hidden sm:block h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#1e1e1e]" type="submit" value="ADD SERVICES" id="add-button">
+                            <input class="block sm:hidden h-12 w-full rounded-full text-xs font-[Inter] font-semibold text-[#1e1e1e]" type="submit" value="ADD" id="add-button">
+                        </div>
+                    </div>
+
                 </div>
-                <div class="service">
-                    <a href="services_client.html">
-                        <div class="picture">
-                            <img src="../pictures/bg_nosrs.png" alt="">
-                        </div>
-                        <div class="title">
-                            <p>Title</p>
-                            <img src="../pictures/icons/next_icon.png" alt="">
-                        </div>
-                    </a>
-                </div>
-                <div class="service">
-                    <a href="services_client.html">
-                        <div class="picture">
-                            <img src="../pictures/bg_nosrs.png" alt="">
-                        </div>
-                        <div class="title">
-                            <p>Title</p>
-                            <img src="../pictures/icons/next_icon.png" alt="">
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
+            </form>
+        </div>  
     </div>
 </body>
-
-{{ redirect_to_login_immediately }}
-
 </html>

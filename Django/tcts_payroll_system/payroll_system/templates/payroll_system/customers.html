@@ -4,25 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employees</title>
     <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/employees.css' %}">
-
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
     <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
-
-    <style>
-        .dt-length{
-            display: none;
-        }
-        .dt-search {
-            display: none;
-        }
-    </style>
+    
+    <title>Customers</title>
 </head>
 <body class="bg-[#EFEDE6]">
     <nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
@@ -32,7 +21,7 @@
                     <img class="h-8 md:h-10" src="{% static 'images/logo_icon.png' %}" alt="">
                 </div>
                 <div class="text-[#1E1E1E] text-xs/3 md:text-lg/5 font-[League Spartan] font-extrabold" id="logo-name">
-                    <p class="text-center md:text-left ">PAYROLL</p>
+                    <p class="text-center md:text-left">PAYROLL</p>
                     <p class="text-center md:text-left">SYSTEM</p>
                 </div>
             </div>
@@ -51,9 +40,9 @@
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
                     </a>
                 </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
                     <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/employee_icon_focused.png' %}" alt="">
+                        <img class="w-auto h-auto" src="{% static 'images/employee_icon.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
                     </a>
                 </li>
@@ -69,9 +58,9 @@
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">STATUS</div>
                     </a>
                 </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
                     <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:customers' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/customers_icon.png' %}" alt="">
+                        <img class="w-auto h-auto" src="{% static 'images/customers_icon_focused.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
                     </a>
                 </li>
@@ -91,54 +80,74 @@
         </div>
         
         <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">EMPLOYEES</h1>
+            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold">CUSTOMERS</h1>
         </div>
 
-        <div class="size-full py-4 px-3" id="thing">
-            <div class="container">
-                <div class="search">
-                    <form method="get" action="{% url 'payroll_system:payrolls' %}">
-                        <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt="Search"></button>
-                        <input type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
+        <div class="size-full p-4" id="thing">
+            <div class="size-full flex flex-col">
+                <div class="w-full h-[40px] flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden" id="search">
+                    <form class="w-full flex justify-center items-center gap-3" method="get" action="{% url 'payroll_system:payrolls' %}">
+                        <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
+                            <img class="h-[25px] w-[25px]" src="{% static 'images/search_icon.png' %}" alt="Search">
+                        </button>
+                        <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
                     </form>
                 </div>
+                
+                <div class="flex flex-col justify-center" id="table">
+                    <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="customer-table">
+                        <style>
+                            .dt-length{
+                                display: none;
+                            }
+                            .dt-search {
+                                display: none;
+                            }
 
-                <div class="table">
-                    <table class="" id="employee-table">
-                        <thead>
-                            <tr>
-                                <th>EMPLOYEE NAME</th>
-                                <th>ID</th>
-                                <th>CONTACT NUMBER</th>
-                                <th>EMPLOYMENT STATUS</th>
-                                <th>PAYROLL STATUS</th>
-                                <th>LAST ATTENDANCE</th>
+                            #employee-data:nth-child(odd){
+                                background-color: #f2f2f2;
+                            }
+
+                            #employee-data td{
+                                border-bottom: 2px solid rgba(30, 30, 30, 0.20);
+                            }
+
+                            #employee-data:last-child td{
+                                border-bottom:none;
+                            }
+                        </style>
+                        <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                            <tr class="text-base text-center font-[League Spartan]">
+                                <th class="py-2">CUSTOMER NAME</th>
+                                <th>GENDER</th> 
+                                <th>ADDRESS</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for employee in employees %}
-                            <tr class="emp1">
-                                <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                                <td>{{ employee.employee_id }}</td>
-                                <td>{{ employee.contact_number}}</td>
-                                <td>{{ employee.employee_status }}</td>
+                            <tr id="employee-data">
+                                <td>{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
+                                <td>{{ customer.gender }}</td>
+                                <td>{{ customer.region }}, {{ customer.province }}, {{ customer.municipality }}, {{ customer.barangay }}</td>
                                 <td>
-                                    {% if employee.latest_payroll_status %}
-                                        {{ employee.latest_payroll_status }}
-                                    {% else %}
-                                        No Payroll Data
-                                    {% endif %}
+                                    <a class="" href="#">MORE</a>
                                 </td>
+                            </tr>
+                            <tr id="employee-data">
+                                <td>{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
+                                <td>{{ customer.gender }}</td>
+                                <td>{{ customer.region }}, {{ customer.province }}, {{ customer.municipality }}, {{ customer.barangay }}</td>
                                 <td>
-                                    {% if employee.latest_attendance_date %}
-                                        {{ employee.latest_attendance_date }}
-                                    {% else %}
-                                        No Attendance Data
-                                    {% endif %}
+                                    <a class="" href="#">MORE</a>
                                 </td>
+                            </tr>
+                        {% for employee in employees %}
+                            <tr id="employee-data">
+                                <td>{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
+                                <td>{{ customer.gender }}</td>
+                                <td>{{ customer.region }}, {{ customer.province }}, {{ customer.municipality }}, {{ customer.barangay }}</td>
                                 <td>
-                                    <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}">MORE</a>
+                                    <a class="" href="#">MORE</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -149,9 +158,8 @@
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
     </div>
-
     <script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
     <script src="{% static 'css/dataTables.js' %}"></script>
 
@@ -159,7 +167,7 @@
         let table;
 
         $(document).ready( function () {
-            table = $('#employee-table').DataTable();
+            table = $('#customer-table').DataTable();
         } );
 
         $("#search-input").on('change', (e) => {
