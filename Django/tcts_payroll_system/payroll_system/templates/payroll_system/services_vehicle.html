@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registering Employees...</title>
+    <title>Confirming Client</title>
     <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/payroll_edit.css' %}">
+    <link rel="stylesheet" href="{% static 'css/services_vehicle.css' %}">
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -32,9 +32,9 @@
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">DASHBOARD</div>
                     </a>
                 </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start">
                     <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/payroll_icon_focused.png' %}" alt="">
+                        <img class="w-auto h-auto" src="{% static 'images/payroll_icon.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
                     </a>
                 </li>
@@ -44,9 +44,9 @@
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
                     </a>
                 </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
+                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
                     <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/services_icon.png' %}" alt="">
+                        <img class="w-auto h-auto" src="{% static 'images/services_icon_focused.png' %}" alt="">
                         <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
                     </a>
                 </li>
@@ -78,46 +78,50 @@
         </div>
         
         <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">PAYROLL</h1>
+            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">SERVICES</h1>
         </div>
 
         <div class="size-full py-4 px-3" id="thing">
-            <div class="profile-picture">
-                <img src="{{ employee.employee_image.url }}" alt="">
-                <div class="employee_name">
-                    <h1>
-                        {{ employee.first_name }} {{ employee.last_name }}
-                    </h1>
+            <form action="" method="post">
+                <div class="form">
+                    <div class="vehicle_form">
+                        <div class="field_1">
+                            <div class="field">
+                                <label for="vehicle-brand">vehicle brand</label>
+                                <!-- {{ form.vehicle-brand }} -->
+                            </div>
+                            <div class="field">
+                                <label for="vehicle-model">vehicle model</label>
+                                <!-- {{ form.vehicle-model }} -->
+                            </div>
+                        </div>
+                        <div class="field_2">
+                            <div class="field">
+                                <label for="vehicle-color">vehicle color</label>
+                                <!-- {{ form.vehicle-color }} -->
+                            </div>
+                            <div class="field">
+                                <label for="plate-number">plate number</label>
+                                <!-- {{ form.plate-number }} -->
+                            </div>
+                        </div>
+                    </div>
+                    <span></span>
+                    <div class="employee_form">
+                        <label for="assigned-employee">assigned employee</label>
+                        <input type="text" name="" id="">
+                    </div>
                 </div>
-            </div>
-            <div class="edit_container">
-                <table>
-                    <tr>
-                        <th>Rate per Day</th>
-                        <!-- <th>Deductions</th> -->
-                        <th>Date of Pay</th>
-                        <th>Payroll Status</th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <form class="edit_field" method="POST">
-                            {% csrf_token %}
-                            <td>{{ form.rate }}</td>
-                            <!-- <td>{{ form.deductions }}</td> -->
-                            <td>{{ form.payment_date }}</td>
-                            <td>{{ form.payroll_status }}</td>
-                            <td>
-                                <a href=""><input type="button" value=""></a>
-                                <input type="submit" value="">
-                            </td>
-                        </form>
-                    </tr>
-                </table>
-            </div>
+                <div class="submit">
+                    <a href="">
+                        <input type="button" value="Back">
+                    </a>
+                    <a href="">
+                        <input type="submit" value="Assign Task">
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </body>
-
-{{ redirect_to_login_immediately }}
-
 </html>

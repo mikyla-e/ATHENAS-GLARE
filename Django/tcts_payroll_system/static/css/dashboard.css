@@ -1,3 +1,24 @@
+#ttl_emp #content #amount,
+#act_emp #content #amount{
+    background: -webkit-linear-gradient(320deg, #F8D146, #F5B93F);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#payroll-status #payroll-info{
+    background: -webkit-linear-gradient(180deg, #F8D146 0%, #F5B93F 100%);
+}
+
+#processed-pending #processed{
+    background: -webkit-linear-gradient(320deg, #F8D146, #F5B93F);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#processed-pending #pending{
+    color: #DC4646;
+}
+
 .body{
     height: 100%;
     

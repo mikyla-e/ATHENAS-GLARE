@@ -20,4 +20,6 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('get-address-options/', views.get_address_options, name='get_address_options'), 
     path('get-regions/', views.get_regions, name='get-regions'),
+    path('status/', views.status, name='status'),
+    path('customers/', views.customers, name='customers'),
 ]

@@ -661,4 +661,8 @@ def about(request):
 
 @login_required
 def status(request):
-    return render(request, 'status.html')
+    return render(request, 'payroll_system/status.html')
+
+@login_required
+def customers(request):
+    return render(request, 'payroll_system/customers.html')
