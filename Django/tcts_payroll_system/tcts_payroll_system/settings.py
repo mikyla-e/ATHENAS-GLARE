@@ -139,7 +139,7 @@ LOGIN_REDIRECT_URL = 'payroll_system:dashboard'
 LOGIN_URL = 'users:login'
 LOGOUT_REDIRECT_URL = 'users:logout'
 AUTO_LOGOUT = {
-    'IDLE_TIME': 300, # logout after 5 minutes of downtime
+    'IDLE_TIME': 900, # logout after 15 minutes of downtime
     'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
     'MESSAGE': 'The session has expired. Please login again to continue.',
 }  
