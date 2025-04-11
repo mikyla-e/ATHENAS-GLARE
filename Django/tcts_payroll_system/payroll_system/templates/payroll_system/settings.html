@@ -82,34 +82,14 @@
         </div>
 
         <div class="size-full py-4 px-3" id="thing">
-            <div class="manage_user">
-                <button class="user" onclick="toggleDropdown()">
+            <a href="{% url 'payroll_system:admin_edit_profile' %}">
+                <div class="manage_user">
                     <div class="content">
                         <img src="{% static 'images/user_icon.png' %}" alt="">
                         <h1>Manage User</h1>
                     </div>
-                </button>
-                <div class="dropdown-content">
-                    <div class="form">
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="change_username">
-                                <label for="username">Change Username</label>
-                                {{ form.username }}
-                            </div>
-
-                            <div class="change_password">
-                                <label for="password">Change Password</label>
-                                {{ form.password }}
-                            </div>
-
-                            <div class="save_btn">
-                                <input type="submit" value="Save">
-                            </div>
-                        </form>
-                    </div>
                 </div>
-            </div>
+            </a>
 
             <a href="{% url 'payroll_system:about' %}">
                 <div class="about_us">

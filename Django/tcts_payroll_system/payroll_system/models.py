@@ -16,10 +16,6 @@ def rename_employee_image(instance, filename):
     return f'employee_images/{sanitized_name}.{ext}'
 
 # Create your models here.
-class Admin(models.Model):
-    admin_id = models.IntegerField(primary_key=True)
-    username = models.CharField(max_length=100, null=False)
-    password = models.CharField(max_length=100, null=False)
 
 class Employee(models.Model):
     class Gender(models.TextChoices):

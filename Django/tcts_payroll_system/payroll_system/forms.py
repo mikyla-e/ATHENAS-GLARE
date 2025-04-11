@@ -1,56 +1,24 @@
 from django import forms
+from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
+from django.contrib.auth.models import User
 from django.forms import ModelForm
 from django.utils import timezone
-from datetime import datetime, timedelta, date
-from .models import Admin, Employee, Payroll
+from datetime import datetime
+from .models import Employee, Payroll
 from ph_geography.models import Region, Province, Municipality, Barangay
 
-class AdminForm(ModelForm):
-    class Meta:
-        model = Admin
-        fields = ('username', 'password')
-        widgets = {
-            'username': forms.TextInput(),
-            'password': forms.PasswordInput()
-        }
-        
 class EmployeeForm(ModelForm):
-    region_name = forms.CharField(
-        label='Region',
-        widget=forms.TextInput(attrs={
-            'list': 'region-list',
-            'autocomplete': 'off',
-            'class': 'location-field'
-        }),
-        required=True
-    )
-    province_name = forms.CharField(
-        label='Province',
-        widget=forms.TextInput(attrs={
-            'list': 'province-list', 
-            'autocomplete': 'off',
-            'class': 'location-field'
-        }),
-        required=True
-    )
-    municipality_name = forms.CharField(
-        label='Municipality',
-        widget=forms.TextInput(attrs={
-            'list': 'municipality-list',
-            'autocomplete': 'off',
-            'class': 'location-field'
-        }),
-        required=True
-    )
-    barangay_name = forms.CharField(
-        label='Barangay',
-        widget=forms.TextInput(attrs={
-            'list': 'barangay-list',
-            'autocomplete': 'off',
-            'class': 'location-field'
-        }),
-        required=True
-    )
+    region_name = forms.CharField(label='Region', widget=forms.TextInput(attrs={ 'list': 'region-list', 
+    'autocomplete': 'off', 'class': 'location-field'}), required=True)
+
+    province_name = forms.CharField(label='Province', widget=forms.TextInput(attrs={ 'list': 'province-list', 
+    'autocomplete': 'off', 'class': 'location-field'}), required=True)
+
+    municipality_name = forms.CharField(label='Municipality', widget=forms.TextInput(attrs={'list': 'municipality-list',
+    'autocomplete': 'off', 'class': 'location-field'}), required=True)
+
+    barangay_name = forms.CharField(label='Barangay', widget=forms.TextInput(attrs={'list': 'barangay-list', 
+    'autocomplete': 'off', 'class': 'location-field'}), required=True)
     
     class Meta:
         model = Employee
@@ -192,3 +160,22 @@ class PayrollForm(ModelForm):
         if payment_date:
             self.validate_date_format(str(payment_date))
         return payment_date    
+    
+class AdminEditProfileForm(UserChangeForm):
+    username = forms.CharField(max_length=100, widget=forms.TextInput())
+    first_name = forms.CharField(max_length=100, widget=forms.TextInput())
+    last_name = forms.CharField(max_length=100, widget=forms.TextInput())
+    email = forms.EmailField(widget=forms.EmailInput())
+    
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'password')
+
+class PasswordChangingForm(PasswordChangeForm):
+    old_password = forms.CharField(max_length=100, widget=forms.PasswordInput())
+    new_password1 = forms.CharField(max_length=100, widget=forms.PasswordInput())
+    new_password2 = forms.CharField(max_length=100, widget=forms.PasswordInput())
+    
+    class Meta:
+        model = User
+        fields = ('old_password', 'new_password1', 'new_password2', )

@@ -1,14 +1,17 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Max, OuterRef, Subquery, Count, Sum, Min, Avg
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import OuterRef, Subquery, Count, Sum, Min, Avg
 from django.http import JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
+from django.views import generic
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_GET
-from .forms import EmployeeForm, PayrollForm
+from .forms import EmployeeForm, PayrollForm, AdminEditProfileForm, PasswordChangingForm
 from .face_recognition_attendance import recognize_face
 from .models import Employee, Payroll, Attendance, History
 from ph_geography.models import Region, Province, Municipality, Barangay
@@ -81,21 +84,6 @@ def dashboard(request):
 
     avg_active_employees = total_active_counts / days_counted
     
-    # Payroll Status: Count employees with "Processed" payroll
-    # processed_payroll_count = (
-    #     Employee.objects.filter(payrolls__payroll_status='PROCESSED')
-    #     .distinct()
-    #     .count()
-    # )
-
-    # Payroll Status: Count employees with "Pending" payroll
-    # pending_payroll_count = (
-    #     Employee.objects.filter(payrolls__payroll_status='PENDING')
-    #     .distinct()
-    #     .count()
-    # )
-
-    #(new)
     latest_payroll_subquery = (
     Payroll.objects.filter(employee_id_fk=OuterRef('pk'))
     .order_by('-payment_date')
@@ -109,8 +97,6 @@ def dashboard(request):
     processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
     
     pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
-    
-    #(new end)
     
     # Calculate Total Payroll (Sum of all processed salaries)
     total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']
@@ -652,17 +638,29 @@ def services_client(request):
     return render(request, 'payroll_system/services_client.html')
 
 @login_required
-def settings(request):
-    return render(request, 'payroll_system/settings.html')
-
-@login_required
-def about(request):
-    return render(request, 'payroll_system/about.html')
-
-@login_required
 def status(request):
     return render(request, 'payroll_system/status.html')
 
 @login_required
 def customers(request):
     return render(request, 'payroll_system/customers.html')
+
+@login_required
+def settings(request):
+    return render(request, 'payroll_system/settings.html')
+
+class AdminEditView(LoginRequiredMixin, generic.UpdateView):
+    form_class = AdminEditProfileForm
+    template_name = 'payroll_system/admin_edit_profile.html'
+    success_url = reverse_lazy('payroll_system:settings')
+
+    def get_object(self):
+        return self.request.user
+    
+class PasswordsChangeView(LoginRequiredMixin, PasswordChangeView):
+    form_class = PasswordChangingForm
+    success_url = reverse_lazy('payroll_system:settings')
+
+@login_required
+def about(request):
+    return render(request, 'payroll_system/about.html')

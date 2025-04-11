@@ -1,8 +1,5 @@
 from django.contrib import admin
-from .models import Admin, Employee, Payroll, Attendance, History
-
-class AdminAdmin(admin.ModelAdmin):
-    list_display = ('username', 'password')
+from .models import Employee, Payroll, Attendance, History
 
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('employee_id', 'first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
@@ -16,7 +13,6 @@ class PayrollAdmin(admin.ModelAdmin):
 class AttendanceAdmin(admin.ModelAdmin):
     list_display = ('attendance_id', 'time_in', 'time_out', 'date', 'hours_worked', 'attendance_status','remarks')
 
-admin.site.register(Admin, AdminAdmin)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Payroll, PayrollAdmin)
 admin.site.register(Attendance, AttendanceAdmin)
