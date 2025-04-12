@@ -15,14 +15,14 @@ def rename_employee_image(instance, filename):
     # Return the new path
     return f'employee_images/{sanitized_name}.{ext}'
 
-# Create your models here.
-
-class Employee(models.Model):
-    class Gender(models.TextChoices):
+class Gender(models.TextChoices):
         MALE = 'Male', _('Male')
         FEMALE = 'Female', _('Female')
         OTHERS = 'Others', _('Others')
 
+# Create your models here.
+
+class Employee(models.Model):
     class HighestEducation(models.TextChoices):
         GRADESCHOOL = 'Grade School', _('Grade School')
         HIGHSCHOOL = 'High School', _('High School')
@@ -46,13 +46,10 @@ class Employee(models.Model):
     date_of_birth = models.DateField(null=True)
     contact_number = models.CharField(max_length=15, null=True)
     emergency_contact = models.CharField(max_length=15, null=True)
-    
-    # Address fields as strings
     region = models.CharField(max_length=255, null=False, default='')
     province = models.CharField(max_length=255, null=False, default='')
     municipality = models.CharField(max_length=255, null=False, default='')
     barangay = models.CharField(max_length=255, null=False, default='')
-
     highest_education = models.CharField(max_length=20, choices=HighestEducation.choices, null=True)
     work_experience = models.CharField(max_length=2083, null=True, blank=True)
     date_of_employment = models.DateField(default=timezone.now)
@@ -134,3 +131,28 @@ class History(models.Model):
     history_id = models.AutoField(primary_key=True)
     description = models.CharField(max_length=255, null=False)
     date_time = models.DateTimeField(default=timezone.now, null=False)
+
+class Customer(models.Model):
+    customer_id = models.AutoField(primary_key=True)
+    first_name = models.CharField(max_length=100, null=False)
+    middle_name = models.CharField(max_length=100, null=True, blank=True)
+    last_name = models.CharField(max_length=100, null=False)
+    gender = models.CharField(max_length=6, choices=Gender.choices, null=False)
+    contact_number = models.CharField(max_length=15, null=True)
+    region = models.CharField(max_length=255, null=False, default='')
+    province = models.CharField(max_length=255, null=False, default='')
+    municipality = models.CharField(max_length=255, null=False, default='')
+    barangay = models.CharField(max_length=255, null=False, default='')
+
+class Vehicle(models.Model):
+    vehicle_id = models.AutoField(primary_key=True)
+    vehicle_name = models.CharField(max_length=100, null=False)
+    vehicle_color = models.CharField(max_length=100, null=False)
+    plate_number = models.CharField(max_length=100, null=False)
+
+class Service(models.Model):
+    service_id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100, null=False)
+    service_image = models.ImageField(null=True, blank=True, upload_to='images/')
+
+# Create your task model here.
