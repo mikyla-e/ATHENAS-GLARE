@@ -1,0 +1,23 @@
+#time-in, #time-out {
+    display: block; 
+    width: fit-content; 
+    padding: 15px 30px;
+    margin: 0;
+
+    font-family: 'League Spartan';
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+
+    border-radius: 100px;
+    border: none;
+    background: linear-gradient(to right, #F8D146 , #F5B93F);
+}
+
+#time-in:hover,
+#time-out:hover {
+    scale: 1.05;
+    transition: 0.5s;
+    background: linear-gradient(to right, #1e1e1e , #1e1e1e);
+    color: #F8D146;
+}

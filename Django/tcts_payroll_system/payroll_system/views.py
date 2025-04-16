@@ -672,3 +672,7 @@ class PasswordsChangeView(LoginRequiredMixin, PasswordChangeView):
 @login_required
 def about(request):
     return render(request, 'payroll_system/about.html')
+
+@login_required
+def attendance(request):
+    return render(request, 'payroll_system/attendance.html')

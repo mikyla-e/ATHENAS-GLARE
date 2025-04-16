@@ -26,4 +26,5 @@ urlpatterns = [
     path('get-address-options/', views.get_address_options, name='get_address_options'), 
     path('get-regions/', views.get_regions, name='get-regions'),
     path('customers/', views.customers, name='customers'),
+    path('attendance/', views.attendance, name='attendance'),
 ]

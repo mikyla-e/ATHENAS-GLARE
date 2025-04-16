@@ -1,0 +1,106 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Attendance</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
+</head>
+<body>
+    <div class="absolute max-h-50 max-w-50">
+        <img src="{% static 'images/clients_logo.png' %}" alt="Toto's Car Tinting Shop">
+    </div>
+
+    <div class="h-lvh grid grid-rows-[5fr_1fr] lg:grid-cols-[3fr_1fr] lg:grid-rows-1">
+        <div class="bg-[#1E1E1E] order-1 border border-black">
+            <div class="webcam-container m-0 h-full overflow-hidden">
+                <video id="video" class="h-full object-cover" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+        
+        <div class="bg-[#FFF] p-4 flex lg:flex-col justify-between order-2">
+            <div id="logo" class="hidden lg:flex items-center gap-3">
+                <img src="{% static 'images/logo_icon.png' %}" alt="">
+                <p class="text-2xl font-extrabold">ATTENDANCE</p>
+            </div>
+            <div id="content" class="h-full lg:h-[70%] w-full flex justify-between lg:flex-col lg:justify-center items-center gap-10">
+                <div id="title" class="w-fit flex justify-start overflow-hidden">
+                    <p class="px-4 text-5xl font-[League Spartan] font-bold text-left flex flex-wrap">RECORD ATTENDANCE</p>
+                </div>
+                <form method="post" class="w-[50%] lg:w-full flex flex-nowrap justify-center items-center gap-5" id="buttons">
+                    <input id="time-in" class="cursor-pointer" type="submit" value="TIME IN">
+                    <input id="time-out" class="cursor-pointer" type="submit" value="TIME OUT">
+                </form>
+            </div>
+            <div class="h-[10%]" id="empty">
+
+            </div>
+            
+        </div>
+    </div>
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const capturedImage = document.getElementById('capturedImage');
+        const captureButton = document.getElementById('captureButton');
+        const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
+
+        // Initialize webcam
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+            })
+            .catch(function(error) {
+            console.error('Could not access webcam:', error);
+            alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
+            });
+        } else {
+        alert('Your browser does not support webcam access. Please try a different browser.');
+        }
+
+        // Capture button click handler
+        captureButton.addEventListener('click', function() {
+            // Set canvas dimensions to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw the video frame to the canvas
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert canvas to image
+            const dataURL = canvas.toDataURL('image/jpeg');
+            capturedImage.src = dataURL;
+            capturedImage.style.display = 'block';
+        
+            // Convert canvas content to a File object for form submission
+            canvas.toBlob(function(blob) {
+                // Create a File object from the Blob
+                const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
+                
+                // Create a FileList-like object
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(imageFile);
+                
+                // Set the file to the file input
+                fileInput.files = dataTransfer.files;
+                
+                console.log("Image captured and file created");
+            }, 'image/jpeg', 0.95); // High quality JPEG
+        });
+    });
+</script>
+</html>
