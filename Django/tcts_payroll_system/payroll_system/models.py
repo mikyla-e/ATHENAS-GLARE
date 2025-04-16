@@ -22,6 +22,44 @@ class Gender(models.TextChoices):
 
 # Create your models here.
 
+class Region(models.Model):
+    psgcCode = models.CharField(max_length=10)
+    regDesc = models.CharField(max_length=255)
+    regCode = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.regDesc
+
+class Province(models.Model):
+    psgcCode = models.CharField(max_length=10)
+    provDesc = models.CharField(max_length=255)
+    regCode = models.CharField(max_length=10)
+    provCode = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.provDesc
+
+class City(models.Model):
+    psgcCode = models.CharField(max_length=10)
+    cityDesc = models.CharField(max_length=255)
+    regCode = models.CharField(max_length=10)
+    provCode = models.CharField(max_length=10)
+    cityCode = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.cityDesc
+
+class Barangay(models.Model):
+    psgcCode = models.CharField(max_length=10)
+    brgyDesc = models.CharField(max_length=255)
+    regCode = models.CharField(max_length=10)
+    provCode = models.CharField(max_length=10)
+    cityCode = models.CharField(max_length=10)
+    brgyCode = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.brgyDesc
+
 class Employee(models.Model):
     class HighestEducation(models.TextChoices):
         GRADESCHOOL = 'Grade School', _('Grade School')
@@ -46,10 +84,10 @@ class Employee(models.Model):
     date_of_birth = models.DateField(null=True)
     contact_number = models.CharField(max_length=15, null=True)
     emergency_contact = models.CharField(max_length=15, null=True)
-    region = models.CharField(max_length=255, null=False, default='')
-    province = models.CharField(max_length=255, null=False, default='')
-    municipality = models.CharField(max_length=255, null=False, default='')
-    barangay = models.CharField(max_length=255, null=False, default='')
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True)
+    municipality = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
+    barangay = models.ForeignKey(Barangay, on_delete=models.SET_NULL, null=True)
     highest_education = models.CharField(max_length=20, choices=HighestEducation.choices, null=True)
     work_experience = models.CharField(max_length=2083, null=True, blank=True)
     date_of_employment = models.DateField(default=timezone.now)
@@ -60,8 +98,6 @@ class Employee(models.Model):
     employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
 
     def __str__(self):
-        if self.barangay:
-            return f"{self.first_name} {self.last_name} - {self.barangay}, {self.municipality}, {self.province}, {self.region}"
         return f"{self.first_name} {self.last_name}"
 
     def update_attendance_stats(self):

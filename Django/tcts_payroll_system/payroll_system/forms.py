@@ -8,8 +8,8 @@ from .models import Employee, Payroll
 from ph_geography.models import Region, Province, Municipality, Barangay
 
 class EmployeeForm(ModelForm):
-    region_name = forms.CharField(label='Region', widget=forms.TextInput(attrs={ 'list': 'region-list', 
-    'autocomplete': 'off', 'class': 'location-field'}), required=True)
+    region_name = forms.CharField(widget=forms.TextInput(attrs={ 'list': 'region-list', 'autocomplete': 'off', 'class': 
+                                  'location-field'}), required=True)
 
     province_name = forms.CharField(label='Province', widget=forms.TextInput(attrs={ 'list': 'province-list', 
     'autocomplete': 'off', 'class': 'location-field'}), required=True)
@@ -131,15 +131,16 @@ class EmployeeForm(ModelForm):
         return instance
     
 class PayrollForm(ModelForm):
+    rate = forms.FloatField(widget=forms.NumberInput())
+    payment_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    
     class Meta:
         model = Payroll
         fields = ('rate', 'payment_date', 'payroll_status')
-        widgets = {
-            'rate': forms.NumberInput(),
-            'payment_date': forms.DateInput(),
-            'payroll_status': forms.Select()
+        widget = {
+            'payroll_status': forms.Select(),
         }
-
+        
     def clean(self):
         cleaned_data = super().clean()
         required_fields = ['rate', 'payment_date', 'payroll_status']
