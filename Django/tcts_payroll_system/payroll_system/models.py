@@ -30,6 +30,10 @@ class Region(models.Model):
     def __str__(self):
         return self.regDesc
 
+    class Meta:
+        db_table = 'refregion'
+        managed = False
+
 class Province(models.Model):
     psgcCode = models.CharField(max_length=10)
     provDesc = models.CharField(max_length=255)
@@ -39,26 +43,38 @@ class Province(models.Model):
     def __str__(self):
         return self.provDesc
 
+    class Meta:
+        db_table = 'refprovince'
+        managed = False
+
 class City(models.Model):
     psgcCode = models.CharField(max_length=10)
-    cityDesc = models.CharField(max_length=255)
+    citymunDesc = models.CharField(max_length=255)
     regCode = models.CharField(max_length=10)
     provCode = models.CharField(max_length=10)
-    cityCode = models.CharField(max_length=10)
+    citymunCode = models.CharField(max_length=10)
 
     def __str__(self):
-        return self.cityDesc
+        return self.citymunDesc
+    
+    class Meta:
+        db_table = 'refcitymun'
+        managed = False
 
 class Barangay(models.Model):
     psgcCode = models.CharField(max_length=10)
     brgyDesc = models.CharField(max_length=255)
     regCode = models.CharField(max_length=10)
     provCode = models.CharField(max_length=10)
-    cityCode = models.CharField(max_length=10)
+    citymunCode = models.CharField(max_length=10)
     brgyCode = models.CharField(max_length=10)
 
     def __str__(self):
         return self.brgyDesc
+
+    class Meta:
+        db_table = 'refbrgy'
+        managed = False
 
 class Employee(models.Model):
     class HighestEducation(models.TextChoices):
@@ -86,7 +102,7 @@ class Employee(models.Model):
     emergency_contact = models.CharField(max_length=15, null=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True)
-    municipality = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
     barangay = models.ForeignKey(Barangay, on_delete=models.SET_NULL, null=True)
     highest_education = models.CharField(max_length=20, choices=HighestEducation.choices, null=True)
     work_experience = models.CharField(max_length=2083, null=True, blank=True)
