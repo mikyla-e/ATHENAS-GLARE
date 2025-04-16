@@ -1,467 +1,402 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-</head>
-<body class="bg-[#EFEDE6]">
-    <nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
-        <div class="bg-[#FFFFFF] cols-span-1 row-span-1">
-            <div class="h-[70px] flex flex-wrap justify-center place-items-center md:gap-2" id="logo">
-                <div class="-mb-2 md:mb-0" id="logo-picture">
-                    <img class="h-8 md:h-10" src="{% static 'images/logo_icon.png' %}" alt="">
+{% block title %}Dashboard{% endblock %}
+
+{% block header %}DASHBOARD{% endblock %}
+
+{% block content %}
+    <div class="h-dvh w-full grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] grid-rows-[1fr_1fr_1fr_2fr] lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-[2.75fr_4fr_5.25fr] gap-3">
+        <div class="order-1 lg:order-1 border border-black col-span-5 lg:col-span-4 p-3 bg-[#1E1E1E] rounded-xl flex justify-evenly items-center" id="emp">
+            
+            <div class="h-full flex flex-col justify-center items-center" id="ttl_emp">
+                <div class="h-full flex flex-col justify-around items-end" id="content">
+                    <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
+                        <p class="text-base/5 md:text-lg/6 font-bold text-right">TOTAL EMPLOYEES</p>
+                        <p class="text-sm/5 md:text-sm/6 font-light text-right">currently</p>
+                    </div>
+
+                    <div class="text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
+                        <p class="">{{ total_employees }}</p>
+                    </div>
                 </div>
-                <div class="text-[#1E1E1E] text-xs/3 md:text-lg/5 font-[League Spartan] font-extrabold" id="logo-name">
-                    <p class="text-center md:text-left ">PAYROLL</p>
-                    <p class="text-center md:text-left">SYSTEM</p>
+            </div>
+            
+            <span class="h-[95%] w-[3px] bg-[#f8d14625] rounded-xl mx-4 my-[20px]"></span> <!--horizontal line-->
+            
+            <div class="h-full flex flex-col justify-center items-center" id="act_emp">
+                <div class="h-full flex flex-col justify-around items-end" id="content">
+                    <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
+                        <p class="text-base/5 md:text-lg/6 font-bold text-right">ACTIVE EMPLOYEES</p>
+                        <p class="text-sm/5 md:text-sm/6 font-light text-right">within the week</p>
+                    </div>
+                    <div class="text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
+                        <p class="">{{ avg_active_employees }}</p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="overflow-hidden" id="menu">
-            <ul class="h-auto w-[80px] md:w-[190px]">
-                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:dashboard' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/dashboard_icon_focused.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">DASHBOARD</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/payroll_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/employee_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/services_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:status' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/status_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">STATUS</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:customers' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/customers_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:settings' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/settings_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SETTINGS</div>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
 
-    <div class="h-dvh w-full grid grid-cols-[80px_1fr] md:grid-cols-[190px_1fr] grid-rows-[70px_1fr] z-25">
-        <div class="bg-[#FFFFFF] row-span-2">
+        <div class="order-2 lg:order-3 border border-black col-span-5 lg:col-span-4" id="time">
 
         </div>
-        
-        <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">DASHBOARD</h1>
-        </div>
 
-        <div class="size-full py-4 px-3" id="thing">
-            <!-- <div class="h-dvh w-full grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] grid-rows-[1fr_1fr_1fr_2fr] lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-[2.75fr_4fr_5.25fr] gap-3">
-                <div class="order-1 lg:order-1 border border-black col-span-5 lg:col-span-4 p-3 bg-[#1E1E1E] rounded-xl flex justify-evenly items-center" id="emp">
-                    
-                    <div class="h-full flex flex-col justify-center items-center" id="ttl_emp">
-                        <div class="h-full flex flex-col justify-around items-end" id="content">
-                            <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
-                                <p class="text-base/5 md:text-lg/6 font-bold text-right">TOTAL EMPLOYEES</p>
-                                <p class="text-sm/5 md:text-sm/6 font-light text-right">currently</p>
-                            </div>
-
-                            <div class="text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
-                                <p class="">{{ total_employees }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <span class="h-[95%] w-[3px] bg-[#f8d14625] rounded-xl mx-4 my-[20px]"></span> <!--horizontal line
-                    
-                    <div class="h-full flex flex-col justify-center items-center" id="act_emp">
-                        <div class="h-full flex flex-col justify-around items-end" id="content">
-                            <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
-                                <p class="text-base/5 md:text-lg/6 font-bold text-right">ACTIVE EMPLOYEES</p>
-                                <p class="text-sm/5 md:text-sm/6 font-light text-right">within the week</p>
-                            </div>
-                            <div class="text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
-                                <p class="">{{ avg_active_employees }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="order-2 lg:order-3 border border-black col-span-5 lg:col-span-4" id="time">
-
-                </div>
-                <div class="order-3 lg:order-2 border border-black col-span-5 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center overflow-hidden" id="payroll-status">
-                    <div class="w-[45%] h-full p-3 flex flex-col justify-between" id="processed-pending">
-                        <div class="text-[#FFFFFF] text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
-                            <p >PAYROLL STATUS</p>
-                        </div>
-                        
-                        <div class="flex flex-col items-start" id="content">
-                            <div class="my-[10px]" id="processed">
-                                <h2 class="text-sm/5 lg:text-base/5 font-bold">PROCESSED</h2>
-                                <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ processed_payroll_count }}</p>  
-                            </div>
-                            <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line
-                            <div class="my-[10px]" id="pending">
-                                <h2 class="text-sm/5 lg:text-base/5 font-bold">PENDING</h2>
-                                <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ pending_payroll_count }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-[55%] h-full p-3 rounded-xl " id="payroll-info">
-
-                    </div>
-                </div>
-                <div class="order-4 lg:order-5 border border-black col-span-5 lg:col-span-4" id="attendance">
-
-                </div>
-                <div class="order-5 lg:order-4 border border-black col-span-4 lg:col-span-3 row-span-2" id="recent-history">
-
-                </div>
-                <div class="order-6 lg:order-6 border border-black col-span-6 lg:col-span-5" id="payroll-per-week">
-
-                </div>
-                <div class="order-7 border border-black col-span-6 lg:col-span-9" id="preview">
-
-                </div>
-            </div> -->
-
-            <div class="container">
-                <div class="order-1 lg:order-1 border border-black col-span-5 lg:col-span-4 p-3 bg-[#1E1E1E] rounded-xl flex justify-evenly items-center" id="emp">
-                    
-                    <div class="h-full flex flex-col justify-center items-center" id="ttl_emp">
-                        <div class="h-full flex flex-col justify-around items-end" id="content">
-                            <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
-                                <p class="text-base/5 md:text-lg/6 font-bold text-right">TOTAL EMPLOYEES</p>
-                                <p class="text-sm/5 md:text-sm/6 font-light text-right">currently</p>
-                            </div>
-
-                            <div class="text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
-                                <p class="">{{ total_employees }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <span class="h-[95%] w-[3px] bg-[#f8d14625] rounded-xl mx-4 my-[20px]"></span> <!--horizontal line-->
-                    
-                    <div class="h-full flex flex-col justify-center items-center" id="act_emp">
-                        <div class="h-full flex flex-col justify-around items-end" id="content">
-                            <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
-                                <p class="text-base/5 md:text-lg/6 font-bold text-right">ACTIVE EMPLOYEES</p>
-                                <p class="text-sm/5 md:text-sm/6 font-light text-right">within the week</p>
-                            </div>
-                            <div class="text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
-                                <p class="">{{ avg_active_employees }}</p>
-                            </div>
-                        </div>
-                    </div>
+        <div class="order-3 lg:order-2 border border-black col-span-5 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center overflow-hidden" id="payroll-status">
+            <div class="w-[45%] h-full p-3 flex flex-col justify-between" id="processed-pending">
+                <div class="text-[#FFFFFF] text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
+                    <p >PAYROLL STATUS</p>
                 </div>
                 
-                <div class="order-3 lg:order-2 border border-black col-span-5 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center overflow-hidden" id="payroll-status">
-                    <div class="w-[45%] h-full p-3 flex flex-col justify-between" id="processed-pending">
-                        <div class="text-[#FFFFFF] text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
-                            <p >PAYROLL STATUS</p>
-                        </div>
-                        
-                        <div class="flex flex-col items-start" id="content">
-                            <div class="my-[10px]" id="processed">
-                                <h2 class="text-sm/5 lg:text-base/5 font-bold">PROCESSED</h2>
-                                <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ processed_payroll_count }}</p>  
-                            </div>
-                            <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line-->
-                            <div class="my-[10px]" id="pending">
-                                <h2 class="text-sm/5 lg:text-base/5 font-bold">PENDING</h2>
-                                <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ pending_payroll_count }}</p>
-                            </div>
-                        </div>
+                <div class="flex flex-col items-start" id="content">
+                    <div class="my-[10px]" id="processed">
+                        <h2 class="text-sm/5 lg:text-base/5 font-bold">PROCESSED</h2>
+                        <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ processed_payroll_count }}</p>  
                     </div>
-                    <div class="w-[55%] h-full p-3 rounded-xl " id="payroll-info">
-                        <div class="flex flex-col justify-evenly items-end" id="content2">
-                            <div class="h-fit my-2 mx-4 flex flex-col items-end" id="total_payroll">
-                                <p class="font-[Roboto] font-semibold text-right text-white">TOTAL PAYROLL</p>
-                                <h1 class="font-[Inter] font-semibold text-3xl text-right">{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</h1>
-                            </div>
-                            <div class="h-fit my-2 mx-4 flex flex-col items-end" id="next_payday">
-                                <h1 class="font-[Inter] font-semibold text-2xl text-right">{{ next_payday|default:"N/A" }}</h1>
-                                <p class="font-[Roboto] font-semibold text-right text-white">NEXT PAYDAY</p>    
-                            </div>
-                        </div>
+                    <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line-->
+                    <div class="my-[10px]" id="pending">
+                        <h2 class="text-sm/5 lg:text-base/5 font-bold">PENDING</h2>
+                        <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ pending_payroll_count }}</p>
                     </div>
                 </div>
-                    
-                <!-- <div class="payroll_stats">
-                    <div class="content1">
-                        <h1 class="payroll_status">PAYROLL STATUS</h1>
-                        <div class="processed">
-                            <h2>PROCESSED</h2>
-                            <p>{{ processed_payroll_count }}</p>   
-                        </div>
-                        <div class="horizontal_line"></div>
-                        <div class="pending">
-                            <h2>PENDING</h2>
-                            <p>{{ pending_payroll_count }}</p>
-                        </div>
+            </div>
+            <div class="w-[55%] h-full p-3 rounded-xl " id="payroll-info">
+                <div class="flex flex-col justify-evenly items-end" id="content2">
+                    <div class="h-fit my-2 mx-4 flex flex-col items-end" id="total_payroll">
+                        <p class="font-[Roboto] font-semibold text-right text-white">TOTAL PAYROLL</p>
+                        <h1 class="font-[Inter] font-semibold text-3xl text-right">{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</h1>
                     </div>
-
-                    <div class="content2">
-                        <div class="total_payroll">
-                            <p>TOTAL PAYROLL</p>
-                            <h1>{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</h1>
-                        </div>
-                        <div class="next_payday">
-                            <h1>{{ next_payday|default:"N/A" }}</h1>
-                            <p>NEXT PAYDAY</p>    
-                        </div>
+                    <div class="h-fit my-2 mx-4 flex flex-col items-end" id="next_payday">
+                        <h1 class="font-[Inter] font-semibold text-2xl text-right">{{ next_payday|default:"N/A" }}</h1>
+                        <p class="font-[Roboto] font-semibold text-right text-white">NEXT PAYDAY</p>    
                     </div>
-                </div> -->
-    
-                <div class="order-3 lg:order-2 border border-black col-span-5 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center overflow-hidden" id="payroll-status">
-                    <div class="w-[45%] h-full p-3 flex flex-col justify-between" id="processed-pending">
-                        <div class="text-[#FFFFFF] text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
-                            <p >PAYROLL STATUS</p>
-                        </div>
-                        
-                        <div class="flex flex-col items-start" id="content">
-                            <div class="my-[10px]" id="processed">
-                                <h2 class="text-sm/5 lg:text-base/5 font-bold">PROCESSED</h2>
-                                <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ processed_payroll_count }}</p>  
-                            </div>
-                            <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line-->
-                            <div class="my-[10px]" id="pending">
-                                <h2 class="text-sm/5 lg:text-base/5 font-bold">PENDING</h2>
-                                <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ pending_payroll_count }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-[55%] h-full p-3 rounded-xl " id="payroll-info">
-                        <div class="content2">
-                            <div class="total_payroll">
-                                <p>TOTAL PAYROLL</p>
-                                <h1>{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</h1>
-                            </div>
-                            <div class="next_payday">
-                                <h1>{{ next_payday|default:"N/A" }}</h1>
-                                <p>NEXT PAYDAY</p>    
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="time">
-                    <div class="top_content">
-                        <div class="weather">
-                            <p>it is WEATHER</p>
-                            <img src="{% static 'images/weather_icon.png' %}" alt="">
-                        </div>
-                        <div class="number_time"><h1 id="philippines-time"></h1></div>
-                        
-                    </div>
-                    <div class="bottom_content">
-                        <p id="philippines-day"></p>
-                        <p>|</p>
-                        <p id="philippines-date"></p>
-                        <h1>GMT +8</h1>
-                    </div>
-                </div>
-
-                <div class="table">
-                    <table class="table-1">
-                        <th style="font-weight: bold;">RECENT HISTORY</th>
-                        {% for history in histories %}
-                        <tr>
-                            <td>
-                                <p class="history">{{ history.description }}</p>
-                                <p class="history_time">{{ history.date_time }}</p>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td>
-                                <p>No logs found.</p>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        <tr>
-                            <td>
-                                
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-                <div class="donut_chart">
-                    <canvas id="donut"></canvas>
-                </div>
-
-                <script>
-                    const donutChart = document.getElementById('donut');
-                    
-                    const donutLabels = ["Present", "Absent"];
-                    const donutData = [100, 40];
-
-                    const donutColor = ["#F8D146","#DC4646"];
-
-                    const attendance = new Chart(donutChart, {
-                        type: "doughnut",
-                        data: {
-                            labels: donutLabels,
-                            datasets: [{
-                                backgroundColor: donutColor,
-                                data: donutData,
-                                borderWidth: 0
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            cutout: "40%",
-                            layout: {
-                                padding: 0
-                            },
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        boxWidth: 15,
-                                        padding: 5,
-                                        font: {
-                                            size: 14
-                                        }
-                                    }
-                                    
-                                },
-                                title: {
-                                    display: true,
-                                    text: "ATTENDANCE",
-                                    color: "#1E1E1E",
-                                    align: 'start',
-                                    padding: {
-                                        top: 0,
-                                        bottom: 10
-                                    },
-                                    font: {
-                                        size: 16
-                                    }
-                                }
-                            }
-                            
-                        }
-                    });
-                </script>
-
-                <div class="bar_chart">
-                    <canvas id="bar"></canvas>
-                </div>
-                <script>
-                    const barChart = document.getElementById('bar');
-                    
-                    const barLabels = ["Jan 1", "Jan 8", "Jan 15", "Jan 22", "Jan 28"];
-                    const barData = [100, 40, 21, 98, 68];
-
-                    const barColor = ["#F8D14680"];
-
-                    const payroll_chart = new Chart(barChart, {
-                        type: "bar",
-                        data: {
-                            labels: barLabels,
-                            datasets: [{
-                                label: "Payroll",
-                                backgroundColor: barColor,
-                                borderColor: ["#F8D146"],
-                                data: barData,
-                                borderWidth: 2
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            layout: {
-                                padding: 0
-                            },
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: "PAYROLL PER WEEK",
-                                    color: "#1E1E1E",
-                                    align: 'start',
-                                    padding: {
-                                        top: 0,
-                                        bottom: 10
-                                    },
-                                    font: {
-                                        size: 16
-                                    }
-                                }
-                            }
-                            
-                        }
-                    });
-                </script>
-
-                <div class="table2">
-                    <table class="table-2">
-                        <th style="color: #1E1E1E;">EMPLOYEE</th>
-                        <th style="color: #1E1E1E;">PAYMENT AMOUNT</th>
-                        <th style="color: #1E1E1E;">STATUS</th>
-                        <th style="color: #1E1E1E;">LAST ATTENDANCE</th>
-    
-                        {% for employee in employees %}
-                        <tr>
-                            <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                            <td>{{ employee.total_payment }}</td>
-                            <td>
-                                {% if employee.active_status == "Active" %}
-                                    Active
-                                {% else %}
-                                    Inactive
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if employee.latest_attendance_date %}
-                                        {{ employee.latest_attendance_date }}
-                                {% else %}
-                                    No Attendance Data
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4">No employees found.</td>
-                        </tr>
-                        {% endfor %}
-                        <tr>
-                            <td></td>
-                        </tr>
-                    </table>
                 </div>
             </div>
         </div>
-    </div>
-</body>
+        
+        <div class="order-4 lg:order-5 border border-black col-span-5 lg:col-span-4" id="attendance">
 
+        </div>
+        <div class="order-5 lg:order-4 border border-black col-span-4 lg:col-span-3 row-span-2" id="recent-history">
+
+        </div>
+        <div class="order-6 lg:order-6 border border-black col-span-6 lg:col-span-5" id="payroll-per-week">
+
+        </div>
+        <div class="order-7 border border-black col-span-6 lg:col-span-9" id="preview">
+
+        </div>
+    </div> 
+
+    <div class="container">
+        <div class="order-1 lg:order-1 border border-black col-span-5 lg:col-span-4 p-3 bg-[#1E1E1E] rounded-xl flex justify-evenly items-center" id="emp">
+            
+            <div class="h-full flex flex-col justify-center items-center" id="ttl_emp">
+                <div class="h-full flex flex-col justify-around items-end" id="content">
+                    <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
+                        <p class="text-base/5 md:text-lg/6 font-bold text-right">TOTAL EMPLOYEES</p>
+                        <p class="text-sm/5 md:text-sm/6 font-light text-right">currently</p>
+                    </div>
+
+                    <div class="text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
+                        <p class="">{{ total_employees }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <span class="h-[95%] w-[3px] bg-[#f8d14625] rounded-xl mx-4 my-[20px]"></span> <!--horizontal line-->
+            
+            <div class="h-full flex flex-col justify-center items-center" id="act_emp">
+                <div class="h-full flex flex-col justify-around items-end" id="content">
+                    <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
+                        <p class="text-base/5 md:text-lg/6 font-bold text-right">ACTIVE EMPLOYEES</p>
+                        <p class="text-sm/5 md:text-sm/6 font-light text-right">within the week</p>
+                    </div>
+                    <div class="text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
+                        <p class="">{{ avg_active_employees }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="order-3 lg:order-2 border border-black col-span-5 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center overflow-hidden" id="payroll-status">
+            <div class="w-[45%] h-full p-3 flex flex-col justify-between" id="processed-pending">
+                <div class="text-[#FFFFFF] text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
+                    <p >PAYROLL STATUS</p>
+                </div>
+                
+                <div class="flex flex-col items-start" id="content">
+                    <div class="my-[10px]" id="processed">
+                        <h2 class="text-sm/5 lg:text-base/5 font-bold">PROCESSED</h2>
+                        <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ processed_payroll_count }}</p>  
+                    </div>
+                    <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line-->
+                    <div class="my-[10px]" id="pending">
+                        <h2 class="text-sm/5 lg:text-base/5 font-bold">PENDING</h2>
+                        <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ pending_payroll_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="w-[55%] h-full p-3 rounded-xl " id="payroll-info">
+                <div class="flex flex-col justify-evenly items-end" id="content2">
+                    <div class="h-fit my-2 mx-4 flex flex-col items-end" id="total_payroll">
+                        <p class="font-[Roboto] font-semibold text-right text-white">TOTAL PAYROLL</p>
+                        <h1 class="font-[Inter] font-semibold text-3xl text-right">{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</h1>
+                    </div>
+                    <div class="h-fit my-2 mx-4 flex flex-col items-end" id="next_payday">
+                        <h1 class="font-[Inter] font-semibold text-2xl text-right">{{ next_payday|default:"N/A" }}</h1>
+                        <p class="font-[Roboto] font-semibold text-right text-white">NEXT PAYDAY</p>    
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        <!-- <div class="payroll_stats">
+            <div class="content1">
+                <h1 class="payroll_status">PAYROLL STATUS</h1>
+                <div class="processed">
+                    <h2>PROCESSED</h2>
+                    <p>{{ processed_payroll_count }}</p>   
+                </div>
+                <div class="horizontal_line"></div>
+                <div class="pending">
+                    <h2>PENDING</h2>
+                    <p>{{ pending_payroll_count }}</p>
+                </div>
+            </div>
+
+            <div class="content2">
+                <div class="total_payroll">
+                    <p>TOTAL PAYROLL</p>
+                    <h1>{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</h1>
+                </div>
+                <div class="next_payday">
+                    <h1>{{ next_payday|default:"N/A" }}</h1>
+                    <p>NEXT PAYDAY</p>    
+                </div>
+            </div>
+        </div> -->
+
+        <div class="order-3 lg:order-2 border border-black col-span-5 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center overflow-hidden" id="payroll-status">
+            <div class="w-[45%] h-full p-3 flex flex-col justify-between" id="processed-pending">
+                <div class="text-[#FFFFFF] text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
+                    <p >PAYROLL STATUS</p>
+                </div>
+                
+                <div class="flex flex-col items-start" id="content">
+                    <div class="my-[10px]" id="processed">
+                        <h2 class="text-sm/5 lg:text-base/5 font-bold">PROCESSED</h2>
+                        <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ processed_payroll_count }}</p>  
+                    </div>
+                    <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line-->
+                    <div class="my-[10px]" id="pending">
+                        <h2 class="text-sm/5 lg:text-base/5 font-bold">PENDING</h2>
+                        <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ pending_payroll_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="w-[55%] h-full p-3 rounded-xl " id="payroll-info">
+                <div class="content2">
+                    <div class="total_payroll">
+                        <p>TOTAL PAYROLL</p>
+                        <h1>{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</h1>
+                    </div>
+                    <div class="next_payday">
+                        <h1>{{ next_payday|default:"N/A" }}</h1>
+                        <p>NEXT PAYDAY</p>    
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="time">
+            <div class="top_content">
+                <div class="weather">
+                    <p>it is WEATHER</p>
+                    <img src="{% static 'images/weather_icon.png' %}" alt="">
+                </div>
+                <div class="number_time"><h1 id="philippines-time"></h1></div>
+                
+            </div>
+            <div class="bottom_content">
+                <p id="philippines-day"></p>
+                <p>|</p>
+                <p id="philippines-date"></p>
+                <h1>GMT +8</h1>
+            </div>
+        </div>
+
+        <div class="table">
+            <table class="table-1">
+                <th style="font-weight: bold;">RECENT HISTORY</th>
+                {% for history in histories %}
+                <tr>
+                    <td>
+                        <p class="history">{{ history.description }}</p>
+                        <p class="history_time">{{ history.date_time }}</p>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td>
+                        <p>No logs found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td>
+                        
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <div class="donut_chart">
+            <canvas id="donut"></canvas>
+        </div>
+
+        <script>
+            const donutChart = document.getElementById('donut');
+            
+            const donutLabels = ["Present", "Absent"];
+            const donutData = [100, 40];
+
+            const donutColor = ["#F8D146","#DC4646"];
+
+            const attendance = new Chart(donutChart, {
+                type: "doughnut",
+                data: {
+                    labels: donutLabels,
+                    datasets: [{
+                        backgroundColor: donutColor,
+                        data: donutData,
+                        borderWidth: 0
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    cutout: "40%",
+                    layout: {
+                        padding: 0
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                boxWidth: 15,
+                                padding: 5,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                            
+                        },
+                        title: {
+                            display: true,
+                            text: "ATTENDANCE",
+                            color: "#1E1E1E",
+                            align: 'start',
+                            padding: {
+                                top: 0,
+                                bottom: 10
+                            },
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                    
+                }
+            });
+        </script>
+
+        <div class="bar_chart">
+            <canvas id="bar"></canvas>
+        </div>
+        <script>
+            const barChart = document.getElementById('bar');
+            
+            const barLabels = ["Jan 1", "Jan 8", "Jan 15", "Jan 22", "Jan 28"];
+            const barData = [100, 40, 21, 98, 68];
+
+            const barColor = ["#F8D14680"];
+
+            const payroll_chart = new Chart(barChart, {
+                type: "bar",
+                data: {
+                    labels: barLabels,
+                    datasets: [{
+                        label: "Payroll",
+                        backgroundColor: barColor,
+                        borderColor: ["#F8D146"],
+                        data: barData,
+                        borderWidth: 2
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    layout: {
+                        padding: 0
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "PAYROLL PER WEEK",
+                            color: "#1E1E1E",
+                            align: 'start',
+                            padding: {
+                                top: 0,
+                                bottom: 10
+                            },
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                    
+                }
+            });
+        </script>
+
+        <div class="table2">
+            <table class="table-2">
+                <th style="color: #1E1E1E;">EMPLOYEE</th>
+                <th style="color: #1E1E1E;">PAYMENT AMOUNT</th>
+                <th style="color: #1E1E1E;">STATUS</th>
+                <th style="color: #1E1E1E;">LAST ATTENDANCE</th>
+
+                {% for employee in employees %}
+                <tr>
+                    <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                    <td>{{ employee.total_payment }}</td>
+                    <td>
+                        {% if employee.active_status == "Active" %}
+                            Active
+                        {% else %}
+                            Inactive
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if employee.latest_attendance_date %}
+                                {{ employee.latest_attendance_date }}
+                        {% else %}
+                            No Attendance Data
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No employees found.</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
 <script>
     function updateDay() {
             // Get the current day of the week in the Philippines
@@ -527,7 +462,5 @@
     // Display the date
     document.getElementById("current-date").textContent = month + " " + day + ", " + year;
 </script>
+{% endblock %}
 
-    {{ redirect_to_login_immediately }}
-    
-</html>

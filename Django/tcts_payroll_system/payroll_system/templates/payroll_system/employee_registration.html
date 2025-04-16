@@ -1,11 +1,401 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
+
+<!--title-->
+{% block title %}Registering Employee...{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<link rel="stylesheet" href="{% static 'css/employee_registration.css' %}" />
+
+<style>
+    .webcam-container {
+        margin-bottom: 20px;
+    }
+    #video {
+        width: 320px;
+        height: 240px;
+        background-color: #eee;
+        border: 1px solid #ccc;
+    }
+    #canvas {
+        display: none;
+    }
+    #capturedImage {
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        display: none;
+    }
+    </style>
+{% endblock %}
+
+<!--header-->
+{% block header %}EMPLOYEES{% endblock %} 
+
+<!--page content-->
+{% block content %}
+<div class="register_container">
+    <div class="register_title">
+    <p>Adding new employee!</p>
+    </div>
+    <div>
+        <form class="register_field" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="fields_1">
+                <div class="field">
+                    <label for="first-name">first name</label>
+                    {{ form.first_name }}
+                </div>
+                <div class="field">
+                    <label for="middle-name">middle name</label>
+                    {{ form.middle_name }}
+                </div>
+                <div class="field">
+                    <label for="last-name">last name</label>
+                    {{ form.last_name }}
+                </div>
+                <div class="field">
+                    <label for="gender">gender</label>
+                    {{ form.gender }}
+                </div>
+                <div class="field">
+                    <label for="date-of-birth">date of birth</label>
+                    {{ form.date_of_birth }}
+                </div>
+                <div class="field">
+                    <label for="contact-number">contact number</label>
+                    {{ form.contact_number }}
+                </div>
+                <div class="field">
+                    <label for="emergency-contact">emergency contact</label>
+                    {{ form.emergency_contact }}
+                </div>
+                <div class="field">
+                    <label for="id_region_name">Region</label>
+                    <input type="text" class="location-field" id="id_region_name" 
+                        name="region_name" list="region-list" autocomplete="off"
+                        value="{{ form.region_name.value|default_if_none:'' }}">
+                    <datalist id="region-list">
+                        {% for region in form.region_choices %}
+                            <option value="{{ region }}">
+                        {% endfor %}
+                    </datalist>
+                    {% if form.region_name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.region_name.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="field">
+                    <label for="id_province_name">province</label>
+                    <input type="text" class="location-field" id="id_province_name" 
+                        name="province_name" list="province-list" autocomplete="off"
+                        value="{{ form.province_name.value|default_if_none:'' }}">
+                    <datalist id="province-list">
+                        {% for province in form.province_choices %}
+                            <option value="{{ province }}">
+                        {% endfor %}
+                    </datalist>
+                    {% if form.province_name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.province_name.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="field">
+                    <label for="id_municipality_name">municipality</label>
+                    <input type="text" class="location-field" id="id_municipality_name" 
+                        name="municipality_name" list="municipality-list" autocomplete="off"
+                        value="{{ form.municipality_name.value|default_if_none:'' }}">
+                    <datalist id="municipality-list">
+                        {% for municipality in form.municipality_choices %}
+                            <option value="{{ municipality }}">
+                        {% endfor %}
+                    </datalist>
+                    {% if form.municipality_name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.municipality_name.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="field">
+                    <label for="id_barangay_name">barangay</label>
+                    <input type="text" class="location-field" id="id_barangay_name" 
+                        name="barangay_name" list="barangay-list" autocomplete="off"
+                        value="{{ form.barangay_name.value|default_if_none:'' }}">
+                    <datalist id="barangay-list">
+                        {% for barangay in form.barangay_choices %}
+                            <option value="{{ barangay }}">
+                        {% endfor %}
+                    </datalist>
+                    {% if form.barangay_name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.barangay_name.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="field">
+                    <label for="education">highest education attainment</label>
+                    {{ form.highest_education }}
+                </div>
+            </div>
+
+            <div class="fields_2">
+                <div class="field">
+                    <label for="work-experience">work experience</label>
+                    {{ form.work_experience }}
+                </div>
+                <div class="field">
+                    <label for="date-of-employment">date of employment</label>
+                    {{ form.date_of_employment }}
+                </div>
+                <div class="field">
+                    <label for="employee-status">employee status</label>
+                    {{ form.employee_status }}
+                </div>
+
+                <div class="field">  
+                    <label for="employee_image">employee image</label>
+                    <div class="employee_picture">
+                        <!-- Webcam capture elements -->
+                        <div class="webcam-container" >
+                            <video id="video" autoplay playsinline></video>
+                            <canvas id="canvas"></canvas>
+                            <img id="capturedImage" src="" alt="Captured Image"/>
+                        </div>
+                        
+                        <!-- Hide the original file input but keep it in the form for file submission -->
+                        <div style="display: none;">
+                            {{ form.employee_image }}
+                        </div>
+                    </div>
+
+                    <div class="button">
+                        <button type="button" id="captureButton">
+                            <p>TAKE A PICTURE</p>
+                            <img src="{% static 'images/camera.png' %}" alt="">
+                        </button>
+                        <input class="submit" type="submit" value="SUBMIT" />
+                    </div>
+                </div>
+
+                {% if form.errors %}
+                    <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                        <li>{{ field }}: {{ errors}}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    </ul>
+                {% endif%}
+
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<!--(optional)script-->
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const capturedImage = document.getElementById('capturedImage');
+        const captureButton = document.getElementById('captureButton');
+        const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
+
+        // Initialize webcam
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+            })
+            .catch(function(error) {
+            console.error('Could not access webcam:', error);
+            alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
+            });
+        } else {
+        alert('Your browser does not support webcam access. Please try a different browser.');
+        }
+
+        // Capture button click handler
+        captureButton.addEventListener('click', function() {
+            // Set canvas dimensions to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw the video frame to the canvas
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert canvas to image
+            const dataURL = canvas.toDataURL('image/jpeg');
+            capturedImage.src = dataURL;
+            capturedImage.style.display = 'block';
+        
+            // Convert canvas content to a File object for form submission
+            canvas.toBlob(function(blob) {
+                // Create a File object from the Blob
+                const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
+                
+                // Create a FileList-like object
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(imageFile);
+                
+                // Set the file to the file input
+                fileInput.files = dataTransfer.files;
+                
+                console.log("Image captured and file created");
+            }, 'image/jpeg', 0.95); // High quality JPEG
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the date of birth input field
+        const dobInput = document.querySelector('input[name="date_of_birth"]');
+        
+        if (dobInput) {
+            // Calculate date 18 years ago
+            const today = new Date();
+            const defaultDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+            
+            // Format as YYYY-MM-DD for the date input
+            const defaultDateStr = defaultDate.toISOString().split('T')[0];
+            
+            // Set the default date when the input is clicked but not yet filled
+            dobInput.addEventListener('focus', function() {
+                if (!this.value) {
+                    // Only set default if no value is already selected
+                    this.valueAsDate = defaultDate;
+                }
+            });
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all inputs and datalists
+        const regionInput = document.getElementById('id_region_name');
+        const provinceInput = document.getElementById('id_province_name');
+        const municipalityInput = document.getElementById('id_municipality_name');
+        const barangayInput = document.getElementById('id_barangay_name');
+        
+        const regionList = document.getElementById('region-list');
+        const provinceList = document.getElementById('province-list');
+        const municipalityList = document.getElementById('municipality-list');
+        const barangayList = document.getElementById('barangay-list');
+        
+        // Reset dependent fields
+        function resetDependentFields(startingFrom) {
+            if (startingFrom === 'region') {
+                provinceInput.value = '';
+                provinceList.innerHTML = '';
+                municipalityInput.value = '';
+                municipalityList.innerHTML = '';
+                barangayInput.value = '';
+                barangayList.innerHTML = '';
+            } else if (startingFrom === 'province') {
+                municipalityInput.value = '';
+                municipalityList.innerHTML = '';
+                barangayInput.value = '';
+                barangayList.innerHTML = '';
+            } else if (startingFrom === 'municipality') {
+                barangayInput.value = '';
+                barangayList.innerHTML = '';
+            }
+        }
+        
+        // Fetch data from API
+        function fetchData(url, params) {
+            const queryString = new URLSearchParams(params).toString();
+            return fetch(`${url}?${queryString}`)
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    return [];
+                });
+        }
+        
+        // Load regions on page load
+        fetch('/payroll_system/get-regions/')
+            .then(response => response.json())
+            .then(regions => {
+                regionList.innerHTML = regions.map(region => 
+                    `<option value="${region.trim()}"></option>` // Trim spaces
+                ).join('');
+            })
+            .catch(error => console.error('Error loading regions:', error));
+        
+        // Region change event
+        regionInput.addEventListener('change', function() {
+            const region = this.value.trim();
+            resetDependentFields('region');
+            
+            if (region) {
+                fetchData('/payroll_system/get-address-options/', {
+                    level: 'province',
+                    region: region
+                }).then(provinces => {
+                    provinceList.innerHTML = provinces.map(province => 
+                        `<option value="${province}"></option>`
+                    ).join('');
+                });
+            }
+        });
+        
+        // Province change event
+        provinceInput.addEventListener('change', function() {
+            const province = this.value.trim();
+            const region = regionInput.value.trim();
+            resetDependentFields('province');
+            
+            if (region && province) {
+                fetchData('/payroll_system/get-address-options/', {
+                    level: 'municipality',
+                    region: region,
+                    province: province
+                }).then(municipalities => {
+                    municipalityList.innerHTML = municipalities.map(municipality => 
+                        `<option value="${municipality}"></option>`
+                    ).join('');
+                });
+            }
+        });
+        
+        // Municipality change event
+        municipalityInput.addEventListener('change', function() {
+            const municipality = this.value.trim();
+            const province = provinceInput.value.trim();
+            const region = regionInput.value.trim();
+            resetDependentFields('municipality');
+            
+            if (region && province && municipality) {
+                fetchData('/payroll_system/get-address-options/', {
+                    level: 'barangay',
+                    region: region,
+                    province: province,
+                    municipality: municipality
+                }).then(barangays => {
+                    barangayList.innerHTML = barangays.map(barangay => 
+                        `<option value="${barangay}"></option>`
+                    ).join('');
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registering Employees...</title>
-    <link rel="stylesheet" href="{% static 'css/employee_registration.css' %}" />
+    
     <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link
@@ -13,7 +403,6 @@
       rel="stylesheet"
     />
     <style>
-    /* Add these styles for the webcam UI */
     .webcam-container {
         margin-bottom: 20px;
     }
@@ -228,14 +617,14 @@
                             <div class="field">  
                                 <label for="employee_image">employee image</label>
                                 <div class="employee_picture">
-                                    <!-- Webcam capture elements -->
+                                    <!-- Webcam capture elements
                                     <div class="webcam-container" >
                                         <video id="video" autoplay playsinline></video>
                                         <canvas id="canvas"></canvas>
                                         <img id="capturedImage" src="" alt="Captured Image"/>
                                     </div>
                                     
-                                    <!-- Hide the original file input but keep it in the form for file submission -->
+                                    <!-- Hide the original file input but keep it in the form for file submission   
                                     <div style="display: none;">
                                         {{ form.employee_image }}
                                     </div>
@@ -267,197 +656,9 @@
         </div>
 
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get elements
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            const capturedImage = document.getElementById('capturedImage');
-            const captureButton = document.getElementById('captureButton');
-            const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
-
-            // Initialize webcam
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
-                video.srcObject = stream;
-                video.play();
-                })
-                .catch(function(error) {
-                console.error('Could not access webcam:', error);
-                alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
-                });
-            } else {
-            alert('Your browser does not support webcam access. Please try a different browser.');
-            }
-
-            // Capture button click handler
-            captureButton.addEventListener('click', function() {
-                // Set canvas dimensions to match video
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                
-                // Draw the video frame to the canvas
-                const context = canvas.getContext('2d');
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                // Convert canvas to image
-                const dataURL = canvas.toDataURL('image/jpeg');
-                capturedImage.src = dataURL;
-                capturedImage.style.display = 'block';
-            
-                // Convert canvas content to a File object for form submission
-                canvas.toBlob(function(blob) {
-                    // Create a File object from the Blob
-                    const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
-                    
-                    // Create a FileList-like object
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(imageFile);
-                    
-                    // Set the file to the file input
-                    fileInput.files = dataTransfer.files;
-                    
-                    console.log("Image captured and file created");
-                }, 'image/jpeg', 0.95); // High quality JPEG
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get the date of birth input field
-            const dobInput = document.querySelector('input[name="date_of_birth"]');
-            
-            if (dobInput) {
-                // Calculate date 18 years ago
-                const today = new Date();
-                const defaultDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-                
-                // Format as YYYY-MM-DD for the date input
-                const defaultDateStr = defaultDate.toISOString().split('T')[0];
-                
-                // Set the default date when the input is clicked but not yet filled
-                dobInput.addEventListener('focus', function() {
-                    if (!this.value) {
-                        // Only set default if no value is already selected
-                        this.valueAsDate = defaultDate;
-                    }
-                });
-            }
-        });
     
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all inputs and datalists
-            const regionInput = document.getElementById('id_region_name');
-            const provinceInput = document.getElementById('id_province_name');
-            const municipalityInput = document.getElementById('id_municipality_name');
-            const barangayInput = document.getElementById('id_barangay_name');
-            
-            const regionList = document.getElementById('region-list');
-            const provinceList = document.getElementById('province-list');
-            const municipalityList = document.getElementById('municipality-list');
-            const barangayList = document.getElementById('barangay-list');
-            
-            // Reset dependent fields
-            function resetDependentFields(startingFrom) {
-                if (startingFrom === 'region') {
-                    provinceInput.value = '';
-                    provinceList.innerHTML = '';
-                    municipalityInput.value = '';
-                    municipalityList.innerHTML = '';
-                    barangayInput.value = '';
-                    barangayList.innerHTML = '';
-                } else if (startingFrom === 'province') {
-                    municipalityInput.value = '';
-                    municipalityList.innerHTML = '';
-                    barangayInput.value = '';
-                    barangayList.innerHTML = '';
-                } else if (startingFrom === 'municipality') {
-                    barangayInput.value = '';
-                    barangayList.innerHTML = '';
-                }
-            }
-            
-            // Fetch data from API
-            function fetchData(url, params) {
-                const queryString = new URLSearchParams(params).toString();
-                return fetch(`${url}?${queryString}`)
-                    .then(response => response.json())
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        return [];
-                    });
-            }
-            
-            // Load regions on page load
-            fetch('/payroll_system/get-regions/')
-                .then(response => response.json())
-                .then(regions => {
-                    regionList.innerHTML = regions.map(region => 
-                        `<option value="${region.trim()}"></option>` // Trim spaces
-                    ).join('');
-                })
-                .catch(error => console.error('Error loading regions:', error));
-            
-            // Region change event
-            regionInput.addEventListener('change', function() {
-                const region = this.value.trim();
-                resetDependentFields('region');
-                
-                if (region) {
-                    fetchData('/payroll_system/get-address-options/', {
-                        level: 'province',
-                        region: region
-                    }).then(provinces => {
-                        provinceList.innerHTML = provinces.map(province => 
-                            `<option value="${province}"></option>`
-                        ).join('');
-                    });
-                }
-            });
-            
-            // Province change event
-            provinceInput.addEventListener('change', function() {
-                const province = this.value.trim();
-                const region = regionInput.value.trim();
-                resetDependentFields('province');
-                
-                if (region && province) {
-                    fetchData('/payroll_system/get-address-options/', {
-                        level: 'municipality',
-                        region: region,
-                        province: province
-                    }).then(municipalities => {
-                        municipalityList.innerHTML = municipalities.map(municipality => 
-                            `<option value="${municipality}"></option>`
-                        ).join('');
-                    });
-                }
-            });
-            
-            // Municipality change event
-            municipalityInput.addEventListener('change', function() {
-                const municipality = this.value.trim();
-                const province = provinceInput.value.trim();
-                const region = regionInput.value.trim();
-                resetDependentFields('municipality');
-                
-                if (region && province && municipality) {
-                    fetchData('/payroll_system/get-address-options/', {
-                        level: 'barangay',
-                        region: region,
-                        province: province,
-                        municipality: municipality
-                    }).then(barangays => {
-                        barangayList.innerHTML = barangays.map(barangay => 
-                            `<option value="${barangay}"></option>`
-                        ).join('');
-                    });
-                }
-            });
-        });
-    </script>
 </body>
 
 {{ redirect_to_login_immediately }}
 
-</html>
+</html> -->

@@ -1,15 +1,12 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payroll</title>
-    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/payroll.css' %}">
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<!--title-->
+{% block title %}Payroll{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+    <link rel="stylesheet" href="{% static 'css/payroll.css' %}">
 
     <!--Datatables-->
     <link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
@@ -22,6 +19,275 @@
         }
         .dt-search {
             display: none;
+        }
+
+        #title,
+        #percentage{
+            background: -webkit-linear-gradient(#F8D146, #F5B93F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        #processed{
+            background: -webkit-linear-gradient(#F8D146, #F5B93F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #pending{
+            color: #DC4646;
+        }
+
+        #paydate{
+            background: -webkit-linear-gradient(#F8D146, #F5B93F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #payroll-data:nth-child(odd){
+            background-color: #f2f2f2;
+        }
+
+        #payroll-data td{
+            border-bottom: 2px solid rgba(30, 30, 30, 0.20);
+        }
+
+        #payroll-data:last-child td{
+            border-bottom:none;
+        }
+    </style>
+{% endblock %}
+
+<!--header-->
+{% block header %}PAYROLL{% endblock %} 
+
+<!--page content-->
+{% block content %}
+<div class="w-full grid grid-cols-4 grid-rows-[75px_75px_75px_75px] md:grid-cols-6 md:grid-rows-[70px_70px] gap-4">
+    <div class="bg-[#1E1E1E] px-4 order-1 col-span-4 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
+
+        <div class="h-full w-[30%] py-5 flex flex-col justify-between">
+            <p class="text-lg font-bold font-[League Spartan] text-left" id="title">TOTAL PAYROLL</p>
+            <div class="flex flex-col justify-end items-end text-right">
+                <p class="text-[#FFF] text-3xl font-[Inter] font-semibold">{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</p>
+                <p id="percentage" class="text-lg font-[Inter] font-semibold {% if payroll_percentage > 0 %}positive{% elif payroll_percentage < 0 %}negative{% endif %}">
+                    {% if payroll_percentage > 0 %}+{% endif %}{{ payroll_percentage|floatformat:1 }}%
+                </p>
+            </div>
+        </div>
+
+        <span class="w-[3px] h-[80%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
+
+        <div class="h-full w-[30%] py-5 flex flex-col justify-between">
+            <p class="text-lg font-bold font-[League Spartan] text-left" id="title">AVR RATE OF EMPLOYEES</p>
+            <div class="flex flex-col justify-end items-end text-right">
+                <p class="text-[#FFF] text-3xl font-[Inter] font-semibold">{% if avg_rate == "No rate data" %} No rate data {% else %} ₱{{ avg_rate|floatformat:2 }} {% endif %}</p>
+                <p id="percentage" class="text-lg font-[Inter] font-semibold {% if rate_percentage > 0 %}positive{% elif rate_percentage < 0 %}negative{% endif %}">
+                    {% if rate_percentage > 0 %}+{% endif %}{{ rate_percentage|floatformat:1 }}%
+                </p>
+            </div>
+        </div>
+
+        <span class="w-[3px] h-[80%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
+        
+        <div class="h-full py-5 flex flex-col justify-between">
+            <p class="text-white text-lg font-bold font-[League Spartan] text-left">TOTAL PAYROLL</p>
+            <div class="flex flex-row justify-evenly">
+                <div id="processed">
+                    <h1 class="text-lg font-bold">PROCESSED</h1>
+                    <p class="text-5xl font-[Inter] font-medium">{{ processed_payroll_count }}</p>  
+                </div>
+
+                <span class="w-[3px] h-[100%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
+                
+                <div id="pending">
+                    <h1 class="text-lg font-bold">PENDING</h1>
+                    <p class="text-5xl font-[Inter] font-medium">{{ pending_payroll_count }}</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="order-2 col-span-2 rows-span-1">
+        <div class="size-full flex rounded-full overflow-hidden">
+            <div class="h-full w-[35%] flex justify-center items-center bg-[#F8D146]">
+                <p class="font-semibold">PAYDAY:</p>
+                
+            </div>
+            <div class="h-full w-[65%] bg-white flex justify-center items-center gap-3">
+                <!-- <input type="date" placeholder=""> -->
+                <p class="text-lg font-semibold" id="paydate">XX/XX/XXXX, SAT</p>
+                <button class="bg-[{% static 'images/calendar_icon.png' %}] hover:bg-[{% static 'images/calendar_icon_hover.png' %}]">
+                    
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-3 col-span-2 rows-span-1">
+        <div class="size-full flex rounded-full overflow-hidden">
+            <button class="size-full flex justify-center items-center bg-[#F8D146] gap-4 cursor-pointer" id="edit_incentives" onclick="editIncentives()">
+                <p class="text-[#FFF] font-semibold text-lg">EDIT ALL EMPLOYEE'S INCENTIVES</p>
+                <img src="{% static 'images/edit_icon.png' %}" alt="">
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="size-full flex flex-col py-10">    
+    <div class="w-full h-[40px] flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden" id="search">
+        <form class="w-full flex justify-center items-center gap-3" method="get" action="{% url 'payroll_system:payrolls' %}">
+            <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
+                <img class="h-[25px] w-[25px]" src="{% static 'images/search_icon.png' %}" alt="Search">
+            </button>
+            <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
+        </form>
+    </div>             
+
+    <div class="flex flex-col justify-center">
+        <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="payroll-table">
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr class="text-base text-center font-[League Spartan]">
+                    <th class="py-2">EMPLOYEE</th>
+                    <th>RATE PER DAY</th>
+                    <!-- <th>DEDUCTIONS</th> -->
+                    <th>PAYMENT AMOUNT</th>
+                    <th>STATUS</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in employee_data %}
+                {% with employee=data.employee latest_payroll=data.latest_payroll %}
+                    {% if latest_payroll %}
+                    <tr id="payroll-data">
+                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td>{{ latest_payroll.rate }}</td>
+                        <!-- <td>{{ latest_payroll.deductions }}</td> -->
+                        <td>{{ latest_payroll.salary }}</td>
+                        <td>{{ latest_payroll.payroll_status }}</td>
+                        <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                    </tr>
+                    {% else %}
+                    <tr id="payroll-data">
+                        <td colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                    </tr>
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="background" id="background">
+    <div class="edit_incentives_popup" id="editIncentivesPopup">
+        <h1>Edit for <span>{{ employee.first_name }} {{ employee.last_name }}</span>.</h1>
+        <form method="post">
+            <div class="incentives_field">
+                <label for="incentives">Incentives</label>
+                <input type="text" name="incentives" id="incentives" placeholder="ex. 1000.00">
+            </div>
+
+            <div class="buttons">
+                <input type="button" value="Cancel" onclick="cancelEditIncentives()">
+                <input type="submit" value="Save">
+            </div>
+        </form>
+    </div>
+</div>  
+{% endblock %}
+
+<!--(optional)script-->
+{% block script %}
+<script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'css/dataTables.js' %}"></script>
+
+    <script>
+        let table;
+    
+        $(document).ready(function () {
+            table = $('#payroll-table').DataTable({
+                responsive: true
+            });
+    
+            // Make search input work with DataTables
+            $('#search-input').on('keyup', function () {
+                table.search(this.value).draw();
+            });
+        });
+    </script>    
+
+    <script>
+        function editIncentives(){
+            const bg = document.getElementById("background");
+            bg.classList.add("show");
+        }
+        
+        function cancelEditIncentives(){
+            const bg = document.getElementById("background");
+            bg.classList.remove("show");
+        }
+    </script>
+{% endblock %}
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll</title>
+    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
+    <link rel="stylesheet" href="{% static 'css/payroll.css' %}">
+
+    <!--Datatables
+    <link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
+    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+    
+    <style>
+        .dt-length{
+            display: none;
+        }
+        .dt-search {
+            display: none;
+        }
+
+        #title,
+        #percentage{
+            background: -webkit-linear-gradient(#F8D146, #F5B93F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        #processed{
+            background: -webkit-linear-gradient(#F8D146, #F5B93F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #pending{
+            color: #DC4646;
+        }
+
+        #paydate{
+            background: -webkit-linear-gradient(#F8D146, #F5B93F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #payroll-data:nth-child(odd){
+            background-color: #f2f2f2;
+        }
+
+        #payroll-data td{
+            border-bottom: 2px solid rgba(30, 30, 30, 0.20);
+        }
+
+        #payroll-data:last-child td{
+            border-bottom:none;
         }
     </style>
 </head>
@@ -95,106 +361,8 @@
             <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold">PAYROLL</h1>
         </div>
 
-        <div class="size-full py-4 px-3" id="thing">
-            <div class="container">
-                <div class="top">
-                    <div class="content_1">
-                        <div class="statistics">
-                            <div class="total_payroll">
-                                <div class="title"><h1>TOTAL PAYROLL</h1></div>
-                                <div class="content">
-                                    <p class="amount">{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</p>
-                                    <p class="percentage {% if payroll_percentage > 0 %}positive{% elif payroll_percentage < 0 %}negative{% endif %}">
-                                        {% if payroll_percentage > 0 %}+{% endif %}{{ payroll_percentage|floatformat:1 }}%
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="avg_rate">
-                                <div class="title">
-                                    <h1>AVG RATE OF EMPLOYEES</h1>
-                                </div>
-                                <div class="content">
-                                    <p class="amount">{% if avg_rate == "No rate data" %} No rate data {% else %} ₱{{ avg_rate|floatformat:2 }} {% endif %}</p>
-                                    <p class="percentage {% if rate_percentage > 0 %}positive{% elif rate_percentage < 0 %}negative{% endif %}">
-                                        {% if rate_percentage > 0 %}+{% endif %}{{ rate_percentage|floatformat:1 }}%
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="payroll_status">
-                                <div class="title">
-                                    <h1>PAYROLL STATUS</h1>
-                                </div>
-                                <div class="content">
-                                    <div class="processed">
-                                        <h1>PROCESSED</h1>
-                                        <p>{{ processed_payroll_count }}</p>  
-                                    </div>
-                                    <div class="pending">
-                                        <h1>PENDING</h1>
-                                        <p>{{ pending_payroll_count }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="content_2">
-                        <div class="payday">
-                            <div class="payday_title">
-                                <p>PAYDAY DATE</p>
-                            </div>
-                            <div class="payday_date">
-                                <p>XX/XX/XXXX, SAT</p>
-                                <button onclick=""></button>
-                            </div>
-                        </div>
-                        <div class="incentives">
-                            <button class="edit_incentives" onclick="editIncentives()">
-                                <p>EDIT ALL EMPLOYEES' INCENTIVES</p>
-                                <img src="{% static 'images/edit_icon.png' %}" alt="">
-                            </button>
-                        </div>
-                    </div>
-                </div>
-    
-                <div class="search">
-                    <div class="search-box">
-                        <button type="button"><img src="{% static 'images/search_icon.png' %}" alt="Search"></button>
-                        <input type="text" id="search-input" placeholder="Search">
-                    </div>
-                </div>                
-
-                <table class="" id="payroll-table">
-                    <thead>
-                        <th>EMPLOYEE</th>
-                        <th>RATE PER DAY</th>
-                        <!-- <th>DEDUCTIONS</th> -->
-                        <th>PAYMENT AMOUNT</th>
-                        <th>STATUS</th>
-                        <th></th>
-                    </thead>
-                    <tbody>
-                        {% for data in employee_data %}
-                        {% with employee=data.employee latest_payroll=data.latest_payroll %}
-                            {% if latest_payroll %}
-                            <tr>
-                                <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                                <td>{{ latest_payroll.rate }}</td>
-                                <!-- <td>{{ latest_payroll.deductions }}</td> -->
-                                <td>{{ latest_payroll.salary }}</td>
-                                <td>{{ latest_payroll.payroll_status }}</td>
-                                <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                                <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
-                            </tr>
-                            {% endif %}
-                        {% endwith %}
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="size-full p-4" id="thing">
+            
         </div>
     </div>
     
@@ -231,4 +399,4 @@
 
 {{ redirect_to_login_immediately }}
 
-</html>
+</html> -->

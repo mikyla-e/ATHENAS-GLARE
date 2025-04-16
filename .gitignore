@@ -16,3 +16,4 @@ Django/tcts_payroll_system/db.sqlite3
 *.pyc
 *.sqlite3
 Django/tcts_payroll_system/django-ph-geography/
+Django/tcts_payroll_system/db.sqlite3

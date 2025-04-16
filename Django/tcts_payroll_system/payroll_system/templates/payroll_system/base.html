@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Toto's Payroll System{% endblock %}</title>
+
+
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    {% block headcontent %}
+    {% endblock %}
+
+</head>
+<body class="bg-[#EFEDE6]">
+    {% include 'navbar.html' %}
+
+    <div class="h-dvh w-full grid grid-cols-[80px_1fr] md:grid-cols-[190px_1fr] grid-rows-[70px_1fr] z-25">
+        <div class="bg-[#FFFFFF] row-span-2">
+
+        </div>
+        
+        <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
+            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold">{% block header%}HEADER{% endblock %}</h1>
+        </div>
+
+        <div class="size-full p-4" id="thing">
+            {% block content %}
+            {% endblock %}
+        </div>
+    
+    </div>
+</body>
+
+{% block script %}
+{% endblock %}
+
+{{ redirect_to_login_immediately }}
+
+</html>

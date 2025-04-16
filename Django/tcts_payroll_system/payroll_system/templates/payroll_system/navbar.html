@@ -1,0 +1,130 @@
+{% load static %}
+<style>
+
+    #menu-item .focused a:hover{
+        color: #FFF;
+    }
+
+    #menu-item li a:hover{
+        color: #f8d146;
+    }
+
+    .focused{
+        color: #FFFFFF !important;
+        background: linear-gradient(89.98deg, rgba(248, 209, 70, 0), rgba(248, 209, 70, 0.6) 23%, #f8d146 66%, #f5b93f);
+    }
+</style>
+
+<nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
+    <div class="bg-[#FFFFFF] cols-span-1 row-span-1">
+        <div class="h-[70px] flex flex-wrap justify-center place-items-center md:gap-2" id="logo">
+            <div class="-mb-2 md:mb-0" id="logo-picture">
+                <img class="h-8 md:h-10" src="{% static 'images/logo_icon.png' %}" alt="">
+            </div>
+            <div class="text-[#1E1E1E] text-xs/3 md:text-lg/5 font-[League Spartan] font-extrabold" id="logo-name">
+                <p class="text-center md:text-left">PAYROLL</p>
+                <p class="text-center md:text-left">SYSTEM</p>
+            </div>
+        </div>
+    </div>
+    <div class="overflow-hidden" id="menu">
+        <ul class="h-auto w-[80px] md:w-[190px]">
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if request.path == '/payroll_system/dashboard/' %}focused{% endif %}">
+                <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:dashboard' %}">
+                    <img class="w-auto h-auto"
+                    src="{% if 'dashboard' in request.path %}
+                            {% static 'images/dashboard_icon_focused.png' %}
+                        {% else %}
+                            {% static 'images/dashboard_icon.png' %}
+                        {% endif %}"
+                    alt="">
+                    <div class="hidden md:block text-base font-[League Spartan] font-semibold">DASHBOARD</div>
+                </a>
+            </li>
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'payrolls' in request.path %}focused{% endif %}">
+                <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
+                    <img class="w-auto h-auto" 
+                    src="{% if 'payrolls' in request.path %}
+                            {% static 'images/payroll_icon_focused.png' %}
+                        {% else %}
+                            {% static 'images/payroll_icon.png' %}
+                        {% endif %}"
+                    alt="">
+                    <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
+                </a>
+            </li>
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'employees' in request.path %}focused{% endif %}">
+                <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
+                    <img class="w-auto h-auto"
+                    src="{% if 'employees' in request.path %}
+                            {% static 'images/employee_icon_focused.png' %}
+                        {% else %}
+                            {% static 'images/employee_icon.png' %}
+                        {% endif %}"
+                    alt="">
+                    <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
+                </a>
+            </li>
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'services' in request.path %}focused{% endif %}">
+                <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
+                    <img class="w-auto h-auto"
+                    src="{% if 'services' in request.path %}
+                            {% static 'images/services_icon_focused.png' %}
+                        {% else %}
+                            {% static 'images/services_icon.png' %}
+                        {% endif %}"
+                    alt="">
+                    <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
+                </a>
+            </li>
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'status' in request.path %}focused{% endif %}">
+                <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:status' %}">
+                    <img class="w-auto h-auto"
+                    src="{% if 'status' in request.path %}
+                            {% static 'images/status_icon_focused.png' %}
+                        {% else %}
+                            {% static 'images/status_icon.png' %}
+                        {% endif %}"
+                    alt="">
+                    <div class="hidden md:block text-base font-[League Spartan] font-semibold">STATUS</div>
+                </a>
+            </li>
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'customers' in request.path %}focused{% endif %}">
+                <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:customers' %}">
+                    <img class="w-auto h-auto"
+                    src="{% if 'customers' in request.path %}
+                            {% static 'images/customers_icon_focused.png' %}
+                        {% else %}
+                            {% static 'images/customers_icon.png' %}
+                        {% endif %}"
+                    alt="">
+                    <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
+                </a>
+            </li>
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'settings' in request.path %}focused{% elif 'about' in request.path %}focused{% endif %}">
+                <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:settings' %}">
+                    <img class="w-auto h-auto"
+                    src="{% if 'settings' in request.path %}
+                            {% static 'images/settings_icon_focused.png' %}
+                        {% elif 'about' in request.path %}
+                            {% static 'images/settings_icon_focused.png' %}
+                        {% else %}
+                            {% static 'images/settings_icon.png' %}
+                        {% endif %}"
+                    alt="">
+                    <div class="hidden md:block text-base font-[League Spartan] font-semibold">SETTINGS</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    var $navbar = $('#menu ul #menu_item a');
+    var $menu_item = $('#menu ul #menu_item');
+    $navbar.on('click', function() {
+        $menu_item.removeClass('active');
+        $(this).addClass('active'); 
+    });
+</script>

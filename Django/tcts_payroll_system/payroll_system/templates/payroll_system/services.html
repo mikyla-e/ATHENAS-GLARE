@@ -1,4 +1,66 @@
+{% extends 'base.html' %}
 {% load static %}
+
+<!--title-->
+{% block title %}Services{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<link rel="stylesheet" href="{% static 'css/services.css' %}">
+{% endblock %}
+
+<!--header-->
+{% block header %}SERVICES{% endblock %} 
+
+<!--page content-->
+{% block content %}
+<div class="button">
+    <button class="add-services"><a href="{% url 'payroll_system:services_add' %}">ADD SERVICES +</a></button>
+</div>
+
+<div class="services">
+    <div class="service">
+        <a href="{% url 'payroll_system:services_client' %}">
+            <div class="picture">
+                <img src="{% static 'images/bg_norsrs.png' %}" alt="">
+            </div>
+            <div class="title">
+                <p>Title</p>
+                <img src="../pictures/icons/next_icon.png" alt="">
+            </div>
+        </a>
+    </div>
+    <div class="service">
+        <a href="{% url 'payroll_system:services_client' %}">
+            <div class="picture">
+                <img src="../pictures/bg_nosrs.png" alt="">
+            </div>
+            <div class="title">
+                <p>Title</p>
+                <img src="../pictures/icons/next_icon.png" alt="">
+            </div>
+        </a>
+    </div>
+    <div class="service">
+        <a href="{% url 'payroll_system:services_client' %}">
+            <div class="picture">
+                <img src="../pictures/bg_nosrs.png" alt="">
+            </div>
+            <div class="title">
+                <p>Title</p>
+                <img src="../pictures/icons/next_icon.png" alt="">
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+<!--(optional)script-->
+{% block script %}
+
+{% endblock %}
+<!-- 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -127,4 +189,4 @@
 
 {{ redirect_to_login_immediately }}
 
-</html>
+</html> -->

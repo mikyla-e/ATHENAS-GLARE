@@ -1,5 +1,99 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
+
+<!--title-->
+{% block title %}Add Service{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<style>
+    #buttons #cancel #cancel-button{
+        background-color: #1e1e1e;
+    }
+
+    #buttons #cancel #cancel-button:hover{
+        opacity: .8;
+    }
+
+    #buttons #add #add-button{
+        background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
+    }
+
+    #buttons #add #add-button:hover{
+        opacity: .8;
+    }
+</style>
+{% endblock %}
+
+<!--header-->
+{% block header %}SERVICES{% endblock %} 
+
+<!--page content-->
+{% block content %}
+<div class="size-full py-4 px-3" id="thing">
+    <form action="{% url 'payroll_system:services_client' %}" method="post">
+        {% csrf_token %}
+        <div class="flex flex-wrap lg:flex-nowrap gap-5 lg:gap-11" id="form">
+
+            <div class="w-full h-75 sm:h-100 lg:w-[70%] bg-[#FFFFFF] rounded-xl overflow-hidden shadow-md" id="services">
+                <div class="relative h-[70%] flex justify-center items-center bg-[#1E1E1E30]" id="photo">
+
+                    <div class="absolute flex justify-center items-center z-10">
+                        <input class="hidden" type="file" accept="image/*" onchange="loadImage(event)" name="services-photo" id="services-photo">
+                        <input class="px-4 py-2 rounded cursor-pointer text-[#FFFFFF] text-center text-xl font-bold" type="button" value="Choose File" onclick="document.getElementById('services-photo').click()">
+
+                        <!-- <input class="text-[#FFFFFF] text-center text-xl font-bold" type="file" accept="image/*" onchange="loadImage(event)" name="services-photo" id="services-photo"> -->
+                    </div>
+                    
+                    <div class="relative size-full">
+                        <div class="absolute size-full bg-[#1E1E1E30] z-5"></div>
+                        <img class="hidden size-full object-cover" src="" alt=""  id="imagePreview">
+                    </div>
+
+                </div>
+                <div class="h-[30%] py-5 px-10 flex flex-col gap-1" id="title">
+                    <p class="text-[#1E1E1E4D] text-sm font-[League Spartan] font-bold">TITLE</p>
+                    <input class="w-full outline-none text-lg" type="text" name="services-title" id="services-title" placeholder="Enter Title" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="w-full lg:w-[30%] h-100 flex lg:flex-col justify-end items-start gap-5 lg:justify-center lg:items-center lg:gap-10" id="buttons">
+                <div class="w-[50%] sm:w-[30%] lg:w-[90%]" id="cancel">
+                    <a href="{% url 'payroll_system:services' %}">
+                    <input class="h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#F8D146]" type="button" value="CANCEL" id="cancel-button">
+                    <a/>
+                </div>
+                <div class="w-[50%] sm:w-[40%] lg:w-[90%]" id="add">
+                    <input class="hidden sm:block h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#1e1e1e]" type="submit" value="ADD SERVICES" id="add-button">
+                    <input class="block sm:hidden h-12 w-full rounded-full text-xs font-[Inter] font-semibold text-[#1e1e1e]" type="submit" value="ADD" id="add-button">
+                </div>
+            </div>
+
+        </div>
+    </form>
+{% endblock %}
+
+<!--(optional)script-->
+{% block script %}
+<script>
+    var loadImage = function(event) {
+        const image = document.getElementById('imagePreview');
+        const file = event.target.files[0];
+
+        if (file) {
+        image.src = URL.createObjectURL(file);
+        image.classList.remove('hidden');
+
+        image.onload = () => {
+            URL.revokeObjectURL(image.src); // free memory
+        };
+        }
+    };
+</script>
+{% endblock %}
+
+
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -98,68 +192,11 @@
             <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">SERVICES</h1>
         </div>
 
-        <div class="size-full py-4 px-3" id="thing">
-            <form action="{% url 'payroll_system:services_client' %}" method="post">
-                {% csrf_token %}
-                <div class="flex flex-wrap lg:flex-nowrap gap-5 lg:gap-11" id="form">
-
-                    <div class="w-full h-75 sm:h-100 lg:w-[70%] bg-[#FFFFFF] rounded-xl overflow-hidden shadow-md" id="services">
-                        <div class="relative h-[70%] flex justify-center items-center bg-[#1E1E1E30]" id="photo">
-
-                            <div class="absolute flex justify-center items-center z-10">
-                                <input class="hidden" type="file" accept="image/*" onchange="loadImage(event)" name="services-photo" id="services-photo">
-                                <input class="px-4 py-2 rounded cursor-pointer text-[#FFFFFF] text-center text-xl font-bold" type="button" value="Choose File" onclick="document.getElementById('services-photo').click()">
-
-                                <!-- <input class="text-[#FFFFFF] text-center text-xl font-bold" type="file" accept="image/*" onchange="loadImage(event)" name="services-photo" id="services-photo"> -->
-                            </div>
-                            
-                            <div class="relative size-full">
-                                <div class="absolute size-full bg-[#1E1E1E30] z-5"></div>
-                                <img class="hidden size-full object-cover" src="" alt=""  id="imagePreview">
-                            </div>
-                            
-
-                            <script>
-                                var loadImage = function(event) {
-                                    const image = document.getElementById('imagePreview');
-                                    const file = event.target.files[0];
-
-                                    if (file) {
-                                    image.src = URL.createObjectURL(file);
-                                    image.classList.remove('hidden');
-
-                                    image.onload = () => {
-                                        URL.revokeObjectURL(image.src); // free memory
-                                    };
-                                    }
-                                };
-                            </script>
-
-                        </div>
-                        <div class="h-[30%] py-5 px-10 flex flex-col gap-1" id="title">
-                            <p class="text-[#1E1E1E4D] text-sm font-[League Spartan] font-bold">TITLE</p>
-                            <input class="w-full outline-none text-lg" type="text" name="services-title" id="services-title" placeholder="Enter Title" autocomplete="off">
-                        </div>
-                    </div>
-
-                    <div class="w-full lg:w-[30%] h-100 flex lg:flex-col justify-end items-start gap-5 lg:justify-center lg:items-center lg:gap-10" id="buttons">
-                        <div class="w-[50%] sm:w-[30%] lg:w-[90%]" id="cancel">
-                            <a href="{% url 'payroll_system:services' %}">
-                            <input class="h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#F8D146]" type="button" value="CANCEL" id="cancel-button">
-                            <a/>
-                        </div>
-                        <div class="w-[50%] sm:w-[40%] lg:w-[90%]" id="add">
-                            <input class="hidden sm:block h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#1e1e1e]" type="submit" value="ADD SERVICES" id="add-button">
-                            <input class="block sm:hidden h-12 w-full rounded-full text-xs font-[Inter] font-semibold text-[#1e1e1e]" type="submit" value="ADD" id="add-button">
-                        </div>
-                    </div>
-
-                </div>
-            </form>
+        
         </div>  
     </div>
 </body>
 
 {{ redirect_to_login_immediately }}
 
-</html>
+</html> -->

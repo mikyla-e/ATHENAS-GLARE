@@ -1,4 +1,67 @@
+{% extends 'base.html' %}
 {% load static %}
+
+<!--title-->
+{% block title %}Assigning Employee{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<link rel="stylesheet" href="{% static 'css/services_vehicle.css' %}">
+{% endblock %}
+
+<!--header-->
+{% block header %}SERVICES{% endblock %} 
+
+<!--page content-->
+{% block content %}
+<form action="{% url 'payroll_system:services' %}" method="post">
+    {% csrf_token %}
+    <div class="form">
+        <div class="vehicle_form">
+            <div class="field_1">
+                <div class="field">
+                    <label for="vehicle-brand">vehicle brand</label>
+                    {% comment %} <!--{{ form.vehicle-brand }}--> {% endcomment %}
+                </div>
+                <div class="field">
+                    <label for="vehicle-model">vehicle model</label>
+                    {% comment %} <!--{{ form.vehicle-model }}--> {% endcomment %}
+                </div>
+            </div>
+            <div class="field_2">
+                <div class="field">
+                    <label for="vehicle-color">vehicle color</label>
+                    {% comment %} <!--{{ form.vehicle-color }}--> {% endcomment %}
+                </div>
+                <div class="field">
+                    <label for="plate-number">plate number</label>
+                    {% comment %} <!--{{ form.plate-number }}--> {% endcomment %}
+                </div>
+            </div>
+        </div>
+        <span></span>
+        <div class="employee_form">
+            <label for="assigned-employee">assigned employee</label>
+            <input type="text" name="" id="">
+        </div>
+    </div>
+    <div class="submit">
+        <a href="{% url 'payroll_system:services_client' %}">
+            <input type="button" value="Back">
+        </a>
+        <a href="{% url 'payroll_system:services' %}">
+            <input type="submit" value="Assign Task">
+        </a>
+    </div>
+</form>
+{% endblock %}
+
+<!--(optional)script-->
+{% block script %}
+
+{% endblock %}
+
+<!-- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,21 +152,21 @@
                         <div class="field_1">
                             <div class="field">
                                 <label for="vehicle-brand">vehicle brand</label>
-                                {% comment %} <!--{{ form.vehicle-brand }}--> {% endcomment %}
+                                {% comment %} <!--{{ form.vehicle-brand }} {% endcomment %}
                             </div>
                             <div class="field">
                                 <label for="vehicle-model">vehicle model</label>
-                                {% comment %} <!--{{ form.vehicle-model }}--> {% endcomment %}
+                                {% comment %} <!--{{ form.vehicle-model }} {% endcomment %}
                             </div>
                         </div>
                         <div class="field_2">
                             <div class="field">
                                 <label for="vehicle-color">vehicle color</label>
-                                {% comment %} <!--{{ form.vehicle-color }}--> {% endcomment %}
+                                {% comment %} <!--{{ form.vehicle-color }} {% endcomment %}
                             </div>
                             <div class="field">
                                 <label for="plate-number">plate number</label>
-                                {% comment %} <!--{{ form.plate-number }}--> {% endcomment %}
+                                {% comment %} <!--{{ form.plate-number }} {% endcomment %}
                             </div>
                         </div>
                     </div>
@@ -128,4 +191,4 @@
 
 {{ redirect_to_login_immediately }}
 
-</html>
+</html> -->
