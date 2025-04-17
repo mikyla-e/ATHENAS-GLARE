@@ -1,7 +1,34 @@
 {% extends 'base.html' %}
 {% load static %}
 
+<!--title-->
 {% block title %}Dashboard{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<style>
+    #gmt{
+    
+    }
+
+    #philippine-time{
+        font-size: clamp(3rem, 4rem, 4.5rem);
+    }
+
+    #date{
+        background: -webkit-linear-gradient(#F8D146, #F5B93F);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    @media screen {
+        
+    }
+</style>
+{% endblock %}
+
 
 {% block header %}DASHBOARD{% endblock %}
 
@@ -37,8 +64,19 @@
             </div>
         </div>
 
-        <div class="order-2 lg:order-3 border border-black col-span-5 lg:col-span-4" id="time">
+        <div class="order-2 lg:order-3 col-span-5 lg:col-span-4 flex flex-col flex-nowrap justify-end items-end" id="time">
+            <div id="weather" class="flex flex-nowrap items-center gap-3">
+                <img src="{% static 'images/weather_icon.png' %}" alt="">
+                <p class="text-[Roboto] font-bold text-4xl">WEATHER</p>
+            </div>
 
+            <div id="time" class="text-[League Spartan] font-bold text-right">
+                <h1 id="philippines-time" class="text-base" style="font-size: clamp(3.5rem, 6vw, 7rem); line-height: 100%;"></h1>
+            </div>
+
+            <div id="date" class="flex flex-nowrap justify-start items-center gap-3">
+                <p class="text-[Roboto] text-2xl md:text-[28px] xl:text-4xl text-right"><span id="philippines-day" class="font-extrabold text"></span> | <span id="philippines-date" class="font-extrabold"></span></p>
+            </div>
         </div>
 
         <div class="order-3 lg:order-2 border border-black col-span-5 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center overflow-hidden" id="payroll-status">
@@ -60,10 +98,14 @@
                 </div>
             </div>
             <div class="w-[55%] h-full p-3 rounded-xl " id="payroll-info">
-                <div class="flex flex-col justify-evenly items-end" id="content2">
+                <div class="h-full flex flex-col justify-between items-end" id="content2">
                     <div class="h-fit my-2 mx-4 flex flex-col items-end" id="total_payroll">
                         <p class="font-[Roboto] font-semibold text-right text-white">TOTAL PAYROLL</p>
-                        <h1 class="font-[Inter] font-semibold text-3xl text-right">{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</h1>
+                        {% if total_payroll == "No total payroll yet" %}
+                            <h1 class="font-[Inter] font-semibold text-4xl text-right">N/A</h1>    
+                        {% else %}
+                            <h1 class="font-[Inter] font-semibold text-4xl text-right">₱{{ total_payroll|floatformat:2 }}</h1>
+                        {% endif %}
                     </div>
                     <div class="h-fit my-2 mx-4 flex flex-col items-end" id="next_payday">
                         <h1 class="font-[Inter] font-semibold text-2xl text-right">{{ next_payday|default:"N/A" }}</h1>
@@ -87,7 +129,7 @@
         </div>
     </div> 
 
-    <div class="container">
+    <!-- <div class="container">
         <div class="order-1 lg:order-1 border border-black col-span-5 lg:col-span-4 p-3 bg-[#1E1E1E] rounded-xl flex justify-evenly items-center" id="emp">
             
             <div class="h-full flex flex-col justify-center items-center" id="ttl_emp">
@@ -103,7 +145,7 @@
                 </div>
             </div>
             
-            <span class="h-[95%] w-[3px] bg-[#f8d14625] rounded-xl mx-4 my-[20px]"></span> <!--horizontal line-->
+            <span class="h-[95%] w-[3px] bg-[#f8d14625] rounded-xl mx-4 my-[20px]"></span> <!--horizontal line
             
             <div class="h-full flex flex-col justify-center items-center" id="act_emp">
                 <div class="h-full flex flex-col justify-around items-end" id="content">
@@ -129,7 +171,7 @@
                         <h2 class="text-sm/5 lg:text-base/5 font-bold">PROCESSED</h2>
                         <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ processed_payroll_count }}</p>  
                     </div>
-                    <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line-->
+                    <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line
                     <div class="my-[10px]" id="pending">
                         <h2 class="text-sm/5 lg:text-base/5 font-bold">PENDING</h2>
                         <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ pending_payroll_count }}</p>
@@ -149,7 +191,7 @@
                 </div>
             </div>
         </div>
-            
+             -->
         <!-- <div class="payroll_stats">
             <div class="content1">
                 <h1 class="payroll_status">PAYROLL STATUS</h1>
@@ -175,7 +217,7 @@
                 </div>
             </div>
         </div> -->
-
+<!-- 
         <div class="order-3 lg:order-2 border border-black col-span-5 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center overflow-hidden" id="payroll-status">
             <div class="w-[45%] h-full p-3 flex flex-col justify-between" id="processed-pending">
                 <div class="text-[#FFFFFF] text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
@@ -187,7 +229,7 @@
                         <h2 class="text-sm/5 lg:text-base/5 font-bold">PROCESSED</h2>
                         <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ processed_payroll_count }}</p>  
                     </div>
-                    <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line-->
+                    <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line
                     <div class="my-[10px]" id="pending">
                         <h2 class="text-sm/5 lg:text-base/5 font-bold">PENDING</h2>
                         <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ pending_payroll_count }}</p>
@@ -393,14 +435,14 @@
                 </tr>
             </table>
         </div>
-    </div>
+    </div> -->
 {% endblock %}
 
 {% block script %}
 <script>
     function updateDay() {
             // Get the current day of the week in the Philippines
-            const options = { timeZone: 'Asia/Manila', weekday: 'long' };
+            const options = { timeZone: 'Asia/Manila', weekday: 'short' };
             const phDay = new Date().toLocaleDateString('en-US', options);
 
             // Display the day
@@ -410,7 +452,7 @@
         // Call the function immediately
         updateDay();
 
-    function updateTime() {
+        function updateTime() {
             // Get current time in the Philippines (Asia/Manila)
             const options = { 
                 timeZone: 'Asia/Manila', 
@@ -419,11 +461,14 @@
                 hour12: true // Use 12-hour format (AM/PM)
             };
 
-            const phTime = new Date().toLocaleTimeString('en-US', options);
+            let phTime = new Date().toLocaleTimeString('en-US', options);
+
+            // Remove the space between time and AM/PM (e.g. "11:45 AM" -> "11:45AM")
+            phTime = phTime.replace(' ', '');
 
             // Display the time
             document.getElementById("philippines-time").textContent = phTime;
-            }
+        }
 
             // Update time every second
             setInterval(updateTime, 1000);
