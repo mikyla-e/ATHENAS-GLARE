@@ -132,10 +132,18 @@ class PayrollForm(ModelForm):
         return payment_date    
     
 class AdminEditProfileForm(UserChangeForm):
-    username = forms.CharField(max_length=100, widget=forms.TextInput())
-    first_name = forms.CharField(max_length=100, widget=forms.TextInput())
-    last_name = forms.CharField(max_length=100, widget=forms.TextInput())
-    email = forms.EmailField(widget=forms.EmailInput())
+    username = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Enter username'}))
+    first_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Enter First Name'}))
+    last_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Enter Last Name'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Enter Email'}))
     
     class Meta:
         model = User

@@ -1,20 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Edit Profile</title>
-</head>
-<body>
-    <form action="" method="post">
-        {% csrf_token %}
+{% extends 'base.html' %}
+{% load static %}
 
-        {{ form.as_p }}
+<!--title-->
+{% block title %}Status{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<link rel="stylesheet" href="{% static 'css/status.css' %}">
+{% endblock %}
+
+<!--header-->
+{% block header %}STATUS{% endblock %} 
+
+<!--page content-->
+{% block content %}
+    <div>
+        <form action="" method="post">
+        {% csrf_token %}
+        <div class="fields_1">
+            <div class="field">
+                <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                {{ form.username }}
+            </div>
+            <div class="field">
+                <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                {{ form.first_name }}
+            </div>
+            <div class="field">
+                <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                {{ form.last_name }}
+            </div>
+            <div class="field">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}
+            </div>
+            <div class="field">
+                <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                {{ form.password }}
+            </div>
+            
+        </div>
+        
 
         <button>Update Profile</button>
     </form>
-</body>
+    </div>
+    
+    {% endblock %}
+
+    <!--(optional)script-->
+    {% block script %}
+    
+    {% endblock %}
 
 {{ redirect_to_login_immediately }}
 
-</html>
