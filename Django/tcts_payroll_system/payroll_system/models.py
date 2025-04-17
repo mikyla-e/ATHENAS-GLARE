@@ -26,7 +26,7 @@ class Region(models.Model):
     id = models.AutoField(primary_key=True)  # Add this line
     psgcCode = models.CharField(max_length=10)
     regDesc = models.CharField(max_length=255)
-    regCode = models.CharField(max_length=10, unique=True)
+    regCode = models.CharField(max_length=10)
 
     def __str__(self):
         return self.regDesc
@@ -40,7 +40,7 @@ class Province(models.Model):
     psgcCode = models.CharField(max_length=10)
     provDesc = models.CharField(max_length=255)
     regCode = models.CharField(max_length=10)
-    provCode = models.CharField(max_length=10, unique=True)
+    provCode = models.CharField(max_length=10)
 
     def __str__(self):
         return self.provDesc
@@ -55,7 +55,7 @@ class City(models.Model):
     citymunDesc = models.CharField(max_length=255)
     regDesc = models.CharField(max_length=10)
     provCode = models.CharField(max_length=10)
-    citymunCode = models.CharField(max_length=10, unique=True)
+    citymunCode = models.CharField(max_length=10)
 
     def __str__(self):
         return self.citymunDesc
@@ -70,7 +70,7 @@ class Barangay(models.Model):
     regCode = models.CharField(max_length=10)
     provCode = models.CharField(max_length=10)
     citymunCode = models.CharField(max_length=10)
-    brgyCode = models.CharField(max_length=10, unique=True)
+    brgyCode = models.CharField(max_length=10)
 
     def __str__(self):
         return self.brgyDesc
@@ -103,10 +103,10 @@ class Employee(models.Model):
     date_of_birth = models.DateField(null=True)
     contact_number = models.CharField(max_length=15, null=True)
     emergency_contact = models.CharField(max_length=15, null=True)
-    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
-    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
-    barangay = models.ForeignKey(Barangay, on_delete=models.SET_NULL, null=True)
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, to_field='id')
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, to_field='id')
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, to_field='id')
+    barangay = models.ForeignKey(Barangay, on_delete=models.SET_NULL, null=True, to_field='id')
     highest_education = models.CharField(max_length=20, choices=HighestEducation.choices, null=True)
     work_experience = models.CharField(max_length=2083, null=True, blank=True)
     date_of_employment = models.DateField(default=timezone.now)
