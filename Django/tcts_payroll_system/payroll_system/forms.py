@@ -34,6 +34,7 @@ class EmployeeForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
         self._setup_image_field()
         
         # Set custom attributes for the date picker
@@ -46,19 +47,19 @@ class EmployeeForm(ModelForm):
         )
 
     def _setup_image_field(self):
-        """Make image required only for new employees."""
+        # Make image required only for new employees.
         if not self.instance.pk:
             self.fields['employee_image'].required = True
 
     def validate_date_format(self, date_str):
-        """Helper function to validate 'YYYY-MM-DD' format."""
+        # Helper function to validate 'YYYY-MM-DD' format.
         try:
             datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:
             raise forms.ValidationError("Invalid date format. Use 'YYYY-MM-DD'.")
         
     def clean_date_of_birth(self):
-        """Validate that employee is at least 18 years old"""
+        # Validate that employee is at least 18 years old
         date_of_birth = self.cleaned_data.get('date_of_birth')
         if date_of_birth:
             # Calculate age without using dateutil
@@ -81,7 +82,7 @@ class EmployeeForm(ModelForm):
         return date_of_employment
 
     def validate_contact_number(self, contact_number):
-        """Helper function to validate 11-digit numbers."""
+        # Helper function to validate 11-digit numbers.
         if not contact_number.isdigit() or len(contact_number) != 11:
             raise forms.ValidationError("Invalid contact number. Must be exactly 11 digits.")
         return contact_number
@@ -94,10 +95,14 @@ class EmployeeForm(ModelForm):
     
     def clean(self):
         cleaned_data = super().clean()
-        
-        # Basic location validation if needed
-        # This is simplified since we're just saving strings now
-        return cleaned_data
+
+        required_fields = [
+            'first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
+            'highest_education', 'date_of_employment', 'employee_status', 'region', 'province', 'city', 'barangay'
+        ]
+
+        if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
+            raise forms.ValidationError("All fields must be filled.")
     
 class PayrollForm(ModelForm):
     rate = forms.FloatField(widget=forms.NumberInput())
@@ -119,7 +124,7 @@ class PayrollForm(ModelForm):
             raise forms.ValidationError("All fields must be filled.")
         
     def validate_date_format(self, date_str):
-        """Helper function to validate 'YYYY-MM-DD' format."""
+        # Helper function to validate 'YYYY-MM-DD' format.
         try:
             datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:

@@ -149,7 +149,6 @@ def get_barangays(request):
     barangays = list(Barangay.objects.filter(citymunCode=city_code).values('brgyDesc', 'brgyCode'))
     return JsonResponse({'barangays': barangays})
 
-@login_required
 def employee_registration(request):
     if request.method == "POST":
         form = EmployeeForm(request.POST, request.FILES)
@@ -157,34 +156,70 @@ def employee_registration(request):
         if form.is_valid():
             employee = form.save(commit=False)
             
-            # Handle location fields with proper lookups
+            # Handle location fields with proper lookups and validation
             try:
-                # Find the region by its description
+                # Validate region
                 region_name = request.POST.get('region')
+                region = None
                 if region_name:
                     region = Region.objects.filter(regDesc=region_name).first()
-                    if region:
-                        employee.region = region
-                        print(f"Setting region: {region} with id={region.id}")
+                    if not region:
+                        form.add_error('region', 'Please select a valid region')
+                        raise ValueError("Invalid region selected")
+                    employee.region = region
+                else:
+                    form.add_error('region', 'Region is required')
+                    raise ValueError("Region is required")
                 
-                # Similar for other location fields
+                # Validate province
                 province_name = request.POST.get('province')
+                province = None
                 if province_name:
-                    province = Province.objects.filter(provDesc=province_name).first()
-                    if province:
-                        employee.province = province
+                    province = Province.objects.filter(
+                        provDesc=province_name,
+                        regCode=region.regCode
+                    ).first()
+                    
+                    if not province:
+                        form.add_error('province', 'Province must belong to the selected region')
+                        raise ValueError("Province doesn't match region")
+                    employee.province = province
+                else:
+                    form.add_error('province', 'Province is required')
+                    raise ValueError("Province is required")
                 
+                # Validate city
                 city_name = request.POST.get('city')
+                city = None
                 if city_name:
-                    city = City.objects.filter(citymunDesc=city_name).first()
-                    if city:
-                        employee.city = city
+                    city = City.objects.filter(
+                        citymunDesc=city_name,
+                        provCode=province.provCode
+                    ).first()
+                    
+                    if not city:
+                        form.add_error('city', 'City must belong to the selected province')
+                        raise ValueError("City doesn't match province")
+                    employee.city = city
+                else:
+                    form.add_error('city', 'City is required')
+                    raise ValueError("City is required")
                 
+                # Validate barangay
                 barangay_name = request.POST.get('barangay')
                 if barangay_name:
-                    barangay = Barangay.objects.filter(brgyDesc=barangay_name).first()
-                    if barangay:
-                        employee.barangay = barangay
+                    barangay = Barangay.objects.filter(
+                        brgyDesc=barangay_name,
+                        citymunCode=city.citymunCode
+                    ).first()
+                    
+                    if not barangay:
+                        form.add_error('barangay', 'Barangay must belong to the selected city')
+                        raise ValueError("Barangay doesn't match city")
+                    employee.barangay = barangay
+                else:
+                    form.add_error('barangay', 'Barangay is required')
+                    raise ValueError("Barangay is required")
                 
                 employee.save()
                 
@@ -195,7 +230,6 @@ def employee_registration(request):
                 return redirect('payroll_system:payroll_individual', employee_id=employee.employee_id)
             
             except Exception as e:
-                print(f"Error saving employee: {e}")
                 import traceback
                 traceback.print_exc()
                 form.add_error(None, f"Could not save employee: {e}")
@@ -204,18 +238,11 @@ def employee_registration(request):
     else:
         form = EmployeeForm()
     
-    # Create the context with regions list
-    regions = Region.objects.all().values_list('regDesc', flat=True)
-    provinces = Province.objects.all().values_list('provDesc', flat=True)
-    cities = City.objects.all().values_list('citymunDesc', flat=True)
-    barangays = Barangay.objects.all().values_list('brgyDesc', flat=True)
-
+    regions = list(Region.objects.all().values('regDesc', 'regCode'))
+    
     context = {
         'form': form,
         'regions': regions,
-        'provinces': provinces,
-        'cities': cities,
-        'barangays': barangays,
     }
 
     return render(request, 'payroll_system/employee_registration.html', context)
