@@ -438,18 +438,21 @@ def payrolls(request):
     
     # Get payroll data for each employee
     employee_data = []
-    for employee in employees:
-        latest_payroll = employee.payrolls.order_by('-payment_date').first()
-        
-        # Calculate salary based on attendance count
-        if latest_payroll:
-            attendance_count = employee.attendances.count()
-            latest_payroll.salary = latest_payroll.rate * attendance_count
-        
-        employee_data.append({
-            'employee': employee,
-            'latest_payroll': latest_payroll
-        })
+    try: 
+        for employee in employees:
+            latest_payroll = employee.payrolls.order_by('-payment_date').first()
+            
+            # Calculate salary based on attendance count
+            if latest_payroll:
+                attendance_count = employee.attendances.count()
+                latest_payroll.salary = latest_payroll.rate * attendance_count
+            
+            employee_data.append({
+                'employee': employee,
+                'latest_payroll': latest_payroll
+            })
+    except:
+        pass
     
     #new (end)
 
@@ -535,36 +538,51 @@ def payrolls(request):
 
     # Create a list with employees and their latest payroll
     employee_data = []
-    for employee in employees:
-        latest_payroll = employee.payrolls.order_by('-payment_date').first()
-        
-        # Calculate salary based on attendance count
-        if latest_payroll:
-            attendance_count = employee.attendances.count()
-            latest_payroll.salary = latest_payroll.rate * attendance_count
-        
-        employee_data.append({
-            'employee': employee,
-            'latest_payroll': latest_payroll
-        })
+    try:
+        for employee in employees:
+            latest_payroll = employee.payrolls.order_by('-payment_date').first()
+            
+            # Calculate salary based on attendance count
+            if latest_payroll:
+                attendance_count = employee.attendances.count()
+                latest_payroll.salary = latest_payroll.rate * attendance_count
+            
+            employee_data.append({
+                'employee': employee,
+                'latest_payroll': latest_payroll
+            })
 
     # Pass all data to the template
-    context = {
-        'employee': employee,
-        'employee_data': employee_data,  # List of employees with their latest payroll
-        'total_employees': total_employees,
-        'avg_active_employees': round(avg_active_employees),
-        'processed_payroll_count': processed_payroll_count,
-        'pending_payroll_count': pending_payroll_count,
-        'total_payroll': total_payroll,  # Total payroll amount
-        'previous_total_payroll': previous_total_payroll,
-        'payroll_percentage': payroll_percentage,
-        'next_payday': next_payday,  # Next payday date
-        'previous_avg_rate': previous_avg_rate,
-        'rate_percentage': rate_percentage,
-        'avg_rate': current_avg_rate,
-        'query': query,
-    }
+        context = {
+            'employee': employee,
+            'employee_data': employee_data,  # List of employees with their latest payroll
+            'total_employees': total_employees,
+            'avg_active_employees': round(avg_active_employees),
+            'processed_payroll_count': processed_payroll_count,
+            'pending_payroll_count': pending_payroll_count,
+            'total_payroll': total_payroll,  # Total payroll amount
+            'previous_total_payroll': previous_total_payroll,
+            'payroll_percentage': payroll_percentage,
+            'next_payday': next_payday,  # Next payday date
+            'previous_avg_rate': previous_avg_rate,
+            'rate_percentage': rate_percentage,
+            'avg_rate': current_avg_rate,
+            'query': query,
+        }
+    except:
+        context = {
+            'processed_payroll_count': processed_payroll_count,
+            'pending_payroll_count': pending_payroll_count,
+            'total_payroll': total_payroll,  # Total payroll amount
+            'previous_total_payroll': previous_total_payroll,
+            'payroll_percentage': payroll_percentage,
+            'next_payday': next_payday,  # Next payday date
+            'previous_avg_rate': previous_avg_rate,
+            'rate_percentage': rate_percentage,
+            'avg_rate': current_avg_rate,
+            'query': query,
+        }
+
 
     return render(request, 'payroll_system/payroll.html', context)
 
