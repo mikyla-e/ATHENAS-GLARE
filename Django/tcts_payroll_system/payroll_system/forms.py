@@ -4,26 +4,22 @@ from django.contrib.auth.models import User
 from django.forms import ModelForm
 from django.utils import timezone
 from datetime import datetime
-from .models import Employee, Payroll
-from ph_geography.models import Region, Province, Municipality, Barangay
+from .models import Employee, Payroll, Region, Province, City, Barangay
 
 class EmployeeForm(ModelForm):
-    region_name = forms.CharField(label='Region', widget=forms.TextInput(attrs={ 'list': 'region-list', 
-    'autocomplete': 'off', 'class': 'location-field'}), required=True)
-
-    province_name = forms.CharField(label='Province', widget=forms.TextInput(attrs={ 'list': 'province-list', 
-    'autocomplete': 'off', 'class': 'location-field'}), required=True)
-
-    municipality_name = forms.CharField(label='Municipality', widget=forms.TextInput(attrs={'list': 'municipality-list',
-    'autocomplete': 'off', 'class': 'location-field'}), required=True)
-
-    barangay_name = forms.CharField(label='Barangay', widget=forms.TextInput(attrs={'list': 'barangay-list', 
-    'autocomplete': 'off', 'class': 'location-field'}), required=True)
+    region = forms.CharField(widget=forms.TextInput(attrs={ 'id': 'region-dropdown', 'list': 'region-list', 'autocomplete': 'off', 'class': 
+                                  'location-field'}), required=True)
+    province = forms.CharField(widget=forms.TextInput(attrs={ 'id': 'province-dropdown', 'list': 'province-list', 'autocomplete': 'off', 'class': 
+                                  'location-field'}), required=True)
+    city = forms.CharField(widget=forms.TextInput(attrs={ 'id': 'city-dropdown', 'list': 'city-list', 'autocomplete': 'off', 'class': 
+                                  'location-field'}), required=True)
+    barangay = forms.CharField(widget=forms.TextInput(attrs={ 'id': 'barangay-dropdown', 'list': 'barangay-list', 'autocomplete': 'off', 'class': 
+                                  'location-field'}), required=True)
     
     class Meta:
         model = Employee
         fields = ('first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
-                   'highest_education', 'work_experience', 'date_of_employment',
+                   'region', 'province', 'city', 'barangay', 'highest_education', 'work_experience', 'date_of_employment',
                    'employee_status', 'employee_image')
         widgets = {
             'first_name': forms.TextInput(),
@@ -42,7 +38,6 @@ class EmployeeForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._setup_location_fields()
         self._setup_image_field()
         
         # Set custom attributes for the date picker
@@ -54,14 +49,14 @@ class EmployeeForm(ModelForm):
             }
         )
 
-    def _setup_location_fields(self):
-        """Initialize location fields and their initial values."""
-        if self.instance.pk:
-            # Set initial values from model instance
-            self.fields['region_name'].initial = self.instance.region
-            self.fields['province_name'].initial = self.instance.province
-            self.fields['municipality_name'].initial = self.instance.municipality
-            self.fields['barangay_name'].initial = self.instance.barangay
+    # def _setup_location_fields(self):
+    #     """Initialize location fields and their initial values."""
+    #     if self.instance.pk:
+    #         # Set initial values from model instance
+    #         self.fields['region_name'].initial = self.instance.region
+    #         self.fields['province_name'].initial = self.instance.province
+    #         self.fields['municipality_name'].initial = self.instance.municipality
+    #         self.fields['barangay_name'].initial = self.instance.barangay
 
     def _setup_image_field(self):
         """Make image required only for new employees."""
@@ -117,29 +112,30 @@ class EmployeeForm(ModelForm):
         # This is simplified since we're just saving strings now
         return cleaned_data
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
+    # def save(self, commit=True):
+    #     instance = super().save(commit=False)
         
-        # Copy the location name values to the model instance
-        instance.region = self.cleaned_data.get('region_name', '')
-        instance.province = self.cleaned_data.get('province_name', '')
-        instance.municipality = self.cleaned_data.get('municipality_name', '')
-        instance.barangay = self.cleaned_data.get('barangay_name', '')
+    #     # Copy the location name values to the model instance
+    #     instance.region = self.cleaned_data.get('region_name', '')
+    #     instance.province = self.cleaned_data.get('province_name', '')
+    #     instance.municipality = self.cleaned_data.get('municipality_name', '')
+    #     instance.barangay = self.cleaned_data.get('barangay_name', '')
         
-        if commit:
-            instance.save()
-        return instance
+    #     if commit:
+    #         instance.save()
+    #     return instance
     
 class PayrollForm(ModelForm):
+    rate = forms.FloatField(widget=forms.NumberInput())
+    payment_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    
     class Meta:
         model = Payroll
         fields = ('rate', 'payment_date', 'payroll_status')
-        widgets = {
-            'rate': forms.NumberInput(),
-            'payment_date': forms.DateInput(),
-            'payroll_status': forms.Select()
+        widget = {
+            'payroll_status': forms.Select(),
         }
-
+        
     def clean(self):
         cleaned_data = super().clean()
         required_fields = ['rate', 'payment_date', 'payroll_status']

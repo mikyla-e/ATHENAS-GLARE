@@ -1,140 +1,28 @@
-.body{
-    height: 100%;
+.dt-length{
+    display: none;
 }
-.container{
-    position: absolute;
-    height: 100%;
-    width: 85%;
-    
-    padding: 10px 12px; 
-    z-index: 8;
+.dt-search {
+    display: none;
 }
 
-.search{
-    width: 100%;
-    height: 42px;   
-    
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    
-    background-color: #fff;
-    border-radius: 50px;
-    overflow: hidden;
+#employee-data:nth-child(odd), .dt-empty{
+    background-color: #f2f2f2 !important;
 }
 
-.search form{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+#employee-data td, .dt-empty{
+    border-bottom: 2px solid rgba(30, 30, 30, 0.20) !important;
 }
 
-.search form button{
-    width: fit-content;
-    height: 100%;
-    padding-left: 15px;
-    border: none;
-    background: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+#employee-data:last-child td, .dt-empty{
+    border-bottom:none !important;
 }
 
-.search button img{
-    height: 25px;
-    width: 25px;
-}
-
-.search form input[type=text]{
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-.search form input[type=text]:focus{
-    outline: none;
-}
-
-.search form input[type=text]::placeholder{
+#employee-table_info{
     font-family: 'League Spartan';
-    font-size: 1rem;
-    font-weight: 600;
 }
 
-
-.table{
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    margin: 12px 0;
-}
-
-
-table {
-    font-size: 12px;
-    border: none;
-    border-radius: 15px;
-    width: 100%;
-    background-color: #fff;
-    text-align: center;
-    border-collapse: separate;
-    border-spacing: 0;
-    overflow: hidden;
-}
-
-th {
-    font-family: 'League Spartan';
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    padding: 15px 12.5px 12.5px;
-    border-bottom: 3px solid rgba(30, 30, 30, 0.20);
-}
-td {
-    border-bottom: 2px solid rgba(30, 30, 30, 0.20);
-    padding: 14px;
-    text-align: center;
-    font-size: .8rem;
-    font-family: 'Inter';
-}
-
-td a{
-    text-decoration: none;
-    font-weight: 600;
-    color: #1e1e1e;
-}
-
-td a:hover{
-    color: #F8D146;
-    transition: 0.2s;
-}
-
-tr:last-child td {
-    border-bottom: none;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-a{
-    text-decoration: none;
-}
-
-.button{
-    padding: 10px 0;
-    width: 100%;
-
-    display: flex;
-    justify-content: end;
-}
-
-
-.addemployeebutton{
+#employee-button{
     width: fit-content;
-    padding: 10px 30px;
 
     font-family: 'League Spartan';
     font-weight: bold;
@@ -148,7 +36,7 @@ a{
     
 }
 
-.addemployeebutton:hover{
+#employee-button:hover{
     cursor: pointer;
     scale: 1.05;
     transition: 0.5s;

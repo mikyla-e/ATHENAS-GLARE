@@ -23,8 +23,11 @@ urlpatterns = [
     path('admin_edit_profile/', AdminEditView.as_view(), name='admin_edit_profile'),
     path('password/', PasswordsChangeView.as_view(template_name='payroll_system/change_password.html')),
     path('about/', views.about, name='about'),
-    path('get-address-options/', views.get_address_options, name='get_address_options'), 
-    path('get-regions/', views.get_regions, name='get-regions'),
     path('customers/', views.customers, name='customers'),
     path('attendance/', views.attendance, name='attendance'),
+    # path('get-address-options/', views.get_address_options, name='get_address_options'), 
+    # path('get-regions/', views.get_regions, name='get-regions'),
+    path('ajax/get-provinces/', views.get_provinces, name='get_provinces'),
+    path('ajax/get-cities/', views.get_cities, name='get_cities'),
+    path('ajax/get-barangays/', views.get_barangays, name='get_barangays'),
 ]

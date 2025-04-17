@@ -1,320 +1,63 @@
-.body{
-    height: 100%;
+.dt-length{
+    display: none;
+}
+.dt-search {
+    display: none;
 }
 
-.top{
-    position: relative;
-    height: 15%;
-    width: 100%;
-    
-    display: flex;
-    gap: 20px;
+table.dataTable th.dt-type-numeric,
+table.dataTable td.dt-type-numeric{
+    text-align: left;
 }
 
-.content_1{
-    position: relative;
-    
-    width: 65%;
-}
-
-.content_1 .statistics{
-    display: flex;
-
-    height: 100%;
-    background-color: #1e1e1e;
-    border-radius: 20px;
-    padding: 0 15px;
-}
-
-.total_payroll, .avg_rate, .payroll_status{
-    margin: 15px 0;
-    padding: 0 15px;
-    width: 100%;
-}
-
-
-/* total payroll */
-
-.content_1 .statistics .total_payroll{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    border-right: 2px solid #F8D14630;
-}
-
-.content_1 .statistics .total_payroll .title{
-    width: 100%;
-    padding: 5px 0;
-    background: -webkit-linear-gradient(#F8D146, #F5B93F);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.content_1 .statistics .total_payroll .title h1{
+#payroll-table_info{
     font-family: 'League Spartan';
-    font-size: 1.1rem;
 }
 
-.content_1 .statistics .total_payroll .content{
-    font-family: 'Inter';
-    display: flex;
-    flex-direction: column;
-    align-items: end;
+#payment-amount{
+    text-align: right !important;
 }
 
-.content_1 .statistics .total_payroll .content .amount{
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: white;
-
+#more{
+    text-align: center !important;
 }
 
-.content_1 .statistics .total_payroll .content .percentage{
-    font-size: 1.1rem;
-    font-weight: 500;
-
+#title,
+#percentage{
     background: -webkit-linear-gradient(#F8D146, #F5B93F);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-/* average rate */
-
-.content_1 .statistics .avg_rate{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    border-right: 2px solid #F8D14630;
-    border-left: 2px solid #F8D14630;
-}
-
-.content_1 .statistics .avg_rate .title{
-    width: 100%;
-    padding: 5px 0;
-
-    background: -webkit-linear-gradient(#F8D146, #F5B93F);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-
-}
-
-.content_1 .statistics .avg_rate .title h1{
-    font-family: 'League Spartan';
-    font-size: 1.1rem;
-
-}
-
-.content_1 .statistics .avg_rate .content{
-    font-family: 'Inter';
-    display: flex;
-    flex-direction: column;
-    align-items: end;
-}
-
-.content_1 .statistics .avg_rate .content .amount{
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: white;
-
-}
-
-.content_1 .statistics .avg_rate .content .percentage{
-    font-size: 1.1rem;
-    font-weight: 500;
-
+#processed{
     background: -webkit-linear-gradient(#F8D146, #F5B93F);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-/* payroll status */
-
-.content_1 .statistics .payroll_status{
-    border-left: 2px solid #F8D14630;
-
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.content_1 .statistics .payroll_status .title{
-    width: 100%;
-}
-
-.content_1 .statistics .payroll_status .title h1{
-    margin: 0;
-    font-family: 'League Spartan';
-    font-size: 1.4rem;
-    color: white;
-}
-
-.content_1 .statistics .payroll_status .content{
-    margin: 0;
-    display: flex;
-    flex-wrap: nowrap;
-}
-
-.content_1 .statistics .payroll_status .content .processed{
-    width: 100%;
-    padding: 0 10px 0 5px; 
-    border-right: 2px solid #F8D14630;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-
-    background: -webkit-linear-gradient(#F8D146, #F5B93F);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.content_1 .statistics .payroll_status .content .processed h1{
-    margin: 0;
-    font-size: 1.1rem;
-    font-family: 'Roboto';
-}
-
-.content_1 .statistics .payroll_status .content .processed p{
-    margin: 0;
-    font-size: 2.5rem;
-    font-family: 'Roboto';
-    line-height: 80%
-}
-
-.content_1 .statistics .payroll_status .content .pending{
-    width: 100%;
-    padding: 0 5px 0 10px;
-    border-left: 2px solid #F8D14630;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-
+#pending{
     color: #DC4646;
-}   
-
-.content_1 .statistics .payroll_status .content .pending h1{
-    margin: 0;
-    font-size: 1.1rem;
-    font-family: 'Roboto';
-}   
-
-.content_1 .statistics .payroll_status .content .pending p{
-    margin: 0;
-    font-size: 2.5rem;
-    font-family: 'Roboto';
-    line-height: 80%
-}   
-
-
-.title h1, .content p{
-    margin: 0;
 }
 
-
-.content_2{
-    position: relative;
-    
-    width: 35%;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-
-.content_2 .incentives,
-.content_2 .payday{
-    height: 40%;
-    width: 100%;
-    border-radius: 50px;
-    overflow: hidden;
-}
-
-.content_2 .payday{
-    display: flex;
-    flex-wrap: nowrap;
-    background-color: white;
-}
-
-.content_2 .payday .payday_title,
-.content_2 .payday .payday_date{
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.content_2 .payday .payday_title{
-    width: 35%;
-    background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
-
-}
-
-.content_2 .payday .payday_title p{
-    margin: 0;
-    padding-left: 5px;
-
-    font-family: 'Roboto';
-    font-size: 1rem;
-    font-weight: 600;
-    
-}
-
-.content_2 .payday .payday_date{
-    width: 65%;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-evenly;
-    align-items: center;
-}
-
-
-.content_2 .payday .payday_date p{
-    margin: 0;
-
-    font-family: 'Inter';
-    font-size: 1.25rem;
-    font-weight: 700;
-
-    background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
-    background-clip: text;
+#paydate{
+    background: -webkit-linear-gradient(#F8D146, #F5B93F);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    
 }
 
-.content_2 .incentives{
+#payroll-data:nth-child(odd), .dt-empty{
+    background-color: #f2f2f2 !important;
 }
 
-.content_2 .incentives .edit_incentives{
-    padding: 0 10px;
-    width: 100%;
-    height: 100%;
-    border: none;
-    background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5%;
-
+#payroll-data td, .dt-empty{
+    border-bottom: 2px solid rgba(30, 30, 30, 0.20) !important;
 }
 
-.content_2 .incentives .edit_incentives:hover{
-    cursor: pointer;
+#payroll-data:last-child td, .dt-empty{
+    border-bottom:none !important;
 }
 
-.content_2 .incentives .edit_incentives p{
-    margin: 0;
-
-    color: white;
-    font-family: 'Roboto';
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-
+/*pop up*/
 .background{
     margin: 0;
     position: fixed;

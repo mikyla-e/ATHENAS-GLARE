@@ -72,68 +72,31 @@
                     {{ form.emergency_contact }}
                 </div>
                 <div class="field">
-                    <label for="id_region_name">Region</label>
-                    <input type="text" class="location-field" id="id_region_name" 
-                        name="region_name" list="region-list" autocomplete="off"
-                        value="{{ form.region_name.value|default_if_none:'' }}">
+                    {{ form.region.label_tag }}
+                    {{ form.region }}
                     <datalist id="region-list">
-                        {% for region in form.region_choices %}
-                            <option value="{{ region }}">
+                        {% for region in regions %}
+                            <option value="{{ region.regDesc }}" data-code="{{ region.regCode }}">
                         {% endfor %}
                     </datalist>
-                    {% if form.region_name.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.region_name.errors|join:", " }}
-                        </div>
-                    {% endif %}
                 </div>
                 <div class="field">
-                    <label for="id_province_name">province</label>
-                    <input type="text" class="location-field" id="id_province_name" 
-                        name="province_name" list="province-list" autocomplete="off"
-                        value="{{ form.province_name.value|default_if_none:'' }}">
+                    {{ form.province.label_tag }}
+                    {{ form.province }}
                     <datalist id="province-list">
-                        {% for province in form.province_choices %}
-                            <option value="{{ province }}">
-                        {% endfor %}
                     </datalist>
-                    {% if form.province_name.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.province_name.errors|join:", " }}
-                        </div>
-                    {% endif %}
                 </div>
                 <div class="field">
-                    <label for="id_municipality_name">municipality</label>
-                    <input type="text" class="location-field" id="id_municipality_name" 
-                        name="municipality_name" list="municipality-list" autocomplete="off"
-                        value="{{ form.municipality_name.value|default_if_none:'' }}">
-                    <datalist id="municipality-list">
-                        {% for municipality in form.municipality_choices %}
-                            <option value="{{ municipality }}">
-                        {% endfor %}
+                    {{ form.city.label_tag }}
+                    {{ form.city }}
+                    <datalist id="city-list">
                     </datalist>
-                    {% if form.municipality_name.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.municipality_name.errors|join:", " }}
-                        </div>
-                    {% endif %}
                 </div>
                 <div class="field">
-                    <label for="id_barangay_name">barangay</label>
-                    <input type="text" class="location-field" id="id_barangay_name" 
-                        name="barangay_name" list="barangay-list" autocomplete="off"
-                        value="{{ form.barangay_name.value|default_if_none:'' }}">
+                    {{ form.barangay.label_tag }}
+                    {{ form.barangay }}
                     <datalist id="barangay-list">
-                        {% for barangay in form.barangay_choices %}
-                            <option value="{{ barangay }}">
-                        {% endfor %}
                     </datalist>
-                    {% if form.barangay_name.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.barangay_name.errors|join:", " }}
-                        </div>
-                    {% endif %}
                 </div>
                 <div class="field">
                     <label for="education">highest education attainment</label>
@@ -276,115 +239,112 @@
         }
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get all inputs and datalists
-        const regionInput = document.getElementById('id_region_name');
-        const provinceInput = document.getElementById('id_province_name');
-        const municipalityInput = document.getElementById('id_municipality_name');
-        const barangayInput = document.getElementById('id_barangay_name');
+    document.addEventListener("DOMContentLoaded", function () {
+        // Get elements with error handling
+        const regionInput = document.getElementById("region-dropdown");
+        const provinceInput = document.getElementById("province-dropdown");
+        const cityInput = document.getElementById("city-dropdown");
+        const barangayInput = document.getElementById("barangay-dropdown");
         
-        const regionList = document.getElementById('region-list');
-        const provinceList = document.getElementById('province-list');
-        const municipalityList = document.getElementById('municipality-list');
-        const barangayList = document.getElementById('barangay-list');
+        const provinceList = document.getElementById("province-list");
+        const cityList = document.getElementById("city-list");
+        const barangayList = document.getElementById("barangay-list");
         
-        // Reset dependent fields
-        function resetDependentFields(startingFrom) {
-            if (startingFrom === 'region') {
-                provinceInput.value = '';
-                provinceList.innerHTML = '';
-                municipalityInput.value = '';
-                municipalityList.innerHTML = '';
-                barangayInput.value = '';
-                barangayList.innerHTML = '';
-            } else if (startingFrom === 'province') {
-                municipalityInput.value = '';
-                municipalityList.innerHTML = '';
-                barangayInput.value = '';
-                barangayList.innerHTML = '';
-            } else if (startingFrom === 'municipality') {
-                barangayInput.value = '';
-                barangayList.innerHTML = '';
-            }
+        // Check if elements exist
+        console.log("Region input:", regionInput);
+        console.log("Province input:", provinceInput);
+        console.log("city input:", cityInput);
+        console.log("Barangay input:", barangayInput);
+        console.log("Province list:", provinceList);
+        console.log("city list:", cityList);
+        console.log("Barangay list:", barangayList);
+        
+        // Store current region code, province code, and city code
+        let currentRegionCode = "";
+        let currentProvinceCode = "";
+        let currentCityCode = "";
+        
+        // Only add event listeners if elements exist
+        if (regionInput) {
+            regionInput.addEventListener("input", function() {
+                const selectedOption = document.querySelector(`#region-list option[value="${regionInput.value}"]`);
+                if (selectedOption) {
+                    currentRegionCode = selectedOption.dataset.code;
+                    if (provinceInput) provinceInput.value = "";
+                    if (cityInput) cityInput.value = "";
+                    if (barangayInput) barangayInput.value = "";
+                    
+                    // Fetch provinces based on selected region
+                    fetch(`/payroll_system/ajax/get-provinces/?region=${currentRegionCode}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (provinceList) {
+                                provinceList.innerHTML = "";
+                                data.provinces.forEach(p => {
+                                    const option = document.createElement("option");
+                                    option.value = p.provDesc;
+                                    option.setAttribute("data-code", p.provCode);
+                                    provinceList.appendChild(option);
+                                });
+                            }
+                        })
+                        .catch(error => console.error("Error fetching provinces:", error));
+                }
+            });
         }
         
-        // Fetch data from API
-        function fetchData(url, params) {
-            const queryString = new URLSearchParams(params).toString();
-            return fetch(`${url}?${queryString}`)
-                .then(response => response.json())
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    return [];
-                });
+        if (provinceInput) {
+            provinceInput.addEventListener("input", function() {
+                const selectedOption = document.querySelector(`#province-list option[value="${provinceInput.value}"]`);
+                if (selectedOption) {
+                    currentProvinceCode = selectedOption.dataset.code;
+                    if (cityInput) cityInput.value = "";
+                    if (barangayInput) barangayInput.value = "";
+                    
+                    // Fetch cities based on selected province
+                    fetch(`/payroll_system/ajax/get-cities/?province=${currentProvinceCode}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (cityList) {
+                                cityList.innerHTML = "";
+                                data.cities.forEach(c => {
+                                    const option = document.createElement("option");
+                                    option.value = c.citymunDesc;
+                                    option.setAttribute("data-code", c.citymunCode);
+                                    cityList.appendChild(option);
+                                });
+                            }
+                        })
+                        .catch(error => console.error("Error fetching cities:", error));
+                }
+            });
         }
         
-        // Load regions on page load
-        fetch('/payroll_system/get-regions/')
-            .then(response => response.json())
-            .then(regions => {
-                regionList.innerHTML = regions.map(region => 
-                    `<option value="${region.trim()}"></option>` // Trim spaces
-                ).join('');
-            })
-            .catch(error => console.error('Error loading regions:', error));
-        
-        // Region change event
-        regionInput.addEventListener('change', function() {
-            const region = this.value.trim();
-            resetDependentFields('region');
-            
-            if (region) {
-                fetchData('/payroll_system/get-address-options/', {
-                    level: 'province',
-                    region: region
-                }).then(provinces => {
-                    provinceList.innerHTML = provinces.map(province => 
-                        `<option value="${province}"></option>`
-                    ).join('');
-                });
-            }
-        });
-        
-        // Province change event
-        provinceInput.addEventListener('change', function() {
-            const province = this.value.trim();
-            const region = regionInput.value.trim();
-            resetDependentFields('province');
-            
-            if (region && province) {
-                fetchData('/payroll_system/get-address-options/', {
-                    level: 'municipality',
-                    region: region,
-                    province: province
-                }).then(municipalities => {
-                    municipalityList.innerHTML = municipalities.map(municipality => 
-                        `<option value="${municipality}"></option>`
-                    ).join('');
-                });
-            }
-        });
-        
-        // Municipality change event
-        municipalityInput.addEventListener('change', function() {
-            const municipality = this.value.trim();
-            const province = provinceInput.value.trim();
-            const region = regionInput.value.trim();
-            resetDependentFields('municipality');
-            
-            if (region && province && municipality) {
-                fetchData('/payroll_system/get-address-options/', {
-                    level: 'barangay',
-                    region: region,
-                    province: province,
-                    municipality: municipality
-                }).then(barangays => {
-                    barangayList.innerHTML = barangays.map(barangay => 
-                        `<option value="${barangay}"></option>`
-                    ).join('');
-                });
-            }
-        });
+        if (cityInput) {
+            cityInput.addEventListener("input", function() {
+                const selectedOption = document.querySelector(`#city-list option[value="${cityInput.value}"]`);
+                if (selectedOption) {
+                    currentCityCode = selectedOption.dataset.code;
+                    if (barangayInput) barangayInput.value = "";
+                    
+                    // Fetch barangays based on selected city
+                    fetch(`/payroll_system/ajax/get-barangays/?city=${currentCityCode}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (barangayList) {
+                                barangayList.innerHTML = "";
+                                data.barangays.forEach(b => {
+                                    const option = document.createElement("option");
+                                    option.value = b.brgyDesc;
+                                    option.setAttribute("data-code", b.brgyCode);
+                                    barangayList.appendChild(option);
+                                });
+                            }
+                        })
+                        .catch(error => console.error("Error fetching barangays:", error));
+                }
+            });
+        }
     });
 </script>
 {% endblock %}
@@ -531,7 +491,7 @@
                                 {{ form.emergency_contact }}
                             </div>
                             <div class="field">
-                                <label for="id_region_name">Region</label>
+                                <label for="id_region_name">region</label>
                                 <input type="text" class="location-field" id="id_region_name" 
                                     name="region_name" list="region-list" autocomplete="off"
                                     value="{{ form.region_name.value|default_if_none:'' }}">

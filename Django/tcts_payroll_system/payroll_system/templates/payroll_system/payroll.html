@@ -13,49 +13,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
     <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
     
-    <style>
-        .dt-length{
-            display: none;
-        }
-        .dt-search {
-            display: none;
-        }
-
-        #title,
-        #percentage{
-            background: -webkit-linear-gradient(#F8D146, #F5B93F);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        #processed{
-            background: -webkit-linear-gradient(#F8D146, #F5B93F);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        #pending{
-            color: #DC4646;
-        }
-
-        #paydate{
-            background: -webkit-linear-gradient(#F8D146, #F5B93F);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        #payroll-data:nth-child(odd){
-            background-color: #f2f2f2;
-        }
-
-        #payroll-data td{
-            border-bottom: 2px solid rgba(30, 30, 30, 0.20);
-        }
-
-        #payroll-data:last-child td{
-            border-bottom:none;
-        }
-    </style>
 {% endblock %}
 
 <!--header-->
@@ -63,13 +20,13 @@
 
 <!--page content-->
 {% block content %}
-<div class="w-full grid grid-cols-4 grid-rows-[75px_75px_75px_75px] md:grid-cols-6 md:grid-rows-[70px_70px] gap-4">
+<div class="w-full grid grid-cols-4 grid-rows-[75px_75px_75px_75px] lg:grid-cols-6 lg:grid-rows-[70px_70px] gap-4">
     <div class="bg-[#1E1E1E] px-4 order-1 col-span-4 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
 
         <div class="h-full w-[30%] py-5 flex flex-col justify-between">
             <p class="text-lg font-bold font-[League Spartan] text-left" id="title">TOTAL PAYROLL</p>
             <div class="flex flex-col justify-end items-end text-right">
-                <p class="text-[#FFF] text-3xl font-[Inter] font-semibold">{% if total_payroll == "No total payroll yet" %} No total payroll yet {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</p>
+                <p class="text-[#FFF] text-3xl font-[Inter] font-semibold">{% if total_payroll == "No total payroll yet" %} No Total Payroll {% else %} ₱{{ total_payroll|floatformat:2 }} {% endif %}</p>
                 <p id="percentage" class="text-lg font-[Inter] font-semibold {% if payroll_percentage > 0 %}positive{% elif payroll_percentage < 0 %}negative{% endif %}">
                     {% if payroll_percentage > 0 %}+{% endif %}{{ payroll_percentage|floatformat:1 }}%
                 </p>
@@ -137,7 +94,7 @@
 
 <div class="size-full flex flex-col py-10">    
     <div class="w-full h-[40px] flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden" id="search">
-        <form class="w-full flex justify-center items-center gap-3" method="get" action="{% url 'payroll_system:payrolls' %}">
+        <form class="w-full flex justify-center items-center gap-3" method="get">
             <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
                 <img class="h-[25px] w-[25px]" src="{% static 'images/search_icon.png' %}" alt="Search">
             </button>
@@ -150,10 +107,10 @@
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="text-base text-center font-[League Spartan]">
                     <th class="py-2">EMPLOYEE</th>
+                    <th>STATUS</th>
                     <th>RATE PER DAY</th>
                     <!-- <th>DEDUCTIONS</th> -->
-                    <th>PAYMENT AMOUNT</th>
-                    <th>STATUS</th>
+                    <th id="payment-amount">PAYMENT AMOUNT</th>
                     <th></th>
                 </tr>
             </thead>
@@ -163,16 +120,16 @@
                     {% if latest_payroll %}
                     <tr id="payroll-data">
                         <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td>{{ latest_payroll.payroll_status }}</td>
                         <td>{{ latest_payroll.rate }}</td>
                         <!-- <td>{{ latest_payroll.deductions }}</td> -->
-                        <td>{{ latest_payroll.salary }}</td>
-                        <td>{{ latest_payroll.payroll_status }}</td>
-                        <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                        <td id="payment-amount">₱{{ latest_payroll.salary }}</td>
+                        <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% else %}
                     <tr id="payroll-data">
                         <td colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                        <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% endif %}
                 {% endwith %}
@@ -202,7 +159,7 @@
 
 <!--(optional)script-->
 {% block script %}
-<script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
     <script src="{% static 'css/dataTables.js' %}"></script>
 
     <script>
@@ -217,6 +174,10 @@
             $('#search-input').on('keyup', function () {
                 table.search(this.value).draw();
             });
+        });
+
+        $(document).on('keypress', '#search-input', function (e) {
+            if (e.which == 13) e.preventDefault();
         });
     </script>    
 
