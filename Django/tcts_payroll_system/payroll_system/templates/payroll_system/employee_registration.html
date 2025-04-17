@@ -72,7 +72,7 @@
                     {{ form.emergency_contact }}
                 </div>
                 <div class="field">
-                    {{ form.region.label_tag }}
+                    <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
                     {{ form.region }}
                     <datalist id="region-list">
                         {% for region in regions %}
@@ -81,19 +81,19 @@
                     </datalist>
                 </div>
                 <div class="field">
-                    {{ form.province.label_tag }}
+                    <label for="{{ form.province.id_for_label }}">{{ form.province.label }}</label>
                     {{ form.province }}
                     <datalist id="province-list">
                     </datalist>
                 </div>
                 <div class="field">
-                    {{ form.city.label_tag }}
+                    <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
                     {{ form.city }}
                     <datalist id="city-list">
                     </datalist>
                 </div>
                 <div class="field">
-                    {{ form.barangay.label_tag }}
+                    <label for="{{ form.barangay.id_for_label }}">{{ form.barangay.label }}</label>
                     {{ form.barangay }}
                     <datalist id="barangay-list">
                     </datalist>

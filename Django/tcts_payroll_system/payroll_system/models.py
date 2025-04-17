@@ -23,9 +23,10 @@ class Gender(models.TextChoices):
 # Create your models here.
 
 class Region(models.Model):
+    id = models.AutoField(primary_key=True)  # Add this line
     psgcCode = models.CharField(max_length=10)
     regDesc = models.CharField(max_length=255)
-    regCode = models.CharField(max_length=10)
+    regCode = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
         return self.regDesc
@@ -35,10 +36,11 @@ class Region(models.Model):
         managed = False
 
 class Province(models.Model):
+    id = models.AutoField(primary_key=True)  # Add this line
     psgcCode = models.CharField(max_length=10)
     provDesc = models.CharField(max_length=255)
     regCode = models.CharField(max_length=10)
-    provCode = models.CharField(max_length=10)
+    provCode = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
         return self.provDesc
@@ -48,11 +50,12 @@ class Province(models.Model):
         managed = False
 
 class City(models.Model):
+    id = models.AutoField(primary_key=True)  # Add this line
     psgcCode = models.CharField(max_length=10)
     citymunDesc = models.CharField(max_length=255)
-    regCode = models.CharField(max_length=10)
+    regDesc = models.CharField(max_length=10)
     provCode = models.CharField(max_length=10)
-    citymunCode = models.CharField(max_length=10)
+    citymunCode = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
         return self.citymunDesc
@@ -62,12 +65,12 @@ class City(models.Model):
         managed = False
 
 class Barangay(models.Model):
-    psgcCode = models.CharField(max_length=10)
+    id = models.AutoField(primary_key=True)  # Add this line
     brgyDesc = models.CharField(max_length=255)
     regCode = models.CharField(max_length=10)
     provCode = models.CharField(max_length=10)
     citymunCode = models.CharField(max_length=10)
-    brgyCode = models.CharField(max_length=10)
+    brgyCode = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
         return self.brgyDesc
