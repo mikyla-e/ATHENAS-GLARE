@@ -6,7 +6,7 @@
 
 <!--(optional)head content-->
 {% block headcontent %}
-<link rel="stylesheet" href="{% static 'css/services.css' %}">
+<link rel="stylesheet" href="{% static 'css/button.css' %}">
 {% endblock %}
 
 <!--header-->
@@ -14,45 +14,49 @@
 
 <!--page content-->
 {% block content %}
-<div class="button">
-    <button class="add-services"><a href="{% url 'payroll_system:services_add' %}">ADD SERVICES +</a></button>
+<div class="size-full px-2 flex flex-col items-center">
+    <div class="w-full h-[40px]">
+        <a class="size-full" href="{% url 'payroll_system:services_add' %}">
+            <button class="size-full px-4 text-center" id="button">ADD SERVICES +</button>
+        </a>
+    </div>
+    
+    <div class="w-full h-auto my-5 flex flex-wrap items-center justify-center gap-8">
+        <div id="service" class="w-[31%] h-[250px] bg-white rounded-xl overflow-hidden">
+            <a class="no-underline" href="{% url 'payroll_system:services_client' %}">
+                <div id="picture" class="h-[70%] bg-[#1e1e1e]">
+                    <img class="w-full h-full object-cover" src="{% static 'images/bg_nosrs.png' %}" alt="">
+                </div>
+                <div id="title" class="h-[30%] py-[15px] px-[20px] bg-white flex justify-between">
+                    <p class="m-0 font-[Roboto] text-xl text-[#1E1E1E]">Car Tint</p> <!--to be changed-->
+                </div>
+            </a>
+        </div>
+        
+        <div id="service" class="w-[31%] h-[250px] bg-white rounded-xl overflow-hidden">
+            <a class="no-underline" href="{% url 'payroll_system:services_client' %}">
+                <div id="picture" class="h-[70%]">
+                    <img class="w-full h-full object-cover" src="{% static 'images/bg_nosrs.png' %}" alt="">
+                </div>
+                <div id="title" class="h-[30%] py-[15px] px-[20px] bg-white flex justify-between">
+                    <p class="m-0 font-[Roboto] text-xl text-[#1E1E1E]">Ceramic Coating</p> <!--to be changed-->
+                </div>
+            </a>
+        </div>
+
+        <div id="service" class="w-[31%] h-[250px] bg-white rounded-xl overflow-hidden">
+            <a class="no-underline" href="{% url 'payroll_system:services_client' %}">
+                <div id="picture" class="h-[70%] bg-[#1e1e1e]">
+                    <img class="w-full h-full object-cover" src="{% static 'images/bg_nosrs.png' %}" alt="">
+                </div>
+                <div id="title" class="h-[30%] py-[15px] px-[20px] bg-white flex justify-between">
+                    <p class="m-0 font-[Roboto] text-xl text-[#1E1E1E]">Paint Protection Film</p> <!--to be changed-->
+                </div>
+            </a>
+        </div>
+    </div>
 </div>
 
-<div class="services">
-    <div class="service">
-        <a href="{% url 'payroll_system:services_client' %}">
-            <div class="picture">
-                <img src="{% static 'images/bg_norsrs.png' %}" alt="">
-            </div>
-            <div class="title">
-                <p>Title</p>
-                <img src="../pictures/icons/next_icon.png" alt="">
-            </div>
-        </a>
-    </div>
-    <div class="service">
-        <a href="{% url 'payroll_system:services_client' %}">
-            <div class="picture">
-                <img src="../pictures/bg_nosrs.png" alt="">
-            </div>
-            <div class="title">
-                <p>Title</p>
-                <img src="../pictures/icons/next_icon.png" alt="">
-            </div>
-        </a>
-    </div>
-    <div class="service">
-        <a href="{% url 'payroll_system:services_client' %}">
-            <div class="picture">
-                <img src="../pictures/bg_nosrs.png" alt="">
-            </div>
-            <div class="title">
-                <p>Title</p>
-                <img src="../pictures/icons/next_icon.png" alt="">
-            </div>
-        </a>
-    </div>
-</div>
 {% endblock %}
 
 <!--(optional)script-->

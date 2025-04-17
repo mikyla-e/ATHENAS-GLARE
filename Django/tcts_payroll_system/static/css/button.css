@@ -1,0 +1,51 @@
+#button,
+input[type=submit]{
+    width: fit-content;
+
+    font-family: 'League Spartan';
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+
+    border-radius: 30px;
+    border: none;
+
+    background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
+    
+}
+
+#button:hover,
+input[type=submit]:hover{
+    cursor: pointer;
+    scale: 1.05;
+    transition: 0.5s;
+    background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
+    color: #F8D146;
+}
+
+
+#cancel,
+input[type=button]{
+    width: fit-content;
+
+    font-family: 'League Spartan';
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+
+    border-radius: 30px;
+    border: none;
+
+    background-image: linear-gradient(to right, #DC4646 , #DC4646); 
+    color: #1E1E1E;
+    
+}
+
+#cancel:hover,
+input[type=button]:hover{
+    cursor: pointer;
+    scale: 1.05;
+    transition: 0.2s;
+    background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
+    color: white;
+}

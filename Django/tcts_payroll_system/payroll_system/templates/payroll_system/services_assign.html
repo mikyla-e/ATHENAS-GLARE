@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!--title-->
+{% block title %}Assigning Employee{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<link rel="stylesheet" href="{% static 'css/services_assign.css' %}">
+{% endblock %}
+
+<!--header-->
+{% block header %}SERVICES{% endblock %} 
+
+<!--page content-->
+{% block content %}
+<form action="{% url 'payroll_system:services' %}" method="post">
+    {% csrf_token %}
+    <div class="form">
+        
+        <span></span>
+        <div class="employee_form">
+            <label for="assigned-employee">assigned employee</label>
+            <input type="text" name="" id="">
+        </div>
+    </div>
+    <div class="submit">
+        <a href="{% url 'payroll_system:services_client' %}">
+            <input type="button" value="Back">
+        </a>
+        <a href="{% url 'payroll_system:services' %}">
+            <input type="submit" value="Assign Task">
+        </a>
+    </div>
+</form>
+{% endblock %}
+
+<!--(optional)script-->
+{% block script %}
+
+{% endblock %}

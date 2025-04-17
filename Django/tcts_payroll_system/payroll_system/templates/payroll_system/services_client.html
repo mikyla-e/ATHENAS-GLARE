@@ -7,6 +7,7 @@
 <!--(optional)head content-->
 {% block headcontent %}
 <link rel="stylesheet" href="{% static 'css/services_client.css' %}">
+<link rel="stylesheet" href="{% static 'css/button.css' %}">
 {% endblock %}
 
 <!--header-->
@@ -14,74 +15,131 @@
 
 <!--page content-->
 {% block content %}
-<div class="old_client">
-    <p>Old Client?</p>
-    <div class="search">
-        <form class="form" method="post">
-            <button type="submit"><img src="{% static 'images/search_icon.png' %}" alt=""></button>
-            <input type="text" placeholder="Search...">    
-        </form>
+<div class="flex flex-col">
+    <div class="w-full px-5 flex flex-col gap-2">
+        <p>Not a new customer?</p>
+
+        <div class="w-full h-[40px] flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden">
+            <form class="w-full flex justify-center items-center gap-3" method="">
+                {% csrf_token %}
+                <img class="h-[25px] w-[25px] ml-[15px] flex justify-center items-center" src="{% static 'images/search_icon.png' %}" alt="Search">
+                <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" list="customers" name="customer" id="customer" placeholder="Search Customer...">
+                
+                <!--to be connected to database-->
+                <datalist id="customers">
+                    <option value="Santa Maria">
+                    <option value="Viktor Greg Lim">
+                    <option value="Ejay Rulona">
+                    <option value="Lady Melodiluz Galope">
+                    <option value="Aaron Flores">
+                </datalist>
+            </form>
+        </div>
     </div>
-</div>
-<span></span> <!--Horizontal Line-->
-<div class="client_form">
-    <form action="{% url 'payroll_system:services_vehicle' %}" method="post">
-        {% csrf_token %}
-        <div class="form">
-            <div class="form_1">
-                <div class="field">
-                    <label for="first-name">first name</label>
-                    <input type="text" name="" id="">
-                    {{ form.first_name }}
+
+    <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
+
+    <div class="size-full my-2 flex items-start">
+        <form class="size-full flex flex-col justify-between" action="{% url 'payroll_system:services_assign' %}" method="">
+            {% csrf_token %}
+            <div id="client-form" class="flex">
+                <div id="left" class="w-[50%] mx-5">
+                    <div class="flex flex-col">
+                        <label for="first-name">first name</label>
+                        <input type="text" name="" id="" class="h-[50px]">
+                        <!-- {{ form.first_name }} -->
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="middle-name">middle name</label>
+                        <input type="text" name="" id="" class="h-[50px]">
+                        <!-- {{ form.first_name }} -->
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="last-name">last name</label>
+                        <input type="text" name="" id="" class="h-[50px]">
+                        <!-- {{ form.first_name }} -->
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="contact-number">contact number</label>
+                        <input type="text" name="" id="" class="h-[50px]">
+                        <!-- {{ form.first_name }} -->
+                    </div>
                 </div>
-                <div class="field">
-                    <label for="middle-name">middle name</label>
-                    <input type="text" name="" id="">
-                    {{ form.middle_name }}
-                </div>
-                <div class="field">
-                    <label for="last-name">last name</label>
-                    <input type="text" name="" id="">
-                    {{ form.last_name }}
-                </div>
-                <div class="field">
-                    <label for="gender">gender</label>
-                    <input type="text" name="" id="">
-                    {{ form.last_name }} 
+                <div id="right" class="w-[50%] mx-5">
+                    <div class="flex flex-col">
+                        <label for="region">region</label>
+                        <input type="text" name="" id="" class="h-[50px]">
+                        <!-- {{ form.first_name }} -->
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="province">province</label>
+                        <input type="text" name="" id="" class="h-[50px]">
+                        <!-- {{ form.first_name }} -->
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="municipality">municipality</label>
+                        <input type="text" name="" id="" class="h-[50px]">
+                        <!-- {{ form.first_name }} -->
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="barangay">barangay</label>
+                        <input type="text" name="" id="" class="h-[50px]">
+                        <!-- {{ form.first_name }} -->
+                    </div>
                 </div>
             </div>
-            <div class="form_2">
-                <div class="field">
-                    <label for="region">region</label>
-                    <input type="text" name="" id="">
-                    {{ form.first_name }}
+
+            <span class="w-[100%] h-[2px] my-5 bg-[#45320d4d] rounded-xl"></span>
+
+            <div id="vehicle-form" class="flex flex-col px-5 gap-5">
+
+                <!--<form class="w-full flex justify-center items-center gap-3" method=""> -->
+                    <!--to be connected to database; selecting an option should auto fill proceeding fields(for old customers only!)-->
+                    <select class="w-full h-[50px] pl-4 border-none outline-none focus:outline-none focus:border-none focus:ring-0 text-base font-semibold font-[League_Spartan] bg-white rounded-md" name="vehicle" id="vehicle">
+                        <option value="Vehicle 1">Vehicle 1</option>
+                        <option value="Vehicle 2">Vehicle 2</option>
+                        <option value="Vehicle 3">Vehicle 3</option>
+                        <option value="Vehicle 4">Vehicle 4</option>
+                    </select>
+                
+                <!-- </form> -->
+
+                <div class="flex my-2">
+                    <div id="left" class="w-[50%]">
+                        <div class="flex flex-col">
+                            <label for="vehicle-name">vehicle name</label>
+                            <input type="text" name="" id="" class="h-[50px]">
+                            <!-- {{ form.first_name }} -->
+                        </div>
+                        <div class="flex flex-col">
+                            <label for="vehicle-color">vehicle color</label>
+                            <input type="text" name="" id="" class="h-[50px]">
+                            <!-- {{ form.first_name }} -->
+                        </div>
+                    </div>
+                    <div id="right" class="w-[50%]">
+                        <div class="flex flex-col">
+                            <label for="plate-number">plate number</label>
+                            <input type="text" name="" id="" class="h-[50px]">
+                            <!-- {{ form.first_name }} -->
+                        </div>
+                    </div>
                 </div>
-                <div class="field">
-                    <label for="province">province</label>
-                    <input type="text" name="" id="">
-                    {{ form.middle_name }}
-                </div>
-                <div class="field">
-                    <label for="municipality">municipality</label>
-                    <input type="text" name="" id="">
-                    {{ form.last_name }}
-                </div>
-                <div class="field">
-                    <label for="barangay">barangay</label>
-                    <input type="text" name="" id="">
-                    {{ form.last_name }}
-                </div>
+                
             </div>
-        </div>
-        <div class="submit">
-            <a href="{% url 'payroll_system:services' %}">
-                <input type="button" value="Cancel">
-            </a>
-            <a href="{% url 'payroll_system:services_vehicle' %}">
-                <input type="submit" value="Confirm Client">
-            </a>
-        </div>
-    </form>
+
+            <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
+
+            <div class="w-full h-[50px] flex justify-end gap-4">
+                <a class="h-full" href="{% url 'payroll_system:services' %}">
+                    <input class="size-full px-3" type="button" value="CANCEL">
+                </a>
+                <a class="h-full" href="{% url 'payroll_system:services_assign' %}">
+                    <input class="size-full px-3" type="submit" value="CONFIRM CUSTOMER">
+                </a>
+            </div>
+        </form>
+    </div>   
 </div>
 {% endblock %}
 

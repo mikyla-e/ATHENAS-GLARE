@@ -7,6 +7,7 @@
 <!--(optional)head content-->
 {% block headcontent %}
 <link rel="stylesheet" href="{% static 'css/employees.css' %}">
+<link rel="stylesheet" href="{% static 'css/button.css' %}">
 
 <link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
@@ -30,8 +31,8 @@
             </div>
         </div>
         <div class="w-fit h-full flex flex-nowrap">
-            <a class="size-full " href="{% url 'payroll_system:employee_registration' %}">
-                <button class="size-full px-2" id="employee-button">ADD EMPLOYEE +</button>
+            <a class="size-full" href="{% url 'payroll_system:employee_registration' %}">
+                <button class="size-full px-2" id="button">ADD EMPLOYEE +</button>
             </a>
         </div>
     </div>
