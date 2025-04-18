@@ -16,6 +16,9 @@
 </head>
 <body class="bg-[#EFEDE6]">
     {% include 'navbar.html' %}
+    
+    {% block outsidecontent %}
+    {% endblock %}
 
     <div class="h-dvh w-full grid grid-cols-[80px_1fr] md:grid-cols-[190px_1fr] grid-rows-[70px_1fr] z-25">
         <div class="bg-[#FFFFFF] row-span-2">
@@ -30,8 +33,9 @@
             {% block content %}
             {% endblock %}
         </div>
-    
     </div>
+
+    
 </body>
 
 {% block script %}
