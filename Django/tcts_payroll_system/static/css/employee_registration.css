@@ -144,6 +144,20 @@ body{
     border-radius: 20px;
 }
 
+.register_container .register_field .fields_1 .field input[type=tel],
+.register_container .register_field .fields_2 .field input[type=tel]{
+    margin: 8px;
+    padding: 10px 15px;
+    border: none;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+
+    background-color: #fff;
+    height: 30px;
+    border-radius: 20px;
+}
+
 .register_container .register_field .fields_2 .field textarea{
     margin: 8px;
     padding: 10px 15px;

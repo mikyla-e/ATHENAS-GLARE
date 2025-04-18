@@ -7,29 +7,33 @@ from datetime import datetime
 from .models import Employee, Payroll
 
 class EmployeeForm(ModelForm):
-    region = forms.CharField(label='region', widget=forms.TextInput(attrs={ 'id': 'region-dropdown', 'list': 'region-list', 'autocomplete': 'off'}))
-    province = forms.CharField(label='province', widget=forms.TextInput(attrs={ 'id': 'province-dropdown', 'list': 'province-list', 'autocomplete': 'off'}))
-    city = forms.CharField(label='city', widget=forms.TextInput(attrs={ 'id': 'city-dropdown', 'list': 'city-list', 'autocomplete': 'off'}))
-    barangay = forms.CharField(label='barangay', widget=forms.TextInput(attrs={ 'id': 'barangay-dropdown', 'list': 'barangay-list', 'autocomplete': 'off'}))
-    
+    first_name = forms.CharField(widget=forms.TextInput())
+    middle_name = forms.CharField(widget=forms.TextInput(), required=False)
+    last_name = forms.CharField(widget=forms.TextInput())
+    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    contact_number = forms.CharField(widget=forms.TextInput(attrs={'type': 'tel'}))
+    emergeny_contact = forms.CharField(widget=forms.TextInput(attrs={'type': 'tel'}))
+    region = forms.CharField(label='region', widget=forms.TextInput(attrs={ 'id': 'region-dropdown', 'list': 'region-list', 
+                             'autocomplete': 'off'}))
+    province = forms.CharField(label='province', widget=forms.TextInput(attrs={ 'id': 'province-dropdown', 'list': 'province-list',
+                               'autocomplete': 'off'}))
+    city = forms.CharField(label='city', widget=forms.TextInput(attrs={ 'id': 'city-dropdown', 'list': 'city-list', 
+                           'autocomplete': 'off'}))
+    barangay = forms.CharField(label='barangay', widget=forms.TextInput(attrs={ 'id': 'barangay-dropdown', 'list': 'barangay-list', 
+                               'autocomplete': 'off'}))
+    work_experience = forms.CharField(widget=forms.Textarea(), required=False)
+    date_of_employment = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), initial=timezone.now)
+    employee_image = forms.CharField(widget=forms.ClearableFileInput())
+
     class Meta:
         model = Employee
         fields = ('first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
                    'highest_education', 'work_experience', 'date_of_employment',
                    'employee_status', 'employee_image')
         widgets = {
-            'first_name': forms.TextInput(),
-            'last_name': forms.TextInput(),
-            'middle_name': forms.TextInput(),
             'gender': forms.Select(),
-            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
-            'contact_number': forms.TextInput(),
-            'emergency_contact': forms.TextInput(),
             'highest_education': forms.Select(),
-            'work_experience': forms.Textarea(),
-            'date_of_employment': forms.DateInput(attrs={'type': 'date'}),
             'employee_status': forms.Select(),
-            'employee_image': forms.ClearableFileInput(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -46,23 +50,29 @@ class EmployeeForm(ModelForm):
             }
         )
 
-    def _setup_image_field(self):
-        # Make image required only for new employees.
-        if not self.instance.pk:
-            self.fields['employee_image'].required = True
-
-    def validate_date_format(self, date_str):
-        # Helper function to validate 'YYYY-MM-DD' format.
+    # Helper function to validate 'YYYY-MM-DD' format.
+    def validate_date_format(self, date_str): 
         try:
             datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:
             raise forms.ValidationError("Invalid date format. Use 'YYYY-MM-DD'.")
-        
+    
+    # Helper function to validate 11-digit numbers.    
+    def validate_contact_number(self, contact_number):
+        if not contact_number.isdigit() or len(contact_number) != 11:
+            raise forms.ValidationError("Invalid contact number. Must be exactly 11 digits.")
+        return contact_number
+
+    def _setup_image_field(self):
+        # Make image required only for new employees.
+        if not self.instance.pk:
+            self.fields['employee_image'].required = True
+    
     def clean_date_of_birth(self):
         # Validate that employee is at least 18 years old
         date_of_birth = self.cleaned_data.get('date_of_birth')
         if date_of_birth:
-            # Calculate age without using dateutil
+
             today = timezone.now().date()
             age = today.year - date_of_birth.year
             
@@ -80,12 +90,6 @@ class EmployeeForm(ModelForm):
         if date_of_employment:
             self.validate_date_format(str(date_of_employment))
         return date_of_employment
-
-    def validate_contact_number(self, contact_number):
-        # Helper function to validate 11-digit numbers.
-        if not contact_number.isdigit() or len(contact_number) != 11:
-            raise forms.ValidationError("Invalid contact number. Must be exactly 11 digits.")
-        return contact_number
 
     def clean_contact_number(self):
         return self.validate_contact_number(self.cleaned_data.get('contact_number', ''))
@@ -114,15 +118,7 @@ class PayrollForm(ModelForm):
         widget = {
             'payroll_status': forms.Select(),
         }
-        
-    def clean(self):
-        cleaned_data = super().clean()
-        required_fields = ['rate', 'payment_date', 'payroll_status']
-
-        # Check if all required fields are filled
-        if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
-            raise forms.ValidationError("All fields must be filled.")
-        
+            
     def validate_date_format(self, date_str):
         # Helper function to validate 'YYYY-MM-DD' format.
         try:
@@ -135,6 +131,14 @@ class PayrollForm(ModelForm):
         if payment_date:
             self.validate_date_format(str(payment_date))
         return payment_date    
+
+    def clean(self):
+        cleaned_data = super().clean()
+        required_fields = ['rate', 'payment_date', 'payroll_status']
+
+        # Check if all required fields are filled
+        if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
+            raise forms.ValidationError("All fields must be filled.")
     
 class AdminEditProfileForm(UserChangeForm):
     username = forms.CharField(max_length=100, widget=forms.TextInput(attrs={

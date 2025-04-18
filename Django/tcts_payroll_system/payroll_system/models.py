@@ -21,9 +21,8 @@ class Gender(models.TextChoices):
         OTHERS = 'Others', _('Others')
 
 # Create your models here.
-
 class Region(models.Model):
-    id = models.AutoField(primary_key=True)  # Add this line
+    id = models.AutoField(primary_key=True)
     psgcCode = models.CharField(max_length=10)
     regDesc = models.CharField(max_length=255)
     regCode = models.CharField(max_length=10)
@@ -36,7 +35,7 @@ class Region(models.Model):
         managed = False
 
 class Province(models.Model):
-    id = models.AutoField(primary_key=True)  # Add this line
+    id = models.AutoField(primary_key=True)
     psgcCode = models.CharField(max_length=10)
     provDesc = models.CharField(max_length=255)
     regCode = models.CharField(max_length=10)
@@ -50,7 +49,7 @@ class Province(models.Model):
         managed = False
 
 class City(models.Model):
-    id = models.AutoField(primary_key=True)  # Add this line
+    id = models.AutoField(primary_key=True)
     psgcCode = models.CharField(max_length=10)
     citymunDesc = models.CharField(max_length=255)
     regDesc = models.CharField(max_length=10)
@@ -65,7 +64,7 @@ class City(models.Model):
         managed = False
 
 class Barangay(models.Model):
-    id = models.AutoField(primary_key=True)  # Add this line
+    id = models.AutoField(primary_key=True)
     brgyDesc = models.CharField(max_length=255)
     regCode = models.CharField(max_length=10)
     provCode = models.CharField(max_length=10)
