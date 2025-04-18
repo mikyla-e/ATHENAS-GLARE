@@ -154,87 +154,13 @@ def employee_registration(request):
         form = EmployeeForm(request.POST, request.FILES)
         
         if form.is_valid():
-            employee = form.save(commit=False)
+            employee = form.save()
             
-            # Handle location fields with proper lookups and validation
-            try:
-                # Validate region
-                region_name = request.POST.get('region')
-                region = None
-                if region_name:
-                    region = Region.objects.filter(regDesc=region_name).first()
-                    if not region:
-                        form.add_error('region', 'Please select a valid region')
-                        raise ValueError("Invalid region selected")
-                    employee.region = region
-                else:
-                    form.add_error('region', 'Region is required')
-                    raise ValueError("Region is required")
-                
-                # Validate province
-                province_name = request.POST.get('province')
-                province = None
-                if province_name:
-                    province = Province.objects.filter(
-                        provDesc=province_name,
-                        regCode=region.regCode
-                    ).first()
-                    
-                    if not province:
-                        form.add_error('province', 'Province must belong to the selected region')
-                        raise ValueError("Province doesn't match region")
-                    employee.province = province
-                else:
-                    form.add_error('province', 'Province is required')
-                    raise ValueError("Province is required")
-                
-                # Validate city
-                city_name = request.POST.get('city')
-                city = None
-                if city_name:
-                    city = City.objects.filter(
-                        citymunDesc=city_name,
-                        provCode=province.provCode
-                    ).first()
-                    
-                    if not city:
-                        form.add_error('city', 'City must belong to the selected province')
-                        raise ValueError("City doesn't match province")
-                    employee.city = city
-                else:
-                    form.add_error('city', 'City is required')
-                    raise ValueError("City is required")
-                
-                # Validate barangay
-                barangay_name = request.POST.get('barangay')
-                if barangay_name:
-                    barangay = Barangay.objects.filter(
-                        brgyDesc=barangay_name,
-                        citymunCode=city.citymunCode
-                    ).first()
-                    
-                    if not barangay:
-                        form.add_error('barangay', 'Barangay must belong to the selected city')
-                        raise ValueError("Barangay doesn't match city")
-                    employee.barangay = barangay
-                else:
-                    form.add_error('barangay', 'Barangay is required')
-                    raise ValueError("Barangay is required")
-                
-                employee.save()
-                
-                # Create history entry
-                History.objects.create(
-                    description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was added."
-                )
-                return redirect('payroll_system:payroll_individual', employee_id=employee.employee_id)
-            
-            except Exception as e:
-                import traceback
-                traceback.print_exc()
-                form.add_error(None, f"Could not save employee: {e}")
-        else:
-            print("Form errors:", form.errors)
+            # Create history entry
+            History.objects.create(
+                description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was added."
+            )
+            return redirect('payroll_system:payroll_individual', employee_id=employee.employee_id)
     else:
         form = EmployeeForm()
     
@@ -527,9 +453,9 @@ def payroll_individual(request, employee_id):
     latest_time_log = Attendance.objects.filter(employee_id_fk=employee, date=today).order_by('-time_in').first()
 
     # Determine active status
-    employee.active_status = False
+    employee.active_status = Employee.ActiveStatus.INACTIVE
     if latest_time_log and latest_time_log.time_in and not latest_time_log.time_out:
-        employee.active_status = True
+        employee.active_status = Employee.ActiveStatus.ACTIVE
 
     # Save updated active_status in database
     employee.save(update_fields=['active_status'])
@@ -541,7 +467,6 @@ def payroll_individual(request, employee_id):
         'current_payroll': current_payroll,
         'attendance_count': attendance_count
     })
-
 
 @login_required
 def payroll_edit(request, employee_id):

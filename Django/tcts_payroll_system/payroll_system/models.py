@@ -1,5 +1,6 @@
 import os
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -118,15 +119,84 @@ class Employee(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+    def clean(self):
+        #Validate model data before saving
+        # Call parent's clean method
+        super().clean()
+        
+        # Check for duplicate employees based on name and birth date
+        if self.first_name and self.last_name and self.date_of_birth:
+            existing_employees = Employee.objects.filter(
+                first_name=self.first_name,
+                last_name=self.last_name,
+                date_of_birth=self.date_of_birth
+            )
+            
+            # Exclude self when updating an existing employee
+            if self.employee_id:
+                existing_employees = existing_employees.exclude(employee_id=self.employee_id)
+            
+            # If any match is found, raise a validation error
+            if existing_employees.exists():
+                raise ValidationError({
+                    'first_name': "An employee with this name and birth date already exists.",
+                    'last_name': "Please verify this is not a duplicate entry or add a middle name to distinguish."
+                })
+        
+        # Validate contact number format
+        if self.contact_number and (not self.contact_number.isdigit() or len(self.contact_number) != 11):
+            raise ValidationError({'contact_number': "Contact number must be exactly 11 digits."})
+        
+        # Validate emergency contact format
+        if self.emergency_contact and (not self.emergency_contact.isdigit() or len(self.emergency_contact) != 11):
+            raise ValidationError({'emergency_contact': "Emergency contact must be exactly 11 digits."})
+        
+        # Validate emergency contact is different from contact number
+        if self.contact_number and self.emergency_contact and self.contact_number == self.emergency_contact:
+            raise ValidationError({'emergency_contact': "Emergency contact cannot be the same as personal contact."})
+        
+        # Validate age is at least 18
+        if self.date_of_birth:
+            today = timezone.now().date()
+            age = today.year - self.date_of_birth.year
+            
+            # Adjust age if birthday hasn't occurred yet this year
+            if (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day):
+                age -= 1
+            
+            if age < 18:
+                raise ValidationError({'date_of_birth': "Employee must be at least 18 years old."})
+        
+        # Validate date of employment
+        if self.date_of_employment and self.date_of_birth:
+            # Check if employment date is after birth date
+            if self.date_of_employment < self.date_of_birth:
+                raise ValidationError({'date_of_employment': "Employment date cannot be before birth date."})
+            
+            # Check if employee is at least 18 at employment date
+            age_at_employment = self.date_of_employment.year - self.date_of_birth.year
+            if (self.date_of_employment.month, self.date_of_employment.day) < (self.date_of_birth.month, self.date_of_birth.day):
+                age_at_employment -= 1
+                
+            if age_at_employment < 18:
+                raise ValidationError({
+                    'date_of_employment': "Employee must be at least 18 years old at date of employment."
+                })
+
+    def save(self, *args, **kwargs):
+        # Run full validation before saving (ensures model-level validation runs)
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def update_attendance_stats(self):
         # Update attendance statistics for the current month
         today = timezone.now().date()
         first_day = today.replace(day=1)
         
-        self.days_worked = self.attendances.filter(
+        days_worked = self.attendances.filter(
             date__gte=first_day,
             date__lte=today,
-            attendance_status='Present'  # Assuming this is the correct status value
+            attendance_status='Present'
         ).count()
         
         # Calculate business days
@@ -137,8 +207,17 @@ class Employee(models.Model):
                 workdays_so_far += 1
             day += timedelta(days=1)
 
-        self.absences = workdays_so_far - self.days_worked
-        self.save(update_fields=['days_worked', 'absences'])
+        absences = workdays_so_far - days_worked
+        
+        # Use update() method to bypass validation
+        Employee.objects.filter(employee_id=self.employee_id).update(
+            days_worked=days_worked, 
+            absences=absences
+        )
+        
+        # Update the instance attributes
+        self.days_worked = days_worked
+        self.absences = absences
 
 class Attendance(models.Model):
     class AttendanceStatus(models.TextChoices):
