@@ -23,6 +23,8 @@
     #employee-data:last-child td{
         border-bottom:none;
     }
+
+    
 </style>
 {% endblock %}
 
@@ -41,7 +43,7 @@
     </div>
     
     <div class="flex flex-col justify-center" id="table">
-        <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="customer-table">
+        <table class="bg-white w-full my-5 border border-solid rounded-2xl text-xs-center overflow-hidden" id="customer-table">
             
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="text-base text-center font-[League Spartan]">
@@ -81,7 +83,10 @@
             </tbody>
         </table>
         <div class="button">
-            <a href="{% url 'payroll_system:employee_registration' %}"><button class="addemployeebutton">ADD EMPLOYEE +</button></a>
+            <a class="text-[#F8D146] text-3xs hover:text-black" href="{% url 'payroll_system:employee_registration' %}">
+                <button class="cursor-pointer rounded-2xl p-1 w-40 bg-black 
+                hover:bg-[#F8D146] transition-colors duration-300">ADD EMPLOYEE +</button>
+            </a>
         </div>
     </div>
 </div>
@@ -106,4 +111,5 @@
         .draw();
     });
 </script>
+
 {% endblock %}
