@@ -1,10 +1,3 @@
-.dt-length{
-    display: none;
-}
-.dt-search {
-    display: none;
-}
-
 #title,
 #percentage{
     background: -webkit-linear-gradient(#F8D146, #F5B93F);
@@ -28,19 +21,6 @@
     -webkit-text-fill-color: transparent;
 }
 
-#payroll-data:nth-child(odd), .dt-empty{
-    background-color: #f2f2f2 !important;
-}
-
-#payroll-data td, .dt-empty{
-    border-bottom: 2px solid rgba(30, 30, 30, 0.20) !important;
-}
-
-#payroll-data:last-child td, .dt-empty{
-    border-bottom:none !important;
-}
-
-
 /*pop up*/
 
 .background.show,
@@ -60,53 +40,3 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
-.edit_incentives_popup form .incentives_field{
-    margin: 20px 0;
-    display: flex;
-    flex-direction: column;
-}
-
-
-.edit_incentives_popup form .buttons{
-    display: flex;
-    justify-content: end;
-    gap: 10px;
-}
-/* 
-.edit_incentives_popup form .buttons input[type=button]{
-    border: none;
-    border-radius: 100px;
-
-    padding: 10px 7.5%;
-
-    font-family: 'Roboto';
-    font-size: 1rem;
-    font-weight: 700;
-    
-    background: linear-gradient(180deg, #DC4646 0%, #DC4646 100%);
-    color: #fff;
-}
-
-.edit_incentives_popup form .buttons input[type=button]:hover{
-    cursor: pointer;
-}
-
-.edit_incentives_popup form .buttons input[type=submit]{
-    border: none;
-    border-radius: 100px;
-
-    padding: 10px 7.5%;
-
-    font-family: 'Roboto';
-    font-size: 1rem;
-    font-weight: 700;
-    
-    background: linear-gradient(180deg, #F8D146 0%, #F5B93F 100%);
-    color: #fff;
-}
-
-.edit_incentives_popup form .buttons input[type=submit]:hover{
-    cursor: pointer;
-}
- */

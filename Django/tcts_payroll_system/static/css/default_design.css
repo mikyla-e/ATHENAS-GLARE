@@ -15,6 +15,39 @@ input[type=submit]{
     
 }
 
+#button_1{
+    padding: 0 20px;
+    width: fit-content;
+
+    font-family: 'League Spartan';
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+
+    border-radius: 30px;
+    border: none;
+
+    background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
+    color: white;
+}
+
+#button_2{
+    padding: 0 20px;
+    width: fit-content;
+
+    font-family: 'League Spartan';
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+
+    border-radius: 30px;
+    border: none;
+
+    background-image: linear-gradient(to right, #1e1e1e , #1e1e1e); 
+    color: #F8D146;
+    
+}
+
 #button:hover,
 input[type=submit]:hover{
     cursor: pointer;
@@ -22,6 +55,12 @@ input[type=submit]:hover{
     transition: 0.5s;
     background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
     color: #F8D146;
+}
+
+#button_1:hover, #button_2:hover{
+    cursor: pointer;
+    scale: 1.05;
+    transition: 0.5s;
 }
 
 

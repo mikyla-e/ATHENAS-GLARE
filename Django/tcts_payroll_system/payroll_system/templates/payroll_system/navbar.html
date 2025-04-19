@@ -15,7 +15,7 @@
     }
 </style>
 
-<nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
+<nav class="fixed w-[80px] md:w-[190px] h-screen flex flex-col bg-[#FFFFFF] shadow-lg/30 z-50">
     <div class="bg-[#FFFFFF] cols-span-1 row-span-1">
         <div class="h-[70px] flex flex-wrap justify-center place-items-center md:gap-2" id="logo">
             <div class="-mb-2 md:mb-0" id="logo-picture">
@@ -27,7 +27,7 @@
             </div>
         </div>
     </div>
-    <div class="overflow-hidden" id="menu">
+    <div class="flex-1 overflow-y-auto" id="menu">
         <ul class="h-auto w-[80px] md:w-[190px]">
             <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if request.path == '/payroll_system/dashboard/' %}focused{% endif %}">
                 <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:dashboard' %}">

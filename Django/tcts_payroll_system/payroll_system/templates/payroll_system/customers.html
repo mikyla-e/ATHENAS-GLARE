@@ -4,40 +4,13 @@
 {% block title %}Customers{% endblock %}
 
 {% block headcontent %}
-<style>
-    .dt-length{
-        display: none;
-    }
-    .dt-search {
-        display: none;
-    }
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
 
-    #employee-data:nth-child(odd){
-        background-color: #f2f2f2;
-    }
+<!--Datatables-->
+<link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
+<script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
 
-    #employee-data td{
-        border-bottom: 2px solid rgba(30, 30, 30, 0.20);
-    }
-
-    #employee-data:last-child td{
-        border-bottom:none;
-    }
-    .dt-length, .dt-search, .dt-info{
-        font-family: 'League Spartan';
-    }
-    .dt-paging{
-    text-align: right;
-    }
-    .dt-layout-cell, .dt-layout-start{
-        /* display: flex; */
-    }
-    .dt-layout-row{
-        /* display: flex;
-        justify-content: space-between; */
-    }
-    
-</style>
 {% endblock %}
 
 
@@ -54,19 +27,20 @@
         </form>
     </div>
     
-    <div class="flex flex-col justify-center" id="table">
+    <div class="flex flex-col justify-center">
         <table class="bg-white w-full my-5 border border-solid rounded-2xl text-xs-center overflow-hidden" id="customer-table">
-            
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                <tr class="text-base text-center font-[League Spartan]">
+                <tr class="text-base font-[League Spartan]">
                     <th class="py-2">CUSTOMER NAME</th>
-                    <th>GENDER</th> 
+                    <th>CONTACT NUMBER</th> 
                     <th>ADDRESS</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                <tr id="employee-data">
+            {% for customer in customers %}
+                {% if latest_payroll %}
+                <tr id="customer-data">
                     <td>{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
                     <td>{{ customer.gender }}</td>
                     <td>{{ customer.region }}, {{ customer.province }}, {{ customer.municipality }}, {{ customer.barangay }}</td>
@@ -74,32 +48,17 @@
                         <a class="" href="#">MORE</a>
                     </td>
                 </tr>
-                <tr id="employee-data">
-                    <td>{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
-                    <td>{{ customer.gender }}</td>
-                    <td>{{ customer.region }}, {{ customer.province }}, {{ customer.municipality }}, {{ customer.barangay }}</td>
+                {% else %}
+                <tr id="customer-data">
+                    <td colspan="4">No customer records found</td>
                     <td>
                         <a class="" href="#">MORE</a>
                     </td>
                 </tr>
-            {% for employee in employees %}
-                <tr id="employee-data">
-                    <td>{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
-                    <td>{{ customer.gender }}</td>
-                    <td>{{ customer.region }}, {{ customer.province }}, {{ customer.municipality }}, {{ customer.barangay }}</td>
-                    <td>
-                        <a class="" href="#">MORE</a>
-                    </td>
-                </tr>
+                {% endif %}
             {% endfor %}
             </tbody>
         </table>
-        <div class="button">
-            <a class="text-[#F8D146] text-3xs hover:text-black" href="{% url 'payroll_system:employee_registration' %}">
-                <button class="cursor-pointer rounded-2xl p-1 w-40 bg-black 
-                hover:bg-[#F8D146] transition-colors duration-300">ADD EMPLOYEE +</button>
-            </a>
-        </div>
     </div>
 </div>
 {% endblock %}
@@ -111,16 +70,19 @@
 <script>
     let table;  
 
-    $(document).ready( function () {
-        table = $('#customer-table').DataTable();
-    } );
+    $(document).ready(function () {
+        table = $('#customer-table').DataTable({
+            responsive: true
+        });
 
-    $("#search-input").on('change', (e) => {
-        console.log(e.currentTarget.value)
-        table.search(function (d) {
-            return d.includes(e.currentTarget.value);
-        })
-        .draw();
+        // Make search input work with DataTables
+        $('#search-input').on('keyup', function () {
+            table.search(this.value).draw();
+        });
+    });
+
+    $(document).on('keypress', '#search-input', function (e) {
+        if (e.which == 13) e.preventDefault();
     });
 </script>
 

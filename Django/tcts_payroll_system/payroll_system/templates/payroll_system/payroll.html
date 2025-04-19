@@ -7,6 +7,7 @@
 <!--(optional)head content-->
 {% block headcontent %}
 <link rel="stylesheet" href="{% static 'css/payroll.css' %}">
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
 <link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 
 <!--Datatables-->
@@ -63,8 +64,8 @@
     
 </div> 
 
-<div id="incentive-popup" class="edit_incentives_popup absolute w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
-    <h1>Edit for all employees</h1>
+<div id="incentive-popup" class="edit_incentives_popup absolute w-[80%] sm:w-[60%] md:w-[50%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
+    <h1>Add/Deduct for all Employees</h1>
     <form class="flex flex-col" method="post" onsubmit="event.preventDefault();">
         <div class="flex items-center my-2" >
             <div id="add-radio" class="flex flex-wrap">
@@ -88,7 +89,7 @@
             <input type="text" name="incentives" id="field" class="field" placeholder="ex. 1000.00">
         </div>
 
-        <div class="w-full h-[40px] my-1 flex justify-end gap-3">
+        <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
             <input type="button" class="size-full" value="CANCEL" onclick="cancelEditIncentives()">
             <input type="submit" class="size-full" value="CONFIRM">
         </div>
@@ -185,7 +186,7 @@
     <div class="md:hidden flex flex-col justify-center">
         <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="payroll-table-1">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                <tr class="text-base text-center font-[League Spartan]">
+                <tr class="text-base font-[League Spartan]">
                     <th class="py-2">EMPLOYEE</th>
                     <th>STATUS</th>
                     <!-- <th>DEDUCTIONS</th> -->

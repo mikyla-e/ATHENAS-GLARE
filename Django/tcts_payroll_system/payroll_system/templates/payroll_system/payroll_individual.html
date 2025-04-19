@@ -7,310 +7,229 @@
 <!--(optional)head content-->
 {% block headcontent %}
 <link rel="stylesheet" href="{% static 'css/payroll_individual.css'%}">
+<link rel="stylesheet" href="{% static 'css/table.css'%}">
+<link rel="stylesheet" href="{% static 'css/default_design.css' %}">
+
+<style>
+    .background.show,
+    .edit_incentives_popup.show {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .edit_incentives_popup h1{
+        margin: 0;
+        font-family: 'League Spartan';
+        font-size: 2rem;
+        font-weight: 500;
+
+        background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    #label{
+        margin: 0 10px;
+        font-family: 'Inter';
+        font-size: 14px;
+        font-weight: 600;
+        color: #1e1e1e;
+    }
+
+    #current_payroll_table td:nth-child(even){
+        background-color: #f2f2f2;
+    }
+
+    td {
+        font-family: 'Inter';
+        text-align: center;
+        font-size: 13px;
+
+        border-bottom: 1px solid #cac5c5;
+        border-left: 2px solid #cac5c5;
+    }
+
+    th:first-child, td:first-child{
+        border-left: none;
+    }
+
+    tr:first-child th {
+        border-top: none;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+</style>
 {% endblock %}
 
 <!--header-->
 {% block header %}PAYROLL{% endblock %} 
 
 <!--page content-->
-{% block content %}
-<div class="container">
-    <div class="container-1">
-        <div class="employee_info">
-            <div class="profile-picture">
-                <img src="{{ employee.employee_image.url }}" alt="">
+
+{% block outsidecontent %}
+<div id="background" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelEditIncentives()">
+    
+</div> 
+
+<div id="incentive-popup" class="edit_incentives_popup absolute w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
+    <h1>Add/Deduct for {{ employee.first_name }} {{ employee.last_name }}</h1>
+    <form class="flex flex-col" method="post" onsubmit="event.preventDefault();">
+        <div class="flex items-center my-2" >
+            <div id="add-radio" class="flex flex-wrap">
+                <label class="relative flex items-center cursor-pointer" for="add">
+                    <input id="add" name="incentives" type="radio" class="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-yellow-400 transition-all"/>
+                    <span class="absolute bg-[#F8D146] w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                </label>
+                <p id="label">add</p>
             </div>
             
-            <div class="employee_status">
-                <div class="name">
-                    <p>{{ employee.first_name }} {{ employee.last_name }}</p>
-                </div>
-                <div class="attendance">
-                    <p>
-                        {% if employee.active_status %}
-                            Active
-                        {% else %}
-                            Inactive
-                        {% endif %}
-                    </p>
-                </div>
-                <div class="payroll">
-                    {% if current_payroll %}
-                        <p>{{ current_payroll.payroll_status }}</p>
-                    {% else %}
-                        <p>None</p>
-                    {% endif %}
-                </div>
-            </div>  
+            <div id="subtract-checkbox" class="flex flex-wrap">
+                <label class="relative flex items-center cursor-pointer" for="subtract">
+                    <input id="subtract" name="incentives" type="radio" class="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-yellow-400 transition-all"/>
+                    <span class="absolute bg-[#F8D146] w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                </label>
+                <p id="label">subtract</p>
+            </div>
         </div>
-        
-        <div class="buttons">
-            <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}"><button class="check-employee">check employee profile >></button></a>
-            <button class="edit-employee" onclick="editIncentives()">EDIT EMPLOYEE INCENTIVES</button>
-        </div>
-    </div>
-    
-    
 
-    <div class="div1">
-        <table class="table-1">
-            <tr>
-                <th>Rate per day</th>
-                <th>No. of Attendance during the week</th>
-                <!-- <th>Deductions</th> -->
-                <th>Total Payment Amount</th>
-                <th>Date of Pay</th>
-                <th></th>
-            </tr>
-                {% if current_payroll %}
-                    <td>{{ current_payroll.rate }}</td>
-                    <td>{{ attendance_count }}</td>
-                    <!-- <td>{{ current_payroll.deductions }}</td> -->
-                    <td>{{ current_payroll.salary }}</td>
-                    <td>{{ current_payroll.payment_date }}</td>
-                    <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
+        <div class="flex flex-col my-2">
+            <input type="text" name="incentives" id="field" class="field" placeholder="ex. 1000.00">
+        </div>
+
+        <div class="w-full h-[40px] my-1 flex justify-end gap-3">
+            <input type="button" class="size-full" value="CANCEL" onclick="cancelEditIncentives()">
+            <input type="submit" class="size-full" value="CONFIRM">
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="w-full flex flex-col justify-center gap-5 z-10">
+    <div id="profile-picture" class="rounded-full h-full w-[100px]">
+        {% if employee.active_status %}
+            <img class="rounded-full size-[100px] object-cover" src="{{ employee.employee_image.url }}" alt="">
+        {% else %}
+            <img class="rounded-full size-[100px] object-cover" src="{% static 'images/employee_image' %}" alt="">
+        {% endif %}
+    </div>
+
+    <div id="status" class="h-[65%] w-[85%] bg-white rounded-full flex justify-evenly items-center">
+        <div id="name">
+            <p class="text-[#F8D146] font-bold text-[Roboto]">{{ employee.first_name }} {{ employee.middle_name }} {{ employee.last_name }}</p>
+        </div>
+
+        <span class="w-[1.5px] h-[60%] mx-2 bg-black rounded-full"></span> <!--horizontal line-->
+
+        <div id="attendance">
+            <p class="text-[Inter]">
+                {% if employee.active_status %}
+                    Active
                 {% else %}
-                    <td>0.00</td>
-                    <td>{{ attendance_count|default:"0" }}</td>
-                    <!-- <td>0.00</td> -->
-                    <td>0.00</td>
-                    <td>N/A</td>
-                    <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
+                    Inactive
                 {% endif %}
-        </table>
-    </div>
-
-    <div class="div2">
-        <div class="tableheader">
-            <p style="margin: 15px;">Summary of Past Payroll Records</p>
+            </p>
         </div>
-        <table>
-            <th>Rate per day</th>
-            <th>No. of Attendance during the week</th>
-            <th>Incentives</th>
-            <!-- <th>Total Deduction</th> -->
-            <th>Total Payment Amount</th>
-            <th>Date of Pay</th>
-            <tr>
-            {% if current_payroll %}
-                <td>{{ current_payroll.rate }}</td>
-                <td>
-                    {% with attendance_count=employee.attendances.count %}
-                        {{ attendance_count|default:"0" }}
-                    {% endwith %}
-                </td>
-                <td>{{ current_payroll.incentives }}</td>
-                <!-- <td>{{ current_payroll.deductions }}</td> -->
-                <td>{{ current_payroll.salary }}</td>
-                <td>{{ current_payroll.payment_date }}</td>
-            {% else %}
-                <td>0.00</td>
-                <td>N/A</td>
-                <td>0.00</td>
-                <!-- <td>0.00</td> -->
-                <td>0.00</td>
-                <td>N/A</td>
-            {% endif %}
-            </tr>
-        </table>
-    </div>
-</div>
 
-<div class="background" id="background">
-    <div class="edit_incentives_popup" id="editIncentivesPopup">
-        <h1>Edit for <span>{{ employee.first_name }} {{ employee.last_name }}</span>.</h1>
-        <form method="post">
-            <div class="incentives_field">
-                <label for="incentives">Incentives</label>
-                <input type="text" name="incentives" id="incentives" placeholder="ex. 1000.00">
-            </div>
-
-            <div class="buttons">
-                <input type="button" value="Cancel" onclick="cancelEditIncentives()">
-                <input type="submit" value="Save">
-            </div>
-        </form>
-    </div>
-</div>
-{% endblock %}
-
-<!--(optional)script-->
-{% block script %}
-<script>
-    function editIncentives(){
-        const bg = document.getElementById("background");
-        bg.classList.add("show");
-    }
-
-    function cancelEditIncentives(){
-        const bg = document.getElementById("background");
-        bg.classList.remove("show");
-    }
-</script>
-{% endblock %}
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payroll</title>
-    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/payroll_individual.css'%}">
-
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-</head>
-<body class="bg-[#EFEDE6]">
-    <nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
-        <div class="bg-[#FFFFFF] cols-span-1 row-span-1">
-            <div class="h-[70px] flex flex-wrap justify-center place-items-center md:gap-2" id="logo">
-                <div class="-mb-2 md:mb-0" id="logo-picture">
-                    <img class="h-8 md:h-10" src="{% static 'images/logo_icon.png' %}" alt="">
-                </div>
-                <div class="text-[#1E1E1E] text-xs/3 md:text-lg/5 font-[League Spartan] font-extrabold" id="logo-name">
-                    <p class="text-center md:text-left ">PAYROLL</p>
-                    <p class="text-center md:text-left">SYSTEM</p>
-                </div>
-            </div>
-        </div>
-        <div class="overflow-hidden" id="menu">
-            <ul class="h-auto w-[80px] md:w-[190px]">
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:dashboard' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/dashboard_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">DASHBOARD</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/payroll_icon_focused.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/employee_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/services_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:status' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/status_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">STATUS</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:customers' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/customers_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:settings' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/settings_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SETTINGS</div>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="h-dvh w-full grid grid-cols-[80px_1fr] md:grid-cols-[190px_1fr] grid-rows-[70px_1fr] z-25">
-        <div class="bg-[#FFFFFF] row-span-2">
-
-        </div>
+        <span class="w-[1.5px] h-[60%] mx-2 bg-black rounded-full"></span> <!--horizontal line-->
         
-        <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">PAYROLL</h1>
+        <div id="payroll">
+            <p class="text-[Inter]">
+                {% if current_payroll %}
+                    {{ current_payroll.payroll_status }}
+                {% else %}
+                    None
+                {% endif %}
+            </p>
         </div>
+    </div>
 
-        <div class="size-full py-4 px-3" id="thing">
-            <div class="container">
-                <div class="container-1">
-                    <div class="employee_info">
-                        <div class="profile-picture">
-                            <img src="{{ employee.employee_image.url }}" alt="">
-                        </div>
-                        
-                        <div class="employee_status">
-                            <div class="name">
-                                <p>{{ employee.first_name }} {{ employee.last_name }}</p>
-                            </div>
-                            <div class="attendance">
-                                <p>
-                                    {% if employee.active_status %}
-                                        Active
-                                    {% else %}
-                                        Inactive
-                                    {% endif %}
-                                </p>
-                            </div>
-                            <div class="payroll">
-                                {% if current_payroll %}
-                                    <p>{{ current_payroll.payroll_status }}</p>
-                                {% else %}
-                                    <p>None</p>
-                                {% endif %}
-                            </div>
-                        </div>  
-                    </div>
-                    
-                    <div class="buttons">
-                        <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}"><button class="check-employee">check employee profile >></button></a>
-                        <button class="edit-employee" onclick="editIncentives()">EDIT EMPLOYEE INCENTIVES</button>
-                    </div>
-                </div>
-                
-                
+    <div id="buttons" class="h-full w-[45%] flex flex-row justify-center items-end gap-2">
+        <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}">
+            <button id="button_2" class="h-[50px]">check employee profile >></button>
+        </a>
+        <button id="button_1" class="h-[50px] flex flex-row justify-center items-center gap-2" onclick="editIncentives()">
+            <p class="m-0 p-0 text-[#FFF] font-bold text-lg">EMPLOYEES' INCENTIVES</p>
+            <img src="{% static 'images/edit_icon.png' %}" alt="">
+        </button>
+    </div>
     
-                <div class="div1">
-                    <table class="table-1">
-                        <tr>
-                            <th>Rate per day</th>
-                            <th>No. of Attendance during the week</th>
-                            <!-- <th>Deductions</th> -->
-                            <th>Total Payment Amount</th>
-                            <th>Date of Pay</th>
-                            <th></th>
-                        </tr>
-                            {% if current_payroll %}
-                                <td>{{ current_payroll.rate }}</td>
-                                <td>{{ attendance_count }}</td>
-                                <!-- <td>{{ current_payroll.deductions }}</td> -->
-                                <td>{{ current_payroll.salary }}</td>
-                                <td>{{ current_payroll.payment_date }}</td>
-                                <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
-                            {% else %}
-                                <td>0.00</td>
-                                <td>{{ attendance_count|default:"0" }}</td>
-                                <!-- <td>0.00</td> -->
-                                <td>0.00</td>
-                                <td>N/A</td>
-                                <td><a href="{% url 'payroll_system:payroll_edit' employee.employee_id %}"><img class="edit-icon" src="{% static 'images/payroll_edit_icon.png' %}" alt=""></a></td>
-                            {% endif %}
-                    </table>
-                </div>
-    
-                <div class="div2">
-                    <div class="tableheader">
-                        <p style="margin: 15px;">Summary of Past Payroll Records</p>
-                    </div>
-                    <table>
-                        <th>Rate per day</th>
-                        <th>No. of Attendance during the week</th>
-                        <th>Incentives</th>
-                        <!-- <th>Total Deduction</th> -->
-                        <th>Total Payment Amount</th>
-                        <th>Date of Pay</th>
-                        <tr>
+    <div class="h-[100px] w-full flex flex-wrap md:flex-nowrap justify-around gap-3">
+        <div class="w-[55%] flex items-end justify-between gap-2">
+            
+            
+
+            
+        </div>
+    </div>
+
+    <div id="current_payroll" class="w-full">
+        <table id="current_payroll_table" class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden">
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr class="text-base font-[League Spartan]">
+                    <th class="py-2">RATE PER DAY</th>
+                    <th>TOTAL ATTENDANCE</th>
+                    <th>TOTAL INCENTIVES</th>
+                    <!-- <th>Deductions</th> -->
+                    <th>TOTAL PAYMENT AMOUNT</th>
+                    <th>DATE OF PAY</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% if current_payroll %}
+                        <td>{{ current_payroll.rate }}</td>
+                        <td>{{ attendance_count }}</td>
+                        <td>INCENTIVES</td>
+                        <td>{{ current_payroll.salary }}</td>
+                        <td>{{ current_payroll.payment_date }}</td>
+                        <td class="w-full h-[30%] flex justify-center items-center">
+                            <a class="size-full" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
+                                <img class="h-[30%] py-2 cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
+                            </a>
+                        </td>
+                    {% else %}
+                        <td>0.00</td>
+                        <td>{{ attendance_count|default:"0" }}</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>N/A</td>
+                        <td class="w-full h-full py-2 flex justify-center items-center">
+                            <a class="w-[30%]" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
+                                <img class="size-full cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
+                            </a>
+                        </td>
+                    {% endif %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <span class="w-[100%] h-[2px] bg-black rounded-full"></span> <!--horizontal line-->
+
+    <div class="w-full flex flex-col justify-center gap-3">
+        <div class="w-full flex justify-center items-center">
+            <h1 class="text-lg font-extrabold text-[]">PAYROLL HISTORY</h1>
+        </div>
+        <div id="table">
+            <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden">
+                <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                    <tr class="text-base font-[League Spartan]">
+                        <th class="py-2">RATE PER DAY</th>
+                        <th>TOTAL ATTENDANCE</th>
+                        <th>TOTAL INCENTIVES</th>
+                        <th>TOTAL PAYMENT AMOUNT</th>
+                        <th>DATE OF PAY</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="payroll-data" class="h-[50px]">
                         {% if current_payroll %}
                             <td>{{ current_payroll.rate }}</td>
                             <td>
@@ -330,44 +249,29 @@
                             <td>0.00</td>
                             <td>N/A</td>
                         {% endif %}
-                        </tr>
-                    </table>
-                </div>
-            </div>
-
-            <div class="background" id="background">
-                <div class="edit_incentives_popup" id="editIncentivesPopup">
-                    <h1>Edit for <span>{{ employee.first_name }} {{ employee.last_name }}</span>.</h1>
-                    <form method="post">
-                        <div class="incentives_field">
-                            <label for="incentives">Incentives</label>
-                            <input type="text" name="incentives" id="incentives" placeholder="ex. 1000.00">
-                        </div>
-
-                        <div class="buttons">
-                            <input type="button" value="Cancel" onclick="cancelEditIncentives()">
-                            <input type="submit" value="Save">
-                        </div>
-                    </form>
-                </div>
-            </div>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <script>
-        function editIncentives(){
-            const bg = document.getElementById("background");
-            bg.classList.add("show");
-        }
+<!--(optional)script-->
+{% block script %}
+<script>
+    function editIncentives(){
+        const bg = document.getElementById("background");
+        const popup = document.getElementById("incentive-popup");
+        bg.classList.add("show");
+        popup.classList.add("show");
+    }
     
-        function cancelEditIncentives(){
-            const bg = document.getElementById("background");
-            bg.classList.remove("show");
-        }
-    </script>
-
-</body>
-
-{{ redirect_to_login_immediately }}
-
-</html>
+    function cancelEditIncentives(){
+        const bg = document.getElementById("background");
+        const popup = document.getElementById("incentive-popup");
+        bg.classList.remove("show");
+        popup.classList.remove("show");
+    }
+</script>
+{% endblock %}
