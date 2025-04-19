@@ -5,23 +5,6 @@
     display: none;
 }
 
-table.dataTable th.dt-type-numeric,
-table.dataTable td.dt-type-numeric{
-    text-align: left;
-}
-
-#payroll-table_info{
-    font-family: 'League Spartan';
-}
-
-#payment-amount{
-    text-align: right !important;
-}
-
-#more{
-    text-align: center !important;
-}
-
 #title,
 #percentage{
     background: -webkit-linear-gradient(#F8D146, #F5B93F);
@@ -57,47 +40,13 @@ table.dataTable td.dt-type-numeric{
     border-bottom:none !important;
 }
 
+
 /*pop up*/
-.background{
-    margin: 0;
-    position: fixed;
-    width: 90%;
-    height: 100%;
 
-    background-color: rgba(30, 30, 30, 0.5);
-    visibility: hidden;
-    opacity: 0;
-    
-    transition: opacity 0.2s ease-in-out;
-    
-    z-index: 9;
-}
-
-.background.show {
+.background.show,
+.edit_incentives_popup.show {
     visibility: visible;
     opacity: 1;
-}
-
- .background .edit_incentives_popup {
-    width: 40%;
-    height: fit-content;
-    padding: 25px 35px;
-
-    position: absolute;
-    top: 15%;
-    right: 52.5%;
-    transform: translate(50%, 50%);
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-
-    border-radius: 10px;
-    
-    background-color: white;
-    
-    z-index: 10;
-    overflow: hidden;
 }
 
 .edit_incentives_popup h1{
@@ -112,46 +61,19 @@ table.dataTable td.dt-type-numeric{
     -webkit-text-fill-color: transparent;
 }
 
-.edit_incentives_popup h1 span{
-    font-weight: 700;
-}
-
-.edit_incentives_popup form{
-    display: flex;
-    flex-direction: column;
-
-}
-
 .edit_incentives_popup form .incentives_field{
     margin: 20px 0;
     display: flex;
     flex-direction: column;
 }
 
-.edit_incentives_popup form .incentives_field label{
-    margin: 0 10px;
-    font-family: 'League Spartan';
-}
-
-.edit_incentives_popup form .incentives_field input[type=text]{
-    margin: 8px;
-    padding: 10px 15px;
-    border: none;
-
-    font-family: 'Inter';
-    font-size: 1rem;
-
-    background-color: rgba(111, 81, 21, 0.10);
-    height: 30px;
-    border-radius: 10px;
-}
 
 .edit_incentives_popup form .buttons{
     display: flex;
     justify-content: end;
     gap: 10px;
 }
-
+/* 
 .edit_incentives_popup form .buttons input[type=button]{
     border: none;
     border-radius: 100px;
@@ -187,4 +109,4 @@ table.dataTable td.dt-type-numeric{
 .edit_incentives_popup form .buttons input[type=submit]:hover{
     cursor: pointer;
 }
-
+ */

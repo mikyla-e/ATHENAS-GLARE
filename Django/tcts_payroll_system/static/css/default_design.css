@@ -1,5 +1,6 @@
 #button,
 input[type=submit]{
+    padding: 0 20px;
     width: fit-content;
 
     font-family: 'League Spartan';
@@ -26,6 +27,7 @@ input[type=submit]:hover{
 
 #cancel,
 input[type=button]{
+    padding: 0 20px;
     width: fit-content;
 
     font-family: 'League Spartan';
@@ -37,7 +39,7 @@ input[type=button]{
     border: none;
 
     background-image: linear-gradient(to right, #DC4646 , #DC4646); 
-    color: #1E1E1E;
+    color: white;
     
 }
 
@@ -49,3 +51,21 @@ input[type=button]:hover{
     background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
     color: white;
 }
+
+.field{
+    height: 40px;
+    margin: 2px;
+    padding: 0 15px;
+    border: none;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+
+    background-color: rgba(111, 81, 21, 0.10);
+    border-radius: 10px;
+}
+
+.field:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #F8D146; /* Tailwind's yellow-400 */
+  }
