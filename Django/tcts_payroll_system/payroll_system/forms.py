@@ -56,7 +56,8 @@ class EmployeeForm(forms.ModelForm):
             self.fields['employee_image'].required = True
 
     def validate_contact_number(self, contact_number):
-        """Helper function to validate 11-digit numbers."""
+        
+        #Helper function to validate 11-digit numbers.
         if not contact_number.isdigit() or len(contact_number) != 11:
             raise forms.ValidationError("Contact number must be exactly 11 digits.")
         return contact_number
@@ -65,23 +66,23 @@ class EmployeeForm(forms.ModelForm):
         first_name = self.cleaned_data.get('first_name', '')
         if len(first_name) < 2:
             raise forms.ValidationError("First name must be at least 2 characters.")
-        if not first_name.isalpha():
-            raise forms.ValidationError("First name should contain only letters.")
-        return first_name
+        if not all(char.isalpha() or char.isspace() or char == '-' for char in first_name):
+            raise forms.ValidationError("First name should contain only letters, spaces, or hyphens.")
+        return first_name.strip()
 
     def clean_last_name(self):
         last_name = self.cleaned_data.get('last_name', '')
         if len(last_name) < 2:
             raise forms.ValidationError("Last name must be at least 2 characters.")
-        if not last_name.isalpha():
-            raise forms.ValidationError("Last name should contain only letters.")
-        return last_name
+        if not all(char.isalpha() or char.isspace() or char == '-' for char in last_name):
+            raise forms.ValidationError("Last name should contain only letters, spaces, or hyphens.")
+        return last_name.strip()
 
     def clean_middle_name(self):
         middle_name = self.cleaned_data.get('middle_name', '')
-        if middle_name and not middle_name.isalpha():
-            raise forms.ValidationError("Middle name should contain only letters.")
-        return middle_name
+        if middle_name and not all(char.isalpha() or char.isspace() or char == '-' for char in middle_name):
+            raise forms.ValidationError("Middle name should contain only letters, spaces, or hyphens.")
+        return middle_name.strip() if middle_name else middle_name
 
     def clean_date_of_birth(self):
         date_of_birth = self.cleaned_data.get('date_of_birth')
