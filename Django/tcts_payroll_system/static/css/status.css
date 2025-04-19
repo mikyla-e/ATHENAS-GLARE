@@ -20,3 +20,9 @@ span{
     border-radius: 50px;
     margin: 0 18px;
 }
+strong, bdi{
+    display: none;
+}
+p, a{
+    
+}

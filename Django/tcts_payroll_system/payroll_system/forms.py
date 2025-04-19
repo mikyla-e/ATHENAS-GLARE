@@ -332,16 +332,16 @@ class PayrollForm(ModelForm):
     
 class AdminEditProfileForm(UserChangeForm):
     username = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Enter username'}))
     first_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Enter First Name'}))
     last_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Enter Last Name'}))
     email = forms.EmailField(widget=forms.EmailInput(attrs={
-            'class': 'w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Enter Email'}))
     
     class Meta:
@@ -349,9 +349,15 @@ class AdminEditProfileForm(UserChangeForm):
         fields = ('username', 'first_name', 'last_name', 'email', 'password')
 
 class PasswordChangingForm(PasswordChangeForm):
-    old_password = forms.CharField(max_length=100, widget=forms.PasswordInput())
-    new_password1 = forms.CharField(max_length=100, widget=forms.PasswordInput())
-    new_password2 = forms.CharField(max_length=100, widget=forms.PasswordInput())
+    old_password = forms.CharField(max_length=100, label='Old Password', widget=forms.PasswordInput(attrs={
+            'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Enter Old Password'}))
+    new_password1 = forms.CharField(max_length=100, label='New Password', widget=forms.PasswordInput(attrs={
+            'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Enter New Password'}))
+    new_password2 = forms.CharField(max_length=100, label='Confirm Password', widget=forms.PasswordInput(attrs={
+            'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'placeholder': 'Confirm New Password'}))
     
     class Meta:
         model = User

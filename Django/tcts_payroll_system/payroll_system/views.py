@@ -591,6 +591,10 @@ def customers(request):
     return render(request, 'payroll_system/customers.html')
 
 @login_required
+def customer_page(request):
+    return render(request, 'payroll_system/customer_page.html')
+
+@login_required
 def settings(request):
     return render(request, 'payroll_system/settings.html')
 

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!--title-->
+{% block title %}Change Password{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<!-- <link rel="stylesheet" href="{% static 'css/settings.css' %}"> -->
+{% endblock %}
+
+<!--header-->
+{% block header %}CUSTOMERS{% endblock %} 
+
+<!--page content-->
+{% block content %}
+    <div class="bg-white rounded-xl pl-10 pb-5 pt-5 mb-10">
+        <h1 class="font-bold text-2xl">Customer Name</h1>
+        <p class="opacity-50">DETAILS</p><hr class="mb-5 opacity-50 size-[97%]">
+        <h1 class="opacity-50 font-bold">ADDRESS</h1>
+        <h1 class="mb-5">EXAMPLE</h1>
+        <h1 class="opacity-50 font-bold">CONTACT NUMBER</h1>
+        <h1>EXAMPLE</h1>
+    </div>
+
+    <h1 class="mb-2 ml-2 font-bold text-xs">VEHICLES</h1>
+    <div class="bg-white rounded-xl p-4">
+        <h1 class="font-bold text-2xl ml-5 mb-5 text-2xl">XHJ 029 <- (EXAMPLE PLATE NUMBER)</h1>
+        <div class="ml-10">
+        <h1 class="opacity-50 font-bold">VEHICLE NAME</h1>
+        <h1 class="mb-5">EXAMPLE</h1>
+        <h1 class="opacity-50 font-bold">VEHICLE COLOR</h1>
+        <h1 class="">EXAMPLE</h1>
+        </div>
+        
+    </div>
+
+
+
+    {% endblock %}
