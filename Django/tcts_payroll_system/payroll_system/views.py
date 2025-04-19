@@ -27,11 +27,14 @@ def attendance(request):
         return render(request, "payroll_system/attendance.html")
     
     elif request.method == "POST":
+        
         # For AJAX face recognition request
         if 'image_data' in request.POST:
             try:
+                
                 # Get the image data from the ajax request
                 image_data = request.POST.get('image_data')
+                
                 # Remove the data:image/jpeg;base64, part
                 image_data = image_data.split(',')[1]
                 
@@ -60,8 +63,8 @@ def attendance(request):
             
             try:
                 employee = Employee.objects.get(employee_id=employee_id)
-                message = mark_attendance(employee)
-                return JsonResponse({'status': 'success', 'message': message})
+                result = mark_attendance(employee)
+                return JsonResponse({'status': result["status"], 'message': result["message"]})
             except Employee.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'Employee not found'})
     

@@ -224,8 +224,8 @@
                         'employee_id': employeeId
                     },
                     success: function(response) {
-                        if (response.status === 'success') {
-                            showNotification(response.message, 'success');
+                        if (response.status === 'success' || response.status === 'warning') {
+                            showNotification(response.message, response.status);
                             
                             // Reset recognition state
                             recognizedEmployeeId = null;
@@ -250,10 +250,12 @@
                 notificationMessage.textContent = message;
                 
                 // Remove existing classes
-                notification.classList.remove('border-red-500', 'border-green-500');
+                notification.classList.remove('border-red-500', 'border-green-500', 'border-yellow-500', 'bg-yellow-100');
                 
                 if (type === 'error') {
                     notification.classList.add('border-red-500');
+                } else if (type === 'warning') {
+                    notification.classList.add('border-yellow-500', 'bg-yellow-100');
                 } else {
                     notification.classList.add('border-green-500');
                 }
@@ -264,7 +266,7 @@
                     notification.classList.add('hidden');
                 }, 5000);
             }
-        });
+});
     </script>
 </body>
 </html>
