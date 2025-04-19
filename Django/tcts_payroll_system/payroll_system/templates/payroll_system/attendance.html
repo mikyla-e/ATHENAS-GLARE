@@ -86,7 +86,7 @@
             let consecutiveMatches = 0;
             
             // Constants
-            const REQUIRED_MATCHES = 5;
+            const REQUIRED_MATCHES = 3; // Changed from 5 to 3
             const PROCESS_INTERVAL = 500; // Process a frame every 500ms
             
             // Initialize webcam
@@ -175,7 +175,7 @@
                             
                             // Show recognition overlay
                             recognizedName.textContent = response.name;
-                            recognitionMessage.textContent = "Employee recognized. Please choose Time In or Time Out.";
+                            recognitionMessage.textContent = "Face matched"; // Simplified message
                             recognitionOverlay.classList.remove('hidden');
                             
                             // Hide overlay after 3 seconds

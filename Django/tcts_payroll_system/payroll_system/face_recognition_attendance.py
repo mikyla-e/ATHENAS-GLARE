@@ -31,14 +31,9 @@ def load_registered_faces():
                             registered_faces[employee_id] = encodings[0]
                             # Store the employee's name
                             employee_names[employee_id] = f"{employee.first_name} {employee.last_name}"
-                        else:
-                            print(f"No encodings generated for employee {employee.employee_id}")
-                    else:
-                        print(f"No face detected in image for employee {employee.employee_id}")
-                else:
-                    print(f"Image does not exist at path: {image_path}")
-            except Exception as e:
-                print(f"Error processing image for employee {employee.employee_id}: {str(e)}")
+                    # Removed print debug statements
+            except Exception:
+                pass  # Removed print debug statements
 
     return registered_faces, employee_names
 
@@ -59,21 +54,48 @@ def mark_attendance(employee):
     today = time_in_ph.strftime("%Y-%m-%d")
     current_time = time_in_ph.strftime("%H:%M:%S")
     
-    attendance, created = Attendance.objects.get_or_create(employee_id_fk=employee, date=today)
-
-    if created or attendance.time_in is None:
-        attendance.time_in = current_time
+    # Check for existing attendance records for today
+    try:
+        attendance = Attendance.objects.get(employee_id_fk=employee, date=today)
+        
+        # Employee has an attendance record for today
+        if attendance.time_in is not None and attendance.time_out is None:
+            # They've timed in but not out yet
+            attendance.time_out = current_time
+            attendance.save()
+            message = f"Time Out recorded: {employee.first_name} at {current_time}"
+        elif attendance.time_in is not None and attendance.time_out is not None:
+            # They've already timed in and out
+            message = f"{employee.first_name} has already completed attendance for today."
+        else:
+            # This shouldn't happen normally, but just in case there's a record with no time_in
+            attendance.time_in = current_time
+            attendance.save()
+            message = f"Time In recorded: {employee.first_name} at {current_time}"
+            
+    except Attendance.DoesNotExist:
+        # No attendance record for today, create one for time in
+        attendance = Attendance.objects.create(
+            employee_id_fk=employee, 
+            date=today,
+            time_in=current_time,
+            time_out=None
+        )
         message = f"Time In recorded: {employee.first_name} at {current_time}"
-    elif attendance.time_out is None:
-        attendance.time_out = current_time
-        message = f"Time Out recorded: {employee.first_name} at {current_time}"
-    else:
-        message = f"{employee.first_name} has already timed out today."
-
-    attendance.save()
+    except Attendance.MultipleObjectsReturned:
+        # Handle case where multiple records exist (data inconsistency)
+        # Get the first record and update it
+        attendance = Attendance.objects.filter(employee_id_fk=employee, date=today).first()
+        
+        if attendance.time_out is None:
+            attendance.time_out = current_time
+            attendance.save()
+            message = f"Time Out recorded: {employee.first_name} at {current_time}"
+        else:
+            message = f"{employee.first_name} has already completed attendance for today."
+    
     return message
 
-# New function to process a single frame from the web interface
 def process_frame_recognition(frame):
     registered_faces, employee_names = load_registered_faces()
     
