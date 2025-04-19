@@ -129,7 +129,7 @@ def mark_attendance(employee, action=None):
         # Update open session with time_out
         try:
             log = Attendance.objects.get(
-                id=status_info["current_log_id"],
+                attendance_id=status_info["current_log_id"],
                 employee_id_fk=employee, 
                 date=today
             )
@@ -149,7 +149,7 @@ def mark_attendance(employee, action=None):
             
             # Close open session
             try:
-                log = Attendance.objects.get(id=status_info["current_log_id"])
+                log = Attendance.objects.get(attendance_id=status_info["current_log_id"])
                 log.time_out = current_time
                 log.save()
                 message = f"Time Out recorded: {employee.first_name} at {current_time}"
