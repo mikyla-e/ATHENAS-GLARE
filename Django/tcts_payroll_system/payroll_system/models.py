@@ -189,33 +189,31 @@ class Employee(models.Model):
         super().save(*args, **kwargs)
 
     def update_attendance_stats(self):
-        # Update attendance statistics for the current month
         today = timezone.now().date()
-        first_day = today.replace(day=1)
-        
+        start_date = self.date_of_employment
+        if start_date > today:
+            return  # avoid invalid range
+
         days_worked = self.attendances.filter(
-            date__gte=first_day,
+            date__gte=start_date,
             date__lte=today,
             attendance_status='Present'
         ).count()
-        
-        # Calculate business days
-        workdays_so_far = 0
-        day = first_day
+
+        # Count working days (Mon–Sat, excluding Sundays)
+        total_working_days = 0
+        day = start_date
         while day <= today:
-            if day.weekday() < 5:  # Monday to Friday
-                workdays_so_far += 1
+            if day.weekday() != 6:  # 6 = Sunday
+                total_working_days += 1
             day += timedelta(days=1)
 
-        absences = workdays_so_far - days_worked
-        
-        # Use update() method to bypass validation
+        absences = total_working_days - days_worked
+
         Employee.objects.filter(employee_id=self.employee_id).update(
-            days_worked=days_worked, 
+            days_worked=days_worked,
             absences=absences
         )
-        
-        # Update the instance attributes
         self.days_worked = days_worked
         self.absences = absences
 
@@ -242,13 +240,26 @@ class Attendance(models.Model):
         return f"{employee} - {date_str} {status} - {hours}"
     
     def calculate_hours_worked(self):
+        
         # Calculate hours worked for the day
         if self.time_in and self.time_out:
             time_in_dt = datetime.combine(self.date, self.time_in)
             time_out_dt = datetime.combine(self.date, self.time_out)
-            worked_hours = (time_out_dt - time_in_dt).total_seconds() / 3600  # Convert seconds to hours
-            self.hours_worked = round(worked_hours, 2)
+            worked_seconds = (time_out_dt - time_in_dt).total_seconds()
+            self.hours_worked = round(worked_seconds / 3600, 2)
             self.save()
+    #New        
+    def get_formatted_hours_worked(self):
+        """Returns time worked as hh:mm:ss if time_out exists"""
+        if self.time_in and self.time_out:
+            time_in_dt = datetime.combine(self.date, self.time_in)
+            time_out_dt = datetime.combine(self.date, self.time_out)
+            duration = time_out_dt - time_in_dt
+            total_seconds = int(duration.total_seconds())
+            hours, remainder = divmod(total_seconds, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        return None
 
 
 class Payroll(models.Model):
