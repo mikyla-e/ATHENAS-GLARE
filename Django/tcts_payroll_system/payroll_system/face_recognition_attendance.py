@@ -69,7 +69,7 @@ def check_attendance_status(employee):
         "status": "success",
         "has_open_session": open_session is not None,
         "logs": logs_data,
-        "current_log_id": open_session.id if open_session else None
+        "current_log_id": open_session.attendance_id if open_session else None
     }
 
 def mark_attendance(employee, action=None):

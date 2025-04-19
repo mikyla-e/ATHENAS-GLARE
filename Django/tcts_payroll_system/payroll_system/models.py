@@ -188,26 +188,41 @@ class Employee(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
-    def update_attendance_stats(self):
-        today = timezone.now().date()
+    def update_attendance_stats(self):  
+        today = timezone.now().date()   
         start_date = self.date_of_employment
         if start_date > today:
             return  # avoid invalid range
 
+        # Get all present attendances (only count complete days)
         days_worked = self.attendances.filter(
-            date__gte=start_date,
-            date__lte=today,
+            date__lt=today,  # Only count previous days, not today
             attendance_status='Present'
         ).count()
+        
+        # Add today if the employee is marked present
+        today_present = self.attendances.filter(
+            date=today,
+            attendance_status='Present'
+        ).exists()
+        
+        if today_present:
+            days_worked += 1
 
-        # Count working days (Mon–Sat, excluding Sundays)
+        # Calculate working days from employment until yesterday
         total_working_days = 0
         day = start_date
-        while day <= today:
+        yesterday = today - timedelta(days=1)
+        
+        while day <= yesterday:
             if day.weekday() != 6:  # 6 = Sunday
                 total_working_days += 1
             day += timedelta(days=1)
-
+        
+        # Add today if it's a workday (not Sunday)
+        if today.weekday() != 6:  # If today is not Sunday
+            total_working_days += 1
+        
         absences = total_working_days - days_worked
 
         Employee.objects.filter(employee_id=self.employee_id).update(
@@ -235,9 +250,6 @@ class Attendance(models.Model):
     
     class Meta:
         ordering = ['date', 'time_in']
-        
-    def __str__(self):
-        return f"{self.employee_id_fk} - {self.date} - {self.time_in} to {self.time_out}"
     
     def __str__(self):
         status = f"[{self.attendance_status}]"
