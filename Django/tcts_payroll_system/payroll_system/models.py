@@ -114,7 +114,7 @@ class Employee(models.Model):
     employee_status = models.CharField(max_length=9, choices=EmployeeStatus.choices, null=True)
     active_status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
     absences = models.IntegerField(default=0, null=False)
-    employee_image = models.ImageField(null=True, blank=True, upload_to='images/')
+    employee_image = models.ImageField(null=False, upload_to='images/')
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -227,14 +227,21 @@ class Attendance(models.Model):
     attendance_id = models.AutoField(primary_key=True)
     time_in = models.TimeField(null=True, blank=True)  
     time_out = models.TimeField(null=True, blank=True)  
-    date = models.DateField(default=timezone.now,null=False)
+    date = models.DateField(default=timezone.now, null=False)
     hours_worked = models.FloatField(default=0, null=False)  
     attendance_status = models.CharField(max_length=8, choices=AttendanceStatus.choices, default=AttendanceStatus.PRESENT)
     remarks = models.CharField(max_length=255, null=True, blank=True)  
-    employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendances')
-
-    def calculate_hours_worked(self):
+    employee_id_fk = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='attendances')
+    
+    def __str__(self):
+        status = f"[{self.attendance_status}]"
+        employee = self.employee_id_fk.first_name if hasattr(self.employee_id_fk, 'first_name') else f"Employee #{self.employee_id_fk_id}"
+        date_str = self.date.strftime('%Y-%m-%d')
+        hours = f"{self.hours_worked}hrs" if self.hours_worked else "No hours recorded"
         
+        return f"{employee} - {date_str} {status} - {hours}"
+    
+    def calculate_hours_worked(self):
         # Calculate hours worked for the day
         if self.time_in and self.time_out:
             time_in_dt = datetime.combine(self.date, self.time_in)
@@ -242,7 +249,8 @@ class Attendance(models.Model):
             worked_hours = (time_out_dt - time_in_dt).total_seconds() / 3600  # Convert seconds to hours
             self.hours_worked = round(worked_hours, 2)
             self.save()
-        
+
+
 class Payroll(models.Model):
     class PayrollStatus(models.TextChoices):
         PENDING = 'PENDING', _('Pending')
@@ -250,20 +258,31 @@ class Payroll(models.Model):
     
     payroll_id = models.AutoField(primary_key=True)
     rate = models.FloatField(default=0, null=False)
-    incentives = models.FloatField(default=0, null=False) 
+    incentives = models.FloatField(default=0, null=False)
     payroll_status = models.CharField(max_length=9, choices=PayrollStatus.choices, default=PayrollStatus.PENDING, null=True, blank=True)
     deductions = models.FloatField(default=0, null=False)
     salary = models.FloatField(default=0, null=False)  
     cash_advance = models.FloatField(default=0, null=False)  
     under_time = models.FloatField(default=0, null=False)  
     payment_date = models.DateField(null=False)
-    employee_id_fk = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='payrolls')
+    employee_id_fk = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='payrolls')
     attendance_id_fk = models.ForeignKey(Attendance, null=True, blank=True, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        employee = self.employee_id_fk.first_name if hasattr(self.employee_id_fk, 'first_name') else f"Employee #{self.employee_id_fk_id}"
+        date_str = self.payment_date.strftime('%Y-%m-%d')
+        amount = f"₱{self.salary:,.2f}" if self.salary else "₱0.00"
+        status = f"[{self.payroll_status}]"
+        
+        return f"Payroll #{self.payroll_id} - {employee} - {date_str} - {amount} {status}"
 
 class History(models.Model):
     history_id = models.AutoField(primary_key=True)
     description = models.CharField(max_length=255, null=False)
     date_time = models.DateTimeField(default=timezone.now, null=False)
+
+    def __str__(self):
+        return self.description
 
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
@@ -272,20 +291,45 @@ class Customer(models.Model):
     last_name = models.CharField(max_length=100, null=False)
     gender = models.CharField(max_length=6, choices=Gender.choices, null=False)
     contact_number = models.CharField(max_length=15, null=True)
-    region = models.CharField(max_length=255, null=False, default='')
-    province = models.CharField(max_length=255, null=False, default='')
-    municipality = models.CharField(max_length=255, null=False, default='')
-    barangay = models.CharField(max_length=255, null=False, default='')
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, to_field='id')
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, to_field='id')
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, to_field='id')
+    barangay = models.ForeignKey(Barangay, on_delete=models.SET_NULL, null=True, to_field='id')
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
 
 class Vehicle(models.Model):
     vehicle_id = models.AutoField(primary_key=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='vehicles')
     vehicle_name = models.CharField(max_length=100, null=False)
     vehicle_color = models.CharField(max_length=100, null=False)
     plate_number = models.CharField(max_length=100, null=False)
 
+    def __str__(self):
+        return f"{self.vehicle_name} ({self.plate_number})"
+
 class Service(models.Model):
     service_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100, null=False)
-    service_image = models.ImageField(null=True, blank=True, upload_to='images/')
+    service_image = models.ImageField(null=False, upload_to='images/')
 
-# Create your task model here.
+    def __str__(self):
+        return self.title
+
+class Task(models.Model):
+    class TaskStatus(models.TextChoices):
+        IN_PROGRESS = 'In Progress', _('In Progress')
+        COMPLETED = 'Completed', _('Completed')
+    
+    task_id = models.AutoField(primary_key=True)
+    task_name = models.CharField(max_length=100, null=False)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='tasks')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='tasks')
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='tasks')
+    task_status = models.CharField(max_length=11, choices=TaskStatus.choices, default=TaskStatus.IN_PROGRESS)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.task_name} - {self.customer} - {self.task_status}" 
