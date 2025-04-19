@@ -48,65 +48,131 @@ def compare_faces(known_encoding, captured_encoding):
     # Return True only if the built-in comparison says it's a match AND the distance is small enough
     return match and distance < 0.6  # Slightly more lenient for web camera
 
-def mark_attendance(employee):
+def check_attendance_status(employee):
     timezone_ph = pytz.timezone("Asia/Manila")
-    time_in_ph = datetime.now(timezone_ph)
+    today = datetime.now(timezone_ph).strftime("%Y-%m-%d")
     
-    today = time_in_ph.strftime("%Y-%m-%d")
-    current_time = time_in_ph.strftime("%H:%M:%S")
+    # Get all attendance logs for today
+    logs = Attendance.objects.filter(employee_id_fk=employee, date=today).order_by('created_at')
     
-    # Check for existing attendance records for today
-    try:
-        attendance = Attendance.objects.get(employee_id_fk=employee, date=today)
+    logs_data = []
+    for log in logs:
+        logs_data.append({
+            "time_in": log.time_in.strftime("%H:%M:%S") if log.time_in else None,
+            "time_out": log.time_out.strftime("%H:%M:%S") if log.time_out else None,
+        })
+    
+    # Check if we have an "open" session (time_in without time_out)
+    open_session = logs.filter(time_out__isnull=True).first()
+    
+    return {
+        "status": "success",
+        "has_open_session": open_session is not None,
+        "logs": logs_data,
+        "current_log_id": open_session.id if open_session else None
+    }
+
+def mark_attendance(employee, action=None):
+    timezone_ph = pytz.timezone("Asia/Manila")
+    time_now = datetime.now(timezone_ph)
+    
+    today = time_now.strftime("%Y-%m-%d")
+    current_time = time_now.strftime("%H:%M:%S")
+    
+    # Get current status
+    status_info = check_attendance_status(employee)
+    has_open_session = status_info["has_open_session"]
+    
+    # Handle time_in action
+    if action == "time_in":
+        if has_open_session:
+            return {
+                "status": "warning", 
+                "message": f"You already have an open session. Please time out first."
+            }
         
-        # Employee has an attendance record for today
-        if attendance.time_in is not None and attendance.time_out is None:
+        # Create new time in entry
+        try:
+            log = Attendance.objects.create(
+                employee_id_fk=employee, 
+                date=today,
+                time_in=current_time,
+                time_out=None
+            )
+                
+            return {
+                "status": "success", 
+                "message": f"Time In recorded: {employee.first_name} at {current_time}"
+            }
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+    
+    # Handle time_out action
+    elif action == "time_out":
+        if not has_open_session:
+            # Create an attendance record with only time_out for admin to fix later
+            try:
+                log = Attendance.objects.create(
+                    employee_id_fk=employee, 
+                    date=today,
+                    time_in=None,
+                    time_out=current_time
+                )
+                
+                return {
+                    "status": "warning", 
+                    "message": f"Time Out recorded without Time In. Admin will need to adjust this."
+                }
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        
+        # Update open session with time_out
+        try:
+            log = Attendance.objects.get(
+                id=status_info["current_log_id"],
+                employee_id_fk=employee, 
+                date=today
+            )
+            log.time_out = current_time
+            log.save()
             
-            # They've timed in but not out yet
-            attendance.time_out = current_time
-            attendance.save()
-            message = f"Time Out recorded: {employee.first_name} at {current_time}"
-            status = "success"
-        elif attendance.time_in is not None and attendance.time_out is not None:
+            return {
+                "status": "success", 
+                "message": f"Time Out recorded: {employee.first_name} at {current_time}"
+            }
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+    
+    # Default behavior (for backward compatibility)
+    else:
+        if has_open_session:
             
-            # They've already timed in and out
-            message = "Already recorded"
-            status = "warning"  # New status for already recorded
+            # Close open session
+            try:
+                log = Attendance.objects.get(id=status_info["current_log_id"])
+                log.time_out = current_time
+                log.save()
+                message = f"Time Out recorded: {employee.first_name} at {current_time}"
+                status = "success"
+            except Exception as e:
+                message = f"Error: {str(e)}"
+                status = "error"
         else:
-            
-            # This shouldn't happen normally, but just in case there's a record with no time_in
-            attendance.time_in = current_time
-            attendance.save()
-            message = f"Time In recorded: {employee.first_name} at {current_time}"
-            status = "success"
-            
-    except Attendance.DoesNotExist:
-        
-        # No attendance record for today, create one for time in
-        attendance = Attendance.objects.create(
-            employee_id_fk=employee, 
-            date=today,
-            time_in=current_time,
-            time_out=None
-        )
-        message = f"Time In recorded: {employee.first_name} at {current_time}"
-        status = "success"
-    except Attendance.MultipleObjectsReturned:
-        
-        # Handle case where multiple records exist (data inconsistency)
-        # Get the first record and update it
-        attendance = Attendance.objects.filter(employee_id_fk=employee, date=today).first()
-        
-        if attendance.time_out is None:
-            attendance.time_out = current_time
-            attendance.save()
-            message = f"Time Out recorded: {employee.first_name} at {current_time}"
-            status = "success"
-        else:
-            message = "Already recorded"
-            status = "warning"  # New status for already recorded
-    
-    return {"message": message, "status": status}
+            # Create new session
+            try:
+                log = Attendance.objects.create(
+                    employee_id_fk=employee, 
+                    date=today,
+                    time_in=current_time,
+                    time_out=None
+                )
+                message = f"Time In recorded: {employee.first_name} at {current_time}"
+                status = "success"
+            except Exception as e:
+                message = f"Error: {str(e)}"
+                status = "error"
+                
+        return {"message": message, "status": status}
 
 # Process a single frame from the web interface
 def process_frame_recognition(frame):

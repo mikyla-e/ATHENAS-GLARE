@@ -1,7 +1,9 @@
 import base64
-import io
-import numpy as np
 import cv2
+import io
+import pytz
+import numpy as np
+from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,7 +16,7 @@ from django.utils.timezone import now, timedelta
 from django.views import generic
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from .forms import EmployeeForm, PayrollForm, AdminEditProfileForm, PasswordChangingForm
-from .face_recognition_attendance import process_frame_recognition, mark_attendance
+from .face_recognition_attendance import process_frame_recognition, mark_attendance, check_attendance_status
 from .models import Employee, Payroll, Attendance, History, Region, Province, City, Barangay
 from django.http import JsonResponse
 from PIL import Image
@@ -31,7 +33,6 @@ def attendance(request):
         # For AJAX face recognition request
         if 'image_data' in request.POST:
             try:
-                
                 # Get the image data from the ajax request
                 image_data = request.POST.get('image_data')
                 
@@ -53,8 +54,23 @@ def attendance(request):
             except Exception as e:
                 return JsonResponse({'status': 'error', 'message': str(e)})
         
-        # For regular form submission (time in/out button)
-        elif 'action' in request.POST:
+        # For checking attendance status
+        elif request.POST.get('action') == 'check_status':
+            employee_id = request.POST.get('employee_id')
+            
+            if not employee_id:
+                return JsonResponse({'status': 'error', 'message': 'No employee detected'})
+            
+            try:
+                employee = Employee.objects.get(employee_id=employee_id)
+                result = check_attendance_status(employee)
+                return JsonResponse(result)
+                
+            except Employee.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Employee not found'})
+        
+        # For time in/out actions
+        elif request.POST.get('action') in ['time_in', 'time_out']:
             action = request.POST.get('action')
             employee_id = request.POST.get('employee_id')
             
@@ -63,13 +79,15 @@ def attendance(request):
             
             try:
                 employee = Employee.objects.get(employee_id=employee_id)
-                result = mark_attendance(employee)
-                return JsonResponse({'status': result["status"], 'message': result["message"]})
+                result = mark_attendance(employee, action)
+                return JsonResponse(result)
+                
             except Employee.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'Employee not found'})
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)})
     
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
-
 
 @login_required
 def dashboard(request):

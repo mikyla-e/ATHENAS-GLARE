@@ -142,7 +142,7 @@
                 });
             }
             
-            // Handle the server's response to face recognition
+            // Modify the handleRecognitionResponse function to get attendance status when a face is recognized
             function handleRecognitionResponse(response) {
                 switch(response.status) {
                     case 'waiting':
@@ -170,8 +170,9 @@
                             
                             // Update UI to show recognized employee
                             statusMessage.textContent = "Employee recognized!";
-                            timeInBtn.disabled = false;
-                            timeOutBtn.disabled = false;
+                            
+                            // Check attendance status for this employee
+                            checkAttendanceStatus(recognizedEmployeeId);
                             
                             // Show recognition overlay
                             recognizedName.textContent = response.name;
@@ -242,20 +243,91 @@
                 });
             }
             
-            // Show notification
-            function showNotification(message, type) {
+            // Modify the checkAttendanceStatus function to handle multiple sessions
+            function checkAttendanceStatus(employeeId) {
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        'action': 'check_status',
+                        'employee_id': employeeId
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            // Update button states based on attendance status
+                            if (response.has_open_session) {
+                                // Employee has an open session (timed in but not out)
+                                timeInBtn.disabled = true;
+                                timeOutBtn.disabled = false;
+                                
+                                // Display session info if there are any logs
+                                if (response.logs && response.logs.length > 0) {
+                                    let sessionsInfo = "";
+                                    response.logs.forEach((log, index) => {
+                                        if (log.time_in && log.time_out) {
+                                            sessionsInfo += `Session ${index+1}: ${log.time_in} to ${log.time_out}<br>`;
+                                        } else if (log.time_in) {
+                                            sessionsInfo += `Current session started at: ${log.time_in}<br>`;
+                                        }
+                                    });
+                                    
+                                    if (sessionsInfo) {
+                                        showNotification(sessionsInfo, 'info', 6000);
+                                    }
+                                }
+                            } else {
+                                // Employee has no open session, can time in
+                                timeInBtn.disabled = false;
+                                timeOutBtn.disabled = true;
+                                
+                                // If there are completed sessions today, show them
+                                if (response.logs && response.logs.length > 0) {
+                                    let sessionsInfo = "Today's sessions:<br>";
+                                    response.logs.forEach((log, index) => {
+                                        if (log.time_in && log.time_out) {
+                                            sessionsInfo += `Session ${index+1}: ${log.time_in} to ${log.time_out}<br>`;
+                                        } else if (log.time_out) {
+                                            sessionsInfo += `Incomplete session (admin adjustment needed): out at ${log.time_out}<br>`;
+                                        } else if (log.time_in) {
+                                            sessionsInfo += `Incomplete session (admin adjustment needed): in at ${log.time_in}<br>`;
+                                        }
+                                    });
+                                    
+                                    showNotification(sessionsInfo, 'info', 6000);
+                                }
+                            }
+                        } else {
+                            showNotification(response.message, 'error');
+                            // Default to enabling both buttons if there's an error
+                            timeInBtn.disabled = false;
+                            timeOutBtn.disabled = false;
+                        }
+                    },
+                    error: function(error) {
+                        showNotification('Error checking attendance status', 'error');
+                        timeInBtn.disabled = false;
+                        timeOutBtn.disabled = false;
+                    }
+                });
+            }
+
+            // Update the showNotification function to accept a duration parameter
+            function showNotification(message, type, duration = 5000) {
                 const notification = document.getElementById('notification');
                 const notificationMessage = document.getElementById('notification-message');
                 
-                notificationMessage.textContent = message;
+                // Allow HTML in notifications
+                notificationMessage.innerHTML = message;
                 
                 // Remove existing classes
-                notification.classList.remove('border-red-500', 'border-green-500', 'border-yellow-500', 'bg-yellow-100');
+                notification.classList.remove('border-red-500', 'border-green-500', 'border-yellow-500', 'bg-yellow-100', 'border-blue-500', 'bg-blue-100');
                 
                 if (type === 'error') {
                     notification.classList.add('border-red-500');
                 } else if (type === 'warning') {
                     notification.classList.add('border-yellow-500', 'bg-yellow-100');
+                } else if (type === 'info') {
+                    notification.classList.add('border-blue-500', 'bg-blue-100');
                 } else {
                     notification.classList.add('border-green-500');
                 }
@@ -264,9 +336,9 @@
                 
                 setTimeout(function() {
                     notification.classList.add('hidden');
-                }, 5000);
+                }, duration);
             }
-});
+        });
     </script>
 </body>
 </html>

@@ -229,7 +229,15 @@ class Attendance(models.Model):
     hours_worked = models.FloatField(default=0, null=False)  
     attendance_status = models.CharField(max_length=8, choices=AttendanceStatus.choices, default=AttendanceStatus.PRESENT)
     remarks = models.CharField(max_length=255, null=True, blank=True)  
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     employee_id_fk = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='attendances')
+    
+    class Meta:
+        ordering = ['date', 'time_in']
+        
+    def __str__(self):
+        return f"{self.employee_id_fk} - {self.date} - {self.time_in} to {self.time_out}"
     
     def __str__(self):
         status = f"[{self.attendance_status}]"
