@@ -6,7 +6,7 @@ from . import views
 app_name = 'payroll_system'
 
 urlpatterns = [
-    path('time_in_out/', views.time_in_out, name='time_in_out'),
+    path('attendance/', views.attendance, name='attendance'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('employees/employee_registration/', views.employee_registration, name='employee_registration'),
     path('employees/', views.employees, name='employees'),
@@ -24,7 +24,6 @@ urlpatterns = [
     path('password/', PasswordsChangeView.as_view(template_name='payroll_system/change_password.html')),
     path('about/', views.about, name='about'),
     path('customers/', views.customers, name='customers'),
-    path('attendance/', views.attendance, name='attendance'),
     path('ajax/get-provinces/', views.get_provinces, name='get_provinces'),
     path('ajax/get-cities/', views.get_cities, name='get_cities'),
     path('ajax/get-barangays/', views.get_barangays, name='get_barangays'),
