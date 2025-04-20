@@ -89,7 +89,7 @@ input[type=button]:hover{
     box-shadow: 0 0 0 2px #F8D146; /* Tailwind's yellow-400 */
 }
 
-input[type=text], input[type=email], input[type=password]{
+input[type=text], input[type=email], input[type=password], input[type=tel], select{
     height: 50px;
     margin: 8px 0;
     padding: 2px 15px;

@@ -43,25 +43,6 @@
                 <div id="left" class="w-[50%] mx-5">
                     <div class="flex flex-col">
                         <label for="first-name">first name</label>
-<<<<<<< Updated upstream
-                        <input type="text" name="" id="" class="">
-                        <!-- {{ form.first_name }} -->
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="middle-name">middle name</label>
-                        <input type="text" name="" id="" class="">
-                        <!-- {{ form.first_name }} -->
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="last-name">last name</label>
-                        <input type="text" name="" id="" class="">
-                        <!-- {{ form.first_name }} -->
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="contact-number">contact number</label>
-                        <input type="text" name="" id="" class="">
-                        <!-- {{ form.first_name }} -->
-=======
                         {{ customer_form.first_name }}
                     </div>
                     <div class="flex flex-col">
@@ -79,35 +60,14 @@
                     <div class="flex flex-col">
                         <label for="contact-number">contact number</label>
                         {{ customer_form.contact_number }}
->>>>>>> Stashed changes
                     </div>
                 </div>
                 <div id="right" class="w-[50%] mx-5">
                     <div class="flex flex-col">
-<<<<<<< Updated upstream
-                        <label for="region">region</label>
-                        <input type="text" name="" id="" class="">
-                        <!-- {{ form.first_name }} -->
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="province">province</label>
-                        <input type="text" name="" id="" class="">
-                        <!-- {{ form.first_name }} -->
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="municipality">municipality</label>
-                        <input type="text" name="" id="" class="">
-                        <!-- {{ form.first_name }} -->
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="barangay">barangay</label>
-                        <input type="text" name="" id="" class="">
-                        <!-- {{ form.first_name }} -->
-=======
-                        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
-                        {{ form.region }}
-                        {% if form.region.errors %}
-                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.region.errors.0 }}</div>
+                        <label for="{{ customer_form.region.id_for_label }}">{{ customer_form.region.label }}</label>
+                        {{ customer_form.region }}
+                        {% if customer_form.region.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ customer_form.region.errors.0 }}</div>
                         {% endif %}
                         <datalist id="region-list">
                             {% for region in regions %}
@@ -116,68 +76,59 @@
                         </datalist>
                     </div>
                     <div class="flex flex-col">
-                        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
-                        {{ form.region }}
-                        {% if form.region.errors %}
-                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.region.errors.0 }}</div>
+                        <label for="{{ customer_form.province.id_for_label }}">{{ customer_form.province.label }}</label>
+                        {{ customer_form.province }}
+                        {% if customer_form.province.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ customer_form.province.errors.0 }}</div>
                         {% endif %}
-                        <datalist id="region-list">
-                            {% for region in regions %}
-                                <option value="{{ region.regDesc }}" data-code="{{ region.regCode }}">
+                        <datalist id="province-list">
+                            {% for province in provinces %}
+                                <option value="{{ province.regDesc }}" data-code="{{ province.regCode }}">
                             {% endfor %}
                         </datalist>
                     </div>
                     <div class="flex flex-col">
-                        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
-                        {{ form.region }}
-                        {% if form.region.errors %}
-                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.region.errors.0 }}</div>
+                        <label for="{{ customer_form.city.id_for_label }}">{{ customer_form.city.label }}</label>
+                        {{ customer_form.city }}
+                        {% if customer_form.city.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ customer_form.city.errors.0 }}</div>
                         {% endif %}
-                        <datalist id="region-list">
-                            {% for region in regions %}
-                                <option value="{{ region.regDesc }}" data-code="{{ region.regCode }}">
+                        <datalist id="city-list">
+                            {% for city in citys %}
+                                <option value="{{ city.regDesc }}" data-code="{{ city.regCode }}">
                             {% endfor %}
                         </datalist>
                     </div>
                     <div class="flex flex-col">
-                        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
-                        {{ form.region }}
-                        {% if form.region.errors %}
-                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.region.errors.0 }}</div>
+                        <label for="{{ customer_form.barangay.id_for_label }}">{{ customer_form.barangay.label }}</label>
+                        {{ customer_form.barangay }}
+                        {% if customer_form.barangay.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ customer_form.barangay.errors.0 }}</div>
                         {% endif %}
-                        <datalist id="region-list">
-                            {% for region in regions %}
-                                <option value="{{ region.regDesc }}" data-code="{{ region.regCode }}">
+                        <datalist id="barangay-list">
+                            {% for barangay in barangays %}
+                                <option value="{{ barangay.regDesc }}" data-code="{{ barangay.regCode }}">
                             {% endfor %}
                         </datalist>
->>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
 
             <span class="w-[100%] h-[2px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
-<<<<<<< Updated upstream
-            <div id="vehicle-form" class="flex flex-col">
-
                 <!--<form class="w-full flex justify-center items-center gap-3" method=""> -->
                     <!--to be connected to database; selecting an option should auto fill proceeding fields(for old customers only!)-->
-                    <select class="w-full h-[50px] pl-4 border-none outline-none focus:outline-none focus:border-none focus:ring-0 text-base font-semibold font-[League_Spartan] bg-white rounded-md" name="vehicle" id="vehicle">
+                    <!-- <select class="w-full h-[50px] pl-4 border-none outline-none focus:outline-none focus:border-none focus:ring-0 text-base font-semibold font-[League_Spartan] bg-white rounded-md" name="vehicle" id="vehicle">
                         <option value="Vehicle 1">Vehicle 1</option>
                         <option value="Vehicle 2">Vehicle 2</option>
                         <option value="Vehicle 3">Vehicle 3</option>
                         <option value="Vehicle 4">Vehicle 4</option>
-                    </select>
+                    </select> -->
                 
                 <!-- </form> -->
-
-                <div class="flex my-2 gap-2">
-                    <div id="left" class="w-[50%] mx-5">
-=======
             <div id="vehicle-form" class="flex flex-col px-5 gap-5">
-                <div class="flex my-2">
+                <div class="flex my-2 gap-2 mx-5">
                     <div id="left" class="w-[50%]">
->>>>>>> Stashed changes
                         <div class="flex flex-col">
                             <label for="vehicle-name">vehicle name</label>
                             {{ vehicle_form.vehicle_name }}
@@ -202,13 +153,9 @@
                 <a class="h-full" href="javascript:history.back()">
                     <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
                 </a>
-<<<<<<< Updated upstream
                 <a class="h-full" href="{% url 'payroll_system:services_assign' %}">
                     <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="CONFIRM CUSTOMER">
                 </a>
-=======
-                <input class="size-full px-3" type="submit" value="CONFIRM CUSTOMER">
->>>>>>> Stashed changes
             </div>
         </form>
     </div>   

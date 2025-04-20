@@ -15,20 +15,12 @@
 
 <!--page content-->
 {% block content %}
-<<<<<<< Updated upstream
 
-
-<form action="{% url 'payroll_system:services' %}" method="post" class="flex flex-col">
-    {% csrf_token %}
-    <div class="flex flex-col w-[50%]">
-        <label for="assigned-employee">assigned employee</label>
-        <input type="text" name="" id="">
-=======
-<form action="{% url 'payroll_system:services_assign' %}" method="post">
+<form action="{% url 'payroll_system:services_assign' %}" method="post" class="flex flex-col">
     {% csrf_token %}
     <div class="form">
         <span></span>
-        <div class="employee_form">
+        <div class="flex flex-col w-[50%] employee_form">
             <label for="assigned-employee">assigned employee</label>
             <select name="assigned_employee" id="assigned-employee" class="h-[50px] w-full px-2 rounded-md">
                 {% for employee in employees %}
@@ -36,20 +28,15 @@
                 {% endfor %}
             </select>
         </div>
->>>>>>> Stashed changes
     </div>
     <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
     <div class="submit">
         <a href="javascript:history.back()">
             <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
         </a>
-<<<<<<< Updated upstream
         <a href="{% url 'payroll_system:services' %}">
             <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="ASSIGN TASK">
         </a>
-=======
-        <input type="submit" value="Assign Task">
->>>>>>> Stashed changes
     </div>
 </form>
 {% endblock %}

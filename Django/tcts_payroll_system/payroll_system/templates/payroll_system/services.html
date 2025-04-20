@@ -21,47 +21,14 @@
         </a>
     </div>
     
-<<<<<<< Updated upstream
     <div class="w-full h-auto my-5 flex flex-wrap items-center justify-center gap-5 md:gap-5 xl:gap-6">
-        <div id="service" class="w-[40%] md:w-[40%] lg:w-[30%] h-[200px] md:h-[250px] bg-white rounded-xl overflow-hidden">
-            <a class="no-underline" href="{% url 'payroll_system:services_client' %}">
-=======
-    <div class="w-full h-auto my-5 flex flex-wrap items-center justify-center gap-8">
         {% for service in services %}
-        <div id="service" class="w-[31%] h-[250px] bg-white rounded-xl overflow-hidden">
+        <div id="service" class="w-[40%] md:w-[40%] lg:w-[30%] h-[200px] md:h-[250px] bg-white rounded-xl overflow-hidden">
             <a class="no-underline" href="{% url 'payroll_system:services_client' %}?service_id={{ service.service_id }}">
->>>>>>> Stashed changes
                 <div id="picture" class="h-[70%] bg-[#1e1e1e]">
                     <img class="w-full h-full object-cover" src="{{ service.service_image.url }}" alt="{{ service.title }}">
                 </div>
                 <div id="title" class="h-[30%] py-[15px] px-[20px] bg-white flex justify-between">
-<<<<<<< Updated upstream
-                    <p class="m-0 font-[Roboto] text-base md:text-xl text-[#1E1E1E]">Car Tint</p> <!--to be changed-->
-                </div>
-            </a>
-        </div>
-
-        <div id="service" class="w-[40%] md:w-[40%] lg:w-[30%] h-[200px] md:h-[250px] bg-white rounded-xl overflow-hidden">
-            <a class="no-underline" href="{% url 'payroll_system:services_client' %}">
-                <div id="picture" class="h-[70%] bg-[#1e1e1e]">
-                    <img class="w-full h-full object-cover" src="{% static 'images/bg_nosrs.png' %}" alt="">
-                </div>
-                <div id="title" class="h-[30%] py-[15px] px-[20px] bg-white flex justify-between">
-                    <p class="m-0 font-[Roboto] text-base md:text-xl text-[#1E1E1E]">Car Tint</p> <!--to be changed-->
-                </div>
-            </a>
-        </div>
-
-        <div id="service" class="w-[40%] md:w-[40%] lg:w-[30%] h-[200px] md:h-[250px] bg-white rounded-xl overflow-hidden">
-            <a class="no-underline" href="{% url 'payroll_system:services_client' %}">
-                <div id="picture" class="h-[70%] bg-[#1e1e1e]">
-                    <img class="w-full h-full object-cover" src="{% static 'images/bg_nosrs.png' %}" alt="">
-                </div>
-                <div id="title" class="h-[30%] py-[15px] px-[20px] bg-white flex justify-between">
-                    <p class="m-0 font-[Roboto] text-base md:text-xl text-[#1E1E1E]">Car Tint</p> <!--to be changed-->
-                </div>
-            </a>
-=======
                     <p class="m-0 font-[Roboto] text-xl text-[#1E1E1E]">{{ service.title }}</p>
                 </div>
             </a>
@@ -69,7 +36,6 @@
         {% empty %}
         <div class="w-full text-center py-5">
             <p>No services available. Please add services.</p>
->>>>>>> Stashed changes
         </div>
         {% endfor %}
     </div>
