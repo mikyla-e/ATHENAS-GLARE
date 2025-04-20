@@ -188,48 +188,36 @@ class Employee(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
-    def update_attendance_stats(self):  
-        today = timezone.now().date()   
+    def update_attendance_stats(self):
+        today = timezone.now().date()
         start_date = self.date_of_employment
+
         if start_date > today:
-            return  # avoid invalid range
+            return
 
-        # Get all present attendances (only count complete days)
-        days_worked = self.attendances.filter(
-            date__lt=today,  # Only count previous days, not today
-            attendance_status='Present'
-        ).count()
-        
-        # Add today if the employee is marked present
-        today_present = self.attendances.filter(
-            date=today,
-            attendance_status='Present'
-        ).exists()
-        
-        if today_present:
-            days_worked += 1
-
-        # Calculate working days from employment until yesterday
+        # Count working days (exclude Sundays)
         total_working_days = 0
         day = start_date
-        yesterday = today - timedelta(days=1)
-        
-        while day <= yesterday:
+        while day <= today:
             if day.weekday() != 6:  # 6 = Sunday
                 total_working_days += 1
             day += timedelta(days=1)
-        
-        # Add today if it's a workday (not Sunday)
-        if today.weekday() != 6:  # If today is not Sunday
-            total_working_days += 1
-        
-        absences = total_working_days - days_worked
 
+        # Count present days based on actual time_in
+        present_days = self.attendances.filter(
+            date__lte=today,
+            time_in__isnull=False
+        ).values('date').distinct().count()
+
+        # Calculate absences
+        absences = max(total_working_days - present_days, 0)
+
+        # Update DB and instance
         Employee.objects.filter(employee_id=self.employee_id).update(
-            days_worked=days_worked,
+            days_worked=present_days,
             absences=absences
         )
-        self.days_worked = days_worked
+        self.days_worked = present_days
         self.absences = absences
 
 class Attendance(models.Model):
