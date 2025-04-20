@@ -19,11 +19,6 @@ input[type=submit]{
     padding: 0 20px;
     width: fit-content;
 
-    font-family: 'League Spartan';
-    font-weight: bold;
-    font-size: 1rem;
-    text-align: center;
-
     border-radius: 30px;
     border: none;
 
@@ -34,11 +29,6 @@ input[type=submit]{
 #button_2{
     padding: 0 20px;
     width: fit-content;
-
-    font-family: 'League Spartan';
-    font-weight: bold;
-    font-size: 1rem;
-    text-align: center;
 
     border-radius: 30px;
     border: none;
