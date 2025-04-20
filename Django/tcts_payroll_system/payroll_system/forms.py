@@ -349,13 +349,13 @@ class AdminEditProfileForm(UserChangeForm):
         fields = ('username', 'first_name', 'last_name', 'email', 'password')
 
 class PasswordChangingForm(PasswordChangeForm):
-    old_password = forms.CharField(max_length=100, label='Old Password', widget=forms.PasswordInput(attrs={
+    old_password = forms.CharField(max_length=100, label='old password', widget=forms.PasswordInput(attrs={
             'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Enter Old Password'}))
-    new_password1 = forms.CharField(max_length=100, label='New Password', widget=forms.PasswordInput(attrs={
+    new_password1 = forms.CharField(max_length=100, label='new password', widget=forms.PasswordInput(attrs={
             'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Enter New Password'}))
-    new_password2 = forms.CharField(max_length=100, label='Confirm Password', widget=forms.PasswordInput(attrs={
+    new_password2 = forms.CharField(max_length=100, label='confirm password', widget=forms.PasswordInput(attrs={
             'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
             'placeholder': 'Confirm New Password'}))
     

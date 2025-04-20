@@ -1,26 +1,8 @@
-.body{
-    height: 100%;
-}
-
-.container{
-    position: absolute;
-    height: 88%;
-    width: 84%;
-
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    
-    padding: 0 20px; 
-    z-index: 8;
-}
-
-.container form{
+form{
     width: 100%;
     height: 100%;
 
     display: flex;
-    justify-content: space-between;
     flex-direction: column;
 }
 
@@ -28,54 +10,6 @@ form .form{
     margin: 20px 0;
     display: flex;
     flex-direction: column;
-}
-
-form .form .vehicle_form{
-    display: flex;
-}
-
-form .form .vehicle_form .field_1,
-form .form .vehicle_form .field_2{
-    width: 50%;
-    margin: 0 20px;
-}
-
-form .form .vehicle_form .field_1 .field,
-form .form .vehicle_form .field_2 .field{
-    display: flex;
-    flex-direction: column;
-    margin: 5px 0;
-}
-
-form .form .vehicle_form .field_1 .field label,
-form .form .vehicle_form .field_2 .field label{
-    margin: 0 20px;
-    font-family: 'Inter';
-    font-size: .9rem;
-    font-weight: 600;
-    color: #1e1e1e;
-}
-
-form .form .vehicle_form .field_1 .field input,
-form .form .vehicle_form .field_2 .field input{
-    margin: 8px;
-    padding: 2px 15px;
-    border: none;
-
-    font-family: 'Inter';
-    font-size: 1rem;
-
-    background-color: #fff;
-    height: 50px;
-    border-radius: 20px;
-}
-
-form .form span{
-    height: 3px;
-    width: 95%;
-    background-color: rgba(69, 50, 13, 0.30);;
-    border-radius: 100px;
-    margin: 10px 20px;
 }
 
 form .form .employee_form{
@@ -128,34 +62,4 @@ form .submit{
 
 form .submit a{
 
-}
-
-form .submit a input[type=button]{
-    border: none;
-    border-radius: 100px;
-    height: 50px;
-
-    padding: 0 50px;
-
-    font-family: 'Roboto';
-    font-size: 1rem;
-    font-weight: 500;
-    
-    background-color: #1e1e1e;
-    color: #F8D146;
-}
-
-form .submit a input[type=submit]{
-    border: none;
-    border-radius: 100px;
-    height: 50px;
-
-    padding: 0 50px;
-
-    font-family: 'Roboto';
-    font-size: 1rem;
-    font-weight: 500;
-    
-    background: linear-gradient(180deg, #F8D146 0%, #F5B93F 100%);
-    color: #fff;
 }

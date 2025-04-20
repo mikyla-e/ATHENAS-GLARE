@@ -59,9 +59,7 @@
 
             <div class="w-full lg:w-[30%] h-100 flex lg:flex-col justify-end items-start gap-5 lg:justify-center lg:items-center lg:gap-10" id="buttons">
                 <div class="w-[50%] sm:w-[30%] lg:w-[90%]" id="cancel">
-                    <a href="{% url 'payroll_system:services' %}">
-                        <input class="h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#F8D146]" type="button" value="CANCEL" id="cancel-button">
-                    </a>
+                    <button class="h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#F8D146]" type="button" onclick="history.back()" id="cancel-button">CANCEL</button>
                 </div>
                 <div class="w-[50%] sm:w-[40%] lg:w-[90%]" id="add">
                     <input class="hidden sm:block h-12 lg:h-14 w-full rounded-full text-xs lg:text-base font-[Inter] font-semibold text-[#1e1e1e]" type="submit" value="ADD SERVICES" id="add-button">

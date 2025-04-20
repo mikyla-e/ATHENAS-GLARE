@@ -106,7 +106,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="w-full grid grid-rows-[1fr_80px_1fr_1fr] grid-cols-[2fr_6fr] lg:grid-rows-[100px_1fr_1fr] lg:grid-cols-[1fr_6fr_6fr] gap-3 z-10">
+<div class="w-full grid grid-rows-[1fr_80px_auto_auto] grid-cols-[2fr_6fr] lg:grid-rows-[100px_auto_auto] lg:grid-cols-[1fr_6fr_6fr] gap-3 z-10">
     <div class="order-1 col-span-1 rounded-full size-full flex min-w-[125px] lg:min-w-[100px]">
         {% if employee.active_status %}
             <img class="rounded-full size-[125px] lg:size-[100px] object-cover" src="{{ employee.employee_image.url }}" alt="">
@@ -160,7 +160,7 @@
 
     <!--large devices-->
     <div id="current_payroll" class="order-4 hidden xl:block col-span-3 w-full">
-        <table id="current_payroll_table" class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden">
+        <table id="current_payroll_table" class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="text-base font-[League Spartan]">
                     <th class="p-2 text-base font-[League Spartan]">RATE PER DAY</th>
@@ -203,7 +203,7 @@
 
     <div class="order-5 hidden xl:block col-span-3 flex flex-col justify-center gap-3">
         <div class="w-full flex justify-center items-center">
-            <h1 class="text-xl font-extrabold text-[League Spartan]">PAYROLL HISTORY</h1>
+            <h1 class="py-2 text-xl font-extrabold text-[League Spartan]">PAYROLL HISTORY</h1>
         </div>
         <div id="table">
             <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden">
@@ -227,14 +227,12 @@
                                 {% endwith %}
                             </td>
                             <td class="p-2 text-sm font-[Inter]">{{ current_payroll.incentives }}</td>
-                            <!-- <td class="p-2 text-sm font-[Inter]">{{ current_payroll.deductions }}</td> -->
                             <td class="p-2 text-sm font-[Inter]">{{ current_payroll.salary }}</td>
                             <td class="p-2 text-sm font-[Inter]">{{ current_payroll.payment_date }}</td>
                         {% else %}
                             <td class="p-2 text-sm font-[Inter]">0.00</td>
                             <td class="p-2 text-sm font-[Inter]">N/A</td>
                             <td class="p-2 text-sm font-[Inter]">0.00</td>
-                            <!-- <td class="p-2 text-sm font-[Inter]">0.00</td> -->
                             <td class="p-2 text-sm font-[Inter]">0.00</td>
                             <td class="p-2 text-sm font-[Inter]">N/A</td>
                         {% endif %}
@@ -247,7 +245,7 @@
 
     <!--medium devices-->
     <div id="current_payroll" class="order-4 hidden md:block xl:hidden col-span-3 w-full">
-        <table id="current_payroll_table" class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden">
+        <table id="current_payroll_table" class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="">
                     <th class="p-2 text-sm font-[League Spartan]">RATE</th>
@@ -289,7 +287,7 @@
 
     <div class="order-5 hidden md:block xl:hidden col-span-3 flex flex-col justify-center gap-3">
         <div class="w-full flex justify-center items-center">
-            <h1 class="text-lg font-extrabold text-[League Spartan]">PAYROLL HISTORY</h1>
+            <h1 class="py-2 text-lg font-extrabold text-[League Spartan]">PAYROLL HISTORY</h1>
         </div>
         <div id="table">
             <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden">
@@ -332,7 +330,7 @@
 
     <!--small devices-->
     <div id="current_payroll" class="order-4 md:hidden col-span-3 w-full">
-        <table id="current_payroll_table" class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden">
+        <table id="current_payroll_table" class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="text-base font-[League Spartan]">
                     <th class="p-2 text-xs font-[League Spartan]">RATE</th>

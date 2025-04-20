@@ -3,11 +3,6 @@ input[type=submit]{
     padding: 0 20px;
     width: fit-content;
 
-    font-family: 'League Spartan';
-    font-weight: bold;
-    font-size: 1rem;
-    text-align: center;
-
     border-radius: 30px;
     border: none;
 
@@ -59,11 +54,6 @@ input[type=button]{
     padding: 0 20px;
     width: fit-content;
 
-    font-family: 'League Spartan';
-    font-weight: bold;
-    font-size: 1rem;
-    text-align: center;
-
     border-radius: 30px;
     border: none;
 
@@ -97,4 +87,17 @@ input[type=button]:hover{
 .field:focus {
     outline: none;
     box-shadow: 0 0 0 2px #F8D146; /* Tailwind's yellow-400 */
-  }
+}
+
+input[type=text], input[type=email], input[type=password]{
+    height: 50px;
+    margin: 8px 0;
+    padding: 2px 15px;
+    border: none;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+
+    background-color: #fff;
+    border-radius: 20px;
+}

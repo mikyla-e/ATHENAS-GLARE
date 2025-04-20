@@ -46,44 +46,44 @@
                 <div id="left" class="w-[50%] mx-5">
                     <div class="flex flex-col">
                         <label for="first-name">first name</label>
-                        <input type="text" name="" id="" class="h-[50px]">
+                        <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
                     </div>
                     <div class="flex flex-col">
                         <label for="middle-name">middle name</label>
-                        <input type="text" name="" id="" class="h-[50px]">
+                        <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
                     </div>
                     <div class="flex flex-col">
                         <label for="last-name">last name</label>
-                        <input type="text" name="" id="" class="h-[50px]">
+                        <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
                     </div>
                     <div class="flex flex-col">
                         <label for="contact-number">contact number</label>
-                        <input type="text" name="" id="" class="h-[50px]">
+                        <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
                     </div>
                 </div>
                 <div id="right" class="w-[50%] mx-5">
                     <div class="flex flex-col">
                         <label for="region">region</label>
-                        <input type="text" name="" id="" class="h-[50px]">
+                        <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
                     </div>
                     <div class="flex flex-col">
                         <label for="province">province</label>
-                        <input type="text" name="" id="" class="h-[50px]">
+                        <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
                     </div>
                     <div class="flex flex-col">
                         <label for="municipality">municipality</label>
-                        <input type="text" name="" id="" class="h-[50px]">
+                        <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
                     </div>
                     <div class="flex flex-col">
                         <label for="barangay">barangay</label>
-                        <input type="text" name="" id="" class="h-[50px]">
+                        <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
                     </div>
                 </div>
@@ -91,7 +91,7 @@
 
             <span class="w-[100%] h-[2px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
-            <div id="vehicle-form" class="flex flex-col px-5 gap-5">
+            <div id="vehicle-form" class="flex flex-col">
 
                 <!--<form class="w-full flex justify-center items-center gap-3" method=""> -->
                     <!--to be connected to database; selecting an option should auto fill proceeding fields(for old customers only!)-->
@@ -104,8 +104,8 @@
                 
                 <!-- </form> -->
 
-                <div class="flex my-2">
-                    <div id="left" class="w-[50%]">
+                <div class="flex my-2 gap-2">
+                    <div id="left" class="w-[50%] mx-5">
                         <div class="flex flex-col">
                             <label for="vehicle-name">vehicle name</label>
                             <input type="text" name="" id="" class="h-[50px]">
@@ -117,7 +117,7 @@
                             <!-- {{ form.first_name }} -->
                         </div>
                     </div>
-                    <div id="right" class="w-[50%]">
+                    <div id="right" class="w-[50%] mx-5">
                         <div class="flex flex-col">
                             <label for="plate-number">plate number</label>
                             <input type="text" name="" id="" class="h-[50px]">
@@ -131,11 +131,11 @@
             <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
             <div class="w-full h-[50px] flex justify-end gap-4">
-                <a class="h-full" href="{% url 'payroll_system:services' %}">
-                    <input class="size-full px-3" type="button" value="CANCEL">
+                <a class="h-full" href="javascript:history.back()">
+                    <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
                 </a>
                 <a class="h-full" href="{% url 'payroll_system:services_assign' %}">
-                    <input class="size-full px-3" type="submit" value="CONFIRM CUSTOMER">
+                    <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="CONFIRM CUSTOMER">
                 </a>
             </div>
         </form>

@@ -21,7 +21,7 @@
 <!--page content-->
 {% block content %}
 <div class="size-full flex flex-col">
-    <div class="w-full h-[40px] flex justify-between">
+    <div class="w-full h-[40px] flex justify-between gap-2">
         <div class="w-[88%] flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden">
             <div class="w-full flex justify-center items-center gap-3">
                 <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
@@ -32,48 +32,47 @@
         </div>
         <div class="w-fit h-full flex flex-nowrap">
             <a class="size-full" href="{% url 'payroll_system:employee_registration' %}">
-                <button class="size-full px-2" id="button">EMPLOYEE +</button>
+                <button class="size-full text-xs/3 lg:text-base/4 font-bold text-[League Spartan] text-center" id="button">ADD EMPLOYEE</button>
             </a>
         </div>
     </div>
-    
-    
 
-    <div class="flex flex-col justify-center">
-        <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden" id="employee-table">
+    <!--large-->
+    <div class="hidden md:block flex flex-col justify-center">
+        <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden" id="employee-table-2">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="text-base text-center font-[League Spartan]">
-                    <th class="py-2">EMPLOYEE NAME</th>
-                    <th>ID</th>
-                    <th>CONTACT NUMBER</th>
-                    <th>EMPLOYMENT STATUS</th>
-                    <th>PAYROLL STATUS</th>
-                    <th>LAST ATTENDANCE</th>
+                    <th class="p-2 text-base font-[League Spartan]">EMPLOYEE NAME</th>
+                    <th class="p-2 text-base font-[League Spartan]">ID</th>
+                    <th class="p-2 text-base font-[League Spartan]">CONTACT NUMBER</th>
+                    <th class="p-2 text-base font-[League Spartan]">EMPLOYMENT STATUS</th>
+                    <th class="p-2 text-base font-[League Spartan]">PAYROLL STATUS</th>
+                    <th class="p-2 text-base font-[League Spartan]">LAST ATTENDANCE</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for employee in employees %}
                 <tr id="employee-data">
-                    <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                    <td>{{ employee.employee_id }}</td>
-                    <td>{{ employee.contact_number}}</td>
-                    <td>{{ employee.employee_status }}</td>
-                    <td>
+                    <td class="p-2 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
+                    <td class="p-2 text-sm font-[Inter]">{{ employee.employee_id }}</td>
+                    <td class="p-2 text-sm font-[Inter]">{{ employee.contact_number}}</td>
+                    <td class="p-2 text-sm font-[Inter]">{{ employee.employee_status }}</td>
+                    <td class="p-2 text-sm font-[Inter]">
                         {% if employee.latest_payroll_status %}
                             {{ employee.latest_payroll_status }}
                         {% else %}
                             No Payroll Data
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="p-2 text-sm font-[Inter]">
                         {% if employee.latest_attendance_date %}
                             {{ employee.latest_attendance_date }}
                         {% else %}
                             No Attendance Data
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="p-2 text-sm font-[Inter]">
                         <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}">MORE</a>
                     </td>
                 </tr>
@@ -81,6 +80,50 @@
             </tbody>
         </table>
     </div>
+
+
+    <!--medium-->
+    <div class="md:hidden flex flex-col justify-center">
+        <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden" id="employee-table-1">
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr class="">
+                    <th class="p-2 text-sm font-[League Spartan]">EMPLOYEE NAME</th>
+                    <th class="p-2 text-sm font-[League Spartan]">CONTACT NUMBER</th>
+                    <th class="p-2 text-sm font-[League Spartan]">EMPLOYMENT STATUS</th>
+                    <th class="p-2 text-sm font-[League Spartan]">PAYROLL STATUS</th>
+                    <th class="p-2 text-sm font-[League Spartan]">LAST ATTENDANCE</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                <tr id="employee-data">
+                    <td class="p-2 text-xs font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
+                    <td class="p-2 text-xs font-[Inter]">{{ employee.contact_number}}</td>
+                    <td class="p-2 text-xs font-[Inter]">{{ employee.employee_status }}</td>
+                    <td class="p-2 text-xs font-[Inter]">
+                        {% if employee.latest_payroll_status %}
+                            {{ employee.latest_payroll_status }}
+                        {% else %}
+                            No Payroll Data
+                        {% endif %}
+                    </td>
+                    <td class="p-2 text-xs font-[Inter]">
+                        {% if employee.latest_attendance_date %}
+                            {{ employee.latest_attendance_date }}
+                        {% else %}
+                            No Attendance Data
+                        {% endif %}
+                    </td>
+                    <td class="p-2 text-xs font-[Inter]">
+                        <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}">MORE</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </div>
 {% endblock %}
 
@@ -93,7 +136,11 @@
         let table;
 
         $(document).ready(function () {
-            table = $('#employee-table').DataTable({
+            table = $('#employee-table-2').DataTable({
+                responsive: true
+            });
+
+            table = $('#employee-table-1').DataTable({
                 responsive: true
             });
 

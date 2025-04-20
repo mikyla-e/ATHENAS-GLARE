@@ -7,6 +7,7 @@
 <!--(optional)head content-->
 {% block headcontent %}
 <link rel="stylesheet" href="{% static 'css/services_assign.css' %}">
+<link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 {% endblock %}
 
 <!--header-->
@@ -14,22 +15,21 @@
 
 <!--page content-->
 {% block content %}
-<form action="{% url 'payroll_system:services' %}" method="post">
+
+
+<form action="{% url 'payroll_system:services' %}" method="post" class="flex flex-col">
     {% csrf_token %}
-    <div class="form">
-        
-        <span></span>
-        <div class="employee_form">
-            <label for="assigned-employee">assigned employee</label>
-            <input type="text" name="" id="">
-        </div>
+    <div class="flex flex-col w-[50%]">
+        <label for="assigned-employee">assigned employee</label>
+        <input type="text" name="" id="">
     </div>
+    <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
     <div class="submit">
-        <a href="{% url 'payroll_system:services_client' %}">
-            <input type="button" value="Back">
+        <a href="javascript:history.back()">
+            <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
         </a>
         <a href="{% url 'payroll_system:services' %}">
-            <input type="submit" value="Assign Task">
+            <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="ASSIGN TASK">
         </a>
     </div>
 </form>

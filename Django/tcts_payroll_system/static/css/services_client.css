@@ -5,33 +5,3 @@ label{
     font-weight: 600;
     color: #1e1e1e;
 }
-
-input[type=text]{
-    margin: 8px;
-    padding: 2px 15px;
-    border: none;
-
-    font-family: 'Inter';
-    font-size: 1rem;
-
-    background-color: #fff;
-    border-radius: 20px;
-}
-
-input[type=button]{
-    border: none;
-    border-radius: 100px;
-
-    font-family: 'Roboto';
-    font-size: 1rem;
-    font-weight: 500;
-    
-    background-color: #1e1e1e;
-    color: #F8D146;
-    cursor: pointer;
-}
-
-input[type=button]:hover{
-    scale: 1.1;
-    
-}
