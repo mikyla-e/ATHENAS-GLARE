@@ -189,7 +189,6 @@
                 <tr class="text-base font-[League Spartan]">
                     <th class="py-2">EMPLOYEE</th>
                     <th>STATUS</th>
-                    <!-- <th>DEDUCTIONS</th> -->
                     <th id="payment-amount">PAYMENT AMOUNT</th>
                     <th></th>
                 </tr>
@@ -201,13 +200,12 @@
                     <tr id="payroll-data">
                         <td>{{ employee.first_name }} {{ employee.last_name }}</td>
                         <td>{{ latest_payroll.payroll_status }}</td>
-                        <!-- <td>{{ latest_payroll.deductions }}</td> -->
                         <td id="payment-amount">₱{{ latest_payroll.salary }}</td>
                         <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% else %}
                     <tr id="payroll-data">
-                        <td colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td colspan="3">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
                         <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% endif %}
@@ -224,7 +222,6 @@
                     <th class="py-2">EMPLOYEE</th>
                     <th>STATUS</th>
                     <th>RATE PER DAY</th>
-                    <!-- <th>DEDUCTIONS</th> -->
                     <th id="payment-amount">PAYMENT AMOUNT</th>
                     <th></th>
                 </tr>
@@ -237,13 +234,12 @@
                         <td>{{ employee.first_name }} {{ employee.last_name }}</td>
                         <td>{{ latest_payroll.payroll_status }}</td>
                         <td>{{ latest_payroll.rate }}</td>
-                        <!-- <td>{{ latest_payroll.deductions }}</td> -->
                         <td id="payment-amount">₱{{ latest_payroll.salary }}</td>
                         <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% else %}
                     <tr id="payroll-data">
-                        <td colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td colspan="5">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
                         <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% endif %}
