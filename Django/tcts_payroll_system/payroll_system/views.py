@@ -1,7 +1,6 @@
 import base64
 import cv2
 import io
-import pytz
 import numpy as np
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
