@@ -31,7 +31,7 @@
 <!--page content-->
 {% block content %}
 <div class="size-full py-4 px-3" id="thing">
-    <form action="{% url 'payroll_system:services_client' %}" method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="flex flex-wrap lg:flex-nowrap gap-5 lg:gap-11" id="form">
 
@@ -39,21 +39,19 @@
                 <div class="relative h-[70%] flex justify-center items-center bg-[#1E1E1E30]" id="photo">
 
                     <div class="absolute flex justify-center items-center z-10">
-                        <input class="hidden" type="file" accept="image/*" onchange="loadImage(event)" name="services-photo" id="services-photo">
-                        <input class="px-4 py-2 rounded cursor-pointer text-[#FFFFFF] text-center text-xl font-bold" type="button" value="Choose File" onclick="document.getElementById('services-photo').click()">
-
-                        <!-- <input class="text-[#FFFFFF] text-center text-xl font-bold" type="file" accept="image/*" onchange="loadImage(event)" name="services-photo" id="services-photo"> -->
+                        {{ form.service_image }}
+                        <button type="button" class="px-4 py-2 rounded cursor-pointer text-[#FFFFFF] text-center text-xl font-bold" onclick="document.getElementById('{{ form.service_image.auto_id }}').click()">Choose File</button>
                     </div>
                     
                     <div class="relative size-full">
                         <div class="absolute size-full bg-[#1E1E1E30] z-5"></div>
-                        <img class="hidden size-full object-cover" src="" alt=""  id="imagePreview">
+                        <img class="hidden size-full object-cover" src="" alt="" id="imagePreview">
                     </div>
 
                 </div>
                 <div class="h-[30%] py-5 px-10 flex flex-col gap-1" id="title">
                     <p class="text-[#1E1E1E4D] text-sm font-[League Spartan] font-bold">TITLE</p>
-                    <input class="w-full outline-none text-lg" type="text" name="services-title" id="services-title" placeholder="Enter Title" autocomplete="off">
+                    {{ form.title }}
                 </div>
             </div>
 
@@ -68,9 +66,9 @@
             </div>
         </div>
     </form>
+</div>
 {% endblock %}
 
-<!--(optional)script-->
 {% block script %}
 <script>
     var loadImage = function(event) {
@@ -78,12 +76,12 @@
         const file = event.target.files[0];
 
         if (file) {
-        image.src = URL.createObjectURL(file);
-        image.classList.remove('hidden');
+            image.src = URL.createObjectURL(file);
+            image.classList.remove('hidden');
 
-        image.onload = () => {
-            URL.revokeObjectURL(image.src); // free memory
-        };
+            image.onload = () => {
+                URL.revokeObjectURL(image.src); // free memory
+            };
         }
     };
 </script>

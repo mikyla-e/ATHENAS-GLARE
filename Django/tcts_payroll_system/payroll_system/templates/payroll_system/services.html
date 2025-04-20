@@ -21,13 +21,21 @@
         </a>
     </div>
     
+<<<<<<< Updated upstream
     <div class="w-full h-auto my-5 flex flex-wrap items-center justify-center gap-5 md:gap-5 xl:gap-6">
         <div id="service" class="w-[40%] md:w-[40%] lg:w-[30%] h-[200px] md:h-[250px] bg-white rounded-xl overflow-hidden">
             <a class="no-underline" href="{% url 'payroll_system:services_client' %}">
+=======
+    <div class="w-full h-auto my-5 flex flex-wrap items-center justify-center gap-8">
+        {% for service in services %}
+        <div id="service" class="w-[31%] h-[250px] bg-white rounded-xl overflow-hidden">
+            <a class="no-underline" href="{% url 'payroll_system:services_client' %}?service_id={{ service.service_id }}">
+>>>>>>> Stashed changes
                 <div id="picture" class="h-[70%] bg-[#1e1e1e]">
-                    <img class="w-full h-full object-cover" src="{% static 'images/bg_nosrs.png' %}" alt="">
+                    <img class="w-full h-full object-cover" src="{{ service.service_image.url }}" alt="{{ service.title }}">
                 </div>
                 <div id="title" class="h-[30%] py-[15px] px-[20px] bg-white flex justify-between">
+<<<<<<< Updated upstream
                     <p class="m-0 font-[Roboto] text-base md:text-xl text-[#1E1E1E]">Car Tint</p> <!--to be changed-->
                 </div>
             </a>
@@ -53,144 +61,17 @@
                     <p class="m-0 font-[Roboto] text-base md:text-xl text-[#1E1E1E]">Car Tint</p> <!--to be changed-->
                 </div>
             </a>
+=======
+                    <p class="m-0 font-[Roboto] text-xl text-[#1E1E1E]">{{ service.title }}</p>
+                </div>
+            </a>
         </div>
+        {% empty %}
+        <div class="w-full text-center py-5">
+            <p>No services available. Please add services.</p>
+>>>>>>> Stashed changes
+        </div>
+        {% endfor %}
     </div>
 </div>
-
 {% endblock %}
-
-<!--(optional)script-->
-{% block script %}
-
-{% endblock %}
-<!-- 
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services</title>
-    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/services.css' %}">
-
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-</head>
-<body class="bg-[#EFEDE6]">
-    <nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
-        <div class="bg-[#FFFFFF] cols-span-1 row-span-1">
-            <div class="h-[70px] flex flex-wrap justify-center place-items-center md:gap-2" id="logo">
-                <div class="-mb-2 md:mb-0" id="logo-picture">
-                    <img class="h-8 md:h-10" src="{% static 'images/logo_icon.png' %}" alt="">
-                </div>
-                <div class="text-[#1E1E1E] text-xs/3 md:text-lg/5 font-[League Spartan] font-extrabold" id="logo-name">
-                    <p class="text-center md:text-left ">PAYROLL</p>
-                    <p class="text-center md:text-left">SYSTEM</p>
-                </div>
-            </div>
-        </div>
-        <div class="overflow-hidden" id="menu">
-            <ul class="h-auto w-[80px] md:w-[190px]">
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:dashboard' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/dashboard_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">DASHBOARD</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/payroll_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/employee_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/services_icon_focused.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:status' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/status_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">STATUS</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:customers' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/customers_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:settings' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/settings_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SETTINGS</div>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="h-dvh w-full grid grid-cols-[80px_1fr] md:grid-cols-[190px_1fr] grid-rows-[70px_1fr] z-25">
-        <div class="bg-[#FFFFFF] row-span-2">
-
-        </div>
-        
-        <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">SERVICES</h1>
-        </div>
-
-        <div class="size-full py-4 px-3" id="thing">
-            <div class="button">
-                <button class="add-services"><a href="{% url 'payroll_system:services_add' %}">ADD SERVICES +</a></button>
-            </div>
-
-            <div class="services">
-                <div class="service">
-                    <a href="{% url 'payroll_system:services_client' %}">
-                        <div class="picture">
-                            <img src="{% static 'images/bg_norsrs.png' %}" alt="">
-                        </div>
-                        <div class="title">
-                            <p>Title</p>
-                            <img src="../pictures/icons/next_icon.png" alt="">
-                        </div>
-                    </a>
-                </div>
-                <div class="service">
-                    <a href="{% url 'payroll_system:services_client' %}">
-                        <div class="picture">
-                            <img src="../pictures/bg_nosrs.png" alt="">
-                        </div>
-                        <div class="title">
-                            <p>Title</p>
-                            <img src="../pictures/icons/next_icon.png" alt="">
-                        </div>
-                    </a>
-                </div>
-                <div class="service">
-                    <a href="{% url 'payroll_system:services_client' %}">
-                        <div class="picture">
-                            <img src="../pictures/bg_nosrs.png" alt="">
-                        </div>
-                        <div class="title">
-                            <p>Title</p>
-                            <img src="../pictures/icons/next_icon.png" alt="">
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-
-{{ redirect_to_login_immediately }}
-
-</html> -->

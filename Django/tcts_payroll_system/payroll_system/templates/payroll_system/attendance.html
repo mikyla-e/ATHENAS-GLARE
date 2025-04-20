@@ -186,7 +186,7 @@
                 });
             }
             
-            // Modify the handleRecognitionResponse function to get attendance status when a face is recognized
+            // HandleRecognitionResponse function to get attendance status when a face is recognized
             function handleRecognitionResponse(response) {
                 switch(response.status) {
                     case 'waiting':
@@ -320,6 +320,7 @@
                                     }
                                 }
                             } else {
+                                
                                 // Employee has no open session, can time in
                                 timeInBtn.disabled = false;
                                 timeOutBtn.disabled = true;
@@ -355,7 +356,7 @@
                 });
             }
 
-            // Update the showNotification function to accept a duration parameter
+            //showNotification function to accept a duration parameter
             function showNotification(message, type, duration = 5000) {
                 const notification = document.getElementById('notification');
                 const notificationMessage = document.getElementById('notification-message');

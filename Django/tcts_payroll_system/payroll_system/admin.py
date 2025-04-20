@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Employee, Payroll, Attendance, History
+from .models import Employee, Payroll, Attendance, History, Service, Customer, Vehicle, Task
 
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('employee_id', 'first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
@@ -17,3 +17,7 @@ admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Payroll, PayrollAdmin)
 admin.site.register(Attendance, AttendanceAdmin)
 admin.site.register(History)
+admin.site.register(Service)
+admin.site.register(Customer)
+admin.site.register(Vehicle)
+admin.site.register(Task)

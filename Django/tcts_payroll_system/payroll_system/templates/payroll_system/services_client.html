@@ -20,18 +20,15 @@
         <p>Not a new customer?</p>
 
         <div class="w-full h-[40px] flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden">
-            <form class="w-full flex justify-center items-center gap-3" method="">
+            <form class="w-full flex justify-center items-center gap-3" method="get" action="#">
                 {% csrf_token %}
                 <img class="h-[25px] w-[25px] ml-[15px] flex justify-center items-center" src="{% static 'images/search_icon.png' %}" alt="Search">
                 <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" list="customers" name="customer" id="customer" placeholder="Search Customer...">
                 
-                <!--to be connected to database-->
                 <datalist id="customers">
-                    <option value="Santa Maria">
-                    <option value="Viktor Greg Lim">
-                    <option value="Ejay Rulona">
-                    <option value="Lady Melodiluz Galope">
-                    <option value="Aaron Flores">
+                    {% for customer in customers %}
+                    <option value="{{ customer.first_name }} {{ customer.last_name }}">
+                    {% endfor %}
                 </datalist>
             </form>
         </div>
@@ -40,12 +37,13 @@
     <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
     <div class="size-full my-2 flex items-start">
-        <form class="size-full flex flex-col justify-between" action="{% url 'payroll_system:services_assign' %}" method="">
+        <form class="size-full flex flex-col justify-between" action="{% url 'payroll_system:services_assign' %}" method="post">
             {% csrf_token %}
             <div id="client-form" class="flex">
                 <div id="left" class="w-[50%] mx-5">
                     <div class="flex flex-col">
                         <label for="first-name">first name</label>
+<<<<<<< Updated upstream
                         <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
                     </div>
@@ -63,10 +61,30 @@
                         <label for="contact-number">contact number</label>
                         <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
+=======
+                        {{ customer_form.first_name }}
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="middle-name">middle name</label>
+                        {{ customer_form.middle_name }}
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="last-name">last name</label>
+                        {{ customer_form.last_name }}
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="gender">gender</label>
+                        {{ customer_form.gender }}
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="contact-number">contact number</label>
+                        {{ customer_form.contact_number }}
+>>>>>>> Stashed changes
                     </div>
                 </div>
                 <div id="right" class="w-[50%] mx-5">
                     <div class="flex flex-col">
+<<<<<<< Updated upstream
                         <label for="region">region</label>
                         <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
@@ -85,12 +103,61 @@
                         <label for="barangay">barangay</label>
                         <input type="text" name="" id="" class="">
                         <!-- {{ form.first_name }} -->
+=======
+                        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
+                        {{ form.region }}
+                        {% if form.region.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.region.errors.0 }}</div>
+                        {% endif %}
+                        <datalist id="region-list">
+                            {% for region in regions %}
+                                <option value="{{ region.regDesc }}" data-code="{{ region.regCode }}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
+                        {{ form.region }}
+                        {% if form.region.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.region.errors.0 }}</div>
+                        {% endif %}
+                        <datalist id="region-list">
+                            {% for region in regions %}
+                                <option value="{{ region.regDesc }}" data-code="{{ region.regCode }}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
+                        {{ form.region }}
+                        {% if form.region.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.region.errors.0 }}</div>
+                        {% endif %}
+                        <datalist id="region-list">
+                            {% for region in regions %}
+                                <option value="{{ region.regDesc }}" data-code="{{ region.regCode }}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
+                        {{ form.region }}
+                        {% if form.region.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.region.errors.0 }}</div>
+                        {% endif %}
+                        <datalist id="region-list">
+                            {% for region in regions %}
+                                <option value="{{ region.regDesc }}" data-code="{{ region.regCode }}">
+                            {% endfor %}
+                        </datalist>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
 
             <span class="w-[100%] h-[2px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
+<<<<<<< Updated upstream
             <div id="vehicle-form" class="flex flex-col">
 
                 <!--<form class="w-full flex justify-center items-center gap-3" method=""> -->
@@ -106,26 +173,27 @@
 
                 <div class="flex my-2 gap-2">
                     <div id="left" class="w-[50%] mx-5">
+=======
+            <div id="vehicle-form" class="flex flex-col px-5 gap-5">
+                <div class="flex my-2">
+                    <div id="left" class="w-[50%]">
+>>>>>>> Stashed changes
                         <div class="flex flex-col">
                             <label for="vehicle-name">vehicle name</label>
-                            <input type="text" name="" id="" class="h-[50px]">
-                            <!-- {{ form.first_name }} -->
+                            {{ vehicle_form.vehicle_name }}
                         </div>
                         <div class="flex flex-col">
                             <label for="vehicle-color">vehicle color</label>
-                            <input type="text" name="" id="" class="h-[50px]">
-                            <!-- {{ form.first_name }} -->
+                            {{ vehicle_form.vehicle_color }}
                         </div>
                     </div>
                     <div id="right" class="w-[50%] mx-5">
                         <div class="flex flex-col">
                             <label for="plate-number">plate number</label>
-                            <input type="text" name="" id="" class="h-[50px]">
-                            <!-- {{ form.first_name }} -->
+                            {{ vehicle_form.plate_number }}
                         </div>
                     </div>
                 </div>
-                
             </div>
 
             <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
@@ -134,177 +202,15 @@
                 <a class="h-full" href="javascript:history.back()">
                     <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
                 </a>
+<<<<<<< Updated upstream
                 <a class="h-full" href="{% url 'payroll_system:services_assign' %}">
                     <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="CONFIRM CUSTOMER">
                 </a>
+=======
+                <input class="size-full px-3" type="submit" value="CONFIRM CUSTOMER">
+>>>>>>> Stashed changes
             </div>
         </form>
     </div>   
 </div>
 {% endblock %}
-
-<!--(optional)script-->
-{% block script %}
-
-{% endblock %}
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirming Client</title>
-    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/services_client.css' %}">
-
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-</head>
-<body class="bg-[#EFEDE6]">
-    <nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
-        <div class="bg-[#FFFFFF] cols-span-1 row-span-1">
-            <div class="h-[70px] flex flex-wrap justify-center place-items-center md:gap-2" id="logo">
-                <div class="-mb-2 md:mb-0" id="logo-picture">
-                    <img class="h-8 md:h-10" src="{% static 'images/logo_icon.png' %}" alt="">
-                </div>
-                <div class="text-[#1E1E1E] text-xs/3 md:text-lg/5 font-[League Spartan] font-extrabold" id="logo-name">
-                    <p class="text-center md:text-left ">PAYROLL</p>
-                    <p class="text-center md:text-left">SYSTEM</p>
-                </div>
-            </div>
-        </div>
-        <div class="overflow-hidden" id="menu">
-            <ul class="h-auto w-[80px] md:w-[190px]">
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:dashboard' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/dashboard_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">DASHBOARD</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/payroll_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/employee_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/services_icon_focused.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:status' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/status_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">STATUS</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:customers' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/customers_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:settings' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/settings_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SETTINGS</div>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="h-dvh w-full grid grid-cols-[80px_1fr] md:grid-cols-[190px_1fr] grid-rows-[70px_1fr] z-25">
-        <div class="bg-[#FFFFFF] row-span-2">
-
-        </div>
-        
-        <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">SERVICES</h1>
-        </div>
-
-        <div class="size-full py-4 px-3" id="thing">
-            <div class="old_client">
-                <p>Old Client?</p>
-                <div class="search">
-                    <form class="form" method="post">
-                        <button type="submit"><img src="../pictures/icons/search_icon.png" alt=""></button>
-                        <input type="text" placeholder="Search...">    
-                    </form>
-                </div>
-            </div>
-            <span></span> <!--Horizontal Line
-            <div class="client_form">
-                <form action="{% url 'payroll_system:services_vehicle' %}" method="post">
-                    {% csrf_token %}
-                    <div class="form">
-                        <div class="form_1">
-                            <div class="field">
-                                <label for="first-name">first name</label>
-                                <input type="text" name="" id="">
-                                {{ form.first_name }}
-                            </div>
-                            <div class="field">
-                                <label for="middle-name">middle name</label>
-                                <input type="text" name="" id="">
-                                {{ form.middle_name }}
-                            </div>
-                            <div class="field">
-                                <label for="last-name">last name</label>
-                                <input type="text" name="" id="">
-                                {{ form.last_name }}
-                            </div>
-                            <div class="field">
-                                <label for="gender">gender</label>
-                                <input type="text" name="" id="">
-                                {{ form.last_name }} 
-                            </div>
-                        </div>
-                        <div class="form_2">
-                            <div class="field">
-                                <label for="region">region</label>
-                                <input type="text" name="" id="">
-                                {{ form.first_name }}
-                            </div>
-                            <div class="field">
-                                <label for="province">province</label>
-                                <input type="text" name="" id="">
-                                {{ form.middle_name }}
-                            </div>
-                            <div class="field">
-                                <label for="municipality">municipality</label>
-                                <input type="text" name="" id="">
-                                {{ form.last_name }}
-                            </div>
-                            <div class="field">
-                                <label for="barangay">barangay</label>
-                                <input type="text" name="" id="">
-                                {{ form.last_name }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="submit">
-                        <a href="{% url 'payroll_system:services' %}">
-                            <input type="button" value="Cancel">
-                        </a>
-                        <a href="{% url 'payroll_system:services_vehicle' %}">
-                            <input type="submit" value="Confirm Client">
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</body>
-
-{{ redirect_to_login_immediately }}
-
-</html> -->

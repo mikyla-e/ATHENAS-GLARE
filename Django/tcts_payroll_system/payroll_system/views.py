@@ -14,9 +14,9 @@ from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from django.views import generic
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from .forms import EmployeeForm, PayrollForm, AdminEditProfileForm, PasswordChangingForm
+from .forms import EmployeeForm, PayrollForm, ServiceForm, CustomerForm, VehicleForm, AdminEditProfileForm, PasswordChangingForm
 from .face_recognition_attendance import process_frame_recognition, mark_attendance, check_attendance_status
-from .models import Employee, Payroll, Attendance, History, Region, Province, City, Barangay
+from .models import Employee, Payroll, Attendance, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 from django.http import JsonResponse
 from PIL import Image
 
@@ -567,22 +567,123 @@ def payroll_edit(request, employee_id):
 
 @login_required
 def services(request):
-    return render(request, 'payroll_system/services.html')
+    services = Service.objects.all()
+    context = {
+        'services': services
+    }
+    return render(request, 'payroll_system/services.html', context)
 
 @login_required
 def services_add(request):
-    return render(request, 'payroll_system/services_add.html')
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('payroll_system:services')
+    else:
+        form = ServiceForm()
+    
+    context = {
+        'form': form
+    }
+    return render(request, 'payroll_system/services_add.html', context)
 
 @login_required
 def services_client(request):
-    return render(request, 'payroll_system/services_client.html')
+    # Store selected service in session
+    service_id = request.GET.get('service_id')
+    if service_id:
+        request.session['selected_service_id'] = service_id
+    
+    # Forms for customer and vehicle
+    customer_form = CustomerForm()
+    vehicle_form = VehicleForm()
+
+    context = {
+        'customer_form': customer_form,
+        'vehicle_form': vehicle_form
+    }
+    
+    return render(request, 'payroll_system/services_client.html', context)
 
 @login_required
 def services_assign(request):
-    return render(request, 'payroll_system/services_assign.html')
+    if request.method == 'POST':
+        if 'assigned_employee' in request.POST:
+            # This is the employee assignment form submission
+            employee_id = request.POST.get('assigned_employee')
+            
+            # Get stored data from session
+            service_id = request.session.get('selected_service_id')
+            customer_id = request.session.get('customer_id')
+            vehicle_id = request.session.get('vehicle_id')
+            
+            if service_id and customer_id and vehicle_id and employee_id:
+                # Create the task
+                service = Service.objects.get(pk=service_id)
+                customer = Customer.objects.get(pk=customer_id)
+                vehicle = Vehicle.objects.get(pk=vehicle_id)
+                
+                task = Task(
+                    task_name=f"{service.title} for {customer.first_name} {customer.last_name}",
+                    service=service,
+                    customer=customer,
+                    vehicle=vehicle,
+                    # Assuming you have an Employee model with employee_id as primary key
+                    employee=Employee.objects.get(pk=employee_id)
+                )
+                task.save()
+                
+                # Clear session data
+                for key in ['selected_service_id', 'customer_id', 'vehicle_id']:
+                    if key in request.session:
+                        del request.session[key]
+                
+                return redirect('payroll_system:status')
+                
+        else:
+            # This is the customer and vehicle form submission from services_client
+            customer_form = CustomerForm(request.POST)
+            vehicle_form = VehicleForm(request.POST)
+            
+            if customer_form.is_valid() and vehicle_form.is_valid():
+                # Save customer first
+                customer = customer_form.save()
+                
+                # Then save vehicle with customer reference
+                vehicle = vehicle_form.save(commit=False)
+                vehicle.customer = customer
+                vehicle.save()
+                
+                # Store data in session for next step
+                request.session['customer_id'] = customer.customer_id
+                request.session['vehicle_id'] = vehicle.vehicle_id
+                
+                # Get employees to display for assignment
+                employees = Employee.objects.all()
+                return render(request, 'payroll_system/services_assign.html', {
+                    'employees': employees
+                })
+            else:
+                # If form validation fails, go back to the customer form with errors
+                return render(request, 'payroll_system/services_client.html', {
+                    'customer_form': customer_form,
+                    'vehicle_form': vehicle_form
+                })
+    
+    # If this is a GET request, get employees to display
+    employees = Employee.objects.all()
+    return render(request, 'payroll_system/services_assign.html', {
+        'employees': employees
+    })
 
 @login_required
 def status(request):
+    # Get all tasks for display
+    tasks = Task.objects.all().order_by('-created_at')
+    context = {
+        'tasks': tasks
+    }
     return render(request, 'payroll_system/status.html')
 
 @login_required

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.forms import ModelForm
 from django.utils import timezone
 from datetime import datetime
-from .models import Employee, Payroll, Region, Province, City, Barangay
+from .models import Employee, Payroll, Region, Province, City, Barangay, Service, Customer, Vehicle, Task
 
 class EmployeeForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput())
@@ -39,8 +39,6 @@ class EmployeeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        self._setup_image_field()
-        
         # Set custom attributes for the date picker
         self.fields['date_of_birth'].widget = forms.DateInput(
             attrs={
@@ -49,11 +47,6 @@ class EmployeeForm(forms.ModelForm):
                 'value': '',  # No default value when form loads
             }
         )
-
-    def _setup_image_field(self):
-        # Make image required only for new employees
-        if not self.instance.pk:
-            self.fields['employee_image'].required = True
 
     def validate_contact_number(self, contact_number):
         
@@ -329,6 +322,50 @@ class PayrollForm(ModelForm):
         # Check if all required fields are filled
         if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
             raise forms.ValidationError("All fields must be filled.")
+        
+class ServiceForm(forms.ModelForm):
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'w-full outline-none text-lg', 'placeholder': 'Enter Title'}))
+    service_image = forms.ImageField(widget=forms.ClearableFileInput(attrs={'class': 'hidden', 'accept': 'image/*', 'onchange': 'loadImage(event)'}))
+    
+    class Meta:
+        model = Service
+        fields = ('title', 'service_image')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        required_fields = ['title', 'service_image']
+
+        if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
+            raise forms.ValidationError("All fields must be filled.")
+        
+class CustomerForm(forms.ModelForm):
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}))
+    middle_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}), required=False)
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}))
+    contact_number = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]', 'type': 'tel'}))
+    region = forms.CharField(label='region', widget=forms.TextInput(attrs={'class': 'h-[50px]', 'id': 'region-dropdown', 'list': 'region-list', 
+                             'autocomplete': 'off'}))
+    province = forms.CharField(label='province', widget=forms.TextInput(attrs={'class': 'h-[50px]', 'id': 'province-dropdown', 'list': 'province-list',
+                               'autocomplete': 'off'}))
+    city = forms.CharField(label='city', widget=forms.TextInput(attrs={'class': 'h-[50px]', 'id': 'city-dropdown', 'list': 'city-list', 
+                           'autocomplete': 'off'}))
+    barangay = forms.CharField(label='barangay', widget=forms.TextInput(attrs={'class': 'h-[50px]', 'id': 'barangay-dropdown', 'list': 'barangay-list', 
+                               'autocomplete': 'off'}))
+    
+    class Meta:
+        model = Customer
+        fields = ('first_name', 'middle_name', 'gender', 'contact_number', 'region', 'province', 'city', 'barangay')
+        widgets = {
+            'gender': forms.Select(attrs={'class': 'h-[50px]'})
+        }
+
+class VehicleForm(forms.ModelForm):
+    vehicle_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}))
+    vehicle_color = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}))
+    plate_number = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}))
+    class Meta:
+        model = Vehicle
+        fields = ('vehicle_name', 'vehicle_color', 'plate_number')
     
 class AdminEditProfileForm(UserChangeForm):
     username = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
