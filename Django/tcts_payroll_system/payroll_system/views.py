@@ -3,6 +3,7 @@ import cv2
 import io
 import numpy as np
 from datetime import datetime
+from django.contrib.auth import  authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -713,3 +714,9 @@ class PasswordsChangeView(LoginRequiredMixin, PasswordChangeView):
 @login_required
 def about(request):
     return render(request, 'payroll_system/about.html')
+
+@login_required
+def logout_user(request):
+    logout(request)
+    message.success(request, ("You Were Logout!"))
+    return redirect('users')

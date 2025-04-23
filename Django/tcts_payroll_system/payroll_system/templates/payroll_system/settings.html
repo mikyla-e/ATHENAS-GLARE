@@ -23,7 +23,7 @@
     </div>
 </a>
 
-<a href="{% url 'payroll_system:admin_edit_profile' %}">
+<a href="{% url 'payroll_system:about' %}">
     <div class=" bg-white rounded-xl manage_user p-5 mb-5">
         <div class="flex items-center content">
             <img src="{% static 'images/about_icon.png' %}" alt="">
@@ -31,16 +31,17 @@
         </div>
     </div>
 </a>
-
-<form class="" method="post" action="{% url 'users:logout' %}">
-    {% csrf_token %}
-    <button class=" w-full bg-white cursor-pointer rounded-xl p-5 mb-5">
-        <div class="flex items-center content">
-            <img src="{% static 'images/logout_icon.png' %}" alt="">
-            <h1 class="ml-2">Logout</h1>
-        </div>
-    </button>
-</form>
+{% if user.is_authenticated %}
+    <form class="" method="post" action="{% url 'users:logout' %}">
+        {% csrf_token %}
+        <button class=" w-full bg-white cursor-pointer rounded-xl p-5 mb-5">
+            <div class="flex items-center content">
+                <img src="{% static 'images/logout_icon.png' %}" alt="">
+                <h1 class="ml-2">Logout</h1>
+            </div>
+        </button>
+    </form>
+{% endif %}
 {% endblock %}
 
 <!--(optional)script-->
