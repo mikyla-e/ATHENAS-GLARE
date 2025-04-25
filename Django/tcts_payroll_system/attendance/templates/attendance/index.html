@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,24 +10,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
     <style>
-        #time-in, #time-out {
+        .action-button {
             padding: 10px 20px;
             border-radius: 5px;
             font-weight: bold;
             transition: all 0.3s;
+            margin: 5px;
         }
         
-        #time-in {
+        .confirm-btn {
             background-color: #4CAF50;
             color: white;
         }
         
-        #time-out {
+        .cancel-btn {
             background-color: #f44336;
             color: white;
         }
         
-        #time-in:disabled, #time-out:disabled {
+        .disabled-btn {
             background-color: #cccccc;
             color: #666666;
             cursor: not-allowed;
@@ -52,6 +52,29 @@
         
         .border-green-500 {
             border-left-color: #4CAF50 !important;
+        }
+        
+        .attendance-log {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .attendance-log:last-child {
+            border-bottom: none;
+        }
+        
+        #confirmation-dialog {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 100;
+            text-align: center;
+            color: white;
+            min-width: 300px;
         }
     </style>
 </head>
@@ -80,6 +103,16 @@
                         <div id="recognition-message" class="text-xl"></div>
                     </div>
                 </div>
+                
+                <!-- Confirmation dialog -->
+                <div id="confirmation-dialog" class="hidden">
+                    <h2 id="confirmation-title" class="text-2xl font-bold mb-4"></h2>
+                    <p id="confirmation-message" class="text-lg mb-6"></p>
+                    <div class="flex justify-center gap-4">
+                        <button id="confirm-yes" class="action-button confirm-btn">Yes</button>
+                        <button id="confirm-no" class="action-button cancel-btn">No</button>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -88,13 +121,20 @@
                 <img src="{% static 'images/logo_icon.png' %}" alt="">
                 <p class="text-2xl font-extrabold">ATTENDANCE</p>
             </div>
-            <div id="content" class="h-full lg:h-[70%] w-full flex justify-between lg:flex-col lg:justify-center items-center gap-10">
-                <div id="title" class="w-fit flex justify-start overflow-hidden">
-                    <p class="px-4 text-5xl font-[League Spartan] font-bold text-left flex flex-wrap">RECORD ATTENDANCE</p>
+            <div id="content" class="h-full lg:h-[70%] w-full flex justify-between lg:flex-col lg:justify-start items-center">
+                <div id="title" class="w-fit flex justify-start overflow-hidden mb-4">
+                    <p class="px-4 text-4xl lg:text-5xl font-[League Spartan] font-bold text-left flex flex-wrap">RECORD ATTENDANCE</p>
                 </div>
-                <div class="w-[50%] lg:w-full flex flex-nowrap justify-center items-center gap-5" id="buttons">
-                    <button id="time-in" class="cursor-pointer" type="button" disabled>TIME IN</button>
-                    <button id="time-out" class="cursor-pointer" type="button" disabled>TIME OUT</button>
+                
+                <!-- Attendance History Section -->
+                <div id="attendance-history" class="w-full overflow-y-auto max-h-80 border border-gray-200 rounded-lg p-2 bg-gray-50">
+                    <h3 class="text-xl font-bold text-center mb-2">Today's Attendance</h3>
+                    <div id="history-content" class="text-sm">
+                        <div class="text-center text-gray-500 py-4">
+                            Face recognition system is active.<br>
+                            Attendance records will appear here.
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="h-[10%]" id="empty"></div>
@@ -118,20 +158,26 @@
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
             const statusMessage = document.getElementById('status-message');
-            const timeInBtn = document.getElementById('time-in');
-            const timeOutBtn = document.getElementById('time-out');
             const recognitionOverlay = document.getElementById('recognition-overlay');
             const recognizedName = document.getElementById('recognized-name');
             const recognitionMessage = document.getElementById('recognition-message');
+            const historyContent = document.getElementById('history-content');
+            const confirmationDialog = document.getElementById('confirmation-dialog');
+            const confirmationTitle = document.getElementById('confirmation-title');
+            const confirmationMessage = document.getElementById('confirmation-message');
+            const confirmYesBtn = document.getElementById('confirm-yes');
+            const confirmNoBtn = document.getElementById('confirm-no');
             
             // State variables
             let isProcessing = false;
+            let isPaused = false;
             let recognizedEmployeeId = null;
             let consecutiveMatches = 0;
+            let attendanceAction = null;
             
             // Constants
-            const REQUIRED_MATCHES = 3; // Changed from 5 to 3
-            const PROCESS_INTERVAL = 500; // Process a frame every 500ms
+            const REQUIRED_MATCHES = 2; // Reduced for faster matching
+            const PROCESS_INTERVAL = 300; // Process a frame every 300ms for faster response
             
             // Initialize webcam
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -153,7 +199,7 @@
             
             // Process a single video frame
             function processFrame() {
-                if (isProcessing) return;
+                if (isProcessing || isPaused) return;
                 
                 isProcessing = true;
                 
@@ -164,7 +210,7 @@
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 
                 // Get image data
-                const imageData = canvas.toDataURL('image/jpeg');
+                const imageData = canvas.toDataURL('image/jpeg', 0.7); // Lower quality for faster processing
                 
                 // Send to server for face recognition
                 $.ajax({
@@ -176,17 +222,25 @@
                     success: function(response) {
                         handleRecognitionResponse(response);
                         isProcessing = false;
-                        setTimeout(processFrame, PROCESS_INTERVAL);
+                        
+                        // Continue processing frames if not paused
+                        if (!isPaused) {
+                            setTimeout(processFrame, PROCESS_INTERVAL);
+                        }
                     },
                     error: function(error) {
                         console.error('Error processing frame:', error);
                         isProcessing = false;
-                        setTimeout(processFrame, PROCESS_INTERVAL);
+                        
+                        // Continue processing frames if not paused
+                        if (!isPaused) {
+                            setTimeout(processFrame, PROCESS_INTERVAL);
+                        }
                     }
                 });
             }
             
-            // HandleRecognitionResponse function to get attendance status when a face is recognized
+            // Handle recognition response
             function handleRecognitionResponse(response) {
                 switch(response.status) {
                     case 'waiting':
@@ -195,8 +249,6 @@
                         
                         // Update UI
                         statusMessage.textContent = response.message;
-                        timeInBtn.disabled = true;
-                        timeOutBtn.disabled = true;
                         recognizedEmployeeId = null;
                         break;
                         
@@ -215,18 +267,19 @@
                             // Update UI to show recognized employee
                             statusMessage.textContent = "Employee recognized!";
                             
-                            // Check attendance status for this employee
-                            checkAttendanceStatus(recognizedEmployeeId);
+                            // Pause face recognition
+                            isPaused = true;
                             
                             // Show recognition overlay
                             recognizedName.textContent = response.name;
-                            recognitionMessage.textContent = "Face matched"; // Simplified message
+                            recognitionMessage.textContent = "Face matched";
                             recognitionOverlay.classList.remove('hidden');
                             
-                            // Hide overlay after 3 seconds
+                            // Check attendance status and show confirmation after a short delay
                             setTimeout(function() {
                                 recognitionOverlay.classList.add('hidden');
-                            }, 3000);
+                                checkAttendanceStatus(recognizedEmployeeId);
+                            }, 2000);
                         }
                         break;
                         
@@ -234,8 +287,6 @@
                         // Reset consecutive matches
                         consecutiveMatches = 0;
                         statusMessage.textContent = "Face not recognized";
-                        timeInBtn.disabled = true;
-                        timeOutBtn.disabled = true;
                         recognizedEmployeeId = null;
                         break;
                         
@@ -245,18 +296,32 @@
                 }
             }
             
-            // Time In button click handler
-            timeInBtn.addEventListener('click', function() {
-                if (!recognizedEmployeeId) return;
+            // Show confirmation dialog
+            function showConfirmationDialog(title, message, action) {
+                confirmationTitle.textContent = title;
+                confirmationMessage.textContent = message;
+                attendanceAction = action;
+                confirmationDialog.classList.remove('hidden');
+            }
+            
+            // Hide confirmation dialog
+            function hideConfirmationDialog() {
+                confirmationDialog.classList.add('hidden');
+                attendanceAction = null;
+            }
+            
+            // Confirm button click handler
+            confirmYesBtn.addEventListener('click', function() {
+                if (!recognizedEmployeeId || !attendanceAction) return;
                 
-                recordAttendance('time_in', recognizedEmployeeId);
+                recordAttendance(attendanceAction, recognizedEmployeeId);
+                hideConfirmationDialog();
             });
             
-            // Time Out button click handler
-            timeOutBtn.addEventListener('click', function() {
-                if (!recognizedEmployeeId) return;
-                
-                recordAttendance('time_out', recognizedEmployeeId);
+            // Cancel button click handler
+            confirmNoBtn.addEventListener('click', function() {
+                hideConfirmationDialog();
+                resetRecognition();
             });
             
             // Record attendance
@@ -272,23 +337,33 @@
                         if (response.status === 'success' || response.status === 'warning') {
                             showNotification(response.message, response.status);
                             
-                            // Reset recognition state
-                            recognizedEmployeeId = null;
-                            timeInBtn.disabled = true;
-                            timeOutBtn.disabled = true;
-                            consecutiveMatches = 0;
+                            // Refresh attendance history
+                            checkAttendanceStatus(employeeId, true);
+                            
+                            // Reset recognition state after a short delay
+                            setTimeout(resetRecognition, 2000);
                         } else {
                             showNotification(response.message, 'error');
+                            resetRecognition();
                         }
                     },
                     error: function(error) {
                         showNotification('Error recording attendance', 'error');
+                        resetRecognition();
                     }
                 });
             }
             
-            // Modify the checkAttendanceStatus function to handle multiple sessions
-            function checkAttendanceStatus(employeeId) {
+            // Reset recognition state and resume processing
+            function resetRecognition() {
+                recognizedEmployeeId = null;
+                consecutiveMatches = 0;
+                isPaused = false;
+                processFrame();
+            }
+            
+            // Check attendance status and update UI accordingly
+            function checkAttendanceStatus(employeeId, skipConfirmation = false) {
                 $.ajax({
                     url: window.location.href,
                     type: 'POST',
@@ -298,65 +373,75 @@
                     },
                     success: function(response) {
                         if (response.status === 'success') {
-                            // Update button states based on attendance status
-                            if (response.has_open_session) {
-                                // Employee has an open session (timed in but not out)
-                                timeInBtn.disabled = true;
-                                timeOutBtn.disabled = false;
-                                
-                                // Display session info if there are any logs
-                                if (response.logs && response.logs.length > 0) {
-                                    let sessionsInfo = "";
-                                    response.logs.forEach((log, index) => {
-                                        if (log.time_in && log.time_out) {
-                                            sessionsInfo += `Session ${index+1}: ${log.time_in} to ${log.time_out}<br>`;
-                                        } else if (log.time_in) {
-                                            sessionsInfo += `Current session started at: ${log.time_in}<br>`;
-                                        }
-                                    });
-                                    
-                                    if (sessionsInfo) {
-                                        showNotification(sessionsInfo, 'info', 6000);
-                                    }
-                                }
-                            } else {
-                                
-                                // Employee has no open session, can time in
-                                timeInBtn.disabled = false;
-                                timeOutBtn.disabled = true;
-                                
-                                // If there are completed sessions today, show them
-                                if (response.logs && response.logs.length > 0) {
-                                    let sessionsInfo = "Today's sessions:<br>";
-                                    response.logs.forEach((log, index) => {
-                                        if (log.time_in && log.time_out) {
-                                            sessionsInfo += `Session ${index+1}: ${log.time_in} to ${log.time_out}<br>`;
-                                        } else if (log.time_out) {
-                                            sessionsInfo += `Incomplete session (admin adjustment needed): out at ${log.time_out}<br>`;
-                                        } else if (log.time_in) {
-                                            sessionsInfo += `Incomplete session (admin adjustment needed): in at ${log.time_in}<br>`;
-                                        }
-                                    });
-                                    
-                                    showNotification(sessionsInfo, 'info', 6000);
+                            // Update attendance history
+                            updateAttendanceHistory(response.logs);
+                            
+                            if (!skipConfirmation) {
+                                // Show confirmation dialog based on attendance status
+                                if (response.has_open_session) {
+                                    showConfirmationDialog(
+                                        "Time Out?",
+                                        `Do you want to time out now?`,
+                                        "time_out"
+                                    );
+                                } else {
+                                    showConfirmationDialog(
+                                        "Time In?",
+                                        `Do you want to time in now?`,
+                                        "time_in"
+                                    );
                                 }
                             }
                         } else {
                             showNotification(response.message, 'error');
-                            // Default to enabling both buttons if there's an error
-                            timeInBtn.disabled = false;
-                            timeOutBtn.disabled = false;
+                            resetRecognition();
                         }
                     },
                     error: function(error) {
                         showNotification('Error checking attendance status', 'error');
-                        timeInBtn.disabled = false;
-                        timeOutBtn.disabled = false;
+                        resetRecognition();
                     }
                 });
             }
-
-            //showNotification function to accept a duration parameter
+            
+            // Update attendance history in sidebar
+            function updateAttendanceHistory(logs) {
+                if (!logs || logs.length === 0) {
+                    historyContent.innerHTML = `
+                        <div class="text-center text-gray-500 py-4">
+                            No attendance records for today.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let historyHTML = '';
+                
+                logs.forEach((log, index) => {
+                    const sessionNumber = index + 1;
+                    let sessionStatus = '';
+                    
+                    if (log.time_in && log.time_out) {
+                        sessionStatus = `<div class="text-green-600">Completed</div>`;
+                    } else if (log.time_in) {
+                        sessionStatus = `<div class="text-blue-600">Active</div>`;
+                    } else if (log.time_out) {
+                        sessionStatus = `<div class="text-yellow-600">Incomplete</div>`;
+                    }
+                    
+                    historyHTML += `
+                        <div class="attendance-log bg-white rounded shadow-sm p-2 mb-2">
+                            <div class="font-bold">Session ${sessionNumber} ${sessionStatus}</div>
+                            ${log.time_in ? `<div>In: ${log.time_in}</div>` : ''}
+                            ${log.time_out ? `<div>Out: ${log.time_out}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                historyContent.innerHTML = historyHTML;
+            }
+            
+            // Show notification
             function showNotification(message, type, duration = 5000) {
                 const notification = document.getElementById('notification');
                 const notificationMessage = document.getElementById('notification-message');

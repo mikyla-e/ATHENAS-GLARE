@@ -2,10 +2,12 @@ import os
 import cv2
 import pytz
 import face_recognition
-import numpy as np
 from datetime import datetime
+from functools import lru_cache
 from payroll_system.models import Employee, Attendance
 
+# Cache the face encodings to avoid reloading them for every frame
+@lru_cache(maxsize=1)
 def load_registered_faces():
     registered_faces = {}
     employee_names = {}
@@ -17,15 +19,21 @@ def load_registered_faces():
                 image_path = employee.employee_image.path
                 
                 if os.path.exists(image_path):
-                    image = face_recognition.load_image_file(image_path)
+                    # Reduce image size for faster processing before encoding
+                    image = cv2.imread(image_path)
+                    if image is None:
+                        continue
                     
-                    # Try to detect faces first
-                    face_locations = face_recognition.face_locations(image)
+                    # Resize image to 1/4 size for faster processing
+                    small_image = cv2.resize(image, (0, 0), fx=0.25, fy=0.25)
+                    rgb_small_image = cv2.cvtColor(small_image, cv2.COLOR_BGR2RGB)
+                    
+                    # Try to detect faces first - use HOG model for speed
+                    face_locations = face_recognition.face_locations(rgb_small_image, model="hog")
                     
                     if face_locations:
-                        
                         # Only encode if we actually found a face
-                        encodings = face_recognition.face_encodings(image, face_locations)
+                        encodings = face_recognition.face_encodings(rgb_small_image, face_locations)
 
                         if len(encodings) > 0:
                             employee_id = str(employee.employee_id)
@@ -38,9 +46,9 @@ def load_registered_faces():
     return registered_faces, employee_names
 
 def compare_faces(known_encoding, captured_encoding):
-    
     # Returns True if the face matches, False otherwise.
-    match = face_recognition.compare_faces([known_encoding], captured_encoding, tolerance=0.5)[0]
+    # The tolerance value controls strictness: lower = stricter (0.6 is lenient)
+    match = face_recognition.compare_faces([known_encoding], captured_encoding, tolerance=0.55)[0]
     
     # For additional security, also check the distance
     distance = face_recognition.face_distance([known_encoding], captured_encoding)[0]
@@ -146,7 +154,6 @@ def mark_attendance(employee, action=None):
     # Default behavior (for backward compatibility)
     else:
         if has_open_session:
-            
             # Close open session
             try:
                 log = Attendance.objects.get(attendance_id=status_info["current_log_id"])
@@ -176,31 +183,29 @@ def mark_attendance(employee, action=None):
 
 # Process a single frame from the web interface
 def process_frame_recognition(frame):
-    registered_faces, employee_names = load_registered_faces()
+    # Resize frame to 1/4 size for faster processing
+    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
     
-    # Convert to RGB for face_recognition library if not already in RGB format
-    if len(frame.shape) == 3 and frame.shape[2] == 3:
-        if frame.dtype == np.uint8:
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        else:
-            rgb_frame = frame  # Assume it's already RGB
-    else:
-        return {'status': 'error', 'message': 'Invalid frame format'}
+    # Convert to RGB for face_recognition library
+    rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
     
-    # Find faces in the frame
-    face_locations = face_recognition.face_locations(rgb_frame)
+    # Find faces in the frame - use HOG model for speed
+    face_locations = face_recognition.face_locations(rgb_small_frame, model="hog")
     
     if not face_locations:
         return {'status': 'waiting', 'message': 'No face detected'}
     
     # Process the first (largest) face
     face_location = face_locations[0]
-    face_encodings = face_recognition.face_encodings(rgb_frame, [face_location])
+    face_encodings = face_recognition.face_encodings(rgb_small_frame, [face_location])
     
     if not face_encodings:
         return {'status': 'waiting', 'message': 'Cannot encode face'}
     
     face_encoding = face_encodings[0]
+    
+    # Load face database (uses cached version after first call)
+    registered_faces, employee_names = load_registered_faces()
     
     # Check against all registered faces
     for employee_id, known_encoding in registered_faces.items():
