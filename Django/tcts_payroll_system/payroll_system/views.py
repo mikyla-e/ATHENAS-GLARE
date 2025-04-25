@@ -1,5 +1,4 @@
-from datetime import datetime
-from django.contrib.auth import  authenticate, logout
+from django.contrib.auth import  logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -527,9 +526,12 @@ def services_client(request):
     customer_form = CustomerForm()
     vehicle_form = VehicleForm()
 
+    regions = list(Region.objects.all().values('regDesc', 'regCode'))
+    
     context = {
         'customer_form': customer_form,
-        'vehicle_form': vehicle_form
+        'vehicle_form': vehicle_form,
+        'regions': regions,
     }
     
     return render(request, 'payroll_system/services_client.html', context)

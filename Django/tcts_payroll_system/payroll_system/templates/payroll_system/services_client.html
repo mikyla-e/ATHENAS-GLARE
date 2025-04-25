@@ -161,3 +161,21 @@
     </div>   
 </div>
 {% endblock %}
+{% block script %}
+<script src="{% static 'javascript/phLocations.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        initializeAddressFields({
+            regionInputId: "region-dropdown",
+            provinceInputId: "province-dropdown",
+            cityInputId: "city-dropdown",
+            barangayInputId: "barangay-dropdown",
+            regionListId: "region-list",
+            provinceListId: "province-list",
+            cityListId: "city-list",
+            barangayListId: "barangay-list",
+            baseUrl: "/payroll_system/ajax"
+        });
+    });
+</script>
+{% endblock %}

@@ -207,6 +207,22 @@
 
 <!--(optional)script-->
 {% block script %}
+<script src="{% static 'javascript/phLocations.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        initializeAddressFields({
+            regionInputId: "region-dropdown",
+            provinceInputId: "province-dropdown",
+            cityInputId: "city-dropdown",
+            barangayInputId: "barangay-dropdown",
+            regionListId: "region-list",
+            provinceListId: "province-list",
+            cityListId: "city-list",
+            barangayListId: "barangay-list",
+            baseUrl: "/payroll_system/ajax"
+        });
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Get elements
@@ -285,201 +301,201 @@
         }
     });
 
-    document.addEventListener("DOMContentLoaded", function () {
-        // Get elements
-        const regionInput = document.getElementById("region-dropdown");
-        const provinceInput = document.getElementById("province-dropdown");
-        const cityInput = document.getElementById("city-dropdown");
-        const barangayInput = document.getElementById("barangay-dropdown");
+    // document.addEventListener("DOMContentLoaded", function () {
+    //     // Get elements
+    //     const regionInput = document.getElementById("region-dropdown");
+    //     const provinceInput = document.getElementById("province-dropdown");
+    //     const cityInput = document.getElementById("city-dropdown");
+    //     const barangayInput = document.getElementById("barangay-dropdown");
         
-        const provinceList = document.getElementById("province-list");
-        const cityList = document.getElementById("city-list");
-        const barangayList = document.getElementById("barangay-list");
+    //     const provinceList = document.getElementById("province-list");
+    //     const cityList = document.getElementById("city-list");
+    //     const barangayList = document.getElementById("barangay-list");
 
-        // Store current location codes
-        let currentRegionCode = "";
-        let currentProvinceCode = "";
-        let currentCityCode = "";
+    //     // Store current location codes
+    //     let currentRegionCode = "";
+    //     let currentProvinceCode = "";
+    //     let currentCityCode = "";
         
-        // Function to enable/disable fields based on their dependencies
-        function updateFieldStates() {
-            if (provinceInput) {
-                provinceInput.disabled = !regionInput?.value;
-            }
-            if (cityInput) {
-                cityInput.disabled = !provinceInput?.value;
-            }
-            if (barangayInput) {
-                barangayInput.disabled = !cityInput?.value;
-            }
-        }
+    //     // Function to enable/disable fields based on their dependencies
+    //     function updateFieldStates() {
+    //         if (provinceInput) {
+    //             provinceInput.disabled = !regionInput?.value;
+    //         }
+    //         if (cityInput) {
+    //             cityInput.disabled = !provinceInput?.value;
+    //         }
+    //         if (barangayInput) {
+    //             barangayInput.disabled = !cityInput?.value;
+    //         }
+    //     }
 
-        // Function to fetch provinces for a region
-        function fetchProvinces(regionCode) {
-            if (!regionCode) return;
+    //     // Function to fetch provinces for a region
+    //     function fetchProvinces(regionCode) {
+    //         if (!regionCode) return;
             
-            fetch(`/payroll_system/ajax/get-provinces/?region=${regionCode}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (provinceList) {
-                        provinceList.innerHTML = "";
-                        data.provinces.forEach(p => {
-                            const option = document.createElement("option");
-                            option.value = p.provDesc;
-                            option.setAttribute("data-code", p.provCode);
-                            provinceList.appendChild(option);
-                        });
+    //         fetch(`/payroll_system/ajax/get-provinces/?region=${regionCode}`)
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 if (provinceList) {
+    //                     provinceList.innerHTML = "";
+    //                     data.provinces.forEach(p => {
+    //                         const option = document.createElement("option");
+    //                         option.value = p.provDesc;
+    //                         option.setAttribute("data-code", p.provCode);
+    //                         provinceList.appendChild(option);
+    //                     });
                         
-                        // If province has a value, trigger its input handler
-                        if (provinceInput && provinceInput.value) {
-                            const event = new Event('input');
-                            provinceInput.dispatchEvent(event);
-                        }
-                    }
-                })
-                .catch(error => console.error("Error fetching provinces:", error));
-        }
+    //                     // If province has a value, trigger its input handler
+    //                     if (provinceInput && provinceInput.value) {
+    //                         const event = new Event('input');
+    //                         provinceInput.dispatchEvent(event);
+    //                     }
+    //                 }
+    //             })
+    //             .catch(error => console.error("Error fetching provinces:", error));
+    //     }
 
-        // Function to fetch cities for a province
-        function fetchCities(provinceCode) {
-            if (!provinceCode) return;
+    //     // Function to fetch cities for a province
+    //     function fetchCities(provinceCode) {
+    //         if (!provinceCode) return;
             
-            fetch(`/payroll_system/ajax/get-cities/?province=${provinceCode}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (cityList) {
-                        cityList.innerHTML = "";
-                        data.cities.forEach(c => {
-                            const option = document.createElement("option");
-                            option.value = c.citymunDesc;
-                            option.setAttribute("data-code", c.citymunCode);
-                            cityList.appendChild(option);
-                        });
+    //         fetch(`/payroll_system/ajax/get-cities/?province=${provinceCode}`)
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 if (cityList) {
+    //                     cityList.innerHTML = "";
+    //                     data.cities.forEach(c => {
+    //                         const option = document.createElement("option");
+    //                         option.value = c.citymunDesc;
+    //                         option.setAttribute("data-code", c.citymunCode);
+    //                         cityList.appendChild(option);
+    //                     });
                         
-                        // If city has a value, trigger its input handler
-                        if (cityInput && cityInput.value) {
-                            const event = new Event('input');
-                            cityInput.dispatchEvent(event);
-                        }
-                    }
-                })
-                .catch(error => console.error("Error fetching cities:", error));
-        }
+    //                     // If city has a value, trigger its input handler
+    //                     if (cityInput && cityInput.value) {
+    //                         const event = new Event('input');
+    //                         cityInput.dispatchEvent(event);
+    //                     }
+    //                 }
+    //             })
+    //             .catch(error => console.error("Error fetching cities:", error));
+    //     }
 
-        // Function to fetch barangays for a city
-        function fetchBarangays(cityCode) {
-            if (!cityCode) return;
+    //     // Function to fetch barangays for a city
+    //     function fetchBarangays(cityCode) {
+    //         if (!cityCode) return;
             
-            fetch(`/payroll_system/ajax/get-barangays/?city=${cityCode}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (barangayList) {
-                        barangayList.innerHTML = "";
-                        data.barangays.forEach(b => {
-                            const option = document.createElement("option");
-                            option.value = b.brgyDesc;
-                            option.setAttribute("data-code", b.brgyCode);
-                            barangayList.appendChild(option);
-                        });
-                    }
-                })
-                .catch(error => console.error("Error fetching barangays:", error));
-        }
+    //         fetch(`/payroll_system/ajax/get-barangays/?city=${cityCode}`)
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 if (barangayList) {
+    //                     barangayList.innerHTML = "";
+    //                     data.barangays.forEach(b => {
+    //                         const option = document.createElement("option");
+    //                         option.value = b.brgyDesc;
+    //                         option.setAttribute("data-code", b.brgyCode);
+    //                         barangayList.appendChild(option);
+    //                     });
+    //                 }
+    //             })
+    //             .catch(error => console.error("Error fetching barangays:", error));
+    //     }
 
-        // Setup event listeners if elements exist
-        if (regionInput) {
-            regionInput.addEventListener("change", function() {
-                if (!this.value) {
-                    if (provinceInput) provinceInput.value = "";
-                    if (cityInput) cityInput.value = "";
-                    if (barangayInput) barangayInput.value = "";
-                }
-                updateFieldStates();
-            });
+    //     // Setup event listeners if elements exist
+    //     if (regionInput) {
+    //         regionInput.addEventListener("change", function() {
+    //             if (!this.value) {
+    //                 if (provinceInput) provinceInput.value = "";
+    //                 if (cityInput) cityInput.value = "";
+    //                 if (barangayInput) barangayInput.value = "";
+    //             }
+    //             updateFieldStates();
+    //         });
             
-            regionInput.addEventListener("input", function() {
-                const selectedOption = document.querySelector(`#region-list option[value="${regionInput.value}"]`);
-                if (selectedOption) {
-                    currentRegionCode = selectedOption.dataset.code;
-                    if (provinceInput) provinceInput.value = "";
-                    if (cityInput) cityInput.value = "";
-                    if (barangayInput) barangayInput.value = "";
+    //         regionInput.addEventListener("input", function() {
+    //             const selectedOption = document.querySelector(`#region-list option[value="${regionInput.value}"]`);
+    //             if (selectedOption) {
+    //                 currentRegionCode = selectedOption.dataset.code;
+    //                 if (provinceInput) provinceInput.value = "";
+    //                 if (cityInput) cityInput.value = "";
+    //                 if (barangayInput) barangayInput.value = "";
                     
-                    fetchProvinces(currentRegionCode);
-                }
-            });
+    //                 fetchProvinces(currentRegionCode);
+    //             }
+    //         });
             
-            // If region already has a value on page load, fetch provinces
-            if (regionInput.value) {
-                const selectedOption = document.querySelector(`#region-list option[value="${regionInput.value}"]`);
-                if (selectedOption) {
-                    currentRegionCode = selectedOption.dataset.code;
-                    fetchProvinces(currentRegionCode);
-                }
-            }
-        }
+    //         // If region already has a value on page load, fetch provinces
+    //         if (regionInput.value) {
+    //             const selectedOption = document.querySelector(`#region-list option[value="${regionInput.value}"]`);
+    //             if (selectedOption) {
+    //                 currentRegionCode = selectedOption.dataset.code;
+    //                 fetchProvinces(currentRegionCode);
+    //             }
+    //         }
+    //     }
         
-        if (provinceInput) {
-            provinceInput.addEventListener("change", function() {
-                if (!this.value) {
-                    if (cityInput) cityInput.value = "";
-                    if (barangayInput) barangayInput.value = "";
-                }
-                updateFieldStates();
-            });
+    //     if (provinceInput) {
+    //         provinceInput.addEventListener("change", function() {
+    //             if (!this.value) {
+    //                 if (cityInput) cityInput.value = "";
+    //                 if (barangayInput) barangayInput.value = "";
+    //             }
+    //             updateFieldStates();
+    //         });
             
-            provinceInput.addEventListener("input", function() {
-                const selectedOption = document.querySelector(`#province-list option[value="${provinceInput.value}"]`);
-                if (selectedOption) {
-                    currentProvinceCode = selectedOption.dataset.code;
-                    if (cityInput) cityInput.value = "";
-                    if (barangayInput) barangayInput.value = "";
+    //         provinceInput.addEventListener("input", function() {
+    //             const selectedOption = document.querySelector(`#province-list option[value="${provinceInput.value}"]`);
+    //             if (selectedOption) {
+    //                 currentProvinceCode = selectedOption.dataset.code;
+    //                 if (cityInput) cityInput.value = "";
+    //                 if (barangayInput) barangayInput.value = "";
                     
-                    fetchCities(currentProvinceCode);
-                }
-            });
+    //                 fetchCities(currentProvinceCode);
+    //             }
+    //         });
             
-            // If province already has a value on page load, fetch cities
-            if (provinceInput.value) {
-                const selectedOption = document.querySelector(`#province-list option[value="${provinceInput.value}"]`);
-                if (selectedOption) {
-                    currentProvinceCode = selectedOption.dataset.code;
-                    fetchCities(currentProvinceCode);
-                }
-            }
-        }
+    //         // If province already has a value on page load, fetch cities
+    //         if (provinceInput.value) {
+    //             const selectedOption = document.querySelector(`#province-list option[value="${provinceInput.value}"]`);
+    //             if (selectedOption) {
+    //                 currentProvinceCode = selectedOption.dataset.code;
+    //                 fetchCities(currentProvinceCode);
+    //             }
+    //         }
+    //     }
         
-        if (cityInput) {
-            cityInput.addEventListener("change", function() {
-                if (!this.value) {
-                    if (barangayInput) barangayInput.value = "";
-                }
-                updateFieldStates();
-            });
+    //     if (cityInput) {
+    //         cityInput.addEventListener("change", function() {
+    //             if (!this.value) {
+    //                 if (barangayInput) barangayInput.value = "";
+    //             }
+    //             updateFieldStates();
+    //         });
             
-            cityInput.addEventListener("input", function() {
-                const selectedOption = document.querySelector(`#city-list option[value="${cityInput.value}"]`);
-                if (selectedOption) {
-                    currentCityCode = selectedOption.dataset.code;
-                    if (barangayInput) barangayInput.value = "";
+    //         cityInput.addEventListener("input", function() {
+    //             const selectedOption = document.querySelector(`#city-list option[value="${cityInput.value}"]`);
+    //             if (selectedOption) {
+    //                 currentCityCode = selectedOption.dataset.code;
+    //                 if (barangayInput) barangayInput.value = "";
                     
-                    fetchBarangays(currentCityCode);
-                }
-            });
+    //                 fetchBarangays(currentCityCode);
+    //             }
+    //         });
             
-            // If city already has a value on page load, fetch barangays
-            if (cityInput.value) {
-                const selectedOption = document.querySelector(`#city-list option[value="${cityInput.value}"]`);
-                if (selectedOption) {
-                    currentCityCode = selectedOption.dataset.code;
-                    fetchBarangays(currentCityCode);
-                }
-            }
-        }
+    //         // If city already has a value on page load, fetch barangays
+    //         if (cityInput.value) {
+    //             const selectedOption = document.querySelector(`#city-list option[value="${cityInput.value}"]`);
+    //             if (selectedOption) {
+    //                 currentCityCode = selectedOption.dataset.code;
+    //                 fetchBarangays(currentCityCode);
+    //             }
+    //         }
+    //     }
         
-        // Initialize field states based on current values
-        updateFieldStates();
-    });
+    //     // Initialize field states based on current values
+    //     updateFieldStates();
+    // });
 </script>
 {% endblock %}
 
