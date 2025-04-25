@@ -39,23 +39,21 @@
             </thead>
             <tbody>
             {% for customer in customers %}
-                {% if latest_payroll %}
                 <tr id="customer-data">
                     <td>{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
                     <td>{{ customer.gender }}</td>
                     <td>{{ customer.region }}, {{ customer.province }}, {{ customer.municipality }}, {{ customer.barangay }}</td>
                     <td>
-                        <a class="" href="#">MORE</a>
+                        <a class="" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
                     </td>
                 </tr>
-                {% else %}
+            {% empty %}
                 <tr id="customer-data">
                     <td colspan="4">No customer records found</td>
                     <td>
-                        <a class="" href="#">MORE</a>
+                        MORE
                     </td>
                 </tr>
-                {% endif %}
             {% endfor %}
             </tbody>
         </table>

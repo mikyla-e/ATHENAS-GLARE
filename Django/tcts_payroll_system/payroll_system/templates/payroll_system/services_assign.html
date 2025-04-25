@@ -16,7 +16,7 @@
 <!--page content-->
 {% block content %}
 
-<form action="{% url 'payroll_system:services_assign' %}" method="post" class="flex flex-col">
+<form method="post" class="flex flex-col">
     {% csrf_token %}
     <div class="form">
         <span></span>
@@ -34,9 +34,9 @@
         <a href="javascript:history.back()">
             <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
         </a>
-        <a href="{% url 'payroll_system:services' %}">
-            <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="ASSIGN TASK">
-        </a>
+        <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="ASSIGN TASK">
+        <!-- <a href="{% url 'payroll_system:services' %}">
+        </a> -->
     </div>
 </form>
 {% endblock %}

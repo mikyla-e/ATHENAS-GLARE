@@ -354,10 +354,34 @@ class CustomerForm(forms.ModelForm):
     
     class Meta:
         model = Customer
-        fields = ('first_name', 'middle_name', 'gender', 'contact_number', 'region', 'province', 'city', 'barangay')
+        fields = ('first_name', 'middle_name', 'gender', 'contact_number')
         widgets = {
             'gender': forms.Select(attrs={'class': 'h-[50px]'})
         }
+
+    def save(self, commit=True):
+        customer = super().save(commit=False)
+        
+        # Set location fields based on validated data
+        region_name = self.cleaned_data.get('region')
+        province_name = self.cleaned_data.get('province')
+        city_name = self.cleaned_data.get('city')
+        barangay_name = self.cleaned_data.get('barangay')
+        
+        region = Region.objects.filter(regDesc=region_name).first()
+        province = Province.objects.filter(provDesc=province_name, regCode=region.regCode).first()
+        city = City.objects.filter(citymunDesc=city_name, provCode=province.provCode).first()
+        barangay = Barangay.objects.filter(brgyDesc=barangay_name, citymunCode=city.citymunCode).first()
+        
+        customer.region = region
+        customer.province = province
+        customer.city = city
+        customer.barangay = barangay
+        
+        if commit:
+            customer.save()
+        
+        return customer
 
 class VehicleForm(forms.ModelForm):
     vehicle_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}))

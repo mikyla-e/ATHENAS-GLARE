@@ -614,15 +614,23 @@ def status(request):
     context = {
         'tasks': tasks
     }
-    return render(request, 'payroll_system/status.html')
+    return render(request, 'payroll_system/status.html', context)
 
 @login_required
 def customers(request):
-    return render(request, 'payroll_system/customers.html')
+    customers = Customer.objects.all()
+    context = {
+        'customers': customers
+    }
+    return render(request, 'payroll_system/customers.html', context)
 
 @login_required
-def customer_page(request):
-    return render(request, 'payroll_system/customer_page.html')
+def customer_page(request, customer_id):
+    customer = Customer.objects.prefetch_related('vehicles').get(customer_id=customer_id)
+    context = {
+        'customer': customer
+    }
+    return render(request, 'payroll_system/customer_page.html', context)
 
 @login_required
 def settings(request):

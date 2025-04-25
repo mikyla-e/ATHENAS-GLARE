@@ -346,6 +346,7 @@ class Task(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='tasks')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='tasks')
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='tasks')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='tasks', null=True)
     task_status = models.CharField(max_length=11, choices=TaskStatus.choices, default=TaskStatus.IN_PROGRESS)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
