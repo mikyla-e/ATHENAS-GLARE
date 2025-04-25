@@ -6,7 +6,6 @@ from . import views
 app_name = 'payroll_system'
 
 urlpatterns = [
-    path('attendance/', views.attendance, name='attendance'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('employees/employee_registration/', views.employee_registration, name='employee_registration'),
     path('employees/', views.employees, name='employees'),

@@ -1,0 +1,389 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Attendance</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
+    <style>
+        #time-in, #time-out {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        #time-in {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        #time-out {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        #time-in:disabled, #time-out:disabled {
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+        
+        #status-message {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+        
+        #notification {
+            transition: all 0.3s ease;
+        }
+        
+        .border-red-500 {
+            border-left-color: #f44336 !important;
+        }
+        
+        .border-green-500 {
+            border-left-color: #4CAF50 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="absolute max-h-50 max-w-50">
+        <img src="{% static 'images/clients_logo.png' %}" alt="Logo">
+    </div>
+
+    <div class="h-lvh grid grid-rows-[5fr_1fr] lg:grid-cols-[3fr_1fr] lg:grid-rows-1">
+        <div class="bg-[#1E1E1E] order-1 border border-black relative">
+            <div class="webcam-container m-0 h-full overflow-hidden">
+                <video id="video" class="size-full object-cover" autoplay playsinline></video>
+                <canvas id="canvas" class="hidden"></canvas>
+                
+                <!-- Status overlay -->
+                <div id="status-overlay" class="absolute bottom-4 left-0 right-0 text-center p-4">
+                    <div id="status-message" class="inline-block bg-black bg-opacity-70 text-white py-2 px-4 rounded-lg text-xl">
+                        Waiting for face...
+                    </div>
+                </div>
+                
+                <!-- Recognition overlay -->
+                <div id="recognition-overlay" class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center hidden">
+                    <div class="bg-black bg-opacity-80 text-white p-6 rounded-lg text-center">
+                        <div id="recognized-name" class="text-3xl font-bold mb-4"></div>
+                        <div id="recognition-message" class="text-xl"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-[#FFF] p-4 flex lg:flex-col justify-between order-2">
+            <div id="logo" class="hidden lg:flex items-center gap-3">
+                <img src="{% static 'images/logo_icon.png' %}" alt="">
+                <p class="text-2xl font-extrabold">ATTENDANCE</p>
+            </div>
+            <div id="content" class="h-full lg:h-[70%] w-full flex justify-between lg:flex-col lg:justify-center items-center gap-10">
+                <div id="title" class="w-fit flex justify-start overflow-hidden">
+                    <p class="px-4 text-5xl font-[League Spartan] font-bold text-left flex flex-wrap">RECORD ATTENDANCE</p>
+                </div>
+                <div class="w-[50%] lg:w-full flex flex-nowrap justify-center items-center gap-5" id="buttons">
+                    <button id="time-in" class="cursor-pointer" type="button" disabled>TIME IN</button>
+                    <button id="time-out" class="cursor-pointer" type="button" disabled>TIME OUT</button>
+                </div>
+            </div>
+            <div class="h-[10%]" id="empty"></div>
+        </div>
+    </div>
+    
+    <!-- Toast notifications -->
+    <div id="notification" class="fixed top-4 right-4 max-w-md hidden">
+        <div class="bg-white border-l-4 p-4 shadow-md rounded">
+            <div class="flex">
+                <div id="notification-content" class="ml-3">
+                    <p id="notification-message" class="text-sm text-gray-700"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const statusMessage = document.getElementById('status-message');
+            const timeInBtn = document.getElementById('time-in');
+            const timeOutBtn = document.getElementById('time-out');
+            const recognitionOverlay = document.getElementById('recognition-overlay');
+            const recognizedName = document.getElementById('recognized-name');
+            const recognitionMessage = document.getElementById('recognition-message');
+            
+            // State variables
+            let isProcessing = false;
+            let recognizedEmployeeId = null;
+            let consecutiveMatches = 0;
+            
+            // Constants
+            const REQUIRED_MATCHES = 3; // Changed from 5 to 3
+            const PROCESS_INTERVAL = 500; // Process a frame every 500ms
+            
+            // Initialize webcam
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        video.srcObject = stream;
+                        video.play();
+                        
+                        // Start processing frames
+                        setTimeout(processFrame, 1000); // Start after a short delay
+                    })
+                    .catch(function(error) {
+                        console.error('Could not access webcam:', error);
+                        showNotification('Could not access webcam. Please check permissions.', 'error');
+                    });
+            } else {
+                showNotification('Your browser does not support webcam access.', 'error');
+            }
+            
+            // Process a single video frame
+            function processFrame() {
+                if (isProcessing) return;
+                
+                isProcessing = true;
+                
+                // Draw current video frame to canvas
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Get image data
+                const imageData = canvas.toDataURL('image/jpeg');
+                
+                // Send to server for face recognition
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        'image_data': imageData
+                    },
+                    success: function(response) {
+                        handleRecognitionResponse(response);
+                        isProcessing = false;
+                        setTimeout(processFrame, PROCESS_INTERVAL);
+                    },
+                    error: function(error) {
+                        console.error('Error processing frame:', error);
+                        isProcessing = false;
+                        setTimeout(processFrame, PROCESS_INTERVAL);
+                    }
+                });
+            }
+            
+            // HandleRecognitionResponse function to get attendance status when a face is recognized
+            function handleRecognitionResponse(response) {
+                switch(response.status) {
+                    case 'waiting':
+                        // Reset recognition state
+                        consecutiveMatches = 0;
+                        
+                        // Update UI
+                        statusMessage.textContent = response.message;
+                        timeInBtn.disabled = true;
+                        timeOutBtn.disabled = true;
+                        recognizedEmployeeId = null;
+                        break;
+                        
+                    case 'recognized':
+                        // Increment consecutive matches
+                        consecutiveMatches++;
+                        
+                        // Update status
+                        statusMessage.textContent = `Matching... (${consecutiveMatches}/${REQUIRED_MATCHES})`;
+                        
+                        // If we have enough consecutive matches, accept the recognition
+                        if (consecutiveMatches >= REQUIRED_MATCHES) {
+                            // Store recognized employee
+                            recognizedEmployeeId = response.employee_id;
+                            
+                            // Update UI to show recognized employee
+                            statusMessage.textContent = "Employee recognized!";
+                            
+                            // Check attendance status for this employee
+                            checkAttendanceStatus(recognizedEmployeeId);
+                            
+                            // Show recognition overlay
+                            recognizedName.textContent = response.name;
+                            recognitionMessage.textContent = "Face matched"; // Simplified message
+                            recognitionOverlay.classList.remove('hidden');
+                            
+                            // Hide overlay after 3 seconds
+                            setTimeout(function() {
+                                recognitionOverlay.classList.add('hidden');
+                            }, 3000);
+                        }
+                        break;
+                        
+                    case 'unknown':
+                        // Reset consecutive matches
+                        consecutiveMatches = 0;
+                        statusMessage.textContent = "Face not recognized";
+                        timeInBtn.disabled = true;
+                        timeOutBtn.disabled = true;
+                        recognizedEmployeeId = null;
+                        break;
+                        
+                    case 'error':
+                        showNotification(response.message, 'error');
+                        break;
+                }
+            }
+            
+            // Time In button click handler
+            timeInBtn.addEventListener('click', function() {
+                if (!recognizedEmployeeId) return;
+                
+                recordAttendance('time_in', recognizedEmployeeId);
+            });
+            
+            // Time Out button click handler
+            timeOutBtn.addEventListener('click', function() {
+                if (!recognizedEmployeeId) return;
+                
+                recordAttendance('time_out', recognizedEmployeeId);
+            });
+            
+            // Record attendance
+            function recordAttendance(action, employeeId) {
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        'action': action,
+                        'employee_id': employeeId
+                    },
+                    success: function(response) {
+                        if (response.status === 'success' || response.status === 'warning') {
+                            showNotification(response.message, response.status);
+                            
+                            // Reset recognition state
+                            recognizedEmployeeId = null;
+                            timeInBtn.disabled = true;
+                            timeOutBtn.disabled = true;
+                            consecutiveMatches = 0;
+                        } else {
+                            showNotification(response.message, 'error');
+                        }
+                    },
+                    error: function(error) {
+                        showNotification('Error recording attendance', 'error');
+                    }
+                });
+            }
+            
+            // Modify the checkAttendanceStatus function to handle multiple sessions
+            function checkAttendanceStatus(employeeId) {
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        'action': 'check_status',
+                        'employee_id': employeeId
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            // Update button states based on attendance status
+                            if (response.has_open_session) {
+                                // Employee has an open session (timed in but not out)
+                                timeInBtn.disabled = true;
+                                timeOutBtn.disabled = false;
+                                
+                                // Display session info if there are any logs
+                                if (response.logs && response.logs.length > 0) {
+                                    let sessionsInfo = "";
+                                    response.logs.forEach((log, index) => {
+                                        if (log.time_in && log.time_out) {
+                                            sessionsInfo += `Session ${index+1}: ${log.time_in} to ${log.time_out}<br>`;
+                                        } else if (log.time_in) {
+                                            sessionsInfo += `Current session started at: ${log.time_in}<br>`;
+                                        }
+                                    });
+                                    
+                                    if (sessionsInfo) {
+                                        showNotification(sessionsInfo, 'info', 6000);
+                                    }
+                                }
+                            } else {
+                                
+                                // Employee has no open session, can time in
+                                timeInBtn.disabled = false;
+                                timeOutBtn.disabled = true;
+                                
+                                // If there are completed sessions today, show them
+                                if (response.logs && response.logs.length > 0) {
+                                    let sessionsInfo = "Today's sessions:<br>";
+                                    response.logs.forEach((log, index) => {
+                                        if (log.time_in && log.time_out) {
+                                            sessionsInfo += `Session ${index+1}: ${log.time_in} to ${log.time_out}<br>`;
+                                        } else if (log.time_out) {
+                                            sessionsInfo += `Incomplete session (admin adjustment needed): out at ${log.time_out}<br>`;
+                                        } else if (log.time_in) {
+                                            sessionsInfo += `Incomplete session (admin adjustment needed): in at ${log.time_in}<br>`;
+                                        }
+                                    });
+                                    
+                                    showNotification(sessionsInfo, 'info', 6000);
+                                }
+                            }
+                        } else {
+                            showNotification(response.message, 'error');
+                            // Default to enabling both buttons if there's an error
+                            timeInBtn.disabled = false;
+                            timeOutBtn.disabled = false;
+                        }
+                    },
+                    error: function(error) {
+                        showNotification('Error checking attendance status', 'error');
+                        timeInBtn.disabled = false;
+                        timeOutBtn.disabled = false;
+                    }
+                });
+            }
+
+            //showNotification function to accept a duration parameter
+            function showNotification(message, type, duration = 5000) {
+                const notification = document.getElementById('notification');
+                const notificationMessage = document.getElementById('notification-message');
+                
+                // Allow HTML in notifications
+                notificationMessage.innerHTML = message;
+                
+                // Remove existing classes
+                notification.classList.remove('border-red-500', 'border-green-500', 'border-yellow-500', 'bg-yellow-100', 'border-blue-500', 'bg-blue-100');
+                
+                if (type === 'error') {
+                    notification.classList.add('border-red-500');
+                } else if (type === 'warning') {
+                    notification.classList.add('border-yellow-500', 'bg-yellow-100');
+                } else if (type === 'info') {
+                    notification.classList.add('border-blue-500', 'bg-blue-100');
+                } else {
+                    notification.classList.add('border-green-500');
+                }
+                
+                notification.classList.remove('hidden');
+                
+                setTimeout(function() {
+                    notification.classList.add('hidden');
+                }, duration);
+            }
+        });
+    </script>
+</body>
+</html>
