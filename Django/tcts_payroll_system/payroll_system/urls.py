@@ -28,4 +28,5 @@ urlpatterns = [
     path('ajax/get-cities/', views.get_cities, name='get_cities'),
     path('ajax/get-barangays/', views.get_barangays, name='get_barangays'),
     path('update-incentives/', views.update_incentives, name='update_incentives'),
+    path('print/', views.print, name='print'),
 ]

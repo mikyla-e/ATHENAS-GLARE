@@ -668,6 +668,10 @@ class PasswordsChangeView(LoginRequiredMixin, PasswordChangeView):
 def about(request):
     return render(request, 'payroll_system/about.html')
 
+@login_required
+def print(request):
+    return render(request, 'payroll_system/print.html')
+
 @csrf_exempt
 def update_incentives(request):
     if request.method == 'POST':
