@@ -41,8 +41,8 @@
             {% for customer in customers %}
                 <tr id="customer-data">
                     <td>{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
-                    <td>{{ customer.gender }}</td>
-                    <td>{{ customer.region }}, {{ customer.province }}, {{ customer.municipality }}, {{ customer.barangay }}</td>
+                    <td>{{ customer.contact_number }}</td>
+                    <td>{{ customer.region }}, {{ customer.province }}, {{ customer.city }}, {{ customer.barangay }}</td>
                     <td>
                         <a class="" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
                     </td>

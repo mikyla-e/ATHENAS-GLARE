@@ -37,7 +37,7 @@
     <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
     <div class="size-full my-2 flex items-start">
-        <form class="size-full flex flex-col justify-between" action="{% url 'payroll_system:services_assign' %}" method="post">
+        <form class="size-full flex flex-col justify-between" action="{% url 'payroll_system:services_assign' %}" method="post" onsubmit="return confirmation()">
             {% csrf_token %}
             <div id="client-form" class="flex">
                 <div id="left" class="w-[50%] mx-5">
@@ -164,6 +164,10 @@
 {% block script %}
 <script src="{% static 'javascript/phLocations.js' %}"></script>
 <script>
+    function confirmation(){
+       return confirm("Are you sure about the details of this customer?");
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         initializeAddressFields({
             regionInputId: "region-dropdown",

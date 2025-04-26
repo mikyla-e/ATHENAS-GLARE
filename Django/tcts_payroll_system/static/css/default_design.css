@@ -71,7 +71,7 @@ input[type=button]:hover{
     color: white;
 }
 
-.field{
+#field{
     height: 40px;
     margin: 2px;
     padding: 0 15px;
