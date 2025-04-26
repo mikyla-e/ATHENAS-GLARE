@@ -176,7 +176,7 @@
                     {% if current_payroll %}
                         <td class="p-2 text-sm font-[Inter]">{{ current_payroll.rate }}</td>
                         <td class="p-2 text-sm font-[Inter]">{{ attendance_count }}</td>
-                        <td class="p-2 text-sm font-[Inter]">INCENTIVES</td>
+                        <td id="total-incentives" class="p-2 text-sm font-[Inter]">{{ current_payroll.incentives|default:"0.00" }}</td>                        
                         <td class="p-2 text-sm font-[Inter]">{{ current_payroll.salary }}</td>
                         <td class="p-2 text-sm font-[Inter]">{{ current_payroll.payment_date }}</td>
                         <td class="p-3 w-full h-[30%] flex justify-center items-center">
