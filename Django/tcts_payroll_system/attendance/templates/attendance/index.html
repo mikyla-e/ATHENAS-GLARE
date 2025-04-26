@@ -116,6 +116,12 @@
             background-color: white;
             z-index: 5;
         }
+
+        #date{
+            background: -webkit-linear-gradient(#F8D146, #F5B93F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -124,7 +130,7 @@
     </div>
 
     <div class="h-lvh grid grid-rows-[5fr_1fr] lg:grid-cols-[3fr_1fr] lg:grid-rows-1">
-        <div class="bg-[#1E1E1E] order-1 border border-black relative">
+        <div class="bg-[#1E1E1E] order-1 relative">
             <div class="webcam-container m-0 h-full overflow-hidden">
                 <video id="video" class="size-full object-cover" autoplay playsinline></video>
                 <canvas id="canvas" class="hidden"></canvas>
@@ -161,13 +167,18 @@
                 <img src="{% static 'images/logo_icon.png' %}" alt="">
                 <p class="text-2xl font-extrabold">ATTENDANCE</p>
             </div>
-            <div id="content" class="h-full lg:h-[70%] w-full flex justify-between lg:flex-col lg:justify-start items-center">
-                <div id="title" class="w-fit flex justify-start overflow-hidden mb-4">
-                    <p class="px-4 text-4xl lg:text-5xl font-[League Spartan] font-bold text-left flex flex-wrap">RECORD ATTENDANCE</p>
+
+            <div class="flex flex-col h-[90%] gap-4">
+                <div id="content" class=" h-fit lg:h-fite w-full flex justify-between lg:flex-col lg:justify-start">
+                    <p id="philippines-time"  class="text-4xl lg:text-[75px] font-[Roboto] font-bold text-left flex flex-wrap">00:00AM</p>
+                    <div id="date" class="flex flex-row flex-nowrap font-[League Spartan] gap-2">
+                        <p id="philippines-date" class="text-3xl font-extrabold"></p>
+                        <p id="" class="text-3xl font-extrabold">|</p>
+                        <p id="philippines-day" class="text-3xl font-extrabold"></p>
+                    </div>
                 </div>
-                
                 <!-- Attendance History Section -->
-                <div id="attendance-history" class="w-full border border-gray-200 rounded-lg p-2 bg-gray-50 flex flex-col">
+                <div id="attendance-history" class="w-full h-full border border-gray-200 rounded-lg p-2 bg-gray-50 flex flex-col">
                     <h3 class="text-xl font-bold text-center mb-2 sticky top-0 bg-gray-50 py-1 z-20">Attendance History</h3>
                     
                     <div class="scrollable-content">
@@ -185,7 +196,6 @@
                     </div>
                 </div>
             </div>
-            <div class="h-[10%]" id="empty"></div>
         </div>
     </div>
     
@@ -199,6 +209,75 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function updateDay() {
+            // Get the current day of the week in the Philippines
+            const options = { timeZone: 'Asia/Manila', weekday: 'short' };
+            const phDay = new Date().toLocaleDateString('en-US', options);
+    
+            // Display the day
+            document.getElementById("philippines-day").textContent = phDay;
+        }
+    
+        // Call the function immediately
+        updateDay();
+    
+        function updateTime() {
+            // Get current time in the Philippines (Asia/Manila)
+            const options = { 
+                timeZone: 'Asia/Manila', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true // Use 12-hour format (AM/PM)
+            };
+    
+            let phTime = new Date().toLocaleTimeString('en-US', options);
+    
+            // Remove the space between time and AM/PM (e.g. "11:45 AM" -> "11:45AM")
+            phTime = phTime.replace(' ', '');
+    
+            // Display the time
+            document.getElementById("philippines-time").textContent = phTime;
+        }
+    
+            // Update time every second
+            setInterval(updateTime, 1000);
+    
+            // Call the function immediately
+            updateTime();
+    
+    
+            function updateDate() {
+            // Get the current date and format it to Month, Day, Year
+            const options = { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' };
+            const philippineDate = new Date().toLocaleDateString('en-US', options);
+    
+            // Update the text inside the <p> tag with the ID "philippines-date"
+            document.getElementById("philippines-date").textContent = philippineDate;
+        }
+    
+        // Call the function once when the page loads
+        updateDate();
+    
+        function displayWeek() {
+            const weekNumber = getWeekNumber(new Date());
+            document.getElementById("philippines-week").textContent = "Philippines Current Week: " + weekNumber;
+        }
+    
+        displayWeek();
+            
+        // Get the current date
+        const today = new Date();
+    
+        // Format the date
+        const month = today.toLocaleString('default', { month: 'long' }); // Full month name
+        const day = today.getDate(); // Day of the month
+        const year = today.getFullYear(); // Year
+    
+        // Display the date
+        document.getElementById("current-date").textContent = month + " " + day + ", " + year;
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

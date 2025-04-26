@@ -6,6 +6,7 @@
 
 <!--(optional)head content-->
 {% block headcontent %}
+<link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 <link rel="stylesheet" href="{% static 'css/employee_registration.css' %}" />
 
 <style>
@@ -113,6 +114,9 @@
                     <datalist id="province-list">
                     </datalist>
                 </div>
+            </div>
+        
+            <div class="fields_2">
                 <div class="field">
                     <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
                     {{ form.city }}
@@ -138,9 +142,6 @@
                         <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.highest_education.errors.0 }}</div>
                     {% endif %}
                 </div>
-            </div>
-        
-            <div class="fields_2">
                 <div class="field">
                     <label for="work-experience">work experience</label>
                     {{ form.work_experience }}
@@ -163,17 +164,17 @@
                     {% endif %}
                 </div>
         
-                <div class="field">  
+                <!-- <div class="field">  
                     <label for="employee_image">employee image</label>
                     <div class="employee_picture">
-                        <!-- Webcam capture elements -->
+                        <!-- Webcam capture elements
                         <div class="webcam-container" >
                             <video id="video" autoplay playsinline></video>
                             <canvas id="canvas"></canvas>
                             <img id="capturedImage" src="" alt="Captured Image"/>
                         </div>
                         
-                        <!-- Hide the original file input but keep it in the form for file submission -->
+                        <!-- Hide the original file input but keep it in the form for file submission
                         <div style="display: none;">
                             {{ form.employee_image }}
                         </div>
@@ -187,9 +188,11 @@
                             <p>TAKE A PICTURE</p>
                             <img src="{% static 'images/camera.png' %}" alt="">
                         </button>
-                        <input class="submit" type="submit" value="SUBMIT" />
+                        
                     </div>
-                </div>
+                </div> -->
+                
+                <input class="submit" type="submit" value="SUBMIT" />
         
                 <!-- Display non-field errors -->
                 {% if form.non_field_errors %}
@@ -224,60 +227,60 @@
     });
 </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get elements
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const capturedImage = document.getElementById('capturedImage');
-        const captureButton = document.getElementById('captureButton');
-        const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     // Get elements
+    //     const video = document.getElementById('video');
+    //     const canvas = document.getElementById('canvas');
+    //     const capturedImage = document.getElementById('capturedImage');
+    //     const captureButton = document.getElementById('captureButton');
+    //     const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
 
-        // Initialize webcam
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(stream) {
-            video.srcObject = stream;
-            video.play();
-            })
-            .catch(function(error) {
-            console.error('Could not access webcam:', error);
-            alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
-            });
-        } else {
-        alert('Your browser does not support webcam access. Please try a different browser.');
-        }
+    //     // Initialize webcam
+    //     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    //     navigator.mediaDevices.getUserMedia({ video: true })
+    //         .then(function(stream) {
+    //         video.srcObject = stream;
+    //         video.play();
+    //         })
+    //         .catch(function(error) {
+    //         console.error('Could not access webcam:', error);
+    //         alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
+    //         });
+    //     } else {
+    //     alert('Your browser does not support webcam access. Please try a different browser.');
+    //     }
 
-        // Capture button click handler
-        captureButton.addEventListener('click', function() {
-            // Set canvas dimensions to match video
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+    //     // Capture button click handler
+    //     captureButton.addEventListener('click', function() {
+    //         // Set canvas dimensions to match video
+    //         canvas.width = video.videoWidth;
+    //         canvas.height = video.videoHeight;
             
-            // Draw the video frame to the canvas
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    //         // Draw the video frame to the canvas
+    //         const context = canvas.getContext('2d');
+    //         context.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Convert canvas to image
-            const dataURL = canvas.toDataURL('image/jpeg');
-            capturedImage.src = dataURL;
-            capturedImage.style.display = 'block';
+    //         // Convert canvas to image
+    //         const dataURL = canvas.toDataURL('image/jpeg');
+    //         capturedImage.src = dataURL;
+    //         capturedImage.style.display = 'block';
         
-            // Convert canvas content to a File object for form submission
-            canvas.toBlob(function(blob) {
-                // Create a File object from the Blob
-                const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
+    //         // Convert canvas content to a File object for form submission
+    //         canvas.toBlob(function(blob) {
+    //             // Create a File object from the Blob
+    //             const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
                 
-                // Create a FileList-like object
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(imageFile);
+    //             // Create a FileList-like object
+    //             const dataTransfer = new DataTransfer();
+    //             dataTransfer.items.add(imageFile);
                 
-                // Set the file to the file input
-                fileInput.files = dataTransfer.files;
+    //             // Set the file to the file input
+    //             fileInput.files = dataTransfer.files;
                 
-                console.log("Image captured and file created");
-            }, 'image/jpeg', 0.95); // High quality JPEG
-        });
-    });
+    //             console.log("Image captured and file created");
+    //         }, 'image/jpeg', 0.95); // High quality JPEG
+    //     });
+    // });
 
     document.addEventListener('DOMContentLoaded', function() {
         // Get the date of birth input field
@@ -496,7 +499,9 @@
     //     // Initialize field states based on current values
     //     updateFieldStates();
     // });
+
 </script>
+
 {% endblock %}
 
 <!-- <!DOCTYPE html>

@@ -101,3 +101,40 @@ input[type=text], input[type=email], input[type=password], input[type=tel], sele
     background-color: #fff;
     border-radius: 20px;
 }
+
+textarea{
+    margin: 8px 0;
+    padding: 10px 15px;
+    border: none;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+
+    background-color: #fff;
+    min-height: 150px;
+    border-radius: 20px;
+    resize: none
+}
+
+input[type=date]{
+    height: 50px;
+    margin: 8px 0;
+    padding: 2px 15px;
+    border: none;
+
+    font-family: 'Inter';
+    font-size: 1rem;
+
+    background-color: #fff;
+    height: 50px;
+    border-radius: 20px;
+    resize: none
+}
+
+label{
+    margin: 0 20px;
+    font-family: 'Inter';
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e1e1e;
+}
