@@ -14,7 +14,6 @@
 <!--page content-->
 {% block content %}
 
-{% for task in tasks %}
 <div class="size-full flex flex-col">
     <div class="w-full h-[7%] px-3 flex flex-row justify-between items-center gap-3">
         <div class="w-fit flex items-center">
@@ -30,9 +29,10 @@
             </a>
         </div>
     </div>
-
+    
     <span class="w-full h-[2px] bg-[#f8d14660] rounded-xl"></span> <!--horizontal line-->
-
+    
+{% for task in tasks %}
     <div class="w-full h-[20%] flex justify-between rounded-xl bg-white my-5 py-5 px-8">
         <div class="w-[85%] h-full flex flex-col justify-between">
             <div class="w-full h-[30%]">
@@ -59,7 +59,7 @@
     <div class="flex justify-center items-center p-10">
         <h2>No tasks available.</h2>
     </div>
-</div>
 {% endfor %}
+</div>
 
 {% endblock %}

@@ -1,4 +1,5 @@
 import os
+import re
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -15,6 +16,11 @@ def rename_employee_image(instance, filename):
     
     # Return the new path
     return f'employee_images/{sanitized_name}.{ext}'
+
+def validate_image_size(image):
+    max_size = 5 * 1024 * 1024  # 5MB
+    if image.size > max_size:
+        raise ValidationError(_('Image size cannot exceed 5MB.'))
 
 class Gender(models.TextChoices):
         MALE = 'Male', _('Male')
@@ -114,15 +120,31 @@ class Employee(models.Model):
     employee_status = models.CharField(max_length=9, choices=EmployeeStatus.choices, null=True)
     active_status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
     absences = models.IntegerField(default=0, null=False)
-    employee_image = models.ImageField(null=False, upload_to='images/')
+    employee_image = models.ImageField(null=False, upload_to='images/', validators=[validate_image_size])
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
     def clean(self):
-        #Validate model data before saving
         # Call parent's clean method
         super().clean()
+        
+        # Name validation
+        if self.first_name and self.first_name.strip() == '':
+            raise ValidationError({'first_name': _('First name cannot be empty.')})
+            
+        if self.last_name and self.last_name.strip() == '':
+            raise ValidationError({'last_name': _('Last name cannot be empty.')})
+        
+        # Location validation - ensure proper relationship between region, province, city
+        if self.city and not self.province:
+            raise ValidationError(_('Province must be specified if city is provided.'))
+            
+        if self.province and not self.region:
+            raise ValidationError(_('Region must be specified if province is provided.'))
+            
+        if self.barangay and not self.city:
+            raise ValidationError(_('City must be specified if barangay is provided.'))
         
         # Check for duplicate employees based on name and birth date
         if self.first_name and self.last_name and self.date_of_birth:
@@ -144,12 +166,20 @@ class Employee(models.Model):
                 })
         
         # Validate contact number format
-        if self.contact_number and (not self.contact_number.isdigit() or len(self.contact_number) != 11):
-            raise ValidationError({'contact_number': "Contact number must be exactly 11 digits."})
+        if self.contact_number:
+            phone_regex = re.compile(r'^\+?[0-9]{10,15}$')
+            if not phone_regex.match(self.contact_number):
+                raise ValidationError({
+                    'contact_number': _('Phone number must be entered in the format: "+999999999". 10-15 digits allowed.')
+                })
         
         # Validate emergency contact format
-        if self.emergency_contact and (not self.emergency_contact.isdigit() or len(self.emergency_contact) != 11):
-            raise ValidationError({'emergency_contact': "Emergency contact must be exactly 11 digits."})
+        if self.emergency_contact:
+            phone_regex = re.compile(r'^\+?[0-9]{10,15}$')
+            if not phone_regex.match(self.emergency_contact):
+                raise ValidationError({
+                    'emergency_contact': _('Emergency contact must be entered in the format: "+999999999". 10-15 digits allowed.')
+                })
         
         # Validate emergency contact is different from contact number
         if self.contact_number and self.emergency_contact and self.contact_number == self.emergency_contact:
@@ -179,9 +209,7 @@ class Employee(models.Model):
                 age_at_employment -= 1
                 
             if age_at_employment < 18:
-                raise ValidationError({
-                    'date_of_employment': "Employee must be at least 18 years old at date of employment."
-                })
+                raise ValidationError({'date_of_employment': "Employee must be at least 18 years old at date of employment."})
 
     def save(self, *args, **kwargs):
         # Run full validation before saving (ensures model-level validation runs)
@@ -247,6 +275,23 @@ class Attendance(models.Model):
         
         return f"{employee} - {date_str} {status} - {hours}"
     
+    def clean(self):
+        # Validate time_in is before time_out
+        if self.time_in and self.time_out and self.time_in >= self.time_out:
+            raise ValidationError(_('Time in must be before time out.'))
+        
+        # Validate attendance_status is consistent with times
+        if self.attendance_status == self.AttendanceStatus.PRESENT and not self.time_in:
+            raise ValidationError(_('Present status requires time in to be set.'))
+            
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Run validation before saving
+        super().save(*args, **kwargs)
+        
+        # Calculate hours after saving
+        if self.time_in and self.time_out:
+            self.calculate_hours_worked()
+    
     def calculate_hours_worked(self):
         
         # Calculate hours worked for the day
@@ -258,7 +303,7 @@ class Attendance(models.Model):
             self.save()
     #New        
     def get_formatted_hours_worked(self):
-        """Returns time worked as hh:mm:ss if time_out exists"""
+        #eturns time worked as hh:mm:ss if time_out exists
         if self.time_in and self.time_out:
             time_in_dt = datetime.combine(self.date, self.time_in)
             time_out_dt = datetime.combine(self.date, self.time_out)
@@ -268,7 +313,6 @@ class Attendance(models.Model):
             minutes, seconds = divmod(remainder, 60)
             return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
         return None
-
 
 class Payroll(models.Model):
     class PayrollStatus(models.TextChoices):
@@ -294,6 +338,20 @@ class Payroll(models.Model):
         status = f"[{self.payroll_status}]"
         
         return f"Payroll #{self.payroll_id} - {employee} - {date_str} - {amount} {status}"
+    
+    def clean(self):
+        # Validate that salary computation makes sense
+        calculated_salary = self.rate - self.deductions - self.cash_advance - self.under_time + self.incentives
+        if abs(calculated_salary - self.salary) > 0.01:  # Allow for small floating point differences
+            raise ValidationError(_('Salary does not match the calculated amount based on rates and deductions.'))
+            
+        # Validate non-negative values
+        if self.rate < 0 or self.incentives < 0 or self.deductions < 0 or self.salary < 0 or self.cash_advance < 0 or self.under_time < 0:
+            raise ValidationError(_('Financial values cannot be negative.'))
+            
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 class History(models.Model):
     history_id = models.AutoField(primary_key=True)
@@ -302,6 +360,19 @@ class History(models.Model):
 
     def __str__(self):
         return f"{self.description} - {self.date_time}"
+
+    def clean(self):
+        # Validate that description is not just whitespace
+        if self.description and self.description.strip() == '':
+            raise ValidationError(_('Description cannot be empty or whitespace only.'))
+            
+        # Future date validation
+        if self.date_time and self.date_time > timezone.now():
+            raise ValidationError(_('History date cannot be in the future.'))
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
@@ -315,6 +386,36 @@ class Customer(models.Model):
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, to_field='id')
     barangay = models.ForeignKey(Barangay, on_delete=models.SET_NULL, null=True, to_field='id')
 
+    def clean(self):
+        # Name validation
+        if self.first_name and self.first_name.strip() == '':
+            raise ValidationError({'first_name': _('First name cannot be empty.')})
+            
+        if self.last_name and self.last_name.strip() == '':
+            raise ValidationError({'last_name': _('Last name cannot be empty.')})
+        
+        # Validate contact number format
+        if self.contact_number:
+            phone_regex = re.compile(r'^\+?[0-9]{10,15}$')
+            if not phone_regex.match(self.contact_number):
+                raise ValidationError({
+                    'contact_number': _('Phone number must be entered in the format: "+999999999". 10-15 digits allowed.')
+                })
+        
+        # Location validation - ensure proper relationship between region, province, city
+        if self.city and not self.province:
+            raise ValidationError(_('Province must be specified if city is provided.'))
+            
+        if self.province and not self.region:
+            raise ValidationError(_('Region must be specified if province is provided.'))
+            
+        if self.barangay and not self.city:
+            raise ValidationError(_('City must be specified if barangay is provided.'))
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
@@ -327,14 +428,42 @@ class Vehicle(models.Model):
 
     def __str__(self):
         return f"{self.vehicle_name} ({self.plate_number})"
+    
+    def clean(self):
+        # Basic validation for vehicle details
+        if self.vehicle_name and self.vehicle_name.strip() == '':
+            raise ValidationError({'vehicle_name': _('Vehicle name cannot be empty.')})
+            
+        if self.vehicle_color and self.vehicle_color.strip() == '':
+            raise ValidationError({'vehicle_color': _('Vehicle color cannot be empty.')})
+            
+        # Plate number validation - simple format check (can be adjusted based on your country's format)
+        if self.plate_number:
+            if self.plate_number.strip() == '':
+                raise ValidationError({'plate_number': _('Plate number cannot be empty.')})
+            # Check if plate number is unique
+            if Vehicle.objects.exclude(pk=self.pk).filter(plate_number=self.plate_number).exists():
+                raise ValidationError({'plate_number': _('This plate number is already registered.')})
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 class Service(models.Model):
     service_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100, null=False)
-    service_image = models.ImageField(null=False, upload_to='images/')
+    service_image = models.ImageField(null=False, upload_to='images/', validators=[validate_image_size])
 
     def __str__(self):
         return self.title
+    
+    def clean(self):
+        if self.title and self.title.strip() == '':
+            raise ValidationError({'title': _('Service title cannot be empty.')})
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 class Task(models.Model):
     class TaskStatus(models.TextChoices):
@@ -353,3 +482,15 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.task_name} - {self.customer} - {self.task_status}" 
+    
+    def clean(self):
+        if self.task_name and self.task_name.strip() == '':
+            raise ValidationError({'task_name': _('Task name cannot be empty.')})
+            
+        # Validate relationships
+        if self.vehicle and self.vehicle.customer != self.customer:
+            raise ValidationError(_('The vehicle must belong to the selected customer.'))
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
