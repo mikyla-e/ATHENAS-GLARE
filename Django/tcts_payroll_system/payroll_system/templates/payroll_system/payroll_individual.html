@@ -106,8 +106,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="w-full grid grid-rows-[1fr_80px_auto_auto] grid-cols-[2fr_6fr] lg:grid-rows-[100px_auto_auto] lg:grid-cols-[1fr_6fr_6fr] gap-3 z-10">
-    <div class="order-1 col-span-1 rounded-full size-full flex min-w-[125px] lg:min-w-[100px]">
+<div class="w-full grid grid-cols-2 md:grid-cols-[2fr_6fr] lg:grid-cols-[1fr_6fr_6fr] md:grid-rows-[1fr_80px_auto_auto] lg:grid-rows-[100px_auto_auto] gap-3 z-10">
+
+    <div class="order-1 col-span-2 md:col-span-1 rounded-full w-full flex justify-center min-w-[125px] md:min-w-[100px]">
         {% if employee.active_status %}
             <img class="rounded-full size-[125px] lg:size-[100px] object-cover" src="{{ employee.employee_image.url }}" alt="">
         {% else %}

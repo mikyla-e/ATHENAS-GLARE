@@ -5,3 +5,13 @@ label{
     font-weight: 600;
     color: #1e1e1e;
 }
+
+@media (max-width: 1231px) {
+    #client-form {
+        column-count: 1 !important; /* force one column */
+    }
+
+    #client-form > div {
+        break-inside: avoid; /* keep content blocks together */
+    }
+}

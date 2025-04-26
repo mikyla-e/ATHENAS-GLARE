@@ -36,33 +36,33 @@
 
     <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
-    <div class="size-full my-2 flex items-start">
+    <div class="size-full my-2 flex items-start lg: m-0">
         <form class="size-full flex flex-col justify-between" action="{% url 'payroll_system:services_assign' %}" method="post" onsubmit="return confirmation()">
             {% csrf_token %}
-            <div id="client-form" class="flex">
-                <div id="left" class="w-[50%] mx-5">
-                    <div class="flex flex-col">
+            <div id="client-form" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div id="left" class=" mx-5">
+                    <div class="flex flex-col h-[70px]">
                         <label for="first-name">first name</label>
                         {{ customer_form.first_name }}
                         {% if form.first_name.errors %}
                             <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.first_name.errors.0 }}</div>
                         {% endif %}
                     </div>
-                    <div class="flex flex-col">
+                    <div class="flex flex-col h-[70px]">
                         <label for="middle-name">middle name</label>
                         {{ customer_form.middle_name }}
                         {% if form.middle_name.errors %}
                             <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.middle_name.errors.0 }}</div>
                         {% endif %}
                     </div>
-                    <div class="flex flex-col">
+                    <div class="flex flex-col h-[70px]">
                         <label for="last-name">last name</label>
                         {{ customer_form.last_name }}
                         {% if form.last_name.errors %}
                             <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.last_name.errors.0 }}</div>
                         {% endif %}
                     </div>
-                    <div class="flex flex-col">
+                    <div class="flex flex-col h-[70px]">
                         <label for="contact-number">contact number</label>
                         {{ customer_form.contact_number }}
                         {% if form.contact_number.errors %}
@@ -70,8 +70,8 @@
                         {% endif %}
                     </div>
                 </div>
-                <div id="right" class="w-[50%] mx-5">
-                    <div class="flex flex-col">
+                <div id="right" class=" mx-5">
+                    <div class="flex flex-col h-[70px]">
                         <label for="{{ customer_form.region.id_for_label }}">{{ customer_form.region.label }}</label>
                         {{ customer_form.region }}
                         {% if customer_form.region.errors %}
@@ -83,7 +83,7 @@
                             {% endfor %}
                         </datalist>
                     </div>
-                    <div class="flex flex-col">
+                    <div class="flex flex-col h-[70px]">
                         <label for="{{ customer_form.province.id_for_label }}">{{ customer_form.province.label }}</label>
                         {{ customer_form.province }}
                         {% if customer_form.province.errors %}
@@ -95,7 +95,7 @@
                             {% endfor %}
                         </datalist>
                     </div>
-                    <div class="flex flex-col">
+                    <div class="flex flex-col h-[70px]">
                         <label for="{{ customer_form.city.id_for_label }}">{{ customer_form.city.label }}</label>
                         {{ customer_form.city }}
                         {% if customer_form.city.errors %}
@@ -107,7 +107,7 @@
                             {% endfor %}
                         </datalist>
                     </div>
-                    <div class="flex flex-col">
+                    <div class="flex flex-col h-[70px]">
                         <label for="{{ customer_form.barangay.id_for_label }}">{{ customer_form.barangay.label }}</label>
                         {{ customer_form.barangay }}
                         {% if customer_form.barangay.errors %}
@@ -134,17 +134,17 @@
                     </select> -->
                 
                 <!-- </form> -->
-            <div id="vehicle-form" class="flex flex-col px-5 gap-5">
-                <div class="flex my-2 gap-2 mx-5">
-                    <div id="left" class="w-[50%]">
-                        <div class="flex flex-col">
+                <div id="vehicle-form" class="flex">
+                    <div class="w-full ">
+                        <div id="left" class="mx-5">
+                            <div class="flex flex-col h-[70px]">
                             <label for="vehicle-name">vehicle name</label>
                             {{ vehicle_form.vehicle_name }}
                             {% if form.vehicle_name.errors %}
                                 <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.vehicle_name.errors.0 }}</div>
                             {% endif %}
                         </div>
-                        <div class="flex flex-col">
+                        <div class="flex flex-col h-[70px]">
                             <label for="vehicle-color">vehicle color</label>
                             {{ vehicle_form.vehicle_color }}
                             {% if form.vehicle_color.errors %}
@@ -152,8 +152,8 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div id="right" class="w-[50%] mx-5">
-                        <div class="flex flex-col">
+                    <div id="right" class="w-full">
+                        <div class="flex flex-col h-[70px] mx-5">
                             <label for="plate-number">plate number</label>
                             {{ vehicle_form.plate_number }}
                             {% if form.plate_number.errors %}
@@ -167,7 +167,7 @@
             <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
             <div class="w-full h-[50px] flex justify-end gap-4">
-                <a class="h-full" href="javascript:history.back()">
+                <a class="h-full mx-5" href="javascript:history.back()">
                     <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
                 </a>
                 <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="CONFIRM CUSTOMER">

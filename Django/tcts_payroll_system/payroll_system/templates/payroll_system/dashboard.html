@@ -34,8 +34,9 @@
 
 {% block content %}
     <div class="h-dvh w-full grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] grid-rows-[1fr_1fr_2fr_2fr_1fr] lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-[2.75fr_4fr_5.25fr] gap-3">
+        <!-- Total Employees Container -->
         <div class="order-2 col-span-5 lg:order-1 lg:col-span-4 p-3 bg-[#1E1E1E] rounded-xl flex flex-col md:flex-row justify-evenly items-center shadow-lg" id="emp">
-            <div class="w-full h-[50%] md:h-full flex flex-col justify-center items-center" id="ttl_emp">
+            <div class="w-full h-[50%] md:h-full flex flex-col justify-center items-center " id="ttl_emp">
                 <div class="w-full h-full px-4 flex flex-col justify-around items-end" id="content">
                     <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
                         <p class="text-sm/5 sm:text-base/5 md:text-lg/6 font-bold text-right">TOTAL EMPLOYEES</p>
@@ -64,7 +65,7 @@
             </div>
         </div>
 
-
+        <!-- Weather Container -->
         <div class="order-1 col-span-10 lg:order-3 lg:col-span-4 flex flex-col flex-nowrap justify-end items-end" id="time">
             <div id="weather" class="flex flex-nowrap items-center gap-3">
                 <img src="{% static 'images/weather_icon.png' %}" alt="">
@@ -80,7 +81,7 @@
             </div>
         </div>
 
-
+        <!-- Payroll Status Container -->
         <div class="order-4 col-span-5 lg:order-2 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center overflow-hidden shadow-lg" id="payroll-status">
             <div class="w-[45%] h-full p-3 flex flex-col justify-between" id="processed-pending">
                 <div class="text-[#FFFFFF] text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
@@ -117,12 +118,12 @@
             </div>
         </div>
         
-
+        <!-- Donut Chart -->
         <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 border border-black shadow-lg" id="attendance">
-            <canvas id="donut"></canvas>
+            <canvas id="donut" class=""></canvas>
         </div>
 
-
+        <!-- Recent History Chart -->
         <div class="relative order-3 col-span-5 lg:col-span-3 row-span-2 rounded-xl overflow-hidden shadow-lg" id="recent-history">
             <table id="history_table" class="absolute w-full border-none outline-none bg-white z-10 rounded-xl z-50">
                 <thead class="border-b-[3px] border-b-[#e2e1e1]">
@@ -207,8 +208,8 @@
             </div>
         </div>
 
-
-        <div class="order-6 border border-black col-span-5 shadow-lg" id="payroll-per-week">
+        <!-- Bar Chart -->
+        <div class="order-6 border border col-span-5 shadow-lg" id="payroll-per-week">
             <canvas id="bar"></canvas>
         </div>
 
