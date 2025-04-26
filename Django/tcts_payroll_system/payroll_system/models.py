@@ -301,7 +301,7 @@ class History(models.Model):
     date_time = models.DateTimeField(default=timezone.now, null=False)
 
     def __str__(self):
-        return self.description
+        return f"{self.description} - {self.date_time}"
 
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)

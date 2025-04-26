@@ -76,6 +76,46 @@
             color: white;
             min-width: 300px;
         }
+
+        /* Attendance history styling updates */
+        #attendance-history {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .history-section {
+            margin-bottom: 10px;
+        }
+        
+        .history-section-title {
+            font-weight: bold;
+            padding: 5px;
+            background-color: #f5f5f5;
+            border-radius: 3px;
+            margin-bottom: 5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .scrollable-content {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        
+        .date-header {
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 4px 0;
+            margin-top: 8px;
+            position: sticky;
+            top: 0;
+            background-color: white;
+            z-index: 5;
+        }
     </style>
 </head>
 <body>
@@ -127,12 +167,20 @@
                 </div>
                 
                 <!-- Attendance History Section -->
-                <div id="attendance-history" class="w-full overflow-y-auto max-h-80 border border-gray-200 rounded-lg p-2 bg-gray-50">
-                    <h3 class="text-xl font-bold text-center mb-2">Today's Attendance</h3>
-                    <div id="history-content" class="text-sm">
-                        <div class="text-center text-gray-500 py-4">
-                            Face recognition system is active.<br>
-                            Attendance records will appear here.
+                <div id="attendance-history" class="w-full border border-gray-200 rounded-lg p-2 bg-gray-50 flex flex-col">
+                    <h3 class="text-xl font-bold text-center mb-2 sticky top-0 bg-gray-50 py-1 z-20">Attendance History</h3>
+                    
+                    <div class="scrollable-content">
+                        <!-- Today's attendance -->
+                        <div class="history-section">
+                            <div class="history-section-title bg-blue-100 text-blue-800 px-2 py-1 rounded">Today's Attendance</div>
+                            <div id="today-history" class="text-sm"></div>
+                        </div>
+                        
+                        <!-- Previous days attendance -->
+                        <div class="history-section">
+                            <div class="history-section-title bg-gray-100 text-gray-800 px-2 py-1 rounded">Previous Attendance</div>
+                            <div id="previous-history" class="text-sm"></div>
                         </div>
                     </div>
                 </div>
@@ -161,7 +209,8 @@
             const recognitionOverlay = document.getElementById('recognition-overlay');
             const recognizedName = document.getElementById('recognized-name');
             const recognitionMessage = document.getElementById('recognition-message');
-            const historyContent = document.getElementById('history-content');
+            const todayHistory = document.getElementById('today-history');
+            const previousHistory = document.getElementById('previous-history');
             const confirmationDialog = document.getElementById('confirmation-dialog');
             const confirmationTitle = document.getElementById('confirmation-title');
             const confirmationMessage = document.getElementById('confirmation-message');
@@ -373,8 +422,8 @@
                     },
                     success: function(response) {
                         if (response.status === 'success') {
-                            // Update attendance history
-                            updateAttendanceHistory(response.logs);
+                            // Update attendance history with both today's logs and history logs
+                            updateAttendanceHistory(response.today_logs, response.history_logs);
                             
                             if (!skipConfirmation) {
                                 // Show confirmation dialog based on attendance status
@@ -404,41 +453,88 @@
                 });
             }
             
+            // Format date from YYYY-MM-DD to more readable format
+            function formatDate(dateString) {
+                const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('en-US', options);
+            }
+            
+            // Get session status
+            function getSessionStatus(log) {
+                if (log.time_in && log.time_out) {
+                    return `<div class="text-green-600">Completed</div>`;
+                } else if (log.time_in) {
+                    return `<div class="text-blue-600">Active</div>`;
+                } else if (log.time_out) {
+                    return `<div class="text-yellow-600">Incomplete</div>`;
+                }
+                return '';
+            }
+            
+            // Render a single log entry
+            function renderLogEntry(log, index) {
+                const sessionNumber = index + 1;
+                const sessionStatus = getSessionStatus(log);
+                
+                return `
+                    <div class="attendance-log bg-white rounded shadow-sm p-2 mb-2">
+                        <div class="font-bold">Session ${sessionNumber} ${sessionStatus}</div>
+                        ${log.time_in ? `<div>In: ${log.time_in}</div>` : ''}
+                        ${log.time_out ? `<div>Out: ${log.time_out}</div>` : ''}
+                    </div>
+                `;
+            }
+            
             // Update attendance history in sidebar
-            function updateAttendanceHistory(logs) {
-                if (!logs || logs.length === 0) {
-                    historyContent.innerHTML = `
+            function updateAttendanceHistory(todayLogs, historyLogs) {
+                // Update today's logs
+                if (!todayLogs || todayLogs.length === 0) {
+                    todayHistory.innerHTML = `
                         <div class="text-center text-gray-500 py-4">
                             No attendance records for today.
                         </div>
                     `;
-                    return;
+                } else {
+                    let todayHTML = '';
+                    todayLogs.forEach((log, index) => {
+                        todayHTML += renderLogEntry(log, index);
+                    });
+                    todayHistory.innerHTML = todayHTML;
                 }
                 
-                let historyHTML = '';
-                
-                logs.forEach((log, index) => {
-                    const sessionNumber = index + 1;
-                    let sessionStatus = '';
-                    
-                    if (log.time_in && log.time_out) {
-                        sessionStatus = `<div class="text-green-600">Completed</div>`;
-                    } else if (log.time_in) {
-                        sessionStatus = `<div class="text-blue-600">Active</div>`;
-                    } else if (log.time_out) {
-                        sessionStatus = `<div class="text-yellow-600">Incomplete</div>`;
-                    }
-                    
-                    historyHTML += `
-                        <div class="attendance-log bg-white rounded shadow-sm p-2 mb-2">
-                            <div class="font-bold">Session ${sessionNumber} ${sessionStatus}</div>
-                            ${log.time_in ? `<div>In: ${log.time_in}</div>` : ''}
-                            ${log.time_out ? `<div>Out: ${log.time_out}</div>` : ''}
+                // Update previous days' logs
+                if (!historyLogs || historyLogs.length === 0) {
+                    previousHistory.innerHTML = `
+                        <div class="text-center text-gray-500 py-4">
+                            No previous attendance records.
                         </div>
                     `;
-                });
-                
-                historyContent.innerHTML = historyHTML;
+                } else {
+                    // Group logs by date
+                    const logsByDate = {};
+                    historyLogs.forEach(log => {
+                        if (!logsByDate[log.date]) {
+                            logsByDate[log.date] = [];
+                        }
+                        logsByDate[log.date].push(log);
+                    });
+                    
+                    let previousHTML = '';
+                    // Sort dates in reverse chronological order
+                    const sortedDates = Object.keys(logsByDate).sort().reverse();
+                    
+                    sortedDates.forEach(date => {
+                        const formattedDate = formatDate(date);
+                        previousHTML += `<div class="date-header">${formattedDate}</div>`;
+                        
+                        const logsForDate = logsByDate[date];
+                        logsForDate.forEach((log, index) => {
+                            previousHTML += renderLogEntry(log, index);
+                        });
+                    });
+                    
+                    previousHistory.innerHTML = previousHTML;
+                }
             }
             
             // Show notification

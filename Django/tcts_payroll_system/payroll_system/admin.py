@@ -8,14 +8,11 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 class PayrollAdmin(admin.ModelAdmin):
     list_display = ('payroll_id', 'rate', 'incentives', 'payroll_status', 'deductions', 'salary', 'cash_advance', 'under_time',
-                     'payment_date')
-    
-class AttendanceAdmin(admin.ModelAdmin):
-    list_display = ('attendance_id', 'time_in', 'time_out', 'date', 'hours_worked', 'attendance_status','remarks')
+                     'payment_date')    
 
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Payroll, PayrollAdmin)
-admin.site.register(Attendance, AttendanceAdmin)
+admin.site.register(Attendance)
 admin.site.register(History)
 admin.site.register(Service)
 admin.site.register(Customer)

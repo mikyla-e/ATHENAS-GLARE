@@ -2,7 +2,7 @@ import os
 import cv2
 import pytz
 import face_recognition
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import lru_cache
 from payroll_system.models import Employee, Attendance
 
@@ -60,23 +60,43 @@ def check_attendance_status(employee):
     timezone_ph = pytz.timezone("Asia/Manila")
     today = datetime.now(timezone_ph).strftime("%Y-%m-%d")
     
-    # Get all attendance logs for today
-    logs = Attendance.objects.filter(employee_id_fk=employee, date=today).order_by('created_at')
+    # Get today's attendance logs
+    today_logs = Attendance.objects.filter(employee_id_fk=employee, date=today).order_by('created_at')
     
-    logs_data = []
-    for log in logs:
-        logs_data.append({
+    # Get attendance logs from previous days (last 14 days)
+    two_weeks_ago = (datetime.now(timezone_ph) - timedelta(days=14)).strftime("%Y-%m-%d")
+    history_logs = Attendance.objects.filter(
+        employee_id_fk=employee,
+        date__gte=two_weeks_ago,
+        date__lt=today
+    ).order_by('-date', 'created_at')
+    
+    # Format today's logs
+    today_logs_data = []
+    for log in today_logs:
+        today_logs_data.append({
+            "date": log.date.strftime("%Y-%m-%d"),
+            "time_in": log.time_in.strftime("%H:%M:%S") if log.time_in else None,
+            "time_out": log.time_out.strftime("%H:%M:%S") if log.time_out else None,
+        })
+    
+    # Format historical logs by day
+    history_logs_data = []
+    for log in history_logs:
+        history_logs_data.append({
+            "date": log.date.strftime("%Y-%m-%d"),
             "time_in": log.time_in.strftime("%H:%M:%S") if log.time_in else None,
             "time_out": log.time_out.strftime("%H:%M:%S") if log.time_out else None,
         })
     
     # Check if we have an "open" session (time_in without time_out)
-    open_session = logs.filter(time_out__isnull=True).first()
+    open_session = today_logs.filter(time_out__isnull=True).first()
     
     return {
         "status": "success",
         "has_open_session": open_session is not None,
-        "logs": logs_data,
+        "today_logs": today_logs_data,
+        "history_logs": history_logs_data,
         "current_log_id": open_session.attendance_id if open_session else None
     }
 
