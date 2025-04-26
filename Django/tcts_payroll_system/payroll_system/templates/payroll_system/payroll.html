@@ -172,15 +172,23 @@
     </div>
 </div>
 
-<div class="w-full flex flex-col py-5">    
-    <div class="w-full h-[40px] flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden" id="search">
-        <form class="w-full flex justify-center items-center gap-3" method="get">
-            {% csrf_token %}
-            <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
-                <img class="h-[25px] w-[25px]" src="{% static 'images/search_icon.png' %}" alt="Search">
-            </button>
-            <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
-        </form>
+<div class="w-full flex flex-col py-5">
+    <div class="w-full h-[40px] flex flex-nowrap justify-between gap-3">
+        <div class="w-[80%] lg:w-[85%] xl:w-[90%] h-full flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden" id="search">
+            <form class="w-full flex justify-center items-center gap-3" method="get">
+                {% csrf_token %}
+                <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
+                    <img class="h-[25px] w-[25px]" src="{% static 'images/search_icon.png' %}" alt="Search">
+                </button>
+                <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
+            </form>
+        </div>
+
+        <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
+            <a class="size-full" href="####">
+                <button class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" id="button">CONFIRM PAYROLL</button>
+            </a>
+        </div>
     </div>
 
     <div class="md:hidden flex flex-col justify-center">

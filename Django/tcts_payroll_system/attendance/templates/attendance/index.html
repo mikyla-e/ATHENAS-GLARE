@@ -19,7 +19,7 @@
         }
         
         .confirm-btn {
-            background-color: #4CAF50;
+            background-color: #F8D146;
             color: white;
         }
         
@@ -38,7 +38,7 @@
             display: inline-block;
             padding: 8px 16px;
             border-radius: 4px;
-            background-color: rgba(0, 0, 0, 0.7);
+            background: linear-gradient(90deg, #5c4b10C4 0%, #4f380bC4 100%);
             color: white;
         }
         
@@ -68,7 +68,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.85);
+            background: linear-gradient(90deg, #5c4b10C4 0%, #4f380bC4 100%);
             padding: 20px;
             border-radius: 10px;
             z-index: 100;
@@ -304,7 +304,7 @@
             let attendanceAction = null;
             
             // Constants
-            const REQUIRED_MATCHES = 2; // Reduced for faster matching
+            const REQUIRED_MATCHES = 3; // Reduced for faster matching
             const PROCESS_INTERVAL = 300; // Process a frame every 300ms for faster response
             
             // Initialize webcam
@@ -549,6 +549,19 @@
                 }
                 return '';
             }
+
+            function formatTimeTo12Hour(timeString) {
+                const date = new Date(`1970-01-01T${timeString}Z`); // Fake date just to use the time
+                let hours = date.getUTCHours();
+                let minutes = date.getUTCMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                
+                hours = hours % 12;
+                hours = hours ? hours : 12; // 0 should be 12
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                
+                return `${hours}:${minutes} ${ampm}`;
+            }
             
             // Render a single log entry
             function renderLogEntry(log, index) {
@@ -558,8 +571,8 @@
                 return `
                     <div class="attendance-log bg-white rounded shadow-sm p-2 mb-2">
                         <div class="font-bold">Session ${sessionNumber} ${sessionStatus}</div>
-                        ${log.time_in ? `<div>In: ${log.time_in}</div>` : ''}
-                        ${log.time_out ? `<div>Out: ${log.time_out}</div>` : ''}
+                        ${log.time_in ? `<div>In: ${formatTimeTo12Hour(log.time_in)}</div>` : ''}
+                        ${log.time_out ? `<div>Out: ${formatTimeTo12Hour(log.time_out)}</div>` : ''}
                     </div>
                 `;
             }
