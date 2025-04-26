@@ -44,22 +44,30 @@
                     <div class="flex flex-col">
                         <label for="first-name">first name</label>
                         {{ customer_form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.first_name.errors.0 }}</div>
+                        {% endif %}
                     </div>
                     <div class="flex flex-col">
                         <label for="middle-name">middle name</label>
                         {{ customer_form.middle_name }}
+                        {% if form.middle_name.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.middle_name.errors.0 }}</div>
+                        {% endif %}
                     </div>
                     <div class="flex flex-col">
                         <label for="last-name">last name</label>
                         {{ customer_form.last_name }}
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="gender">gender</label>
-                        {{ customer_form.gender }}
+                        {% if form.last_name.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.last_name.errors.0 }}</div>
+                        {% endif %}
                     </div>
                     <div class="flex flex-col">
                         <label for="contact-number">contact number</label>
                         {{ customer_form.contact_number }}
+                        {% if form.contact_number.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.contact_number.errors.0 }}</div>
+                        {% endif %}
                     </div>
                 </div>
                 <div id="right" class="w-[50%] mx-5">
@@ -132,16 +140,25 @@
                         <div class="flex flex-col">
                             <label for="vehicle-name">vehicle name</label>
                             {{ vehicle_form.vehicle_name }}
+                            {% if form.vehicle_name.errors %}
+                                <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.vehicle_name.errors.0 }}</div>
+                            {% endif %}
                         </div>
                         <div class="flex flex-col">
                             <label for="vehicle-color">vehicle color</label>
                             {{ vehicle_form.vehicle_color }}
+                            {% if form.vehicle_color.errors %}
+                                <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.middle_name.errors.0 }}</div>
+                            {% endif %}
                         </div>
                     </div>
                     <div id="right" class="w-[50%] mx-5">
                         <div class="flex flex-col">
                             <label for="plate-number">plate number</label>
                             {{ vehicle_form.plate_number }}
+                            {% if form.plate_number.errors %}
+                                <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.middle_name.errors.0 }}</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

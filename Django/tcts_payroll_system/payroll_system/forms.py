@@ -1,9 +1,10 @@
+import re
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from django.forms import ModelForm
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 from .models import Employee, Payroll, Region, Province, City, Barangay, Service, Customer, Vehicle, Task
 
 class EmployeeForm(forms.ModelForm):
@@ -48,9 +49,9 @@ class EmployeeForm(forms.ModelForm):
             }
         )
 
+    #Helper function to validate 11-digit numbers.
     def validate_contact_number(self, contact_number):
         
-        #Helper function to validate 11-digit numbers.
         if not contact_number.isdigit() or len(contact_number) != 11:
             raise forms.ValidationError("Contact number must be exactly 11 digits.")
         return contact_number
@@ -302,18 +303,40 @@ class PayrollForm(ModelForm):
             'payroll_status': forms.Select(),
         }
             
+    # Helper function to validate 'YYYY-MM-DD' format.
     def validate_date_format(self, date_str):
-        # Helper function to validate 'YYYY-MM-DD' format.
         try:
             datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:
             raise forms.ValidationError("Invalid date format. Use 'YYYY-MM-DD'.")
+        
+    def clean_rate(self):
+        rate = self.cleaned_data.get('rate')
+        if rate is not None:
+            # Check if rate is reasonable (adjust max as needed)
+            if rate > 10000:
+                raise forms.ValidationError("Rate seems too high. Please verify.")
+            
+            # Ensure rate has at most 2 decimal places
+            if rate != round(rate, 2):
+                raise forms.ValidationError("Rate should have at most 2 decimal places.")
+        return rate
 
     def clean_payment_date(self):
         payment_date = self.cleaned_data.get('payment_date')
         if payment_date:
             self.validate_date_format(str(payment_date))
-        return payment_date    
+            
+            # Check if date is not in the past
+            today = datetime.now().date()
+            if payment_date < today:
+                raise forms.ValidationError("Payment date cannot be in the past.")
+                
+            # Check if date is not in the too distant future
+            if payment_date > today + timedelta(days=365):
+                raise forms.ValidationError("Payment date cannot be more than a year in the future.")
+                    
+        return payment_date 
 
     def clean(self):
         cleaned_data = super().clean()
@@ -323,6 +346,8 @@ class PayrollForm(ModelForm):
         if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
             raise forms.ValidationError("All fields must be filled.")
         
+        return cleaned_data
+        
 class ServiceForm(forms.ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'w-full outline-none text-lg', 'placeholder': 'Enter Title'}))
     service_image = forms.ImageField(widget=forms.ClearableFileInput(attrs={'class': 'hidden', 'accept': 'image/*', 'onchange': 'loadImage(event)'}))
@@ -331,6 +356,28 @@ class ServiceForm(forms.ModelForm):
         model = Service
         fields = ('title', 'service_image')
 
+    def clean_title(self):
+        title = self.cleaned_data.get('title')
+        if title:
+            # Check if title contains only valid characters (including spaces)
+            if not re.match(r'^[A-Za-z0-9\s\-_.,&()]+$', title):
+                raise forms.ValidationError("Title contains invalid characters")
+        return title
+
+    def clean_service_image(self):
+        image = self.cleaned_data.get('service_image')
+        if image:
+            # Check file size
+            if image.size > 5 * 1024 * 1024:  # 5MB limit
+                raise forms.ValidationError("Image file is too large. Max size is 5MB.")
+            
+            # Check file extension
+            valid_extensions = ['jpg', 'jpeg', 'png', 'gif']
+            ext = image.name.split('.')[-1].lower()
+            if ext not in valid_extensions:
+                raise forms.ValidationError("Unsupported file extension. Use jpg, jpeg, png, or gif.")
+        return image
+
     def clean(self):
         cleaned_data = super().clean()
         required_fields = ['title', 'service_image']
@@ -338,6 +385,8 @@ class ServiceForm(forms.ModelForm):
         if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
             raise forms.ValidationError("All fields must be filled.")
         
+        return cleaned_data
+
 class CustomerForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}))
     middle_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}), required=False)
@@ -358,6 +407,120 @@ class CustomerForm(forms.ModelForm):
         widgets = {
             'gender': forms.Select(attrs={'class': 'h-[50px]'})
         }
+
+    #Helper function to validate 11-digit numbers.
+    def validate_contact_number(self, contact_number):
+        if not contact_number.isdigit() or len(contact_number) != 11:
+            raise forms.ValidationError("Contact number must be exactly 11 digits.")
+        return contact_number
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name', '')
+        if len(first_name) < 2:
+            raise forms.ValidationError("First name must be at least 2 characters.")
+        if not all(char.isalpha() or char.isspace() or char == '-' for char in first_name):
+            raise forms.ValidationError("First name should contain only letters, spaces, or hyphens.")
+        return first_name.strip()
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name', '')
+        if len(last_name) < 2:
+            raise forms.ValidationError("Last name must be at least 2 characters.")
+        if not all(char.isalpha() or char.isspace() or char == '-' for char in last_name):
+            raise forms.ValidationError("Last name should contain only letters, spaces, or hyphens.")
+        return last_name.strip()
+
+    def clean_middle_name(self):
+        middle_name = self.cleaned_data.get('middle_name', '')
+        if middle_name and not all(char.isalpha() or char.isspace() or char == '-' for char in middle_name):
+            raise forms.ValidationError("Middle name should contain only letters, spaces, or hyphens.")
+        return middle_name.strip() if middle_name else middle_name
+    
+    def clean_contact_number(self):
+        return self.validate_contact_number(self.cleaned_data.get('contact_number', ''))
+    
+    def clean_region(self):
+        region_name = self.cleaned_data.get('region')
+        if not region_name:
+            raise forms.ValidationError("Region is required.")
+            
+        region = Region.objects.filter(regDesc=region_name).first()
+        if not region:
+            raise forms.ValidationError("Please select a valid region.")
+            
+        return region_name
+    
+    def clean_province(self):
+        province_name = self.cleaned_data.get('province')
+        region_name = self.cleaned_data.get('region')
+        
+        if not province_name:
+            raise forms.ValidationError("Province is required.")
+            
+        if region_name:
+            region = Region.objects.filter(regDesc=region_name).first()
+            if region:
+                province = Province.objects.filter(
+                    provDesc=province_name,
+                    regCode=region.regCode
+                ).first()
+                
+                if not province:
+                    raise forms.ValidationError("Province must belong to the selected region.")
+        
+        return province_name
+    
+    def clean_city(self):
+        city_name = self.cleaned_data.get('city')
+        province_name = self.cleaned_data.get('province')
+        
+        if not city_name:
+            raise forms.ValidationError("City is required.")
+            
+        if province_name:
+            province = Province.objects.filter(provDesc=province_name).first()
+            if province:
+                city = City.objects.filter(
+                    citymunDesc=city_name,
+                    provCode=province.provCode
+                ).first()
+                
+                if not city:
+                    raise forms.ValidationError("City must belong to the selected province.")
+        
+        return city_name
+    
+    def clean_barangay(self):
+        barangay_name = self.cleaned_data.get('barangay')
+        city_name = self.cleaned_data.get('city')
+        
+        if not barangay_name:
+            raise forms.ValidationError("Barangay is required.")
+            
+        if city_name:
+            city = City.objects.filter(citymunDesc=city_name).first()
+            if city:
+                barangay = Barangay.objects.filter(
+                    brgyDesc=barangay_name,
+                    citymunCode=city.citymunCode
+                ).first()
+                
+                if not barangay:
+                    raise forms.ValidationError("Barangay must belong to the selected city.")
+        
+        return barangay_name
+    
+    def clean(self):
+        cleaned_data = super().clean()
+
+        required_fields = [
+            'first_name', 'last_name', 'contact_number', 'region', 'province', 'city', 'barangay'
+        ]
+        
+        if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
+            raise forms.ValidationError("All fields must be filled.")
+        
+        return cleaned_data
 
     def save(self, commit=True):
         customer = super().save(commit=False)
@@ -390,6 +553,41 @@ class VehicleForm(forms.ModelForm):
     class Meta:
         model = Vehicle
         fields = ('vehicle_name', 'vehicle_color', 'plate_number')
+
+    def clean_vehicle_name(self):
+        vehicle_name = self.cleaned_data.get('vehicle_name')
+        if vehicle_name:
+            # Check if name contains only valid characters (including spaces)
+            if not re.match(r'^[A-Za-z0-9\s\-_.,&()]+$', vehicle_name):
+                raise forms.ValidationError("Vehicle name contains invalid characters")
+        return vehicle_name
+
+    def clean_vehicle_color(self):
+        color = self.cleaned_data.get('vehicle_color')
+        if color:
+            # Check if color contains only alphabets and spaces
+            if not re.match(r'^[A-Za-z\s]+$', color):
+                raise forms.ValidationError("Color should only contain letters")
+        return color
+    
+    def clean_plate_number(self):
+        plate_number = self.cleaned_data.get('plate_number')
+        if plate_number:
+            # Remove spaces for validation
+            clean_plate = plate_number.replace(" ", "")
+            # Check if plate number follows typical pattern (alphanumeric)
+            if not re.match(r'^[A-Za-z0-9\-]+$', clean_plate):
+                raise forms.ValidationError("Plate number contains invalid characters")
+        return plate_number
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        required_fields = ['vehicle_name', 'vehicle_color', 'plate_number']
+
+        if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
+            raise forms.ValidationError("All fields must be filled.")
+            
+        return cleaned_data
     
 class AdminEditProfileForm(UserChangeForm):
     username = forms.CharField(max_length=100, widget=forms.TextInput(attrs={
