@@ -27,6 +27,13 @@
         border: 1px solid #ddd;
         display: none;
     }
+
+    #title{
+        background: -webkit-linear-gradient(#F8D146, #F5B93F);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
     </style>
 {% endblock %}
 
@@ -35,135 +42,184 @@
 
 <!--page content-->
 {% block content %}
-<div class="register_container">
-    <div class="register_title">
-    <p>Adding new employee!</p>
+<div class="size-full">
+    <div class="my-4 mx-5 font-[League Spartan] text-3xl/10 font-bold">
+        <p id="title" class="text-[#1E1E1E]">Adding new employee!</p>
     </div>
-    <div>
-        <form class="register_field" method="POST" enctype="multipart/form-data">
+    
+    <div class="px-5">
+        <form class="grid grid-row-[1fr_1fr] md:grid-row-1 md:grid-cols-[40%_40%] md:gap-10" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
         
-            <div class="fields_1">
-                <div class="field">
-                    <label for="first-name">first name</label>
+            <div class="order-1">
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label for="first-name" class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]">first name</label>
+                        {% if form.first_name.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.first_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
                     {{ form.first_name }}
-                    {% if form.first_name.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.first_name.errors.0 }}</div>
-                    {% endif %}
                 </div>
-                <div class="field">
-                    <label for="middle-name">middle name</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="middle-name">middle name</label>
+                        {% if form.middle_name.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.middle_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
                     {{ form.middle_name }}
-                    {% if form.middle_name.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.middle_name.errors.0 }}</div>
-                    {% endif %}
                 </div>
-                <div class="field">
-                    <label for="last-name">last name</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="last-name">last name</label>
+                        {% if form.last_name.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.last_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
                     {{ form.last_name }}
-                    {% if form.last_name.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.last_name.errors.0 }}</div>
-                    {% endif %}
                 </div>
-                <div class="field">
-                    <label for="gender">gender</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="gender">gender</label>
+                        {% if form.gender.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.gender.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
                     {{ form.gender }}
-                    {% if form.gender.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.gender.errors.0 }}</div>
-                    {% endif %}
                 </div>
-                <div class="field">
-                    <label for="date-of-birth">date of birth</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="date-of-birth">date of birth</label>
+                        {% if form.date_of_birth.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.date_of_birth.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
                     {{ form.date_of_birth }}
-                    {% if form.date_of_birth.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.date_of_birth.errors.0 }}</div>
-                    {% endif %}
                 </div>
-                <div class="field">
-                    <label for="contact-number">contact number</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="contact-number">contact number</label>
+                        {% if form.contact_number.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.contact_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
                     {{ form.contact_number }}
-                    {% if form.contact_number.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.contact_number.errors.0 }}</div>
-                    {% endif %}
                 </div>
-                <div class="field">
-                    <label for="emergency-contact">emergency contact</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="emergency-contact">emergency contact</label>
+                        {% if form.emergency_contact.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.emergency_contact.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     {{ form.emergency_contact }}
-                    {% if form.emergency_contact.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.emergency_contact.errors.0 }}</div>
-                    {% endif %}
                 </div>
-                <div class="field">
-                    <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
+                        {% if form.region.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.region.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     {{ form.region }}
-                    {% if form.region.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.region.errors.0 }}</div>
-                    {% endif %}
                     <datalist id="region-list">
                         {% for region in regions %}
                             <option value="{{ region.regDesc }}" data-code="{{ region.regCode }}">
                         {% endfor %}
                     </datalist>
                 </div>
-                <div class="field">
-                    <label for="{{ form.province.id_for_label }}">{{ form.province.label }}</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="{{ form.province.id_for_label }}">{{ form.province.label }}</label>
+                        {% if form.province.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.province.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     {{ form.province }}
-                    {% if form.province.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.province.errors.0 }}</div>
-                    {% endif %}
                     <datalist id="province-list">
                     </datalist>
                 </div>
             </div>
         
-            <div class="fields_2">
-                <div class="field">
-                    <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+            <div class="order-2">
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+                        {% if form.city.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.city.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
                     {{ form.city }}
-                    {% if form.city.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.city.errors.0 }}</div>
-                    {% endif %}
                     <datalist id="city-list">
                     </datalist>
                 </div>
-                <div class="field">
-                    <label for="{{ form.barangay.id_for_label }}">{{ form.barangay.label }}</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="{{ form.barangay.id_for_label }}">{{ form.barangay.label }}</label>
+                        {% if form.barangay.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.barangay.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     {{ form.barangay }}
-                    {% if form.barangay.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.barangay.errors.0 }}</div>
-                    {% endif %}
                     <datalist id="barangay-list">
                     </datalist>
                 </div>
-                <div class="field">
-                    <label for="education">highest education attainment</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="education">highest education attainment</label>
+                        {% if form.highest_education.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.highest_education.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
                     {{ form.highest_education }}
-                    {% if form.highest_education.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.highest_education.errors.0 }}</div>
-                    {% endif %}
                 </div>
-                <div class="field">
-                    <label for="work-experience">work experience</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="work-experience">work experience</label>
+                        {% if form.work_experience.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.work_experience.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     {{ form.work_experience }}
-                    {% if form.work_experience.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.work_experience.errors.0 }}</div>
-                    {% endif %}
                 </div>
-                <div class="field">
-                    <label for="date-of-employment">date of employment</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="date-of-employment">date of employment</label>
+                        {% if form.date_of_employment.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.date_of_employment.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     {{ form.date_of_employment }}
-                    {% if form.date_of_employment.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.date_of_employment.errors.0 }}</div>
-                    {% endif %}
                 </div>
-                <div class="field">
-                    <label for="employee-status">employee status</label>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="employee-status">employee status</label>
+                        {% if form.employee_status.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.employee_status.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     {{ form.employee_status }}
-                    {% if form.employee_status.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.employee_status.errors.0 }}</div>
-                    {% endif %}
                 </div>
-        
+                
+                <div class="w-full h-[40px] flex justify-end items-center gap-5">
+                    {% if form.non_field_errors %}
+                        <div class="non-field-errors">
+                            {% for error in form.non_field_errors %}
+                                <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <input class="size-full text-xs/3 lg:text-base/4 font-bold text-[League Spartan] text-center" type="submit" value="SUBMIT" />
+                </div>    
                 <!-- <div class="field">  
                     <label for="employee_image">employee image</label>
                     <div class="employee_picture">
@@ -191,17 +247,6 @@
                         
                     </div>
                 </div> -->
-                
-                <input class="submit" type="submit" value="SUBMIT" />
-        
-                <!-- Display non-field errors -->
-                {% if form.non_field_errors %}
-                    <div class="non-field-errors">
-                        {% for error in form.non_field_errors %}
-                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
             </div>
         </form>
     </div>

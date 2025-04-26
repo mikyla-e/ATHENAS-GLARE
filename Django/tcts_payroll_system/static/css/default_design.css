@@ -131,10 +131,3 @@ input[type=date]{
     resize: none
 }
 
-label{
-    margin: 0 20px;
-    font-family: 'Inter';
-    font-size: 14px;
-    font-weight: 600;
-    color: #1e1e1e;
-}

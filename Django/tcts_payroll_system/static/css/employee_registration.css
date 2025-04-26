@@ -1,49 +1,4 @@
 
-.register_container{
-    max-height: fit-content;
-    margin: 0 50px;
-    
-}
-
-.register_container .register_title{
-    margin: 20px 0 20px 0;
-}
-
-.register_container .register_title p{
-    margin: 10px 0;
-    font-family: 'League Spartan';
-    font-size: 2rem;
-    font-weight: 700;
-    background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    
-}
-
-
-.register_container .register_field{
-    margin: 0px 0;
-    display: flex;
-    align-items: flex-start;
-}
-
-.register_container .register_field .fields_1,
-.register_container .register_field .fields_2{
-    width: 40%;
-    margin: 0 20px;
-}
-
-.register_container .register_field .fields_1 .field,
-.register_container .register_field .fields_2 .field{
-    display: flex;
-    flex-direction: column;
-    margin: 5px 0;
-}
-
-.register_container .register_field .fields_2 .field .employee_picture{
-    display: flex;
-}
 
 .employee_picture .webcam-container{
     width: 100%;
@@ -63,6 +18,7 @@
 
     border-radius: 20px;
 }
+
 
 .field .button{
     display: flex;

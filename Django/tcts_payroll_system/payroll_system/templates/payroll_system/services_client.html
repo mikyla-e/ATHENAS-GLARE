@@ -36,7 +36,7 @@
 
     <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
-    <div class="size-full my-2 flex items-start lg: m-0">
+    <div class="size-full my-2 flex items-start">
         <form class="size-full flex flex-col justify-between" action="{% url 'payroll_system:services_assign' %}" method="post" onsubmit="return confirmation()">
             {% csrf_token %}
             <div id="client-form" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -124,7 +124,6 @@
 
             <span class="w-[100%] h-[2px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
-<<<<<<< Updated upstream
                 <!--<form class="w-full flex justify-center items-center gap-3" method=""> -->
                     <!--to be connected to database; selecting an option should auto fill proceeding fields(for old customers only!)-->
                     <!-- <select class="w-full h-[50px] pl-4 border-none outline-none focus:outline-none focus:border-none focus:ring-0 text-base font-semibold font-[League_Spartan] bg-white rounded-md" name="vehicle" id="vehicle">
@@ -135,11 +134,6 @@
                     </select> -->
                 
                 <!-- </form> -->
-                <div id="vehicle-form" class="flex">
-                    <div class="w-full ">
-                        <div id="left" class="mx-5">
-                            <div class="flex flex-col h-[70px]">
-=======
             <div id="vehicle-form" class="flex flex-col px-5 gap-5">
                 <div class="flex my-2 gap-2 mx-5">
                     <div id="left" class="w-[50%]">
@@ -190,7 +184,7 @@
     function confirmation(){
        return confirm("Are you sure about the details of this customer?");
     }
-
+    
     document.addEventListener("DOMContentLoaded", function() {
         initializeAddressFields({
             regionInputId: "region-dropdown",
