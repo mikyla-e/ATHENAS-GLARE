@@ -403,11 +403,8 @@ class CustomerForm(forms.ModelForm):
     
     class Meta:
         model = Customer
-        fields = ('first_name', 'middle_name', 'gender', 'contact_number')
-        widgets = {
-            'gender': forms.Select(attrs={'class': 'h-[50px]'})
-        }
-
+        fields = ('first_name', 'middle_name', 'contact_number')
+        
     #Helper function to validate 11-digit numbers.
     def validate_contact_number(self, contact_number):
         if not contact_number.isdigit() or len(contact_number) != 11:

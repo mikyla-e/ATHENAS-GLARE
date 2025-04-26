@@ -8,16 +8,6 @@
 {% block headcontent %}
 <link rel="stylesheet" href="{% static 'css/services_assign.css' %}">
 <link rel="stylesheet" href="{% static 'css/default_design.css' %}">
-
-<style>
-    label{
-        margin: 0 20px;
-        font-family: 'Inter';
-        font-size: 14px;
-        font-weight: 600;
-        color: #1e1e1e;
-    }
-</style>
 {% endblock %}
 
 <!--header-->
@@ -30,38 +20,70 @@
     <div class="w-full h-[30%] my-2 py-3 px-5 rounded-xl flex flex-col bg-white">
         <div class="px-3 grid grid-cols-[1fr_1fr] grid-row-[20%_20%] md:grid-cols-[3fr_1fr] md:grid-row-[20%] grid-cols-[2fr_1fr] xl:grid-cols-[2fr_1fr] items-end">
             
-            <p class="order-1 text-xl/8 font-[League Spartan] font-semibold">Customer Name <span class="hidden md:inline-block text-sm/7 font-[Roboto] text-[#1e1e1e80] font-extrabold">Customer Address</span></p>
-            <p class="order-3 md:hidden text-sm/7 font-[Roboto] text-[#1e1e1e80] font-extrabold">Customer Address</p>  
-            <p class="order-2 text-xl/8 font-[League Spartan] font-bold md:flex justify-end">09876543210</p>
+            <p class="order-1 text-xl/8 font-[League Spartan] font-semibold">
+                {% if customer %}
+                    {{ customer.first_name }} {{ customer.middle_name|default:'' }} {{ customer.last_name }}
+                {% endif %}
+                <span class="hidden md:inline-block text-sm/7 font-[Roboto] text-[#1e1e1e80] font-extrabold">
+                    {% if customer %}
+                        {{ customer.barangay }}, {{ customer.city }}, {{ customer.province }}, {{ customer.region }}
+                    {% endif %}
+                </span>
+            </p>
+            <p class="order-3 md:hidden text-sm/7 font-[Roboto] text-[#1e1e1e80] font-extrabold">
+                {% if customer %}
+                    {{ customer.barangay }}, {{ customer.city }}, {{ customer.province }}, {{ customer.region }}
+                {% else %}
+                    Customer Address
+                {% endif %}
+            </p>  
+            <p class="order-2 text-xl/8 font-[League Spartan] font-bold md:flex justify-end">
+                {% if customer %}
+                    {{ customer.contact_number }}
+                {% endif %}
+            </p>
         </div>
         <span class="w-[100%] h-[3px] my-3 bg-[#45320d4d] rounded-xl"></span>
         <div class="h-full px-3 flex flex-wrap">
             <div id="vehicle-info" class="w-[60%] md:w-[70%] lg:w-[75%] flex flex-col gap-3">
                 <div class="">
                     <p class="text-sm font-[League Spartan] text-[#1e1e1e80] font-extrabold">VEHICLE NAME</p>
-                    <p class="p-2 text-xl/5 font-[Inter]">Toyota Corolla Altis 1.6 V CVT</p>
+                    <p class="p-2 text-xl/5 font-[Inter]">
+                        {% if vehicle %}
+                            {{ vehicle.vehicle_name }}
+                        {% endif %}
+                    </p>
                 </div>
                 
                 <div class="">
                     <p class="text-sm font-[League Spartan] text-[#1e1e1e80] font-extrabold">VEHICLE COLOR</p>
-                    <p class="p-2 text-xl/5 font-[Inter]">Red</p>
+                    <p class="p-2 text-xl/5 font-[Inter]">
+                        {% if vehicle %}
+                            {{ vehicle.vehicle_color }}
+                        {% endif %}
+                    </p>
                 </div>
             </div>
 
             <div id="vehicle-plate" class="w-[40%] md:w-[30%] lg:w-[25%] flex flex-col gap-2">
                 <p class="text-sm font-[League Spartan] text-[#1e1e1e80] font-extrabold">PLATE NUMBER</p>
                 <div class="w-fit rounded-xl border border-2 border-[#1E1E1E60] flex justify-center items-center">
-                    <p class="text-4xl/4 pt-4 pb-5 px-4">9NI-2NI</p>
+                    <p class="text-4xl/4 pt-4 pb-5 px-4">
+                        {% if vehicle %}
+                            {{ vehicle.plate_number }}
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>
     </div>
-    <form method="post" class="flex flex-col" action="{% url 'payroll_system:status' %}" onsubmit="return confirmation()">
+    <form method="post" class="flex flex-col" action="{% url 'payroll_system:services_assign' %}" onsubmit="return confirmation()">
         {% csrf_token %}
         <div id="form" class="">
             <span></span>
             <div class="flex flex-col w-[50%] my-[15px] mx-[20px]">
-                <label for="assigned-employee">which employee will be assigned here?</label>
+                <!-- Replaced the inline style with Tailwind classes -->
+                <label for="assigned-employee" class="mx-5 font-['Inter'] text-sm font-semibold text-[#1e1e1e]">which employee will be assigned here?</label>
                 <select name="assigned_employee" id="assigned-employee" class="h-[50px] w-full px-2 rounded-md">
                     {% for employee in employees %}
                     <option value="{{ employee.employee_id }}">{{ employee.first_name }} {{ employee.last_name }}</option>
@@ -75,8 +97,6 @@
                 <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
             </a>
             <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="ASSIGN TASK">
-            <!-- <a href="{% url 'payroll_system:services' %}">
-            </a> -->
         </div>
     </form>
 </div>

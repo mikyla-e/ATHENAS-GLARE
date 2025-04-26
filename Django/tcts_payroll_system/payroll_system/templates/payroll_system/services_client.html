@@ -20,8 +20,8 @@
         <p>Not a new customer?</p>
 
         <div class="w-full h-[40px] flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden">
-            <form class="w-full flex justify-center items-center gap-3" method="get" action="#">
-                {% csrf_token %}
+            <form class="w-full flex justify-center items-center gap-3" method="get" action="{% url 'payroll_system:services_assign' %}">
+                <!-- Remove CSRF token from GET form -->
                 <img class="h-[25px] w-[25px] ml-[15px] flex justify-center items-center" src="{% static 'images/search_icon.png' %}" alt="Search">
                 <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" list="customers" name="customer" id="customer" placeholder="Search Customer...">
                 
@@ -44,29 +44,29 @@
                     <div class="flex flex-col h-[70px]">
                         <label for="first-name">first name</label>
                         {{ customer_form.first_name }}
-                        {% if form.first_name.errors %}
-                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.first_name.errors.0 }}</div>
+                        {% if customer_form.first_name.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ customer_form.first_name.errors.0 }}</div>
                         {% endif %}
                     </div>
                     <div class="flex flex-col h-[70px]">
                         <label for="middle-name">middle name</label>
                         {{ customer_form.middle_name }}
-                        {% if form.middle_name.errors %}
-                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.middle_name.errors.0 }}</div>
+                        {% if customer_form.middle_name.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ customer_form.middle_name.errors.0 }}</div>
                         {% endif %}
                     </div>
                     <div class="flex flex-col h-[70px]">
                         <label for="last-name">last name</label>
                         {{ customer_form.last_name }}
-                        {% if form.last_name.errors %}
-                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.last_name.errors.0 }}</div>
+                        {% if customer_form.last_name.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ customer_form.last_name.errors.0 }}</div>
                         {% endif %}
                     </div>
                     <div class="flex flex-col h-[70px]">
                         <label for="contact-number">contact number</label>
                         {{ customer_form.contact_number }}
-                        {% if form.contact_number.errors %}
-                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.contact_number.errors.0 }}</div>
+                        {% if customer_form.contact_number.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold block">{{ customer_form.contact_number.errors.0 }}</div>
                         {% endif %}
                     </div>
                 </div>
@@ -124,6 +124,7 @@
 
             <span class="w-[100%] h-[2px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
+<<<<<<< Updated upstream
                 <!--<form class="w-full flex justify-center items-center gap-3" method=""> -->
                     <!--to be connected to database; selecting an option should auto fill proceeding fields(for old customers only!)-->
                     <!-- <select class="w-full h-[50px] pl-4 border-none outline-none focus:outline-none focus:border-none focus:ring-0 text-base font-semibold font-[League_Spartan] bg-white rounded-md" name="vehicle" id="vehicle">
@@ -138,17 +139,23 @@
                     <div class="w-full ">
                         <div id="left" class="mx-5">
                             <div class="flex flex-col h-[70px]">
+=======
+            <div id="vehicle-form" class="flex flex-col px-5 gap-5">
+                <div class="flex my-2 gap-2 mx-5">
+                    <div id="left" class="w-[50%]">
+                        <div class="flex flex-col">
+>>>>>>> Stashed changes
                             <label for="vehicle-name">vehicle name</label>
                             {{ vehicle_form.vehicle_name }}
-                            {% if form.vehicle_name.errors %}
-                                <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.vehicle_name.errors.0 }}</div>
+                            {% if vehicle_form.vehicle_name.errors %}
+                                <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ vehicle_form.vehicle_name.errors.0 }}</div>
                             {% endif %}
                         </div>
                         <div class="flex flex-col h-[70px]">
                             <label for="vehicle-color">vehicle color</label>
                             {{ vehicle_form.vehicle_color }}
-                            {% if form.vehicle_color.errors %}
-                                <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.middle_name.errors.0 }}</div>
+                            {% if vehicle_form.vehicle_color.errors %}
+                                <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ vehicle_form.vehicle_color.errors.0 }}</div>
                             {% endif %}
                         </div>
                     </div>
@@ -156,8 +163,8 @@
                         <div class="flex flex-col h-[70px] mx-5">
                             <label for="plate-number">plate number</label>
                             {{ vehicle_form.plate_number }}
-                            {% if form.plate_number.errors %}
-                                <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.middle_name.errors.0 }}</div>
+                            {% if vehicle_form.plate_number.errors %}
+                                <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ vehicle_form.plate_number.errors.0 }}</div>
                             {% endif %}
                         </div>
                     </div>
@@ -170,9 +177,8 @@
                 <a class="h-full mx-5" href="javascript:history.back()">
                     <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
                 </a>
+                <!-- Remove the anchor tag here - it's preventing the form submission -->
                 <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="CONFIRM CUSTOMER">
-                <!-- <a class="h-full" href="{% url 'payroll_system:services_assign' %}">
-                </a> -->
             </div>
         </form>
     </div>   

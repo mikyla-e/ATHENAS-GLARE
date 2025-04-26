@@ -41,6 +41,9 @@
                     <div class="absolute flex justify-center items-center z-10">
                         {{ form.service_image }}
                         <button type="button" class="px-4 py-2 rounded cursor-pointer text-[#FFFFFF] text-center text-xl font-bold" onclick="document.getElementById('{{ form.service_image.auto_id }}').click()">Choose File</button>
+                        {% if form.service_image.errors %}
+                            <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.service_image.errors.0 }}</div>
+                        {% endif %}
                     </div>
                     
                     <div class="relative size-full">
@@ -52,6 +55,9 @@
                 <div class="h-[30%] py-5 px-10 flex flex-col gap-1" id="title">
                     <p class="text-[#1E1E1E4D] text-sm font-[League Spartan] font-bold">TITLE</p>
                     {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-[#e74c3c] text-xs font-bold mt-1 block">{{ form.title.errors.0 }}</div>
+                    {% endif %}
                 </div>
             </div>
 

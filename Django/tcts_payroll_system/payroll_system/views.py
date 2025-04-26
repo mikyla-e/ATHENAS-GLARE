@@ -561,7 +561,6 @@ def services_assign(request):
                     service=service,
                     customer=customer,
                     vehicle=vehicle,
-                    # Assuming you have an Employee model with employee_id as primary key
                     employee=Employee.objects.get(pk=employee_id)
                 )
                 task.save()
@@ -593,21 +592,36 @@ def services_assign(request):
                 
                 # Get employees to display for assignment
                 employees = Employee.objects.all()
-                return render(request, 'payroll_system/services_assign.html', {
-                    'employees': employees
-                })
+                
+                # Add the customer and vehicle data to pass to the template
+                return render(request, 'payroll_system/services_assign.html', {'employees': employees, 'customer': customer, 'vehicle': vehicle})
             else:
                 # If form validation fails, go back to the customer form with errors
-                return render(request, 'payroll_system/services_client.html', {
-                    'customer_form': customer_form,
-                    'vehicle_form': vehicle_form
-                })
+                return render(request, 'payroll_system/services_client.html', {'customer_form': customer_form, 'vehicle_form': vehicle_form})
     
-    # If this is a GET request, get employees to display
+    # If this is a GET request, check if we have customer and vehicle in session
     employees = Employee.objects.all()
-    return render(request, 'payroll_system/services_assign.html', {
+    context = {
         'employees': employees
-    })
+    }
+    
+    # If this is a GET request or coming back to this page, try to get the customer and vehicle data
+    customer_id = request.session.get('customer_id')
+    vehicle_id = request.session.get('vehicle_id')
+    
+    if customer_id and vehicle_id:
+        try:
+            customer = Customer.objects.get(pk=customer_id)
+            vehicle = Vehicle.objects.get(pk=vehicle_id)
+            context.update({
+                'customer': customer,
+                'vehicle': vehicle
+            })
+        except (Customer.DoesNotExist, Vehicle.DoesNotExist):
+            # If the objects don't exist, simply don't add them to context
+            pass
+    
+    return render(request, 'payroll_system/services_assign.html', context)
 
 @login_required
 def status(request):
@@ -653,12 +667,6 @@ class PasswordsChangeView(LoginRequiredMixin, PasswordChangeView):
 @login_required
 def about(request):
     return render(request, 'payroll_system/about.html')
-
-@login_required
-def logout_user(request):
-    logout(request)
-    message.success(request, ("You Were Logout!"))
-    return redirect('users')
 
 @csrf_exempt
 def update_incentives(request):
