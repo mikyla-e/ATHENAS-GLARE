@@ -12,6 +12,8 @@ from django.views import generic
 from django.views.decorators.csrf import csrf_protect
 from .forms import EmployeeForm, PayrollForm, ServiceForm, CustomerForm, VehicleForm, AdminEditProfileForm, PasswordChangingForm
 from .models import Employee, Payroll, Attendance, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 @csrf_protect  # Ensure CSRF protection
 
@@ -657,3 +659,29 @@ def logout_user(request):
     logout(request)
     message.success(request, ("You Were Logout!"))
     return redirect('users')
+
+@csrf_exempt
+def update_incentives(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        incentive_value = float(data.get('incentive', 0))
+        action = data.get('action')
+
+        employees = Payroll.objects.filter(payroll_status='PENDING')
+
+        for emp in employees:
+            if action == 'add':
+                emp.incentives += incentive_value
+                emp.salary += incentive_value  # Add to salary
+            elif action == 'subtract':
+                emp.salary -= incentive_value  # Only subtract from salary, NOT incentives
+
+            emp.save()
+
+        first_emp = Payroll.objects.filter(payroll_status='PENDING').first()
+        new_incentive = first_emp.incentives if first_emp else 0.0
+        new_salary = first_emp.salary if first_emp else 0.0
+
+        return JsonResponse({'success': True, 'new_incentive': str(new_incentive), 'new_salary': str(new_salary)})
+
+    return JsonResponse({'success': False})
