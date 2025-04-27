@@ -284,23 +284,28 @@ class Attendance(models.Model):
         if self.attendance_status == self.AttendanceStatus.PRESENT and not self.time_in:
             raise ValidationError(_('Present status requires time in to be set.'))
             
-    def save(self, *args, **kwargs):
-        self.full_clean()  # Run validation before saving
-        super().save(*args, **kwargs)
-        
-        # Calculate hours after saving
-        if self.time_in and self.time_out:
-            self.calculate_hours_worked()
-    
     def calculate_hours_worked(self):
-        
         # Calculate hours worked for the day
         if self.time_in and self.time_out:
             time_in_dt = datetime.combine(self.date, self.time_in)
             time_out_dt = datetime.combine(self.date, self.time_out)
             worked_seconds = (time_out_dt - time_in_dt).total_seconds()
             self.hours_worked = round(worked_seconds / 3600, 2)
-            self.save()
+            # Remove this line to prevent infinite recursion
+            # self.save()  
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Run validation before saving
+        
+        # Calculate hours before saving if needed
+        if self.time_in and self.time_out:
+            if not kwargs.pop('skip_hours_calculation', False):
+                time_in_dt = datetime.combine(self.date, self.time_in)
+                time_out_dt = datetime.combine(self.date, self.time_out)
+                worked_seconds = (time_out_dt - time_in_dt).total_seconds()
+                self.hours_worked = round(worked_seconds / 3600, 2)
+        
+        super().save(*args, **kwargs)
     #New        
     def get_formatted_hours_worked(self):
         #eturns time worked as hh:mm:ss if time_out exists

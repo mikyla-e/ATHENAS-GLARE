@@ -1,23 +1,5 @@
-.body{
-    height: 100%;
-}
-
-.container{
-    position: absolute;
-    height: fit-content;
-    width: 85%;
-    
-    padding: 10px 12px; 
-    z-index: 8;
-
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
 
 .profile{
-    position: relative;
-    height: 100%;
     width: 100%;
 
     background-color: #fff;
@@ -25,7 +7,6 @@
 }
 
 .profile .top{
-    position: relative;
     display: flex;
 }
 
@@ -83,7 +64,6 @@
 }
 
 .profile .bottom{
-    position: relative;
     margin: 0 30px;
     display: flex;
     flex-direction: column;
@@ -202,42 +182,6 @@
     font-weight: 500;
 }
 
-
-.content{
-    position: relative;
-    height: 100%;
-    width: 100%;
-
-    display: flex;
-    flex-direction: column;
-
-    margin: 5px 0;
-}
-
-.content .duration_filter{
-    margin: 20px 0;
-    display: flex;
-    justify-content: end;
-}
-
-.content .duration_filter select{
-    padding: 12.5px 20px;
-    border: none;
-
-    font-family: 'Roboto';
-    font-size: 1rem;
-    font-weight: 700;
-    color: #fff;
-
-    background: linear-gradient(180deg, #F8D146 0%, #F5B93F 100%);
-    border-radius: 20px;
-    resize: none
-}
-
-.content .duration_filter select option{
-    color: #1e1e1e;
-}
-
 .content .employee_state{
     display: flex;
     justify-content: space-between;
@@ -336,6 +280,7 @@
 
 }
 
+/* 
 .right .table{
     width: 100%;
 }
@@ -397,7 +342,7 @@
 
 .right .table table tr th:first-child{
     border-top-left-radius: 20px;
-}
+} */
 
 
 .content .pagination{

@@ -7,15 +7,140 @@
 <!--(optional)head content-->
 {% block headcontent %}
 <link rel="stylesheet" href="{% static 'css/employee_profile.css' %}">
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
+
+<style>
+    #button{
+        padding: 0 20px;
+        width: fit-content;
+
+        border-radius: 30px;
+        border: none;
+
+        background-image: linear-gradient(to right, #1e1e1e , #1e1e1e); 
+        color: #F8D146;
+        
+    }
+
+    #button:hover{
+        cursor: pointer;
+        scale: 1.05;
+        transition: 0.5s;
+    }
+
+    .dt-layout-row{
+        margin: 0 !important;
+    }
+
+    /*pop up*/
+
+    .background.show,
+    .add_attendance.show {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .add_attendance h1{
+        margin: 0;
+        font-family: 'League Spartan';
+        font-size: 2rem;
+        font-weight: 500;
+
+        background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+
+    tbody tr td{
+        padding: 8px;
+        text-align: center;
+        border-bottom: 2px solid rgba(30, 30, 30, 0.20) !important;
+    }
+
+    input[type=button]{
+        padding: 0 20px;
+        width: fit-content;
+
+        border-radius: 30px;
+        border: none;
+
+        background-image: linear-gradient(to right, #DC4646 , #DC4646); 
+        color: white;
+        
+    }
+
+    input[type=button]:hover{
+        cursor: pointer;
+        scale: 1.05;
+        transition: 0.2s;
+        background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
+        color: white;
+    }
+
+    input[type=submit]{
+        padding: 0 20px;
+        width: fit-content;
+
+        border-radius: 30px;
+        border: none;
+
+        background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
+        
+    }
+
+    input[type=submit]:hover{
+        cursor: pointer;
+        scale: 1.05;
+        transition: 0.5s;
+        background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
+        color: #F8D146;
+    }
+</style>
 {% endblock %}
 
 <!--header-->
 {% block header %}EMPLOYEES{% endblock %} 
 
 <!--page content-->
+{% block outsidecontent %}
+    <div id="background" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddAttendance()">
+        
+    </div> 
+
+    <div id="attendance-popup" class="add_attendance fixed w-[80%] sm:w-[60%] md:w-[50%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
+        <h1>Add Attendance to {{ employee.first_name }} {{ employee.last_name }}</h1>
+        <form id="attendance-form" class="flex flex-col" method="post" onsubmit="event.preventDefault();">
+            <div class="w-full">
+                <table class="bg-white w-full border border-solid rounded-2xl text-xs-center overflow-hidden">
+                    <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                        <tr class="text-base font-[League Spartan]">
+                            <th class="py-2">DATE</th>
+                            <th>TIME IN</th>
+                            <th>TIME OUT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="date" name="" id=""></td><!--date should default to current day, but can change-->
+                            <td><input type="time" name="" id=""></td><!--time -->
+                            <td><input type="time" name="" id=""></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
+                <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddAttendance()">
+                <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+            </div>           
+        </form>
+    </div>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="profile">
+<div class="w-full h-[60%] flex flex-col gap-5">
+    <div class="profile h-dvh">
         <div class="top">
             <div class="employee_pic">
                 <img src="{{ employee.employee_image.url }}" alt="Employee Image">
@@ -88,66 +213,83 @@
             </div>
         </div>
     </div>
-    <div class="content">
-        <div class="duration_filter">
-            <select name="duration" id="duration">
-                <option value="Current Week">Current Week</option>
-                <option value="Last Week">Last Week</option>
-                <option value="Two Weeks Ago">Two Weeks Ago</option>
-                <option value="Last Month">Last Month</option>
-                <option value="Custom">Custom</option>
-            </select>
-        </div>
-        <div class="employee_state">
-            <div class="left">
-                <div class="statistic_1">
-                    <div class="img">
-                        <img src="{% static 'images/payroll_status_icon.png' %}" alt="">
-                    </div>
-                    <div class="text">
-                        <h2>PAYROLL STATUS</h2>
-                        <p>{{ payroll_status }}</p>
-                    </div>
+    <div class="w-full h-fit flex flex-row justify-between gap-5">
+        <div class=" w-[25%] h-full flex flex-col gap-[15px] border border-black">
+            <!-- <div class="statistic_1">
+                <div class="img">
+                    <img src="{% static 'images/payroll_status_icon.png' %}" alt="">
                 </div>
-                <div class="statistic_2">
-                    <div class="img">
-                        <img src="{% static 'images/attendance_icon.png' %}" alt="">
-                    </div>
-                    <div class="text">
-                        <h2>LAST ATTENDANCE</h2>
-                        <p>{{ latest_attendance.date }}</p>
-                        
-                    </div>
-                </div>
-                <div class="statistic_3">
-                    <div class="img">
-                        <img src="{% static 'images/absences_icon.png' %}" alt="">
-                    </div>
-                    <div class="text">
-                        <h2>ABSENCES</h2>
-                        <p>{{ employee.absences }}</p>
-                    </div>
-                </div>
-                <div class="statistic_4">
-                    <div class="img">
-                        <img src="{% static 'images/day_worked_icon.png' %}" alt="">
-                    </div>
-                    <div class="text">
-                        <h2>DAYS WORKED</h2>
-                        <p>{{ employee.days_worked }} Days</p>
-                    </div>
+                <div class="text">
+                    <h2>PAYROLL STATUS</h2>
+                    <p>{{ payroll_status }}</p>
                 </div>
             </div>
-            <div class="right">
-                <div class="table">
-                    <table>
-                        <tr>
-                            <th>DATE</th>
+            <div class="statistic_2">
+                <div class="img">
+                    <img src="{% static 'images/attendance_icon.png' %}" alt="">
+                </div>
+                <div class="text">
+                    <h2>LAST ATTENDANCE</h2>
+                    <p>{{ latest_attendance.date }}</p>
+                    
+                </div>
+            </div>
+            <div class="statistic_3">
+                <div class="img">
+                    <img src="{% static 'images/absences_icon.png' %}" alt="">
+                </div>
+                <div class="text">
+                    <h2>ABSENCES</h2>
+                    <p>{{ employee.absences }}</p>
+                </div>
+            </div>
+            <div class="statistic_4">
+                <div class="img">
+                    <img src="{% static 'images/day_worked_icon.png' %}" alt="">
+                </div>
+                <div class="text">
+                    <h2>DAYS WORKED</h2>
+                    <p>{{ employee.days_worked }} Days</p>
+                </div>
+            </div> -->
+        </div>
+    
+        <div class="w-[75%] h-full flex flex-col gap-5">
+            <div class="w-full h-[25%] flex flex-row flex-nowrap justify-between gap-5">
+                <div class="w-[60%] h-full flex justify-center items-center bg-[#FFFFFF] rounded-xl overflow-hidden gap-3">
+                    <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
+                        <img class="h-[25px] w-[25px]" src="{% static 'images/search_icon.png' %}" alt="Search">
+                    </button>
+                    <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
+                </div>
+                <div class="w-fit h-full flex gap-2">
+                    <button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addAttendance()">ADD ATTENDANCE</button>
+
+                    <select name="duration" id="duration" class="w-fit h-full px-2 rounded-full border-none bg-gradient-to-r from-[#F8D146] to-[#F5B93F] text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center">
+                        <option value="Current Week">Current Week</option>
+                        <option value="Last Week">Last Week</option>
+                        <option value="Two Weeks Ago">Two Weeks Ago</option>
+                        <option value="Last Month">Last Month</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+
+            </div>
+    
+            <div class="w-full h-[75%]">
+                <table class="bg-white w-full border border-solid rounded-2xl text-xs-center overflow-hidden">
+                    <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                        <tr class="text-base font-[League Spartan]">
+                            <th class="py-2">DATE</th>
                             <th>TIME IN</th>
                             <th>TIME OUT</th>
                             <th>TIME WORKED</th>
+                            <th></th>
                         </tr>
-                        <!--New-->
+                    </thead>
+                    
+                    <!--New-->
+                    <tbody>
                         {% for attendance in employee.attendances.all %}
                         <tr>
                             <td>{{ attendance.date }}</td>
@@ -169,16 +311,17 @@
                                         Calculating...
                                     </span>
                                 {% endif %}
-                            </td>                            
+                            </td>      
+                            <td><a href="">EDIT</a></td>                      
                         </tr>
                         {% empty %}
                         <tr>
                             <td colspan="4">No attendance records found for {{ employee.first_name }} {{ employee.last_name }}</td>
                         </tr>
                         {% endfor %}
-                        <!--New End-->
-                    </table>
-                </div>
+                    </tbody>
+                    <!--New End-->
+                </table>
             </div>
         </div>
     </div>
@@ -222,6 +365,33 @@
 
     window.addEventListener('load', calculateLiveHours);
     setInterval(calculateLiveHours, 10000);
+</script>
+
+
+<script>
+    let table;
+
+    $(document).ready(function () {
+        $('#search-input').on('keyup', function () {
+            table.search(this.value).draw();
+        });
+    });
+</script>
+
+<script>
+    function addAttendance(){
+        const bg = document.getElementById("background");
+        const popup = document.getElementById("attendance-popup");
+        bg.classList.add("show");
+        popup.classList.add("show");
+    }
+    
+    function cancelAddAttendance(){
+        const bg = document.getElementById("background");
+        const popup = document.getElementById("attendance-popup");
+        bg.classList.remove("show");
+        popup.classList.remove("show");
+    }
 </script>
 
 {% endblock %}
