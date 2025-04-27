@@ -122,6 +122,61 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        
+        /* Date filter styling */
+        .date-filter {
+            margin-bottom: 12px;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .filter-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+        
+        .filter-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 6px;
+        }
+        
+        .filter-input {
+            padding: 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            flex-grow: 1;
+        }
+        
+        .filter-btn {
+            background-color: #F8D146;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .filter-btn:hover {
+            background-color: #F5B93F;
+        }
+        
+        .reset-btn {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .reset-btn:hover {
+            background-color: #cbd5e0;
+        }
     </style>
 </head>
 <body>
@@ -180,6 +235,19 @@
                 <!-- Attendance History Section -->
                 <div id="attendance-history" class="w-full h-full border border-gray-200 rounded-lg p-2 bg-gray-50 flex flex-col">
                     <h3 class="text-xl font-bold text-center mb-2 sticky top-0 bg-gray-50 py-1 z-20">Attendance History</h3>
+                    
+                    <!-- Date Filter Section -->
+                    <div class="date-filter">
+                        <div class="filter-title">Filter History</div>
+                        <div class="filter-row">
+                            <input type="date" id="start-date" class="filter-input" placeholder="Start Date">
+                            <input type="date" id="end-date" class="filter-input" placeholder="End Date">
+                        </div>
+                        <div class="filter-row">
+                            <button id="apply-filter" class="filter-btn">Apply Filter</button>
+                            <button id="reset-filter" class="filter-btn reset-btn">Reset</button>
+                        </div>
+                    </div>
                     
                     <div class="scrollable-content">
                         <!-- Today's attendance -->
@@ -296,12 +364,19 @@
             const confirmYesBtn = document.getElementById('confirm-yes');
             const confirmNoBtn = document.getElementById('confirm-no');
             
+            // Date filter elements
+            const startDateInput = document.getElementById('start-date');
+            const endDateInput = document.getElementById('end-date');
+            const applyFilterBtn = document.getElementById('apply-filter');
+            const resetFilterBtn = document.getElementById('reset-filter');
+            
             // State variables
             let isProcessing = false;
             let isPaused = false;
             let recognizedEmployeeId = null;
             let consecutiveMatches = 0;
             let attendanceAction = null;
+            let currentFilterDates = { startDate: null, endDate: null };
             
             // Constants
             const REQUIRED_MATCHES = 3; // Reduced for faster matching
@@ -323,6 +398,97 @@
                     });
             } else {
                 showNotification('Your browser does not support webcam access.', 'error');
+            }
+            
+            // Initialize date inputs with default values
+            const today = new Date();
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(today.getMonth() - 1);
+            
+            startDateInput.valueAsDate = oneMonthAgo;
+            endDateInput.valueAsDate = today;
+            
+            // Date filter event listeners
+            applyFilterBtn.addEventListener('click', function() {
+                applyDateFilter();
+            });
+            
+            resetFilterBtn.addEventListener('click', function() {
+                resetDateFilter();
+            });
+            
+            // Apply date filter
+            function applyDateFilter() {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                
+                if (!startDate || !endDate) {
+                    showNotification('Please select both start and end dates', 'warning');
+                    return;
+                }
+                
+                if (new Date(startDate) > new Date(endDate)) {
+                    showNotification('Start date cannot be after end date', 'warning');
+                    return;
+                }
+                
+                currentFilterDates = {
+                    startDate: startDate,
+                    endDate: endDate
+                };
+                
+                // If an employee is recognized, fetch their filtered history
+                if (recognizedEmployeeId) {
+                    fetchFilteredHistory(recognizedEmployeeId);
+                } else {
+                    showNotification('Please get recognized first to view filtered history', 'info');
+                }
+            }
+            
+            // Reset date filter
+            function resetDateFilter() {
+                const today = new Date();
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(today.getMonth() - 1);
+                
+                startDateInput.valueAsDate = oneMonthAgo;
+                endDateInput.valueAsDate = today;
+                
+                currentFilterDates = {
+                    startDate: oneMonthAgo.toISOString().split('T')[0],
+                    endDate: today.toISOString().split('T')[0]
+                };
+                
+                // If an employee is recognized, fetch their history with reset filter
+                if (recognizedEmployeeId) {
+                    fetchFilteredHistory(recognizedEmployeeId);
+                }
+            }
+            
+            // Fetch filtered history
+            function fetchFilteredHistory(employeeId) {
+                $.ajax({
+                    url: window.location.href,
+                    type: 'POST',
+                    data: {
+                        'action': 'filter_history',
+                        'employee_id': employeeId,
+                        'start_date': currentFilterDates.startDate,
+                        'end_date': currentFilterDates.endDate
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            // Update attendance history with filtered logs
+                            updateAttendanceHistory(response.today_logs, response.history_logs);
+                            showNotification('Attendance history filtered successfully', 'success');
+                        } else {
+                            showNotification(response.message, 'error');
+                        }
+                    },
+                    error: function(error) {
+                        showNotification('Error filtering attendance history', 'error');
+                    }
+                });
             }
             
             // Process a single video frame
@@ -492,13 +658,21 @@
             
             // Check attendance status and update UI accordingly
             function checkAttendanceStatus(employeeId, skipConfirmation = false) {
+                // Include current filter dates if available
+                const requestData = {
+                    'action': 'check_status',
+                    'employee_id': employeeId
+                };
+                
+                if (currentFilterDates.startDate && currentFilterDates.endDate) {
+                    requestData.start_date = currentFilterDates.startDate;
+                    requestData.end_date = currentFilterDates.endDate;
+                }
+                
                 $.ajax({
                     url: window.location.href,
                     type: 'POST',
-                    data: {
-                        'action': 'check_status',
-                        'employee_id': employeeId
-                    },
+                    data: requestData,
                     success: function(response) {
                         if (response.status === 'success') {
                             // Update attendance history with both today's logs and history logs

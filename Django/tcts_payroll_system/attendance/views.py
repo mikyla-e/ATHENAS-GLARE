@@ -2,11 +2,12 @@ import base64
 import cv2
 import io
 import numpy as np
+from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from payroll_system.models import Employee
-from .face_recognition_attendance import process_frame_recognition, mark_attendance, check_attendance_status
+from .face_recognition_attendance import process_frame_recognition, mark_attendance, check_attendance_status, get_filtered_attendance
 from PIL import Image
 
 # Create your views here.
@@ -42,7 +43,7 @@ def attendance(request):
             except Exception as e:
                 return JsonResponse({'status': 'error', 'message': str(e)})
         
-        # For checking attendance status
+        # For checking attendance status with optional date filtering
         elif request.POST.get('action') == 'check_status':
             employee_id = request.POST.get('employee_id')
             
@@ -51,11 +52,55 @@ def attendance(request):
             
             try:
                 employee = Employee.objects.get(employee_id=employee_id)
-                result = check_attendance_status(employee)
+                
+                # Check if date filter params are provided
+                start_date = request.POST.get('start_date')
+                end_date = request.POST.get('end_date')
+                
+                if start_date and end_date:
+                    # Use date filtered attendance check
+                    result = check_attendance_status(employee, start_date, end_date)
+                else:
+                    # Use default attendance check
+                    result = check_attendance_status(employee)
+                    
                 return JsonResponse(result)
                 
             except Employee.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'Employee not found'})
+        
+        # For handling explicit date filtering requests
+        elif request.POST.get('action') == 'filter_history':
+            employee_id = request.POST.get('employee_id')
+            start_date = request.POST.get('start_date')
+            end_date = request.POST.get('end_date')
+            
+            if not employee_id:
+                return JsonResponse({'status': 'error', 'message': 'No employee detected'})
+                
+            if not start_date or not end_date:
+                return JsonResponse({'status': 'error', 'message': 'Start and end dates are required'})
+            
+            try:
+                # Validate date formats
+                try:
+                    datetime.strptime(start_date, '%Y-%m-%d')
+                    datetime.strptime(end_date, '%Y-%m-%d')
+                except ValueError:
+                    return JsonResponse({'status': 'error', 'message': 'Invalid date format. Please use YYYY-MM-DD'})
+                
+                # Check if end date is after start date
+                if start_date > end_date:
+                    return JsonResponse({'status': 'error', 'message': 'End date must be after start date'})
+                
+                employee = Employee.objects.get(employee_id=employee_id)
+                result = get_filtered_attendance(employee, start_date, end_date)
+                return JsonResponse(result)
+                
+            except Employee.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Employee not found'})
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)})
         
         # For time in/out actions
         elif request.POST.get('action') in ['time_in', 'time_out']:
