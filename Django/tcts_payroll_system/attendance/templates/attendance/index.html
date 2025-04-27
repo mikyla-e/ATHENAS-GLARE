@@ -10,172 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
     <style>
-        .action-button {
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            margin: 5px;
-        }
-        
-        .confirm-btn {
-            background-color: #F8D146;
-            color: white;
-        }
-        
-        .cancel-btn {
-            background-color: #f44336;
-            color: white;
-        }
-        
-        .disabled-btn {
-            background-color: #cccccc;
-            color: #666666;
-            cursor: not-allowed;
-        }
-        
-        #status-message {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 4px;
-            background: linear-gradient(90deg, #5c4b10C4 0%, #4f380bC4 100%);
-            color: white;
-        }
-        
-        #notification {
-            transition: all 0.3s ease;
-        }
-        
-        .border-red-500 {
-            border-left-color: #f44336 !important;
-        }
-        
-        .border-green-500 {
-            border-left-color: #4CAF50 !important;
-        }
-        
-        .attendance-log {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .attendance-log:last-child {
-            border-bottom: none;
-        }
-        
-        #confirmation-dialog {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(90deg, #5c4b10C4 0%, #4f380bC4 100%);
-            padding: 20px;
-            border-radius: 10px;
-            z-index: 100;
-            text-align: center;
-            color: white;
-            min-width: 300px;
-        }
-
-        /* Attendance history styling updates */
-        #attendance-history {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .history-section {
-            margin-bottom: 10px;
-        }
-        
-        .history-section-title {
-            font-weight: bold;
-            padding: 5px;
-            background-color: #f5f5f5;
-            border-radius: 3px;
-            margin-bottom: 5px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        
-        .scrollable-content {
-            overflow-y: auto;
-            flex-grow: 1;
-            padding-right: 5px;
-        }
-        
-        .date-header {
-            font-weight: 600;
-            color: #4a5568;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 4px 0;
-            margin-top: 8px;
-            position: sticky;
-            top: 0;
-            background-color: white;
-            z-index: 5;
-        }
-
-        #date{
+        /* Custom styles that cannot be easily converted to Tailwind */
+        #philippines-time {
             background: -webkit-linear-gradient(#F8D146, #F5B93F);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-        
-        /* Date filter styling */
-        .date-filter {
-            margin-bottom: 12px;
-            padding: 8px;
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .filter-title {
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #4a5568;
-            font-size: 0.9rem;
-        }
-        
-        .filter-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 6px;
-            gap: 6px;
-        }
-        
-        .filter-input {
-            padding: 6px;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            flex-grow: 1;
-        }
-        
-        .filter-btn {
-            background-color: #F8D146;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 12px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .filter-btn:hover {
-            background-color: #F5B93F;
-        }
-        
-        .reset-btn {
-            background-color: #e2e8f0;
-            color: #4a5568;
-        }
-        
-        .reset-btn:hover {
-            background-color: #cbd5e0;
         }
     </style>
 </head>
@@ -184,81 +23,84 @@
         <img src="{% static 'images/clients_logo.png' %}" alt="Logo">
     </div>
 
-    <div class="h-lvh grid grid-rows-[5fr_1fr] lg:grid-cols-[3fr_1fr] lg:grid-rows-1">
+    <div class="h-screen grid grid-rows-[5fr_1fr] lg:grid-cols-[3fr_1fr] lg:grid-rows-1">
+        <!-- Main camera area -->
         <div class="bg-[#1E1E1E] order-1 relative">
-            <div class="webcam-container m-0 h-full overflow-hidden">
-                <video id="video" class="size-full object-cover" autoplay playsinline></video>
+            <div class="h-full overflow-hidden">
+                <video id="video" class="w-full h-full object-cover" autoplay playsinline></video>
                 <canvas id="canvas" class="hidden"></canvas>
                 
                 <!-- Status overlay -->
                 <div id="status-overlay" class="absolute bottom-4 left-0 right-0 text-center p-4">
-                    <div id="status-message" class="inline-block bg-black bg-opacity-70 text-white py-2 px-4 rounded-lg text-xl">
+                    <div id="status-message" class="inline-block bg-black/70 text-white py-2 px-4 rounded-lg text-xl">
                         Waiting for face...
                     </div>
                 </div>
                 
                 <!-- Recognition overlay -->
-                <div id="recognition-overlay" class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center hidden">
-                    <div class="bg-black bg-opacity-80 text-white p-6 rounded-lg text-center">
+                <div id="recognition-overlay" class="absolute inset-0 flex items-center justify-center hidden">
+                    <div class="bg-black/80 text-white p-6 rounded-lg text-center">
                         <div id="recognized-name" class="text-3xl font-bold mb-4"></div>
                         <div id="recognition-message" class="text-xl"></div>
                     </div>
                 </div>
                 
                 <!-- Confirmation dialog -->
-                <div id="confirmation-dialog" class="hidden">
+                <div id="confirmation-dialog" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-[#5c4b10C4] to-[#4f380bC4] p-5 rounded-lg z-50 text-center text-white min-w-[300px]">
                     <h2 id="confirmation-title" class="text-2xl font-bold mb-4"></h2>
                     <p id="confirmation-message" class="text-lg mb-6"></p>
                     <div class="flex justify-center gap-4">
-                        <button id="confirm-yes" class="action-button confirm-btn">Yes</button>
-                        <button id="confirm-no" class="action-button cancel-btn">No</button>
+                        <button id="confirm-yes" class="bg-[#F8D146] text-white px-5 py-2.5 rounded font-bold transition-all duration-300">Yes</button>
+                        <button id="confirm-no" class="bg-red-500 text-white px-5 py-2.5 rounded font-bold transition-all duration-300">No</button>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="bg-[#FFF] p-4 flex lg:flex-col justify-between order-2">
+        <!-- Sidebar area -->
+        <div class="bg-white p-4 flex lg:flex-col justify-between order-2">
             <div id="logo" class="hidden lg:flex items-center gap-3">
                 <img src="{% static 'images/logo_icon.png' %}" alt="">
                 <p class="text-2xl font-extrabold">ATTENDANCE</p>
             </div>
 
             <div class="flex flex-col h-[90%] gap-4">
-                <div id="content" class=" h-fit lg:h-fite w-full flex justify-between lg:flex-col lg:justify-start">
-                    <p id="philippines-time"  class="text-4xl lg:text-[75px] font-[Roboto] font-bold text-left flex flex-wrap">00:00AM</p>
+                <div id="content" class="h-fit lg:h-fit w-full flex justify-between lg:flex-col lg:justify-start">
+                    <p id="philippines-time" class="text-4xl lg:text-[75px] font-[Roboto] font-bold text-left flex flex-wrap">00:00AM</p>
                     <div id="date" class="flex flex-row flex-nowrap font-[League Spartan] gap-2">
                         <p id="philippines-date" class="text-3xl font-extrabold"></p>
-                        <p id="" class="text-3xl font-extrabold">|</p>
+                        <p class="text-3xl font-extrabold">|</p>
                         <p id="philippines-day" class="text-3xl font-extrabold"></p>
                     </div>
                 </div>
+                
                 <!-- Attendance History Section -->
                 <div id="attendance-history" class="w-full h-full border border-gray-200 rounded-lg p-2 bg-gray-50 flex flex-col">
                     <h3 class="text-xl font-bold text-center mb-2 sticky top-0 bg-gray-50 py-1 z-20">Attendance History</h3>
                     
                     <!-- Date Filter Section -->
-                    <div class="date-filter">
-                        <div class="filter-title">Filter History</div>
-                        <div class="filter-row">
-                            <input type="date" id="start-date" class="filter-input" placeholder="Start Date">
-                            <input type="date" id="end-date" class="filter-input" placeholder="End Date">
+                    <div class="mb-3 p-2 bg-gray-100 rounded-md">
+                        <div class="font-semibold text-sm mb-1.5 text-gray-700">Filter History</div>
+                        <div class="flex items-center gap-1.5 mb-1.5">
+                            <input type="date" id="start-date" class="p-1.5 border border-gray-300 rounded text-sm flex-grow" placeholder="Start Date">
+                            <input type="date" id="end-date" class="p-1.5 border border-gray-300 rounded text-sm flex-grow" placeholder="End Date">
                         </div>
-                        <div class="flex justify-end filter-row">
-                            <button id="apply-filter" class="filter-btn">Apply Filter</button>
-                            <button id="reset-filter" class="filter-btn reset-btn">Reset</button>
+                        <div class="flex justify-end gap-2">
+                            <button id="apply-filter" class="bg-[#F8D146] text-white px-3 py-1.5 rounded text-sm transition-colors hover:bg-[#F5B93F]">Apply Filter</button>
+                            <button id="reset-filter" class="bg-gray-300 text-gray-700 px-3 py-1.5 rounded text-sm transition-colors hover:bg-gray-400">Reset</button>
                         </div>
                     </div>
                     
-                    <div class="scrollable-content">
+                    <div class="overflow-y-auto flex-grow pr-1">
                         <!-- Today's attendance -->
-                        <div class="history-section">
-                            <div class="history-section-title bg-blue-100 text-blue-800 px-2 py-1 rounded">Today's Attendance</div>
+                        <div class="mb-2.5">
+                            <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold sticky top-0 z-10">Today's Attendance</div>
                             <div id="today-history" class="text-sm"></div>
                         </div>
                         
                         <!-- Previous days attendance -->
-                        <div class="history-section">
-                            <div class="history-section-title bg-gray-100 text-gray-800 px-2 py-1 rounded">Previous Attendance</div>
+                        <div>
+                            <div class="bg-gray-100 text-gray-800 px-2 py-1 rounded font-semibold sticky top-0 z-10">Previous Attendance</div>
                             <div id="previous-history" class="text-sm"></div>
                         </div>
                     </div>
@@ -279,75 +121,38 @@
     </div>
 
     <script>
+        // Time and date functions
         function updateDay() {
-            // Get the current day of the week in the Philippines
             const options = { timeZone: 'Asia/Manila', weekday: 'short' };
             const phDay = new Date().toLocaleDateString('en-US', options);
-    
-            // Display the day
             document.getElementById("philippines-day").textContent = phDay;
         }
-    
-        // Call the function immediately
-        updateDay();
-    
+
         function updateTime() {
-            // Get current time in the Philippines (Asia/Manila)
             const options = { 
                 timeZone: 'Asia/Manila', 
                 hour: '2-digit', 
                 minute: '2-digit', 
-                hour12: true // Use 12-hour format (AM/PM)
+                hour12: true
             };
-    
             let phTime = new Date().toLocaleTimeString('en-US', options);
-    
-            // Remove the space between time and AM/PM (e.g. "11:45 AM" -> "11:45AM")
             phTime = phTime.replace(' ', '');
-    
-            // Display the time
             document.getElementById("philippines-time").textContent = phTime;
         }
-    
-            // Update time every second
-            setInterval(updateTime, 1000);
-    
-            // Call the function immediately
-            updateTime();
-    
-    
-            function updateDate() {
-            // Get the current date and format it to Month, Day, Year
+
+        function updateDate() {
             const options = { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' };
             const philippineDate = new Date().toLocaleDateString('en-US', options);
-    
-            // Update the text inside the <p> tag with the ID "philippines-date"
             document.getElementById("philippines-date").textContent = philippineDate;
         }
-    
-        // Call the function once when the page loads
-        updateDate();
-    
-        function displayWeek() {
-            const weekNumber = getWeekNumber(new Date());
-            document.getElementById("philippines-week").textContent = "Philippines Current Week: " + weekNumber;
-        }
-    
-        displayWeek();
-            
-        // Get the current date
-        const today = new Date();
-    
-        // Format the date
-        const month = today.toLocaleString('default', { month: 'long' }); // Full month name
-        const day = today.getDate(); // Day of the month
-        const year = today.getFullYear(); // Year
-    
-        // Display the date
-        document.getElementById("current-date").textContent = month + " " + day + ", " + year;
-    </script>
 
-    <script>
+        // Initialize time functions
+        updateDay();
+        setInterval(updateTime, 1000);
+        updateTime();
+        updateDate();
+
+        // Main attendance functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Elements
             const video = document.getElementById('video');
@@ -379,8 +184,8 @@
             let currentFilterDates = { startDate: null, endDate: null };
             
             // Constants
-            const REQUIRED_MATCHES = 3; // Reduced for faster matching
-            const PROCESS_INTERVAL = 300; // Process a frame every 300ms for faster response
+            const REQUIRED_MATCHES = 3;
+            const PROCESS_INTERVAL = 300;
             
             // Initialize webcam
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -388,9 +193,7 @@
                     .then(function(stream) {
                         video.srcObject = stream;
                         video.play();
-                        
-                        // Start processing frames
-                        setTimeout(processFrame, 1000); // Start after a short delay
+                        setTimeout(processFrame, 1000);
                     })
                     .catch(function(error) {
                         console.error('Could not access webcam:', error);
@@ -437,7 +240,6 @@
                     endDate: endDate
                 };
                 
-                // If an employee is recognized, fetch their filtered history
                 if (recognizedEmployeeId) {
                     fetchFilteredHistory(recognizedEmployeeId);
                 } else {
@@ -459,7 +261,6 @@
                     endDate: today.toISOString().split('T')[0]
                 };
                 
-                // If an employee is recognized, fetch their history with reset filter
                 if (recognizedEmployeeId) {
                     fetchFilteredHistory(recognizedEmployeeId);
                 }
@@ -478,7 +279,6 @@
                     },
                     success: function(response) {
                         if (response.status === 'success') {
-                            // Update attendance history with filtered logs
                             updateAttendanceHistory(response.today_logs, response.history_logs);
                             showNotification('Attendance history filtered successfully', 'success');
                         } else {
@@ -497,16 +297,13 @@
                 
                 isProcessing = true;
                 
-                // Draw current video frame to canvas
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 const context = canvas.getContext('2d');
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 
-                // Get image data
-                const imageData = canvas.toDataURL('image/jpeg', 0.7); // Lower quality for faster processing
+                const imageData = canvas.toDataURL('image/jpeg', 0.7);
                 
-                // Send to server for face recognition
                 $.ajax({
                     url: window.location.href,
                     type: 'POST',
@@ -517,7 +314,6 @@
                         handleRecognitionResponse(response);
                         isProcessing = false;
                         
-                        // Continue processing frames if not paused
                         if (!isPaused) {
                             setTimeout(processFrame, PROCESS_INTERVAL);
                         }
@@ -526,7 +322,6 @@
                         console.error('Error processing frame:', error);
                         isProcessing = false;
                         
-                        // Continue processing frames if not paused
                         if (!isPaused) {
                             setTimeout(processFrame, PROCESS_INTERVAL);
                         }
@@ -538,38 +333,23 @@
             function handleRecognitionResponse(response) {
                 switch(response.status) {
                     case 'waiting':
-                        // Reset recognition state
                         consecutiveMatches = 0;
-                        
-                        // Update UI
                         statusMessage.textContent = response.message;
                         recognizedEmployeeId = null;
                         break;
                         
                     case 'recognized':
-                        // Increment consecutive matches
                         consecutiveMatches++;
-                        
-                        // Update status
                         statusMessage.textContent = `Matching... (${consecutiveMatches}/${REQUIRED_MATCHES})`;
                         
-                        // If we have enough consecutive matches, accept the recognition
                         if (consecutiveMatches >= REQUIRED_MATCHES) {
-                            // Store recognized employee
                             recognizedEmployeeId = response.employee_id;
-                            
-                            // Update UI to show recognized employee
                             statusMessage.textContent = "Employee recognized!";
-                            
-                            // Pause face recognition
                             isPaused = true;
-                            
-                            // Show recognition overlay
                             recognizedName.textContent = response.name;
                             recognitionMessage.textContent = "Face matched";
                             recognitionOverlay.classList.remove('hidden');
                             
-                            // Check attendance status and show confirmation after a short delay
                             setTimeout(function() {
                                 recognitionOverlay.classList.add('hidden');
                                 checkAttendanceStatus(recognizedEmployeeId);
@@ -578,7 +358,6 @@
                         break;
                         
                     case 'unknown':
-                        // Reset consecutive matches
                         consecutiveMatches = 0;
                         statusMessage.textContent = "Face not recognized";
                         recognizedEmployeeId = null;
@@ -630,11 +409,7 @@
                     success: function(response) {
                         if (response.status === 'success' || response.status === 'warning') {
                             showNotification(response.message, response.status);
-                            
-                            // Refresh attendance history
                             checkAttendanceStatus(employeeId, true);
-                            
-                            // Reset recognition state after a short delay
                             setTimeout(resetRecognition, 2000);
                         } else {
                             showNotification(response.message, 'error');
@@ -658,7 +433,6 @@
             
             // Check attendance status and update UI accordingly
             function checkAttendanceStatus(employeeId, skipConfirmation = false) {
-                // Include current filter dates if available
                 const requestData = {
                     'action': 'check_status',
                     'employee_id': employeeId
@@ -675,11 +449,9 @@
                     data: requestData,
                     success: function(response) {
                         if (response.status === 'success') {
-                            // Update attendance history with both today's logs and history logs
                             updateAttendanceHistory(response.today_logs, response.history_logs);
                             
                             if (!skipConfirmation) {
-                                // Show confirmation dialog based on attendance status
                                 if (response.has_open_session) {
                                     showConfirmationDialog(
                                         "Time Out?",
@@ -725,13 +497,13 @@
             }
 
             function formatTimeTo12Hour(timeString) {
-                const date = new Date(`1970-01-01T${timeString}Z`); // Fake date just to use the time
+                const date = new Date(`1970-01-01T${timeString}Z`);
                 let hours = date.getUTCHours();
                 let minutes = date.getUTCMinutes();
                 const ampm = hours >= 12 ? 'PM' : 'AM';
                 
                 hours = hours % 12;
-                hours = hours ? hours : 12; // 0 should be 12
+                hours = hours ? hours : 12;
                 minutes = minutes < 10 ? '0' + minutes : minutes;
                 
                 return `${hours}:${minutes} ${ampm}`;
@@ -743,8 +515,8 @@
                 const sessionStatus = getSessionStatus(log);
                 
                 return `
-                    <div class="attendance-log bg-white rounded shadow-sm p-2 mb-2">
-                        <div class="font-bold">Session ${sessionNumber} ${sessionStatus}</div>
+                    <div class="bg-white rounded shadow-sm p-2 mb-2">
+                        <div class="font-semibold">${sessionNumber ? `Session ${sessionNumber}` : ''} ${sessionStatus}</div>
                         ${log.time_in ? `<div>In: ${formatTimeTo12Hour(log.time_in)}</div>` : ''}
                         ${log.time_out ? `<div>Out: ${formatTimeTo12Hour(log.time_out)}</div>` : ''}
                     </div>
@@ -791,7 +563,7 @@
                     
                     sortedDates.forEach(date => {
                         const formattedDate = formatDate(date);
-                        previousHTML += `<div class="date-header">${formattedDate}</div>`;
+                        previousHTML += `<div class="font-medium text-gray-700 border-b border-gray-200 py-1 sticky top-8 bg-white z-5">${formattedDate}</div>`;
                         
                         const logsForDate = logsByDate[date];
                         logsForDate.forEach((log, index) => {
@@ -808,24 +580,30 @@
                 const notification = document.getElementById('notification');
                 const notificationMessage = document.getElementById('notification-message');
                 
-                // Allow HTML in notifications
                 notificationMessage.innerHTML = message;
                 
-                // Remove existing classes
+                // Remove all styling classes first
                 notification.classList.remove('border-red-500', 'border-green-500', 'border-yellow-500', 'bg-yellow-100', 'border-blue-500', 'bg-blue-100');
                 
-                if (type === 'error') {
-                    notification.classList.add('border-red-500');
-                } else if (type === 'warning') {
-                    notification.classList.add('border-yellow-500', 'bg-yellow-100');
-                } else if (type === 'info') {
-                    notification.classList.add('border-blue-500', 'bg-blue-100');
-                } else {
-                    notification.classList.add('border-green-500');
+                // Apply appropriate styling based on message type
+                switch(type) {
+                    case 'error':
+                        notification.classList.add('border-red-500');
+                        break;
+                    case 'warning':
+                        notification.classList.add('border-yellow-500', 'bg-yellow-100');
+                        break;
+                    case 'info':
+                        notification.classList.add('border-blue-500', 'bg-blue-100');
+                        break;
+                    default: // success
+                        notification.classList.add('border-green-500');
                 }
                 
+                // Show notification
                 notification.classList.remove('hidden');
                 
+                // Hide after specified duration
                 setTimeout(function() {
                     notification.classList.add('hidden');
                 }, duration);
@@ -833,4 +611,3 @@
         });
     </script>
 </body>
-</html>

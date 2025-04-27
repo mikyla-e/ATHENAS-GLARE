@@ -128,59 +128,57 @@ def check_attendance_status(employee, start_date=None, end_date=None):
     }
 
 def get_filtered_attendance(employee, start_date, end_date):
-    """
-    Get filtered attendance records for an employee.
-    
-    Args:
-        employee: Employee model instance
-        start_date: Start date for filtering (YYYY-MM-DD)
-        end_date: End date for filtering (YYYY-MM-DD)
+    try:
+        # Convert string dates to datetime objects
+        start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
         
-    Returns:
-        Dictionary with filtered attendance logs
-    """
-    
-    today = date.today()
-    today_str = today.strftime('%Y-%m-%d')
-    
-    # Get today's logs (always shown regardless of filter if today is in range)
-    if start_date <= today_str <= end_date:
+        # Adjust end_date to include the full day
+        end_date_obj = datetime.combine(end_date_obj, datetime.max.time()).date()
+        
+        # Get today's date
+        today = datetime.now().date()
+        
+        # Get today's logs
         today_logs = Attendance.objects.filter(
-            employee_id_fk=employee,
-            date=today_str
+            employee=_id_fkemployee,
+            date=today
         ).order_by('time_in')
         
-        # Format today's logs
-        formatted_today_logs = []
+        # Get history logs within the date range
+        history_logs = Attendance.objects.filter(
+            employee_id_fk=employee,
+            date__gte=start_date_obj,
+            date__lte=end_date_obj,
+            date__lt=today  # Exclude today's logs from history
+        ).order_by('-date', 'time_in')
+        
+        # Format logs for JSON response
+        formatted_today = []
         for log in today_logs:
-            formatted_today_logs.append({
+            formatted_today.append({
+                'date': log.date.strftime('%Y-%m-%d'),
                 'time_in': log.time_in.strftime('%H:%M:%S') if log.time_in else None,
                 'time_out': log.time_out.strftime('%H:%M:%S') if log.time_out else None,
             })
-    else:
-        formatted_today_logs = []
-    
-    # Get historical logs within date range excluding today
-    history_logs = Attendance.objects.filter(
-        employee_id_fk=employee,
-        date__gte=start_date,
-        date__lte=end_date
-    ).exclude(date=today_str).order_by('-date', 'time_in')
-    
-    # Format historical logs
-    formatted_history_logs = []
-    for log in history_logs:
-        formatted_history_logs.append({
-            'date': log.date.strftime('%Y-%m-%d'),
-            'time_in': log.time_in.strftime('%H:%M:%S') if log.time_in else None,
-            'time_out': log.time_out.strftime('%H:%M:%S') if log.time_out else None,
-        })
-    
-    return {
-        'status': 'success',
-        'today_logs': formatted_today_logs,
-        'history_logs': formatted_history_logs
-    }
+        
+        formatted_history = []
+        for log in history_logs:
+            formatted_history.append({
+                'date': log.date.strftime('%Y-%m-%d'),
+                'time_in': log.time_in.strftime('%H:%M:%S') if log.time_in else None,
+                'time_out': log.time_out.strftime('%H:%M:%S') if log.time_out else None,
+            })
+        
+        return {
+            'status': 'success',
+            'today_logs': formatted_today,
+            'history_logs': formatted_history,
+            'has_open_session': any(log.time_in and not log.time_out for log in today_logs),
+        }
+        
+    except Exception as e:
+        return {'status': 'error', 'message': str(e)}
 
 def mark_attendance(employee, action=None):
     timezone_ph = pytz.timezone("Asia/Manila")
