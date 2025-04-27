@@ -146,6 +146,9 @@ def employee_registration(request):
 
     return render(request, 'payroll_system/employee_registration.html', context)
 
+def employee_picture(request):
+    return render(request, 'payroll_system/employee_picture.html')
+
 @login_required
 def employees(request):
     #new

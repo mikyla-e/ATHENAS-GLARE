@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!--title-->
+{% block title %}Registering Employee...{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<style>
+.webcam-container {
+    margin-bottom: 20px;
+}
+#video {
+    width: 320px;
+    height: 240px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+}
+#canvas {
+    display: none;
+}
+#capturedImage {
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    display: none;
+}
+    
+.employee_picture .webcam-container{
+    width: 100%;
+    margin: 8px;
+    display: flex;
+    gap: 10px;
+}
+
+.employee_picture .webcam-container #video{
+    border-radius: 20px;
+}
+
+.employee_picture .webcam-container #capturedImage{
+    margin: 0;
+    width: 50%;
+    height: 100%;
+
+    border-radius: 20px;
+}
+
+
+.field .button{
+    display: flex;
+    justify-content: space-between;
+    gap: 5%;
+    margin: 15px 8px;
+}
+
+.field .button #captureButton{
+    border: none;
+    border-radius: 100px;
+    width: 100%;
+    padding: 10px 20px;
+
+    font-family: 'Roboto';
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: start;
+    background-color: #1e1e1e;
+    color: #fff;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.field .button #captureButton p{
+    margin: 0;
+}
+
+.field .button #captureButton img{
+    width: 30px;
+    height: 30px;
+}
+</style>
+{% endblock %}
+
+<!--header-->
+{% block header %}EMPLOYEES{% endblock %} 
+
+<!--page content-->
+{% block outsidecontent %}
+
+{% endblock %}
+
+{% block content %}
+<div class="size-full">
+    <div class="my-4 mx-5 font-[League Spartan] text-3xl/10 font-bold">
+        <p id="title" class="text-[#1E1E1E]">Smile for the camera!</p>
+    </div>
+    
+    <div class="px-5">
+        <div class="flex flex-col my-1">
+            <div class="employee_picture">
+                <!-- Webcam capture elements -->
+                <div class="webcam-container" >
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas"></canvas>
+                    <img id="capturedImage" src="" alt="Captured Image"/>
+                </div>
+                
+                <!-- Hide the original file input but keep it in the form for file submission -->
+                <div style="display: none;">
+                    {{ form.employee_image }}
+                </div>
+                {% if form.employee_image.errors %}
+                    <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.employee_image.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="button">
+                <button type="button" id="captureButton">
+                    <p>TAKE A PICTURE</p>
+                    <img src="{% static 'images/camera.png' %}" alt="">
+                </button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!--(optional)script-->
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const capturedImage = document.getElementById('capturedImage');
+        const captureButton = document.getElementById('captureButton');
+        const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
+
+        // Initialize webcam
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+            })
+            .catch(function(error) {
+            console.error('Could not access webcam:', error);
+            alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
+            });
+        } else {
+        alert('Your browser does not support webcam access. Please try a different browser.');
+        }
+
+        // Capture button click handler
+        captureButton.addEventListener('click', function() {
+            // Set canvas dimensions to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw the video frame to the canvas
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert canvas to image
+            const dataURL = canvas.toDataURL('image/jpeg');
+            capturedImage.src = dataURL;
+            capturedImage.style.display = 'block';
+        
+            // Convert canvas content to a File object for form submission
+            canvas.toBlob(function(blob) {
+                // Create a File object from the Blob
+                const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
+                
+                // Create a FileList-like object
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(imageFile);
+                
+                // Set the file to the file input
+                fileInput.files = dataTransfer.files;
+                
+                console.log("Image captured and file created");
+            }, 'image/jpeg', 0.95); // High quality JPEG
+        });
+    });
+
+</script>
+{% endblock %}

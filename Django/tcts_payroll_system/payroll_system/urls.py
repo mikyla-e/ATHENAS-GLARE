@@ -8,6 +8,7 @@ app_name = 'payroll_system'
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('employees/employee_registration/', views.employee_registration, name='employee_registration'),
+    path('employees/employee_picture/', views.employee_picture, name='employee_picture'),
     path('employees/', views.employees, name='employees'),
     path('employees/employee_profile/<int:employee_id>/', views.employee_profile, name='employee_profile'),
     path('payrolls/', views.payrolls, name='payrolls'),

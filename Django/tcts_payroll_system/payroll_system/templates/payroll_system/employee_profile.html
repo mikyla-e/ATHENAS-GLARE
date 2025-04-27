@@ -40,19 +40,6 @@
         opacity: 1;
     }
 
-    .add_attendance h1{
-        margin: 0;
-        font-family: 'League Spartan';
-        font-size: 2rem;
-        font-weight: 500;
-
-        background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-
     tbody tr td{
         padding: 8px;
         text-align: center;
@@ -109,10 +96,10 @@
         
     </div> 
 
-    <div id="attendance-popup" class="add_attendance fixed w-[80%] sm:w-[60%] md:w-[50%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
-        <h1>Add Attendance to {{ employee.first_name }} {{ employee.last_name }}</h1>
+    <div id="attendance-popup" class="add_attendance fixed w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-[#EFEDE6] z-60 overflow-hidden">
+        <h1 class="text-3xl font-[League Spartan] font-semibold">Add Attendance:</h1>
         <form id="attendance-form" class="flex flex-col" method="post" onsubmit="event.preventDefault();">
-            <div class="w-full">
+            <div class="w-full my-5">
                 <table class="bg-white w-full border border-solid rounded-2xl text-xs-center overflow-hidden">
                     <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                         <tr class="text-base font-[League Spartan]">
