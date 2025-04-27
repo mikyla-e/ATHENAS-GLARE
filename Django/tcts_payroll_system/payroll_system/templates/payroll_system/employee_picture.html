@@ -6,78 +6,14 @@
 
 <!--(optional)head content-->
 {% block headcontent %}
+
+<link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 <style>
-.webcam-container {
-    margin-bottom: 20px;
-}
-#video {
-    width: 320px;
-    height: 240px;
-    background-color: #eee;
-    border: 1px solid #ccc;
-}
-#canvas {
-    display: none;
-}
-#capturedImage {
-    margin-top: 10px;
-    border: 1px solid #ddd;
-    display: none;
-}
-    
-.employee_picture .webcam-container{
-    width: 100%;
-    margin: 8px;
-    display: flex;
-    gap: 10px;
-}
-
-.employee_picture .webcam-container #video{
-    border-radius: 20px;
-}
-
-.employee_picture .webcam-container #capturedImage{
-    margin: 0;
-    width: 50%;
-    height: 100%;
-
-    border-radius: 20px;
-}
-
-
-.field .button{
-    display: flex;
-    justify-content: space-between;
-    gap: 5%;
-    margin: 15px 8px;
-}
-
-.field .button #captureButton{
-    border: none;
-    border-radius: 100px;
-    width: 100%;
-    padding: 10px 20px;
-
-    font-family: 'Roboto';
-    font-size: 1.3rem;
-    font-weight: 700;
-    text-align: start;
-    background-color: #1e1e1e;
-    color: #fff;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.field .button #captureButton p{
-    margin: 0;
-}
-
-.field .button #captureButton img{
-    width: 30px;
-    height: 30px;
-}
+    .background.show,
+    .add_attendance.show {
+        visibility: visible;
+        opacity: 1;
+    }
 </style>
 {% endblock %}
 
@@ -86,40 +22,69 @@
 
 <!--page content-->
 {% block outsidecontent %}
+<div id="background" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddAttendance()">
+        
+</div> 
 
+<div id="attendance-popup" class="add_attendance fixed w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-[#EFEDE6] z-60 overflow-hidden">
+    <h1 class="text-3xl font-[League Spartan] font-semibold">Add Attendance:</h1>
+    <form id="attendance-form" class="flex flex-col" method="post" onsubmit="event.preventDefault();">
+        <div class="w-full my-5">
+            <table class="bg-white w-full border border-solid rounded-2xl text-xs-center overflow-hidden">
+                <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                    <tr class="text-base font-[League Spartan]">
+                        <th class="py-2">DATE</th>
+                        <th>TIME IN</th>
+                        <th>TIME OUT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="date" name="" id=""></td><!--date should default to current day, but can change-->
+                        <td><input type="time" name="" id=""></td><!--time -->
+                        <td><input type="time" name="" id=""></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
+            <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddAttendance()">
+            <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+        </div>           
+    </form>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="size-full">
-    <div class="my-4 mx-5 font-[League Spartan] text-3xl/10 font-bold">
-        <p id="title" class="text-[#1E1E1E]">Smile for the camera!</p>
-    </div>
+<div class="size-full flex items-center">
+    <div class="w-[95%] h-full flex flex-col items-center">
+        <p class="my-4 mx-5 font-[League Spartan] text-3xl/10 font-bold text-[#1E1E1E]">Smile for the camera!</p>
+        
+        <div class="px-5 flex items-center">
+            <div class="flex flex-col my-1">
+                <div class="w-full flex gap-5">
+                    <!-- Webcam capture elements -->
+                    <div class="w-full mb-[20px] flex">
+                        <video id="video" autoplay playsinline class="w-full h-full bg-white rounded-xl"></video>
+                        <canvas id="canvas" style="display: none;"></canvas>
+                        <img id="capturedImage" src="" alt="Captured Image" class="w-[50%] h-full m-0" style="display: none;"/>
+                    </div>
+                    
+                    <!-- Hide the original file input but keep it in the form for file submission -->
+                    <div style="display: none;">
+                        {{ form.employee_image }}
+                    </div>
+                    {% if form.employee_image.errors %}
+                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.employee_image.errors.0 }}</div>
+                    {% endif %}
+                </div>
     
-    <div class="px-5">
-        <div class="flex flex-col my-1">
-            <div class="employee_picture">
-                <!-- Webcam capture elements -->
-                <div class="webcam-container" >
-                    <video id="video" autoplay playsinline></video>
-                    <canvas id="canvas"></canvas>
-                    <img id="capturedImage" src="" alt="Captured Image"/>
+                <div class="w-full h-[50px] flex justify-end">
+                    <button type="button" id="captureButton" class="w-fit px-4 rounded-full flex flex-row flex-nowrap gap-2 items-center bg-[#1E1E1E] text-white">
+                        <p class="m-0 font-[Roboto] text-xl pt-[1px] font-bold">TAKE A PICTURE</p>
+                        <img src="{% static 'images/camera.png' %}" alt="" class="w-[30px] h-[30px]">
+                    </button>
                 </div>
-                
-                <!-- Hide the original file input but keep it in the form for file submission -->
-                <div style="display: none;">
-                    {{ form.employee_image }}
-                </div>
-                {% if form.employee_image.errors %}
-                    <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.employee_image.errors.0 }}</div>
-                {% endif %}
-            </div>
-
-            <div class="button">
-                <button type="button" id="captureButton">
-                    <p>TAKE A PICTURE</p>
-                    <img src="{% static 'images/camera.png' %}" alt="">
-                </button>
-                
             </div>
         </div>
     </div>
@@ -183,6 +148,20 @@
             }, 'image/jpeg', 0.95); // High quality JPEG
         });
     });
+
+    function addAttendance(){
+        const bg = document.getElementById("background");
+        const popup = document.getElementById("attendance-popup");
+        bg.classList.add("show");
+        popup.classList.add("show");
+    }
+    
+    function cancelAddAttendance(){
+        const bg = document.getElementById("background");
+        const popup = document.getElementById("attendance-popup");
+        bg.classList.remove("show");
+        popup.classList.remove("show");
+    }
 
 </script>
 {% endblock %}
