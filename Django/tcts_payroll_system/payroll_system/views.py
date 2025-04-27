@@ -1007,28 +1007,53 @@ def print(request):
     return render(request, 'payroll_system/print.html', context)
 
 
-@csrf_exempt
+@csrf_exempt 
 def update_incentives(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         incentive_value = float(data.get('incentive', 0))
         action = data.get('action')
-
         employees = Payroll.objects.filter(payroll_status='PENDING')
-
+        
         for emp in employees:
+            try:
+                # Get attendance count for the employee
+                attendance = Attendance.objects.filter(employee_id_fk=emp.employee_id_fk).count()
+            except Exception as e:
+                print(f"Error fetching attendance for employee {emp.employee_id_fk}: {e}")
+                attendance = 0  # Default to 0 if attendance retrieval fails
+            
+            # Calculate the base payment (rate x attendance)
+            base_payment = emp.rate * attendance
+            
             if action == 'add':
-                emp.incentives += incentive_value
-                emp.salary += incentive_value  # Add to salary
+                # Update the incentives field by adding the new value
+                new_incentives = emp.incentives + incentive_value
+                
+                # For the salary, we only add the new incentive_value to the current salary
+                new_salary = emp.salary + incentive_value
+
+                Payroll.objects.filter(pk=emp.payroll_id).update(
+                    incentives=new_incentives,
+                    salary=new_salary
+                )
             elif action == 'subtract':
-                emp.salary -= incentive_value  # Only subtract from salary, NOT incentives
+                # Keep incentives value unchanged when subtracting
+                new_incentives = emp.incentives
+                
+                # For salary, simply subtract the incentive_value from the current salary
+                new_salary = emp.salary - incentive_value
 
-            emp.save()
-
+                Payroll.objects.filter(pk=emp.payroll_id).update(
+                    incentives=new_incentives,
+                    salary=new_salary
+                )
+                
+        # Get updated values for the response
         first_emp = Payroll.objects.filter(payroll_status='PENDING').first()
         new_incentive = first_emp.incentives if first_emp else 0.0
         new_salary = first_emp.salary if first_emp else 0.0
-
+        
         return JsonResponse({'success': True, 'new_incentive': str(new_incentive), 'new_salary': str(new_salary)})
-
+    
     return JsonResponse({'success': False})
