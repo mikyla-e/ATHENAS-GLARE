@@ -12,10 +12,7 @@
     strong, bdi, p #text{
         display: none;
     }
-    p, a{
-        
-    }
-
+    
     label{
         margin: 0 20px;
         font-family: 'Inter';
@@ -45,44 +42,85 @@
 {% block content %}
     <div>
         <form action="" method="post">
-        {% csrf_token %}
-        <div class="fields_1">
-            <div class="">
-                <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
-                {{ form.username }}
-            </div>
-            <div class="">
-                <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
-                {{ form.first_name }}
-            </div>
-            <div class="">
-                <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
-                {{ form.last_name }}
-            </div>
-            <div class="">
-                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-                {{ form.email }}
-            </div>
-            <div class="flex justify-between my-2">
-                <div disabled aria-describedby="id_password_helptext" id="id_password" class="">
-                    <p>
-                        <a class="button" href="../password/">Reset Password</a>
-                    </p>
+            {% csrf_token %}
+            <div class="fields_1">
+                <div class="">
+                    <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                            {% for error in form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
-
-                <div class="flex gap-2">
-                    <button id="button_2" onclick="history.back()" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center">
-                        Cancel
-                    </button>
-
-                    <button id="button_1" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center">
-                        Update Profile
-                    </button>
+        
+                <div class="">
+                    <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                            {% for error in form.first_name.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+        
+                <div class="">
+                    <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                            {% for error in form.last_name.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+        
+                <div class="">
+                    <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                            {% for error in form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+        
+                <!-- Non-field errors (example: "Username already exists") -->
+                {% if form.non_field_errors %}
+                    <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+        
+                <!-- Buttons -->
+                <div class="flex justify-between my-2 mx-4">
+                    <div disabled aria-describedby="id_password_helptext" id="id_password" class="">
+                        <p>
+                            <a class="button" href="../password/">Reset Password</a>
+                        </p>
+                    </div>
+        
+                    <div class="flex gap-2">
+                        <button id="button_2" onclick="history.back()" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center">
+                            Cancel
+                        </button>
+        
+                        <button id="button_1" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center">
+                            Update Profile
+                        </button>
+                    </div>
                 </div>
             </div>
-            
-        </div>
-    </form>
+        </form>
     </div>
     
     {% endblock %}

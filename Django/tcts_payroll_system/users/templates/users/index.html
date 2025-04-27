@@ -42,14 +42,36 @@
                 <form method="post">
                     {% csrf_token %}
                     
-                    <label for="admin-name">name</label><br>
+                    <label for="admin-name">username</label><br>
                     {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                            {% for error in form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                     
                     <br><br>
 
                     <label for="admin-password">password</label><br>
                     {{ form.password }}
-                    
+
+                    {% if form.password.errors %}
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                            {% for error in form.password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 
                     <div class="login_buttons">
                         <input type="submit" value="LOGIN">
