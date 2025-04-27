@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 <style>
     .background.show,
-    .add_attendance.show {
+    .picture.show {
         visibility: visible;
         opacity: 1;
     }
@@ -22,37 +22,22 @@
 
 <!--page content-->
 {% block outsidecontent %}
-<div id="background" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddAttendance()">
+<!-- <div id="background" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelPicture()">
         
 </div> 
 
-<div id="attendance-popup" class="add_attendance fixed w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-[#EFEDE6] z-60 overflow-hidden">
-    <h1 class="text-3xl font-[League Spartan] font-semibold">Add Attendance:</h1>
-    <form id="attendance-form" class="flex flex-col" method="post" onsubmit="event.preventDefault();">
+<div id="picture-popup" class="picture fixed w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-[#EFEDE6] z-60 overflow-hidden">
+    <h1 class="text-3xl font-[League Spartan] font-semibold">Save Picture to Employee Profile?</h1>
+    <form id="picture-form" class="flex flex-col" method="post" onsubmit="event.preventDefault();">
         <div class="w-full my-5">
-            <table class="bg-white w-full border border-solid rounded-2xl text-xs-center overflow-hidden">
-                <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                    <tr class="text-base font-[League Spartan]">
-                        <th class="py-2">DATE</th>
-                        <th>TIME IN</th>
-                        <th>TIME OUT</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="date" name="" id=""></td><!--date should default to current day, but can change-->
-                        <td><input type="time" name="" id=""></td><!--time -->
-                        <td><input type="time" name="" id=""></td>
-                    </tr>
-                </tbody>
-            </table>
+            
         </div>
         <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
-            <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddAttendance()">
+            <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelPicture()">
             <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
         </div>           
     </form>
-</div>
+</div> -->
 {% endblock %}
 
 {% block content %}
@@ -149,19 +134,19 @@
         });
     });
 
-    function addAttendance(){
-        const bg = document.getElementById("background");
-        const popup = document.getElementById("attendance-popup");
-        bg.classList.add("show");
-        popup.classList.add("show");
-    }
+    // function confirmPicture(){
+    //     const bg = document.getElementById("background");
+    //     const popup = document.getElementById("picture-popup");
+    //     bg.classList.add("show");
+    //     popup.classList.add("show");
+    // }
     
-    function cancelAddAttendance(){
-        const bg = document.getElementById("background");
-        const popup = document.getElementById("attendance-popup");
-        bg.classList.remove("show");
-        popup.classList.remove("show");
-    }
+    // function cancelPicture(){
+    //     const bg = document.getElementById("background");
+    //     const popup = document.getElementById("picture-popup");
+    //     bg.classList.remove("show");
+    //     popup.classList.remove("show");
+    // }
 
 </script>
 {% endblock %}
