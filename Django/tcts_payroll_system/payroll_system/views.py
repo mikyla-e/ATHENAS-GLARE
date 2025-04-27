@@ -670,7 +670,127 @@ def about(request):
 
 @login_required
 def print(request):
-    return render(request, 'payroll_system/print.html')
+    # Get all employees with prefetched payroll data for efficiency
+    employees = Employee.objects.prefetch_related('payrolls', 'attendances').all()
+    
+    # Handle search query
+    query = request.GET.get('q', '')
+    
+    if query:
+        employees = employees.filter(
+            first_name__icontains=query
+        ) | employees.filter(
+            last_name__icontains=query
+        ) | employees.filter(
+            employee_id__icontains=query
+        )
+    
+    # Total Employees
+    total_employees = employees.count()
+    
+    # Get current date and time periods
+    today = now().date()
+    start_of_week = today - timedelta(days=today.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
+    current_month_start = today.replace(day=1)
+    previous_month_end = current_month_start - timedelta(days=1)
+    previous_month_start = previous_month_end.replace(day=1)
+
+    # Calculate active employees per day
+    active_employees_per_day = (
+        Attendance.objects.filter(date__range=[start_of_week, end_of_week])
+        .values('date')
+        .annotate(active_count=Count('employee_id_fk', distinct=True))
+    )
+
+    # Calculate average active employees
+    total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
+    days_counted = len(active_employees_per_day) or 1
+    avg_active_employees = total_active_counts / days_counted
+
+    # Prepare employee data with latest payroll information
+    employee_data = []
+    processed_count = 0
+    pending_count = 0
+    
+    for employee in employees:
+        latest_payroll = employee.payrolls.order_by('-payment_date').first()
+        
+        # Calculate salary based on attendance count if payroll exists
+        if latest_payroll:
+            attendance_count = employee.attendances.count()
+            latest_payroll.salary = latest_payroll.rate * attendance_count
+            
+            # Count processed and pending payrolls
+            if latest_payroll.payroll_status == 'PROCESSED':
+                processed_count += 1
+            elif latest_payroll.payroll_status == 'PENDING':
+                pending_count += 1
+        
+        employee_data.append({
+            'employee': employee,
+            'latest_payroll': latest_payroll
+        })
+
+    # Calculate financial metrics
+    total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum'] or 0
+    next_payday = Payroll.objects.filter(payment_date__gt=today).aggregate(Min('payment_date'))['payment_date__min']
+    avg_rate = Payroll.objects.filter(rate__gt=0).aggregate(Avg('rate'))['rate__avg'] or 0
+    
+    # Calculate current and previous month metrics
+    current_total_payroll = Payroll.objects.filter(
+        payroll_status='PROCESSED',
+        payment_date__gte=current_month_start,
+        payment_date__lte=today
+    ).aggregate(Sum('salary'))['salary__sum'] or 0
+
+    previous_total_payroll = Payroll.objects.filter(
+        payroll_status='PROCESSED',
+        payment_date__gte=previous_month_start,
+        payment_date__lte=previous_month_end
+    ).aggregate(Sum('salary'))['salary__sum'] or 0
+
+    # Calculate percentage changes
+    payroll_percentage = 0
+    if previous_total_payroll > 0:
+        payroll_percentage = ((current_total_payroll - previous_total_payroll) / previous_total_payroll) * 100
+
+    current_avg_rate = Payroll.objects.filter(
+        rate__gt=0,
+        payment_date__gte=current_month_start,
+        payment_date__lte=today
+    ).aggregate(Avg('rate'))['rate__avg'] or 0
+
+    previous_avg_rate = Payroll.objects.filter(
+        rate__gt=0,
+        payment_date__gte=previous_month_start,
+        payment_date__lte=previous_month_end
+    ).aggregate(Avg('rate'))['rate__avg'] or 0
+
+    rate_percentage = 0
+    if previous_avg_rate > 0:
+        rate_percentage = ((current_avg_rate - previous_avg_rate) / previous_avg_rate) * 100
+
+    # Context for template
+    context = {
+        'employees': employees,  # All employees for iteration
+        'employee_data': employee_data,  # Employee data with latest payroll info
+        'total_employees': total_employees,
+        'avg_active_employees': round(avg_active_employees),
+        'processed_payroll_count': processed_count,
+        'pending_payroll_count': pending_count,
+        'total_payroll': total_payroll,
+        'previous_total_payroll': previous_total_payroll,
+        'payroll_percentage': payroll_percentage,
+        'next_payday': next_payday,
+        'previous_avg_rate': previous_avg_rate,
+        'rate_percentage': rate_percentage,
+        'avg_rate': current_avg_rate,
+        'query': query,
+    }
+
+    return render(request, 'payroll_system/print.html', context)
+
 
 @csrf_exempt
 def update_incentives(request):

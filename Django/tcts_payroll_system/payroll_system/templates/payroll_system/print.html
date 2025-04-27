@@ -6,9 +6,49 @@
 
 <!--(optional)head content-->
 {% block headcontent %}
-<!-- <link rel="stylesheet" href="{% static 'css/settings.css' %}"> -->
 <link rel="stylesheet" href="{% static 'css/table.css' %}">
 <link rel="stylesheet" href="{% static 'css/default_design.css' %}">
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.7.1.js" 
+integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" 
+crossorigin="anonymous"></script>
+
+<!-- Optional: DataTables for more advanced features -->
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.2/js/buttons.print.min.js"></script>
+
+<!-- jszip and pdfmake for PDF/CSV export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" 
+integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" 
+crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/pdfmake.min.js" 
+integrity="sha512-axXaF5grZBaYl7qiM6OMHgsgVXdSLxqq0w7F4CQxuFyrcPmn0JfnqsOtYHUun80g6mRRdvJDrTCyL8LQqBOt/Q==" 
+crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/vfs_fonts.js"></script>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #print-section, #print-section * {
+            visibility: visible;
+        }
+        #print-section {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        button, .no-print {
+            display: none !important;
+        }
+    }
+</style>
 {% endblock %}
 
 <!--header-->
@@ -16,71 +56,120 @@
 
 <!--page content-->
 {% block content %}
-<div class="border border"><button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">PRINT</button></div>
-
-<div class="md:hidden flex flex-col justify-center">
-    <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="payroll-table-1">
-        <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-            <tr class="text-base font-[League Spartan]">
-                <th class="py-2">EMPLOYEE</th>
-                <th>STATUS</th>
-                <th id="payment-amount">PAYMENT AMOUNT</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in employee_data %}
-            {% with employee=data.employee latest_payroll=data.latest_payroll %}
-                {% if latest_payroll %}
-                <tr id="payroll-data">
-                    <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                    <td>{{ latest_payroll.payroll_status }}</td>
-                    <td id="payment-amount">₱{{ latest_payroll.salary }}</td>
-                    <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
-                </tr>
-                {% else %}
-                <tr id="payroll-data">
-                    <td colspan="3">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                    <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
-                </tr>
-                {% endif %}
-            {% endwith %}
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="flex justify-end gap-3 sm:text-sm">
+    <button id="print-button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center cursor-pointer
+    bg-black text-[#F8D146] rounded-2xl p-3 hover:bg-[#F8D146] hover:text-black duration-200 hover:scale-105">SEND TO PRINT</button>
+    <!-- <button id="pdf-button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center cursor-pointer">SAVE AS PDF</button>
+    <button id="csv-button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">SAVE AS CSV</button> -->
 </div>
 
-<div class="hidden md:block flex flex-col justify-center">
-    <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="payroll-table-2">
-        <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-            <tr class="text-base text-center font-[League Spartan]">
-                <th class="py-2">EMPLOYEE</th>
-                <th>STATUS</th>
-                <th>RATE PER DAY</th>
-                <th id="payment-amount">PAYMENT AMOUNT</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
+<div id="print-section">
+    <!-- Mobile Table View -->
+    <div class="md:hidden flex flex-col justify-center">
+        <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="payroll-table-1">
+            <h1 class="text-center font-bold text-2xl"><u>Toto Car Tinting Shop Employee Payroll</u></h1>
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr class="text-base text-center font-[League Spartan]">
+                    <th class="py-2">EMPLOYEE</th>
+                    <th>STATUS</th>
+                    <th id="payment-amount">PAYMENT AMOUNT</th>
+                    <th>Total Incentives</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
             {% for data in employee_data %}
-            {% with employee=data.employee latest_payroll=data.latest_payroll %}
-                {% if latest_payroll %}
-                <tr id="payroll-data">
-                    <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                    <td>{{ latest_payroll.payroll_status }}</td>
-                    <td>{{ latest_payroll.rate }}</td>
-                    <td id="payment-amount">₱{{ latest_payroll.salary }}</td>
-                    <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
-                </tr>
+                {% if data.latest_payroll %}
+                    <tr id="payroll-data">
+                        <td>{{ data.employee.first_name }} {{ data.employee.last_name }}</td>
+                        <td>{{ data.latest_payroll.payroll_status }}</td>
+                        <td id="payment-amount">₱{{ data.latest_payroll.salary }}</td>
+                        <td>₱{{ data.latest_payroll.salary }}</td>
+                    </tr>
                 {% else %}
-                <tr id="payroll-data">
-                    <td colspan="5">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                    <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
-                </tr>
+                    <tr id="payroll-data">
+                        <td>{{ data.employee.first_name }} {{ data.employee.last_name }}</td>
+                        <td colspan="2">No payroll records found</td>
+                        <td>₱{{ data.latest_payroll.salary }}</td>
+                    </tr>
                 {% endif %}
-            {% endwith %}
-        {% endfor %}
-        </tbody>
-    </table>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Desktop Table View -->
+    <div class="hidden md:block flex flex-col justify-center">
+        <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="payroll-table-2">
+            <h1 class="text-center font-bold text-2xl"><u>Toto Car Tinting Shop Employee Payroll</u></h1>
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr class="text-base text-center font-[League Spartan]">
+                    <th class="py-2">EMPLOYEE</th>
+                    <th>STATUS</th>
+                    <th>RATE PER DAY</th>
+                    <th id="payment-amount">PAYMENT AMOUNT</th>
+                    <th>Total Incentives</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in employee_data %}
+                    {% if data.latest_payroll %}
+                    <tr class="text-center" id="payroll-data">
+                        <td>{{ data.employee.first_name }} {{ data.employee.last_name }}</td>
+                        <td>{{ data.latest_payroll.payroll_status }}</td>
+                        <td>₱{{ data.latest_payroll.rate }}</td>
+                        <td id="payment-amount">₱{{ data.latest_payroll.salary }}</td>
+                        <td>₱{{ data.latest_payroll.incentives }}</td>
+                    </tr>
+                    {% else %}
+                    <tr id="payroll-data">
+                        <td>{{ data.employee.first_name }} {{ data.employee.last_name }}</td>
+                        <td colspan="3">No payroll records found</td>
+                        <td>₱{{ data.latest_payroll.incentives }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+        // Simple print functionality
+        $('#print-button').on('click', function() {
+            window.print();
+        });
+        
+        // DataTables initialization for advanced features
+        var mobileTable = $('#payroll-table-1').DataTable({
+            "paging": false,
+            "searching": false,
+            "info": false,
+            dom: 'Bfrtip',
+            buttons: []
+        });
+        
+        var desktopTable = $('#payroll-table-2').DataTable({
+            "paging": false,
+            "searching": false,
+            "info": false,
+            dom: 'Bfrtip',
+            buttons: []
+        });
+        
+        // Attach DataTables buttons but keep them hidden
+        mobileTable.buttons().container().appendTo('#payroll-table-1_wrapper');
+        desktopTable.buttons().container().appendTo('#payroll-table-2_wrapper');
+        
+        // Add DataTables buttons without displaying them in UI
+        mobileTable.buttons.add(null, {
+            extend: 'pdfHtml5',
+            text: 'PDF',
+            className: 'buttons-pdf hidden'
+        });
+        
+    });
+</script>
 {% endblock %}
