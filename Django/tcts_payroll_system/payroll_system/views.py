@@ -1,4 +1,4 @@
-from django.contrib.auth import  logout
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -531,15 +531,65 @@ def services_client(request):
     customer_form = CustomerForm()
     vehicle_form = VehicleForm()
 
+    # Get all necessary data for the template
     regions = list(Region.objects.all().values('regDesc', 'regCode'))
+    customers = Customer.objects.all()
     
     context = {
         'customer_form': customer_form,
         'vehicle_form': vehicle_form,
         'regions': regions,
+        'customers': customers,
     }
     
     return render(request, 'payroll_system/services_client.html', context)
+
+# API endpoint to get customer details and vehicles
+@login_required
+def get_customer_details(request, customer_id):
+    try:
+        customer = Customer.objects.get(pk=customer_id)
+        vehicles = Vehicle.objects.filter(customer=customer)
+
+        # Prepare response data - simplify this to match the expected format
+        customer_data = {
+            'first_name': customer.first_name,
+            'middle_name': customer.middle_name,
+            'last_name': customer.last_name,
+            'contact_number': customer.contact_number,
+            'region': customer.region.regDesc if customer.region else '',
+            'province': customer.province.provDesc if customer.province else '',
+            'city': customer.city.citymunDesc if customer.city else '',
+            'barangay': customer.barangay.brgyDesc if customer.barangay else '',
+        }
+
+        vehicles_data = [
+            {
+                'id': vehicle.vehicle_id,
+                'vehicle_name': vehicle.vehicle_name,
+                'vehicle_color': vehicle.vehicle_color,
+                'plate_number': vehicle.plate_number,
+            }
+            for vehicle in vehicles
+        ]
+
+        return JsonResponse({
+            'success': True,
+            'customer': customer_data,
+            'vehicles': vehicles_data
+        })
+
+    except Customer.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Customer not found'
+        })
+
+    except Customer.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Customer not found'
+        })
 
 @login_required
 def services_assign(request):
@@ -554,22 +604,64 @@ def services_assign(request):
             vehicle_id = request.session.get('vehicle_id')
             
             if service_id and customer_id and vehicle_id and employee_id:
-                # Create the task
+                # Get the objects
                 service = Service.objects.get(pk=service_id)
                 customer = Customer.objects.get(pk=customer_id)
                 vehicle = Vehicle.objects.get(pk=vehicle_id)
+                employee = Employee.objects.get(pk=employee_id)
                 
+                # Check for duplicate task (same service for same vehicle that's still in progress)
+                existing_task = Task.objects.filter(
+                    service=service,
+                    vehicle=vehicle,
+                    task_status=Task.TaskStatus.IN_PROGRESS
+                ).exists()
+                
+                if existing_task:
+                    # Duplicate task found - send error message
+                    messages.error(request, f"This vehicle already has an active '{service.title}' service in progress.")
+                    # Return to the assignment page with the error
+                    return render(request, 'payroll_system/services_assign.html', {
+                        'employees': Employee.objects.all(),
+                        'customer': customer,
+                        'vehicle': vehicle,
+                        'duplicate_error': True
+                    })
+                
+                # No duplicate - create the task
                 task = Task(
                     task_name=f"{service.title} for {customer.first_name} {customer.last_name}",
                     service=service,
                     customer=customer,
                     vehicle=vehicle,
-                    employee=Employee.objects.get(pk=employee_id)
+                    employee=employee
                 )
                 task.save()
                 
+                # Check if there are additional vehicles to process
+                additional_vehicle_ids = request.session.get('additional_vehicle_ids', [])
+                for add_vehicle_id in additional_vehicle_ids:
+                    add_vehicle = Vehicle.objects.get(pk=add_vehicle_id)
+                    
+                    # Check for duplicate task on additional vehicle
+                    existing_additional_task = Task.objects.filter(
+                        service=service,
+                        vehicle=add_vehicle,
+                        task_status=Task.TaskStatus.IN_PROGRESS
+                    ).exists()
+                    
+                    if not existing_additional_task:  # Only create if no duplicate
+                        add_task = Task(
+                            task_name=f"{service.title} for {customer.first_name} {customer.last_name} - Additional Vehicle",
+                            service=service,
+                            customer=customer,
+                            vehicle=add_vehicle,
+                            employee=employee
+                        )
+                        add_task.save()
+                
                 # Clear session data
-                for key in ['selected_service_id', 'customer_id', 'vehicle_id']:
+                for key in ['selected_service_id', 'customer_id', 'vehicle_id', 'additional_vehicle_ids']:
                     if key in request.session:
                         del request.session[key]
                 
@@ -577,30 +669,105 @@ def services_assign(request):
                 
         else:
             # This is the customer and vehicle form submission from services_client
-            customer_form = CustomerForm(request.POST)
-            vehicle_form = VehicleForm(request.POST)
+            customer_id = request.POST.get('customer_id')
             
-            if customer_form.is_valid() and vehicle_form.is_valid():
-                # Save customer first
-                customer = customer_form.save()
+            if customer_id:
+                # Existing customer flow
+                customer = Customer.objects.get(pk=customer_id)
                 
-                # Then save vehicle with customer reference
-                vehicle = vehicle_form.save(commit=False)
-                vehicle.customer = customer
-                vehicle.save()
-                
-                # Store data in session for next step
-                request.session['customer_id'] = customer.customer_id
-                request.session['vehicle_id'] = vehicle.vehicle_id
-                
-                # Get employees to display for assignment
-                employees = Employee.objects.all()
-                
-                # Add the customer and vehicle data to pass to the template
-                return render(request, 'payroll_system/services_assign.html', {'employees': employees, 'customer': customer, 'vehicle': vehicle})
+                # Process primary vehicle form
+                vehicle_form = VehicleForm(request.POST)
+                if vehicle_form.is_valid():
+                    # Check if we're using an existing vehicle
+                    existing_vehicle_id = request.POST.get('existing_vehicle_id')
+                    
+                    if existing_vehicle_id:
+                        # Using an existing vehicle
+                        vehicle = Vehicle.objects.get(pk=existing_vehicle_id)
+                    else:
+                        # Creating a new vehicle for existing customer
+                        vehicle = vehicle_form.save(commit=False)
+                        vehicle.customer = customer
+                        vehicle.save()
+                    
+                    # Store primary vehicle in session
+                    request.session['customer_id'] = customer.customer_id
+                    request.session['vehicle_id'] = vehicle.vehicle_id
+                    
+                    # Process any additional vehicles
+                    additional_vehicle_ids = []
+                    i = 1
+                    while f'additional_vehicle_name_{i}' in request.POST:
+                        vehicle_name = request.POST.get(f'additional_vehicle_name_{i}')
+                        vehicle_color = request.POST.get(f'additional_vehicle_color_{i}')
+                        plate_number = request.POST.get(f'additional_plate_number_{i}')
+                        
+                        # Create and save the additional vehicle
+                        new_vehicle = Vehicle(
+                            customer=customer,
+                            vehicle_name=vehicle_name,
+                            vehicle_color=vehicle_color,
+                            plate_number=plate_number
+                        )
+                        new_vehicle.save()
+                        additional_vehicle_ids.append(new_vehicle.vehicle_id)
+                        i += 1
+                    
+                    # Store additional vehicle IDs in session
+                    if additional_vehicle_ids:
+                        request.session['additional_vehicle_ids'] = additional_vehicle_ids
+                    
+                    # Get employees to display for assignment
+                    employees = Employee.objects.all()
+                    
+                    # Render the assign page with the primary vehicle
+                    return render(request, 'payroll_system/services_assign.html', {
+                        'employees': employees, 
+                        'customer': customer, 
+                        'vehicle': vehicle
+                    })
+                else:
+                    # If form validation fails, go back with errors
+                    customer_form = CustomerForm(instance=customer)
+                    return render(request, 'payroll_system/services_client.html', {
+                        'customer_form': customer_form, 
+                        'vehicle_form': vehicle_form,
+                        'customers': Customer.objects.all()
+                    })
             else:
-                # If form validation fails, go back to the customer form with errors
-                return render(request, 'payroll_system/services_client.html', {'customer_form': customer_form, 'vehicle_form': vehicle_form})
+                # New customer flow
+                customer_form = CustomerForm(request.POST)
+                vehicle_form = VehicleForm(request.POST)
+                
+                if customer_form.is_valid() and vehicle_form.is_valid():
+                    # Save customer first
+                    customer = customer_form.save()
+                    
+                    # Then save vehicle with customer reference
+                    vehicle = vehicle_form.save(commit=False)
+                    vehicle.customer = customer
+                    vehicle.save()
+                    
+                    # Store data in session for next step
+                    request.session['customer_id'] = customer.customer_id
+                    request.session['vehicle_id'] = vehicle.vehicle_id
+                    
+                    # Get employees to display for assignment
+                    employees = Employee.objects.all()
+                    
+                    # Add the customer and vehicle data to pass to the template
+                    return render(request, 'payroll_system/services_assign.html', {
+                        'employees': employees, 
+                        'customer': customer, 
+                        'vehicle': vehicle
+                    })
+                else:
+                    # If form validation fails, go back to the customer form with errors
+                    return render(request, 'payroll_system/services_client.html', {
+                        'customer_form': customer_form, 
+                        'vehicle_form': vehicle_form,
+                        'customers': Customer.objects.all()
+                    })
     
     # If this is a GET request, check if we have customer and vehicle in session
     employees = Employee.objects.all()

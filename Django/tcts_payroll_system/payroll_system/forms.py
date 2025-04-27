@@ -403,7 +403,7 @@ class CustomerForm(forms.ModelForm):
     
     class Meta:
         model = Customer
-        fields = ('first_name', 'middle_name', 'contact_number')
+        fields = ('first_name', 'middle_name', 'last_name', 'contact_number')
         
     #Helper function to validate 11-digit numbers.
     def validate_contact_number(self, contact_number):
@@ -578,9 +578,9 @@ class VehicleForm(forms.ModelForm):
                 raise forms.ValidationError("Plate number contains invalid characters.")
 
             # Check for duplicate plate number (case insensitive and excluding current instance)
-            existing_vehicle = Vehicle.objects.exclude(pk=self.instance.pk).filter(plate_number__iexact=plate_number)
-            if existing_vehicle.exists():
-                raise forms.ValidationError("This plate number is already registered.")
+            # existing_vehicle = Vehicle.objects.exclude(pk=self.instance.pk).filter(plate_number__iexact=plate_number)
+            # if existing_vehicle.exists():
+            #     raise forms.ValidationError("This plate number is already registered.")
 
         return plate_number
     

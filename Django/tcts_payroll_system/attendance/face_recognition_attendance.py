@@ -177,9 +177,6 @@ def get_filtered_attendance(employee, start_date, end_date):
         'has_open_session': any(log.time_in and not log.time_out for log in today_logs),
     }
         
-    
-    
-
 def mark_attendance(employee, action=None):
     timezone_ph = pytz.timezone("Asia/Manila")
     time_now = datetime.now(timezone_ph)

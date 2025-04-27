@@ -384,7 +384,6 @@ class Customer(models.Model):
     first_name = models.CharField(max_length=100, null=False)
     middle_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=False)
-    gender = models.CharField(max_length=6, choices=Gender.choices, null=False)
     contact_number = models.CharField(max_length=15, null=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, to_field='id')
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, to_field='id')
@@ -446,9 +445,9 @@ class Vehicle(models.Model):
         if self.plate_number:
             if self.plate_number.strip() == '':
                 raise ValidationError({'plate_number': _('Plate number cannot be empty.')})
-            # Check if plate number is unique
-            if Vehicle.objects.exclude(pk=self.pk).filter(plate_number=self.plate_number).exists():
-                raise ValidationError({'plate_number': _('This plate number is already registered.')})
+            # # Check if plate number is unique
+            # if Vehicle.objects.exclude(pk=self.pk).filter(plate_number=self.plate_number).exists():
+            #     raise ValidationError({'plate_number': _('This plate number is already registered.')})
     
     def save(self, *args, **kwargs):
         self.full_clean()

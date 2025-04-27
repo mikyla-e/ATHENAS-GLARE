@@ -18,20 +18,20 @@
 <div class="flex flex-col">
     <div class="w-full px-5 flex flex-col gap-2">
         <p>Not a new customer?</p>
-
+        <!-- Start of the search bar -->
         <div class="w-full h-[40px] flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden">
-            <form class="w-full flex justify-center items-center gap-3" method="get" action="{% url 'payroll_system:services_assign' %}">
-                <!-- Remove CSRF token from GET form -->
+            <div class="w-full flex justify-center items-center gap-3">
                 <img class="h-[25px] w-[25px] ml-[15px] flex justify-center items-center" src="{% static 'images/search_icon.png' %}" alt="Search">
-                <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" list="customers" name="customer" id="customer" placeholder="Search Customer...">
+                <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" list="customers" name="customer" id="customer-search" placeholder="Search Customer...">
                 
                 <datalist id="customers">
                     {% for customer in customers %}
-                    <option value="{{ customer.first_name }} {{ customer.last_name }}">
+                    <option value="{{ customer.first_name }} {{ customer.last_name }}" data-id="{{ customer.customer_id }}">
                     {% endfor %}
                 </datalist>
-            </form>
+            </div>
         </div>
+        <!-- End of the search bar -->
     </div>
 
     <span class="w-[100%] h-[3px] my-5 bg-[#45320d4d] rounded-xl"></span>
@@ -39,6 +39,8 @@
     <div class="size-full my-2 flex items-start">
         <form class="size-full flex flex-col justify-between" action="{% url 'payroll_system:services_assign' %}" method="post" onsubmit="return confirmation()">
             {% csrf_token %}
+            <input type="hidden" id="customer_id" name="customer_id" value="">
+            <input type="hidden" id="existing_vehicle_id" name="existing_vehicle_id" value="">
             <div id="client-form" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div id="left" class=" mx-5">
                     <div class="flex flex-col h-[70px]">
@@ -124,16 +126,17 @@
 
             <span class="w-[100%] h-[2px] my-5 bg-[#45320d4d] rounded-xl"></span>
 
-                <!--<form class="w-full flex justify-center items-center gap-3" method=""> -->
-                    <!--to be connected to database; selecting an option should auto fill proceeding fields(for old customers only!)-->
-                    <!-- <select class="w-full h-[50px] pl-4 border-none outline-none focus:outline-none focus:border-none focus:ring-0 text-base font-semibold font-[League_Spartan] bg-white rounded-md" name="vehicle" id="vehicle">
-                        <option value="Vehicle 1">Vehicle 1</option>
-                        <option value="Vehicle 2">Vehicle 2</option>
-                        <option value="Vehicle 3">Vehicle 3</option>
-                        <option value="Vehicle 4">Vehicle 4</option>
-                    </select> -->
-                
-                <!-- </form> -->
+            <!-- Vehicle section header with dropdown for existing vehicles -->
+            <div class="w-full px-5 flex flex-col gap-2 customer-vehicles-section" style="display: none;">
+                <p>Select existing vehicle or add a new one:</p>
+                <div class="flex items-center gap-3">
+                    <select id="existing-vehicles" class="w-full h-[50px] pl-4 border-none outline-none focus:outline-none focus:border-none focus:ring-0 text-base font-semibold font-[League_Spartan] bg-white rounded-md">
+                        <option value="">Add new vehicle</option>
+                        <!-- Existing vehicles will be populated here via JavaScript -->
+                    </select>
+                </div>
+            </div>
+
             <div id="vehicle-form" class="flex">
                 <div class="w-full ">
                     <div id="left" class="mx-5">
@@ -170,7 +173,6 @@
                 <a class="h-full mx-5" href="javascript:history.back()">
                     <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
                 </a>
-                <!-- Remove the anchor tag here - it's preventing the form submission -->
                 <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="submit" value="CONFIRM CUSTOMER">
             </div>
         </form>
@@ -180,11 +182,12 @@
 {% block script %}
 <script src="{% static 'javascript/phLocations.js' %}"></script>
 <script>
-    function confirmation(){
+    function confirmation() {
        return confirm("Are you sure about the details of this customer?");
     }
     
     document.addEventListener("DOMContentLoaded", function() {
+        // Assuming your initializeAddressFields function works correctly
         initializeAddressFields({
             regionInputId: "region-dropdown",
             provinceInputId: "province-dropdown",
@@ -196,6 +199,216 @@
             barangayListId: "barangay-list",
             baseUrl: "/payroll_system/ajax"
         });
+
+        // Customer search functionality
+        const customerSearchInput = document.getElementById('customer-search');
+        const customerIdInput = document.getElementById('customer_id');
+        const existingVehiclesSection = document.querySelector('.customer-vehicles-section');
+        const existingVehiclesSelect = document.getElementById('existing-vehicles');
+        const existingVehicleIdInput = document.getElementById('existing_vehicle_id');
+
+        // Listen for changes in the customer search input
+        customerSearchInput.addEventListener('input', function() {
+            // Get the selected option from the datalist
+            const selectedCustomer = this.value;
+            
+            if (selectedCustomer) {
+                const options = document.querySelectorAll('#customers option');
+                let customerId = null;
+                
+                // Find the matching option
+                for (const option of options) {
+                    if (option.value === selectedCustomer) {
+                        customerId = option.getAttribute('data-id');
+                        break;
+                    }
+                }
+                
+                if (customerId) {
+                    // Fill the hidden customer ID field
+                    customerIdInput.value = customerId;
+                    
+                    // Fetch customer details and vehicles
+                    fetchCustomerDetails(customerId);
+                } else {
+                    // Clear form if no match found
+                    clearForm();
+                }
+            } else {
+                // Clear form if input is empty
+                clearForm();
+            }
+        });
+
+        // Function to fetch customer details and their vehicles
+        function fetchCustomerDetails(customerId) {
+            fetch(`/payroll_system/ajax/customer/${customerId}/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        console.log("Retrieved customer data:", data); // Debug log
+                        
+                        // Fill the form with customer data
+                        document.getElementById('id_first_name').value = data.customer.first_name || '';
+                        document.getElementById('id_middle_name').value = data.customer.middle_name || '';
+                        document.getElementById('id_last_name').value = data.customer.last_name || '';
+                        document.getElementById('id_contact_number').value = data.customer.contact_number || '';
+                        
+                        // Fill address fields - use the correct field IDs
+                        if (document.getElementById('region-dropdown')) {
+                            document.getElementById('region-dropdown').value = data.customer.region || '';
+                            document.getElementById('province-dropdown').value = data.customer.province || '';
+                            document.getElementById('city-dropdown').value = data.customer.city || '';
+                            document.getElementById('barangay-dropdown').value = data.customer.barangay || '';
+                        } else if (document.getElementById('id_region')) {
+                            // Alternative field IDs
+                            document.getElementById('id_region').value = data.customer.region || '';
+                            document.getElementById('id_province').value = data.customer.province || '';
+                            document.getElementById('id_city').value = data.customer.city || '';
+                            document.getElementById('id_barangay').value = data.customer.barangay || '';
+                        }
+                        
+                        // Make form fields read-only for existing customer
+                        const formFields = [
+                            'id_first_name', 'id_middle_name', 'id_last_name', 
+                            'id_contact_number'
+                        ];
+                        
+                        // Add address fields to the array based on which ones exist
+                        if (document.getElementById('region-dropdown')) {
+                            formFields.push('region-dropdown', 'province-dropdown', 'city-dropdown', 'barangay-dropdown');
+                        } else if (document.getElementById('id_region')) {
+                            formFields.push('id_region', 'id_province', 'id_city', 'id_barangay');
+                        }
+                        
+                        formFields.forEach(id => {
+                            if (document.getElementById(id)) {
+                                document.getElementById(id).readOnly = true;
+                            }
+                        });
+                        
+                        // Show and populate existing vehicles dropdown
+                        existingVehiclesSection.style.display = 'block';
+                        existingVehiclesSelect.innerHTML = '<option value="">Add new vehicle</option>';
+                        
+                        // Add existing vehicles to dropdown
+                        if (data.vehicles && data.vehicles.length > 0) {
+                            data.vehicles.forEach(vehicle => {
+                                const option = document.createElement('option');
+                                option.value = vehicle.id;
+                                option.textContent = `${vehicle.vehicle_name} (${vehicle.plate_number})`;
+                                option.dataset.name = vehicle.vehicle_name;
+                                option.dataset.color = vehicle.vehicle_color;
+                                option.dataset.plate = vehicle.plate_number;
+                                existingVehiclesSelect.appendChild(option);
+                            });
+                        }
+                    } else {
+                        console.error('Error in customer data:', data.message);
+                        clearForm();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching customer details:', error);
+                    clearForm();
+                });
+        }
+
+        // Listen for changes in the existing vehicles dropdown
+        existingVehiclesSelect.addEventListener('change', function() {
+            const selectedVehicleId = this.value;
+            
+            if (selectedVehicleId) {
+                // Get vehicle details from the selected option
+                const selectedOption = this.options[this.selectedIndex];
+                
+                // Fill the vehicle form
+                document.getElementById('id_vehicle_name').value = selectedOption.dataset.name;
+                document.getElementById('id_vehicle_color').value = selectedOption.dataset.color;
+                document.getElementById('id_plate_number').value = selectedOption.dataset.plate;
+                
+                // Set the existing vehicle ID
+                existingVehicleIdInput.value = selectedVehicleId;
+                
+                // Make vehicle fields read-only for existing vehicle
+                document.getElementById('id_vehicle_name').readOnly = true;
+                document.getElementById('id_vehicle_color').readOnly = true;
+                document.getElementById('id_plate_number').readOnly = true;
+            } else {
+                // Clear vehicle form for new vehicle
+                document.getElementById('id_vehicle_name').value = '';
+                document.getElementById('id_vehicle_color').value = '';
+                document.getElementById('id_plate_number').value = '';
+                existingVehicleIdInput.value = '';
+                
+                // Make vehicle fields editable for new vehicle
+                document.getElementById('id_vehicle_name').readOnly = false;
+                document.getElementById('id_vehicle_color').readOnly = false;
+                document.getElementById('id_plate_number').readOnly = false;
+            }
+        });
+
+        // Function to clear the form
+        function clearForm() {
+            customerIdInput.value = '';
+            existingVehicleIdInput.value = '';
+            
+            // Clear customer fields
+            document.getElementById('id_first_name').value = '';
+            document.getElementById('id_middle_name').value = '';
+            document.getElementById('id_last_name').value = '';
+            document.getElementById('id_contact_number').value = '';
+            
+            // Clear address fields based on which ones exist
+            if (document.getElementById('region-dropdown')) {
+                document.getElementById('region-dropdown').value = '';
+                document.getElementById('province-dropdown').value = '';
+                document.getElementById('city-dropdown').value = '';
+                document.getElementById('barangay-dropdown').value = '';
+            } else if (document.getElementById('id_region')) {
+                document.getElementById('id_region').value = '';
+                document.getElementById('id_province').value = '';
+                document.getElementById('id_city').value = '';
+                document.getElementById('id_barangay').value = '';
+            }
+            
+            // Make customer fields editable for new customer
+            const formFields = [
+                'id_first_name', 'id_middle_name', 'id_last_name', 
+                'id_contact_number'
+            ];
+            
+            // Add address fields to the array based on which ones exist
+            if (document.getElementById('region-dropdown')) {
+                formFields.push('region-dropdown', 'province-dropdown', 'city-dropdown', 'barangay-dropdown');
+            } else if (document.getElementById('id_region')) {
+                formFields.push('id_region', 'id_province', 'id_city', 'id_barangay');
+            }
+            
+            formFields.forEach(id => {
+                if (document.getElementById(id)) {
+                    document.getElementById(id).readOnly = false;
+                }
+            });
+            
+            // Clear vehicle fields
+            document.getElementById('id_vehicle_name').value = '';
+            document.getElementById('id_vehicle_color').value = '';
+            document.getElementById('id_plate_number').value = '';
+            
+            // Make vehicle fields editable for new vehicle
+            document.getElementById('id_vehicle_name').readOnly = false;
+            document.getElementById('id_vehicle_color').readOnly = false;
+            document.getElementById('id_plate_number').readOnly = false;
+            
+            // Hide existing vehicles section
+            existingVehiclesSection.style.display = 'none';
+        }
     });
 </script>
 {% endblock %}

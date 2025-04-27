@@ -15,6 +15,18 @@
 
 <!--page content-->
 {% block content %}
+
+{% if messages or duplicate_error %}
+<div class="w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+    {% if duplicate_error %}
+        <p>This vehicle already has this service in progress.</p>
+    {% endif %}
+</div>
+{% endif %}
+
 <div class="size-full flex flex-col">
     <p class="mb-2 mx-3 text-2xl font-[League Spartan] font-semibold">New task! Assign an employee to it.</p>
     <div class="w-full h-[30%] my-2 py-3 px-5 rounded-xl flex flex-col bg-white">
