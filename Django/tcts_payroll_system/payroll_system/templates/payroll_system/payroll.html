@@ -98,6 +98,12 @@
                 const incentiveValue = parseFloat(document.getElementById('field').value);
                 const actionType = document.getElementById('add').checked ? 'add' : 'subtract';
             
+                // Validate input
+                if (isNaN(incentiveValue) || incentiveValue <= 0) {
+                    alert('Please enter a valid positive number for incentives.');
+                    return;
+                }
+            
                 fetch("{% url 'payroll_system:update_incentives' %}", {
                     method: 'POST',
                     headers: {
@@ -112,28 +118,41 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Update total incentives only if action is ADD
+                        // Update the UI - we need to reload the page to see all updated employees
+                        // Only update the first employee's display for immediate feedback
                         if (actionType === 'add') {
                             const incentivesCell = document.getElementById('total-incentives');
-                            incentivesCell.textContent = parseFloat(data.new_incentive).toFixed(2);
+                            if (incentivesCell) {
+                                incentivesCell.textContent = parseFloat(data.new_incentive).toFixed(2);
+                            }
                         }
             
-                        // Always update the salary (Total Payment Amount)
+                        // Always update the salary display of the first employee
                         const salaryCell = document.querySelector('#current_payroll td:nth-child(4)');
-                        salaryCell.textContent = parseFloat(data.new_salary).toFixed(2);
+                        if (salaryCell) {
+                            salaryCell.textContent = parseFloat(data.new_salary).toFixed(2);
+                        }
             
                         // Close the popup
                         document.getElementById('incentive-popup').classList.add('invisible', 'opacity-0');
-            
-                        alert('Successfully updated incentives!');
+                        
+                        // Inform user and reload page to see all changes
+                        alert('Successfully updated incentives for all employees with pending payroll! Reloading page to show all changes.');
+                        window.location.reload();
                     } else {
                         alert('Error updating incentives.');
                     }
                 })                
                 .catch(error => {
                     console.error('Error:', error);
+                    alert('An error occurred while updating incentives.');
                 });
             });
+            
+            // Add a cancel button function if it's missing
+            function cancelEditIncentives() {
+                document.getElementById('incentive-popup').classList.add('invisible', 'opacity-0');
+            }
         </script>                        
     </form>
 </div>

@@ -2,7 +2,7 @@ import os
 import cv2
 import pytz
 import face_recognition
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from functools import lru_cache
 from payroll_system.models import Employee, Attendance
 
@@ -70,15 +70,12 @@ def check_attendance_status(employee, start_date=None, end_date=None):
     Returns:
         Dictionary with attendance status and logs
     """
-    from attendance.models import AttendanceLog
-    from datetime import datetime, date
-    
     today = date.today()
     today_str = today.strftime('%Y-%m-%d')
     
     # Get today's attendance logs
-    today_logs = AttendanceLog.objects.filter(
-        employee=employee,
+    today_logs = Attendance.objects.filter(
+        employee_id_fk=employee,
         date=today_str
     ).order_by('time_in')
     
@@ -94,7 +91,7 @@ def check_attendance_status(employee, start_date=None, end_date=None):
         })
     
     # Get historical logs with date filtering if provided
-    history_query = AttendanceLog.objects.filter(employee=employee)
+    history_query = Attendance.objects.filter(employee_id_fk=employee)
     
     if start_date and end_date:
         # Filter by date range
@@ -142,16 +139,14 @@ def get_filtered_attendance(employee, start_date, end_date):
     Returns:
         Dictionary with filtered attendance logs
     """
-    from attendance.models import AttendanceLog
-    from datetime import datetime, date
     
     today = date.today()
     today_str = today.strftime('%Y-%m-%d')
     
     # Get today's logs (always shown regardless of filter if today is in range)
     if start_date <= today_str <= end_date:
-        today_logs = AttendanceLog.objects.filter(
-            employee=employee,
+        today_logs = Attendance.objects.filter(
+            employee_id_fk=employee,
             date=today_str
         ).order_by('time_in')
         
@@ -166,8 +161,8 @@ def get_filtered_attendance(employee, start_date, end_date):
         formatted_today_logs = []
     
     # Get historical logs within date range excluding today
-    history_logs = AttendanceLog.objects.filter(
-        employee=employee,
+    history_logs = Attendance.objects.filter(
+        employee_id_fk=employee,
         date__gte=start_date,
         date__lte=end_date
     ).exclude(date=today_str).order_by('-date', 'time_in')
