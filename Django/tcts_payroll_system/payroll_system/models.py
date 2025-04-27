@@ -445,9 +445,13 @@ class Vehicle(models.Model):
         if self.plate_number:
             if self.plate_number.strip() == '':
                 raise ValidationError({'plate_number': _('Plate number cannot be empty.')})
-            # # Check if plate number is unique
-            # if Vehicle.objects.exclude(pk=self.pk).filter(plate_number=self.plate_number).exists():
-            #     raise ValidationError({'plate_number': _('This plate number is already registered.')})
+            
+        # Check if plate number is unique, but only for new vehicles or when the plate number changes
+        if not self.pk or Vehicle.objects.filter(plate_number=self.plate_number).exclude(pk=self.pk).exists():
+            # Only check uniqueness for new vehicles (no pk) or if the plate number was changed
+            existing_vehicle = Vehicle.objects.filter(plate_number=self.plate_number).exclude(pk=self.pk)
+            if existing_vehicle.exists():
+                raise ValidationError({'plate_number': _('This plate number is already registered.')})
     
     def save(self, *args, **kwargs):
         self.full_clean()

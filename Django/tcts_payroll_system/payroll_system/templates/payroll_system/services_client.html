@@ -409,6 +409,55 @@
             // Hide existing vehicles section
             existingVehiclesSection.style.display = 'none';
         }
+
+
+        // Function to save form state before submission
+        document.querySelector('form').addEventListener('submit', function() {
+            // Save form values to sessionStorage
+            const formFields = [
+                'id_first_name', 'id_middle_name', 'id_last_name', 
+                'id_contact_number'
+            ];
+            
+            // Add address fields to the array based on which ones exist
+            if (document.getElementById('region-dropdown')) {
+                formFields.push('region-dropdown', 'province-dropdown', 'city-dropdown', 'barangay-dropdown');
+            } else if (document.getElementById('id_region')) {
+                formFields.push('id_region', 'id_province', 'id_city', 'id_barangay');
+            }
+            
+            formFields.forEach(id => {
+                if (document.getElementById(id)) {
+                    sessionStorage.setItem(id, document.getElementById(id).value);
+                }
+            });
+        });
+        
+        // Restore form values if they exist in sessionStorage
+        // This helps maintain values after validation errors
+        const formFields = [
+            'id_first_name', 'id_middle_name', 'id_last_name', 
+            'id_contact_number'
+        ];
+        
+        // Add address fields to the array based on which ones exist
+        if (document.getElementById('region-dropdown')) {
+            formFields.push('region-dropdown', 'province-dropdown', 'city-dropdown', 'barangay-dropdown');
+        } else if (document.getElementById('id_region')) {
+            formFields.push('id_region', 'id_province', 'id_city', 'id_barangay');
+        }
+        
+        formFields.forEach(id => {
+            if (document.getElementById(id) && sessionStorage.getItem(id)) {
+                document.getElementById(id).value = sessionStorage.getItem(id);
+                
+                // Trigger change event for address fields to load appropriate options
+                if (['region-dropdown', 'province-dropdown', 'city-dropdown', 'id_region', 'id_province', 'id_city'].includes(id)) {
+                    const event = new Event('change');
+                    document.getElementById(id).dispatchEvent(event);
+                }
+            }
+        });
     });
 </script>
 {% endblock %}

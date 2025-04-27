@@ -569,19 +569,29 @@ class VehicleForm(forms.ModelForm):
     
     def clean_plate_number(self):
         plate_number = self.cleaned_data.get('plate_number')
-        if plate_number:
-            # Remove spaces for validation
-            cleaned_plate_number = plate_number.replace(" ", "")
+        
+        # If this field is empty, it means we're using an existing vehicle
+        # So we should skip validation
+        if not plate_number:
+            return plate_number
             
-            # Check if plate number follows typical pattern (alphanumeric and dash)
-            if not re.match(r'^[A-Za-z0-9\-]+$', cleaned_plate_number):
-                raise forms.ValidationError("Plate number contains invalid characters.")
+        # Remove spaces for validation
+        cleaned_plate_number = plate_number.replace(" ", "")
+        
+        # Check if plate number follows typical pattern (alphanumeric and dash)
+        if not re.match(r'^[A-Za-z0-9\-]+$', cleaned_plate_number):
+            raise forms.ValidationError("Plate number contains invalid characters.")
 
-            # Check for duplicate plate number (case insensitive and excluding current instance)
-            # existing_vehicle = Vehicle.objects.exclude(pk=self.instance.pk).filter(plate_number__iexact=plate_number)
-            # if existing_vehicle.exists():
-            #     raise forms.ValidationError("This plate number is already registered.")
-
+        # Check for duplicate plate number but handle both new and existing vehicles
+        query = Vehicle.objects.filter(plate_number__iexact=plate_number)
+        
+        # If we're editing an existing vehicle, exclude it from the check
+        if self.instance and self.instance.pk:
+            query = query.exclude(pk=self.instance.pk)
+            
+        if query.exists():
+            raise forms.ValidationError("This plate number is already registered.")
+            
         return plate_number
     
     def clean(self):

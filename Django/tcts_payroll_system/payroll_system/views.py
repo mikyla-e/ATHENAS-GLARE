@@ -675,26 +675,18 @@ def services_assign(request):
                 # Existing customer flow
                 customer = Customer.objects.get(pk=customer_id)
                 
-                # Process primary vehicle form
-                vehicle_form = VehicleForm(request.POST)
-                if vehicle_form.is_valid():
-                    # Check if we're using an existing vehicle
-                    existing_vehicle_id = request.POST.get('existing_vehicle_id')
-                    
-                    if existing_vehicle_id:
-                        # Using an existing vehicle
-                        vehicle = Vehicle.objects.get(pk=existing_vehicle_id)
-                    else:
-                        # Creating a new vehicle for existing customer
-                        vehicle = vehicle_form.save(commit=False)
-                        vehicle.customer = customer
-                        vehicle.save()
+                # Check if user is selecting an existing vehicle
+                existing_vehicle_id = request.POST.get('existing_vehicle_id')
+                
+                if existing_vehicle_id:
+                    # Using an existing vehicle - bypass vehicle form validation completely
+                    vehicle = Vehicle.objects.get(pk=existing_vehicle_id)
                     
                     # Store primary vehicle in session
                     request.session['customer_id'] = customer.customer_id
                     request.session['vehicle_id'] = vehicle.vehicle_id
                     
-                    # Process any additional vehicles
+                    # Process any additional vehicles - code remains the same
                     additional_vehicle_ids = []
                     i = 1
                     while f'additional_vehicle_name_{i}' in request.POST:
@@ -727,13 +719,63 @@ def services_assign(request):
                         'vehicle': vehicle
                     })
                 else:
-                    # If form validation fails, go back with errors
-                    customer_form = CustomerForm(instance=customer)
-                    return render(request, 'payroll_system/services_client.html', {
-                        'customer_form': customer_form, 
-                        'vehicle_form': vehicle_form,
-                        'customers': Customer.objects.all()
-                    })
+                    # Process primary vehicle form for new vehicle
+                    vehicle_form = VehicleForm(request.POST)
+                    if vehicle_form.is_valid():
+                        # Creating a new vehicle for existing customer
+                        vehicle = vehicle_form.save(commit=False)
+                        vehicle.customer = customer
+                        vehicle.save()
+                        
+                        # Store primary vehicle in session
+                        request.session['customer_id'] = customer.customer_id
+                        request.session['vehicle_id'] = vehicle.vehicle_id
+                        
+                        # Process any additional vehicles - code remains the same
+                        additional_vehicle_ids = []
+                        i = 1
+                        while f'additional_vehicle_name_{i}' in request.POST:
+                            vehicle_name = request.POST.get(f'additional_vehicle_name_{i}')
+                            vehicle_color = request.POST.get(f'additional_vehicle_color_{i}')
+                            plate_number = request.POST.get(f'additional_plate_number_{i}')
+                            
+                            # Create and save the additional vehicle
+                            new_vehicle = Vehicle(
+                                customer=customer,
+                                vehicle_name=vehicle_name,
+                                vehicle_color=vehicle_color,
+                                plate_number=plate_number
+                            )
+                            new_vehicle.save()
+                            additional_vehicle_ids.append(new_vehicle.vehicle_id)
+                            i += 1
+                        
+                        # Store additional vehicle IDs in session
+                        if additional_vehicle_ids:
+                            request.session['additional_vehicle_ids'] = additional_vehicle_ids
+                        
+                        # Get employees to display for assignment
+                        employees = Employee.objects.all()
+                        
+                        # Render the assign page with the primary vehicle
+                        return render(request, 'payroll_system/services_assign.html', {
+                            'employees': employees, 
+                            'customer': customer, 
+                            'vehicle': vehicle
+                        })
+                    else:
+                        # If form validation fails, go back with errors
+                        customer_form = CustomerForm(instance=customer)
+                        
+                        # Get all necessary data for the template again
+                        regions = list(Region.objects.all().values('regDesc', 'regCode'))
+                        
+                        return render(request, 'payroll_system/services_client.html', {
+                            'customer_form': customer_form, 
+                            'vehicle_form': vehicle_form,
+                            'customers': Customer.objects.all(),
+                            'regions': regions, 
+                        })
             else:
                 # New customer flow
                 customer_form = CustomerForm(request.POST)
@@ -763,10 +805,13 @@ def services_assign(request):
                     })
                 else:
                     # If form validation fails, go back to the customer form with errors
+                    regions = list(Region.objects.all().values('regDesc', 'regCode'))
+                    
                     return render(request, 'payroll_system/services_client.html', {
                         'customer_form': customer_form, 
                         'vehicle_form': vehicle_form,
-                        'customers': Customer.objects.all()
+                        'customers': Customer.objects.all(),
+                        'regions': regions,  # Add regions data back
                     })
     
     # If this is a GET request, check if we have customer and vehicle in session
