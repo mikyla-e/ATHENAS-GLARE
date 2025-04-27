@@ -34,8 +34,10 @@
 
     /*pop up*/
 
-    .background.show,
-    .add_attendance.show {
+    .background_add.show,
+    .background_edit.show,
+    .add_attendance.show,
+    .edit_attendance.show {
         visibility: visible;
         opacity: 1;
     }
@@ -92,33 +94,81 @@
 
 <!--page content-->
 {% block outsidecontent %}
-    <div id="background" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddAttendance()">
+    <div id="background_add" class="background_add fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddAttendance()">
         
     </div> 
 
-    <div id="attendance-popup" class="add_attendance fixed w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-[#EFEDE6] z-60 overflow-hidden">
-        <h1 class="text-3xl font-[League Spartan] font-semibold">Add Attendance:</h1>
-        <form id="attendance-form" class="flex flex-col" method="post" onsubmit="event.preventDefault();">
-            <div class="w-full my-5">
-                <table class="bg-white w-full border border-solid rounded-2xl text-xs-center overflow-hidden">
-                    <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                        <tr class="text-base font-[League Spartan]">
-                            <th class="py-2">DATE</th>
-                            <th>TIME IN</th>
-                            <th>TIME OUT</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input type="date" name="" id=""></td><!--date should default to current day, but can change-->
-                            <td><input type="time" name="" id=""></td><!--time -->
-                            <td><input type="time" name="" id=""></td>
-                        </tr>
-                    </tbody>
-                </table>
+    <div id="add-popup" class="add_attendance fixed h-[30%] w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden">
+        <h1 class="text-3xl font-[League Spartan] font-semibold">Add Attendance</h1>
+        <form id="add-form" class="size-full flex flex-col" method="post" onsubmit="event.preventDefault();">
+            <div class="w-full h-[50%] my-5 flex gap-1">
+                <div class="w-full bg-[#EFEDE6] rounded-l-xl">
+                    <div class="w-full h-[25%]">
+                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
+                    </div>
+                    <div class="w-full h-[75%]">
+                        <input type="date" name="" id="" class="w-full h-full px-5 outline-none border-none">
+                    </div>
+                </div>
+                <div class="w-full bg-[#EFEDE6]">
+                    <div class="w-full h-[25%]">
+                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time in</label>
+                    </div>
+                    <div class="w-full h-[75%]">
+                        <input type="time" name="" id="" class="w-full h-full px-5 outline-none border-none">
+                    </div>
+                </div>
+                <div class="w-full bg-[#EFEDE6] rounded-r-xl">
+                    <div class="w-full h-[25%]">
+                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time out</label>
+                    </div>
+                    <div class="w-full h-[75%]">
+                        <input type="time" name="" id="" class="w-full h-full px-5 outline-none border-none">
+                    </div>
+                </div>
             </div>
             <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
                 <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddAttendance()">
+                <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+            </div>           
+        </form>
+    </div>
+
+    <div id="background_edit" class="background_edit fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelEditAttendance()">
+        
+    </div> 
+
+    <div id="edit-popup" class="edit_attendance fixed h-[30%] w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden">
+        <h1 class="text-3xl font-[League Spartan] font-semibold">Edit Attendance</h1>
+        <form id="edit-form" class="size-full flex flex-col" method="post" onsubmit="event.preventDefault();">
+            <div class="w-full h-[50%] my-5 flex gap-1">
+                <div class="w-full bg-[#EFEDE6] rounded-l-xl">
+                    <div class="w-full h-[25%]">
+                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
+                    </div>
+                    <div class="w-full h-[75%]">
+                        <input type="date" name="" id="" class="w-full h-full px-5 outline-none border-none" value="2025-04-04">
+                    </div>
+                </div>
+                <div class="w-full bg-[#EFEDE6]">
+                    <div class="w-full h-[25%]">
+                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time in</label>
+                    </div>
+                    <div class="w-full h-[75%]">
+                        <input type="time" name="" id="" class="w-full h-full px-5 outline-none border-none" value="11:00">
+                    </div>
+                </div>
+                <div class="w-full bg-[#EFEDE6] rounded-r-xl">
+                    <div class="w-full h-[25%]">
+                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time out</label>
+                    </div>
+                    <div class="w-full h-[75%]">
+                        <input type="time" name="" id="" class="w-full h-full px-5 outline-none border-none" value="11:00">
+                    </div>
+                </div>
+            </div>
+            <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
+                <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditAttendance()">
                 <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
             </div>           
         </form>
@@ -299,7 +349,7 @@
                                     </span>
                                 {% endif %}
                             </td>      
-                            <td><a href="">EDIT</a></td>                      
+                            <td onclick="editAttendance()">EDIT</td>                      
                         </tr>
                         {% empty %}
                         <tr>
@@ -366,16 +416,31 @@
 </script>
 
 <script>
+
     function addAttendance(){
-        const bg = document.getElementById("background");
-        const popup = document.getElementById("attendance-popup");
+        let bg = document.getElementById("background_add");
+        const popup = document.getElementById("add-popup");
         bg.classList.add("show");
         popup.classList.add("show");
     }
     
     function cancelAddAttendance(){
-        const bg = document.getElementById("background");
-        const popup = document.getElementById("attendance-popup");
+        let bg = document.getElementById("background_add");
+        const popup = document.getElementById("add-popup");
+        bg.classList.remove("show");
+        popup.classList.remove("show");
+    }
+
+    function editAttendance(){
+        let bg = document.getElementById("background_edit");
+        const popup = document.getElementById("edit-popup");
+        bg.classList.add("show");
+        popup.classList.add("show");
+    }
+    
+    function cancelEditAttendance(){
+        let bg = document.getElementById("background_edit");
+        const popup = document.getElementById("edit-popup");
         bg.classList.remove("show");
         popup.classList.remove("show");
     }
