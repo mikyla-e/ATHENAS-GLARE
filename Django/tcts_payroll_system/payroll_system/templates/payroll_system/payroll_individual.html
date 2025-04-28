@@ -208,6 +208,8 @@
                     <th class="p-2 text-base font-[League Spartan]">TOTAL ATTENDANCE</th>
                     <th class="p-2 text-base font-[League Spartan]">TOTAL INCENTIVES</th>
                     <th class="p-2 text-base font-[League Spartan]">TOTAL PAYMENT AMOUNT</th>
+                    <th class="p-2 text-base font-[League Spartan]">OTHERS</th> <!--add to payment amt (cash advance)-->
+                    <th class="p-2 text-base font-[League Spartan]">DEDUCTIONS</th>
                     <th class="p-2 text-base font-[League Spartan]">DATE OF PAY</th>
                     <th class="p-2 text-base font-[League Spartan]"></th>
                 </tr>
@@ -219,6 +221,8 @@
                         <td class="p-2 text-sm font-[Inter]">{{ attendance_count }}</td>
                         <td id="total-incentives" class="p-2 text-sm font-[Inter]">{{ current_payroll.incentives|default:"0.00" }}</td>                        
                         <td class="p-2 text-sm font-[Inter]">{{ current_payroll.salary }}</td>
+                        <td class="p-2 text-sm font-[Inter]"><!--{ other ++pay cash advance }}--> 0.00</td>
+                        <td class="p-2 text-sm font-[Inter]"><!--{ deductions }}--> 0.00</td>
                         <td class="p-2 text-sm font-[Inter]">{{ current_payroll.payment_date }}</td>
                         <td class="p-3 w-full h-[30%] flex justify-center items-center">
                             <a class="h-8.5 w-8.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
@@ -231,6 +235,8 @@
                         <td class="p-2 text-sm font-[Inter]">0.00</td>
                         <td class="p-2 text-sm font-[Inter]">0.00</td>
                         <td class="p-2 text-sm font-[Inter]">N/A</td>
+                        <td class="p-2 text-sm font-[Inter]">0.00</td>
+                        <td class="p-2 text-sm font-[Inter]">0.00</td>
                         <td class="p-3 w-full h-full py-2 flex justify-center items-center">
                             <a class="h-8.5 w-8.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
                                 <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
@@ -254,6 +260,8 @@
                         <th class="p-2 text-base font-[League Spartan]">TOTAL ATTENDANCE</th>
                         <th class="p-2 text-base font-[League Spartan]">TOTAL INCENTIVES</th>
                         <th class="p-2 text-base font-[League Spartan]">TOTAL PAYMENT AMOUNT</th>
+                        <th class="p-2 text-base font-[League Spartan]">OTHERS</th>
+                        <th class="p-2 text-base font-[League Spartan]">DEDUCTIONS</th>
                         <th class="p-2 text-base font-[League Spartan]">DATE OF PAY</th>
                         <th></th>
                     </tr>
@@ -269,10 +277,14 @@
                             </td>
                             <td class="p-2 text-sm font-[Inter]">{{ current_payroll.incentives }}</td>
                             <td class="p-2 text-sm font-[Inter]">{{ current_payroll.salary }}</td>
+                            <td class="p-2 text-sm font-[Inter]"><!--{OTHERS }-->0.00</td>
+                            <td class="p-2 text-sm font-[Inter]"><!--{deductions}-->0.00</td>
                             <td class="p-2 text-sm font-[Inter]">{{ current_payroll.payment_date }}</td>
                         {% else %}
                             <td class="p-2 text-sm font-[Inter]">0.00</td>
                             <td class="p-2 text-sm font-[Inter]">N/A</td>
+                            <td class="p-2 text-sm font-[Inter]">0.00</td>
+                            <td class="p-2 text-sm font-[Inter]">0.00</td>
                             <td class="p-2 text-sm font-[Inter]">0.00</td>
                             <td class="p-2 text-sm font-[Inter]">0.00</td>
                             <td class="p-2 text-sm font-[Inter]">N/A</td>
