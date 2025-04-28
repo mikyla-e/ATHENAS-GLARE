@@ -60,18 +60,39 @@
 
 {% block content %}
 <div class="py-5 px-5 md:px-10 flex flex-col gap-5">
-    <div class="w-full flex items-end justify-between">
-        <div class="w-fit flex flex-row items-end gap-3">
-            <img src="{{ employee.employee_image.url }}" alt="" class="size-[110px] rounded-full object-cover">
-            <div class="mx-[15px] flex flex-col gap-2">
-                <h1 class="font-[League Spartan] text-4xl font-bold">
-                    {{ employee.first_name }} {{ employee.last_name }}
-                </h1>
-                <p class="font-[Roboto] text-lg font-extrabold text-[#1E1E1E96]">{{ employee.employee_status }} Employee | {{ employee.contact_number }}</p>
+    <div class="w-full">
+        <div class="md:hidden w-full flex flex-row items-end justify-between gap-0">
+            <div class="w-fit flex flex-row items-end">
+                <img src="{{ employee.employee_image.url }}" alt="" class="size-[110px] rounded-full object-cover">
+                
+                <div class="mx-[15px] flex flex-col gap-0">
+                    <h1 class="font-[League Spartan] text-2xl font-bold">
+                        {{ employee.first_name }} {{ employee.last_name }}
+                    </h1>
+                    <p class="font-[Roboto] text-base font-extrabold text-[#1E1E1E96]"><span class="hidden">{{ employee.employee_status }} |</span> {{ employee.contact_number }}</p>
+                </div>  
+            </div>
+            <div id="cash_advance" class="h-[40px]">
+                <button id="button" class="size-full text-xs/3 lg:text-base/4 font-bold text-[League Spartan] text-center" onclick="addCashAdvance()">
+                    <span class="text-white md:hidden"><img src="{% static 'images/cash_advance_icon.png' %}" alt=""></span>
+                </button>
             </div>
         </div>
-        <div id="cash_advance" class="h-[40px]">
-            <button id="button" class="size-full text-xs/3 lg:text-base/4 font-bold text-[League Spartan] text-center" onclick="addCashAdvance()">CASH ADVANCE</button>
+        <div class="hidden md:flex items-end justify-between">
+            <div class="w-fit flex flex-row items-end gap-1">
+                <img src="{{ employee.employee_image.url }}" alt="" class="size-[110px] rounded-full object-cover">
+                <div class="mx-[15px] flex flex-col gap-2">
+                    <h1 class="font-[League Spartan] text-4xl font-bold">
+                        {{ employee.first_name }} {{ employee.last_name }}
+                    </h1>
+                    <p class="font-[Roboto] text-lg font-extrabold text-[#1E1E1E96]">{{ employee.employee_status }} | {{ employee.contact_number }}</p>
+                </div>
+            </div>
+            <div id="cash_advance" class="h-[40px]">
+                <button id="button" class="size-full text-xs/3 lg:text-base/4 font-bold text-[League Spartan] text-center" onclick="addCashAdvance()">
+                    <span class="text-white hidden md:block">CASH ADVANCE</span>
+                </button>
+            </div>
         </div>
     </div>
 
