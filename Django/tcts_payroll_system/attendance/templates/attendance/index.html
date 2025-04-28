@@ -39,7 +39,7 @@
                 
                 <!-- Recognition overlay -->
                 <div id="recognition-overlay" class="absolute inset-0 flex items-center justify-center hidden">
-                    <div class="bg-black/80 text-white p-6 rounded-lg text-center">
+                    <div class="bg-gradient-to-r from-[#5c4b10C4] to-[#4f380bC4] text-white p-6 rounded-lg text-center">
                         <div id="recognized-name" class="text-3xl font-bold mb-4"></div>
                         <div id="recognition-message" class="text-xl"></div>
                     </div>
@@ -152,6 +152,51 @@
         updateTime();
         updateDate();
 
+        // Initialize webcam with better mobile support
+        function initializeCamera() {
+            const constraints = {
+                video: {
+                    facingMode: "user",  // Prefer front camera on mobile
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+            
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then(function(stream) {
+                        video.srcObject = stream;
+                        // Play after metadata is loaded to prevent black screen issues on some mobile browsers
+                        video.onloadedmetadata = function() {
+                            video.play();
+                            setTimeout(processFrame, 1000);
+                        };
+                    })
+                    .catch(function(error) {
+                        console.error('Could not access webcam:', error);
+                        showNotification('Could not access camera. Please check permissions and make sure no other app is using it.', 'error');
+                        
+                        // If we can't get user-facing camera, try any available camera as fallback
+                        if (error.name === 'OverconstrainedError') {
+                            navigator.mediaDevices.getUserMedia({ video: true })
+                                .then(function(stream) {
+                                    video.srcObject = stream;
+                                    video.onloadedmetadata = function() {
+                                        video.play();
+                                        setTimeout(processFrame, 1000);
+                                    };
+                                })
+                                .catch(function(fallbackError) {
+                                    console.error('Could not access any camera:', fallbackError);
+                                    showNotification('Could not access any camera. Please check browser permissions.', 'error');
+                                });
+                        }
+                    });
+            } else {
+                showNotification('Your browser does not support camera access. Please try a modern browser.', 'error');
+            }
+        }
+
         // Main attendance functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Elements
@@ -187,21 +232,7 @@
             const REQUIRED_MATCHES = 3;
             const PROCESS_INTERVAL = 300;
             
-            // Initialize webcam
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function(stream) {
-                        video.srcObject = stream;
-                        video.play();
-                        setTimeout(processFrame, 1000);
-                    })
-                    .catch(function(error) {
-                        console.error('Could not access webcam:', error);
-                        showNotification('Could not access webcam. Please check permissions.', 'error');
-                    });
-            } else {
-                showNotification('Your browser does not support webcam access.', 'error');
-            }
+           initializeCamera();
             
             // Initialize date inputs with default values
             const today = new Date();
