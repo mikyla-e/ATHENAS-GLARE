@@ -2,8 +2,10 @@ import re
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from datetime import datetime, timedelta
 from .models import Employee, Payroll, Region, Province, City, Barangay, Service, Customer, Vehicle, Task
 
@@ -291,18 +293,6 @@ class PayrollForm(ModelForm):
             datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:
             raise forms.ValidationError("Invalid date format. Use 'YYYY-MM-DD'.")
-        
-    def clean_rate(self):
-        rate = self.cleaned_data.get('rate')
-        if rate is not None:
-            # Check if rate is reasonable (adjust max as needed)
-            if rate > 10000:
-                raise forms.ValidationError("Rate seems too high. Please verify.")
-            
-            # Ensure rate has at most 2 decimal places
-            if rate != round(rate, 2):
-                raise forms.ValidationError("Rate should have at most 2 decimal places.")
-        return rate
 
     def clean_payment_date(self):
         payment_date = self.cleaned_data.get('payment_date')
@@ -322,6 +312,35 @@ class PayrollForm(ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+
+        # Get values with defaults
+        rate = cleaned_data.get('rate', 0) or 0
+        deductions = cleaned_data.get('deductions', 0) or 0
+        cash_advance = cleaned_data.get('cash_advance', 0) or 0
+        under_time = cleaned_data.get('under_time', 0) or 0
+        incentives = cleaned_data.get('incentives', 0) or 0
+        
+        # Calculate salary
+        calculated_salary = rate - deductions - cash_advance - under_time + incentives
+        
+        # Either validate or auto-set
+        if 'salary' in cleaned_data:
+            salary = cleaned_data.get('salary', 0) or 0
+            if abs(calculated_salary - salary) > 0.01:
+                raise ValidationError(_('Salary does not match the calculated amount based on rates and deductions.'))
+        else:
+            # Auto-set the salary field
+            cleaned_data['salary'] = round(calculated_salary, 2)
+        
+        # Validate non-negative values
+        for field_name, value in [
+            ('rate', rate), ('deductions', deductions), 
+            ('cash_advance', cash_advance), ('under_time', under_time),
+            ('incentives', incentives)
+        ]:
+            if value < 0:
+                self.add_error(field_name, _('This value cannot be negative.'))
+
         required_fields = ['rate', 'payment_date', 'payroll_status']
 
         # Check if all required fields are filled

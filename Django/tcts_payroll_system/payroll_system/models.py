@@ -343,16 +343,6 @@ class Payroll(models.Model):
         status = f"[{self.payroll_status}]"
         
         return f"Payroll #{self.payroll_id} - {employee} - {date_str} - {amount} {status}"
-    
-    def clean(self):
-        # Validate that salary computation makes sense
-        calculated_salary = self.rate - self.deductions - self.cash_advance - self.under_time + self.incentives
-        if abs(calculated_salary - self.salary) > 0.01:  # Allow for small floating point differences
-            raise ValidationError(_('Salary does not match the calculated amount based on rates and deductions.'))
-            
-        # Validate non-negative values
-        if self.rate < 0 or self.incentives < 0 or self.deductions < 0 or self.salary < 0 or self.cash_advance < 0 or self.under_time < 0:
-            raise ValidationError(_('Financial values cannot be negative.'))
             
     def save(self, *args, **kwargs):
         self.full_clean()
