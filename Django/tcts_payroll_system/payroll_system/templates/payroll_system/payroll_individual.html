@@ -10,56 +10,6 @@
 <link rel="stylesheet" href="{% static 'css/table.css'%}">
 <link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 
-<style>
-    .background.show,
-    .edit_incentives_popup.show {
-        visibility: visible;
-        opacity: 1;
-    }
-
-    .edit_incentives_popup h1{
-        margin: 0;
-        font-family: 'League Spartan';
-        font-size: 2rem;
-        font-weight: 500;
-
-        background: linear-gradient(90deg, #F8D146 0%, #F5B93F 100%);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    #label{
-        margin: 0 10px;
-        font-family: 'Inter';
-        font-size: 14px;
-        font-weight: 600;
-        color: #1e1e1e;
-    }
-
-    #current_payroll_table td:nth-child(even){
-        background-color: #f2f2f2;
-    }
-
-    td{
-
-        border-bottom: 1px solid #cac5c5;
-        border-left: 2px solid #cac5c5;
-    }
-
-    th:first-child, td:first-child{
-        border-left: none;
-    }
-
-    tr:first-child th {
-        border-top: none;
-    }
-
-    tr:last-child td {
-        border-bottom: none;
-    }
-
-</style>
 {% endblock %}
 
 <!--header-->
