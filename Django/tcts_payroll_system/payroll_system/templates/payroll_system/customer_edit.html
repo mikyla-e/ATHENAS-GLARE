@@ -2,7 +2,7 @@
 {% load static %}
 
 <!--title-->
-{% block title %}Customers Edit{% endblock %}
+{% block title %}Edit Customer{% endblock %}
 
 <!--(optional)head content-->
 {% block headcontent %}
@@ -10,7 +10,7 @@
 {% endblock %}
 
 <!--header-->
-{% block header %}CUSTOMERS EDIT{% endblock %} 
+{% block header %}CUSTOMER EDIT{% endblock %} 
 
 <!--page content-->
 {% block content %}
@@ -20,63 +20,123 @@
     <div class="order-1">
         <div class="flex flex-col my-1">
             <div class="">
-                <label for="first-name" class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]">first name</label>
+                <label for="first-name" class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]">First Name</label>
                 {% if form.first_name.errors %}
                     <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.first_name.errors.0 }}</div>
                 {% endif %}
             </div>
-            
             {{ form.first_name }}
         </div>
         <div class="flex flex-col my-1">
             <div class="">
-                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="middle-name">middle name</label>
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="middle-name">Middle Name</label>
                 {% if form.middle_name.errors %}
                     <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.middle_name.errors.0 }}</div>
                 {% endif %}
             </div>
-
             {{ form.middle_name }}
         </div>
         <div class="flex flex-col my-1">
             <div class="">
-                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="last-name">last name</label>
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="last-name">Last Name</label>
                 {% if form.last_name.errors %}
                     <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.last_name.errors.0 }}</div>
                 {% endif %}
             </div>
-
             {{ form.last_name }}
         </div>
         <div class="flex flex-col my-1">
             <div class="">
-                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="date-of-birth">date of birth</label>
-                {% if form.date_of_birth.errors %}
-                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.date_of_birth.errors.0 }}</div>
-                {% endif %}
-            </div>
-
-            {{ form.date_of_birth }}
-        </div>
-        <div class="flex flex-col my-1">
-            <div class="">
-                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="contact-number">contact number</label>
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="contact-number">Contact Number</label>
                 {% if form.contact_number.errors %}
                     <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.contact_number.errors.0 }}</div>
                 {% endif %}
             </div>
-            
             {{ form.contact_number }}
+        </div>
+    </div>
+
+    <div class="order-2">
+        <div class="flex flex-col my-1">
+            <div class="">
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="region">Region</label>
+                {% if form.region.errors %}
+                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.region.errors.0 }}</div>
+                {% endif %}
+            </div>
+            {{ form.region }}
+            <datalist id="region-list">
+                {% for region in regions %}
+                    <option value="{{ region.regDesc }}">
+                {% endfor %}
+            </datalist>
         </div>
         <div class="flex flex-col my-1">
             <div class="">
-                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="emergency-contact">emergency contact</label>
-                {% if form.emergency_contact.errors %}
-                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.emergency_contact.errors.0 }}</div>
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="province">Province</label>
+                {% if form.province.errors %}
+                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.province.errors.0 }}</div>
                 {% endif %}
             </div>
-            {{ form.emergency_contact }}
+            {{ form.province }}
+            <datalist id="province-list">
+                {% for province in provinces %}
+                    <option value="{{ province.provDesc }}">
+                {% endfor %}
+            </datalist>
         </div>
+        <div class="flex flex-col my-1">
+            <div class="">
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="city">City/Municipality</label>
+                {% if form.city.errors %}
+                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.city.errors.0 }}</div>
+                {% endif %}
+            </div>
+            {{ form.city }}
+            <datalist id="city-list">
+                {% for city in cities %}
+                    <option value="{{ city.citymunDesc }}">
+                {% endfor %}
+            </datalist>
+        </div>
+        <div class="flex flex-col my-1">
+            <div class="">
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="barangay">Barangay</label>
+                {% if form.barangay.errors %}
+                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.barangay.errors.0 }}</div>
+                {% endif %}
+            </div>
+            {{ form.barangay }}
+            <datalist id="barangay-list">
+                {% for barangay in barangays %}
+                    <option value="{{ barangay.brgyDesc }}">
+                {% endfor %}
+            </datalist>
+        </div>
+    </div>
+
+    <div class="col-span-2 flex justify-center mt-6">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded">
+            Update Customer
+        </button>
     </div>
 </form>
 {% endblock %}
+{% block script %}
+<script src="{% static 'javascript/phLocations.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        initializeAddressFields({
+            regionInputId: "region-dropdown",
+            provinceInputId: "province-dropdown",
+            cityInputId: "city-dropdown",
+            barangayInputId: "barangay-dropdown",
+            regionListId: "region-list",
+            provinceListId: "province-list",
+            cityListId: "city-list",
+            barangayListId: "barangay-list",
+            baseUrl: "/payroll_system/ajax"
+        });
+    });
+</script>
+{% endblock%}

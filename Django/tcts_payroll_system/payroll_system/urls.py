@@ -20,6 +20,7 @@ urlpatterns = [
     path('status/', views.status, name='status'),
     path('customers/', views.customers, name='customers'),
     path('customer_page/<int:customer_id>/', views.customer_page, name='customer_page'),
+    path('customer_edit/<int:customer_id>/', views.customer_edit, name='customer_edit'),
     path('print/', views.print, name='print'),
     path('ajax/get-provinces/', views.get_provinces, name='get_provinces'),
     path('ajax/get-cities/', views.get_cities, name='get_cities'),
@@ -27,5 +28,4 @@ urlpatterns = [
     path('ajax/customer/<int:customer_id>/', views.get_customer_details, name='get_customer_details'),
     path('update-incentives/', views.update_incentives, name='update_incentives'),
     path('update_incentives_individual/<int:employee_id>/', views.update_incentives_individual, name='update_incentives_individual'),
-    path('customer_edit/', views.customer_edit, name='customer_edit'),
 ]

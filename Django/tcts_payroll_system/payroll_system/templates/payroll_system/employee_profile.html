@@ -109,43 +109,102 @@
         
     </div> 
 
-    <div id="add-popup" class="add_attendance fixed h-[30%] w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden">
-        <h1 class="text-3xl font-[League Spartan] font-semibold">Add Attendance</h1>
-        <form id="add-form" class="size-full flex flex-col" method="post" action="">
-            {% csrf_token %}
-            <input type="hidden" name="add_attendance" value="true">
-            <div class="w-full h-[50%] my-5 flex gap-1">
-                <div class="w-full bg-[#EFEDE6] rounded-l-xl">
-                    <div class="w-full h-[25%]">
-                        <label for="add_date" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
-                    </div>
-                    <div class="w-full h-[75%]">
-                        <input type="date" name="date" id="add_date" class="w-full h-full px-5 outline-none border-none" required>
-                    </div>
-                </div>
-                <div class="w-full bg-[#EFEDE6]">
-                    <div class="w-full h-[25%]">
-                        <label for="add_time_in" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time in</label>
-                    </div>
-                    <div class="w-full h-[75%]">
-                        <input type="time" name="time_in" id="add_time_in" class="w-full h-full px-5 outline-none border-none" required>
-                    </div>
-                </div>
-                <div class="w-full bg-[#EFEDE6] rounded-r-xl">
-                    <div class="w-full h-[25%]">
-                        <label for="add_time_out" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time out</label>
-                    </div>
-                    <div class="w-full h-[75%]">
-                        <input type="time" name="time_out" id="add_time_out" class="w-full h-full px-5 outline-none border-none">
-                    </div>
-                </div>
-            </div>
-            <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
-                <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddAttendance()">
-                <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
-            </div>           
-        </form>
-    </div>
+    <!-- Background Overlay for Add Attendance -->
+<div id="background_add" class="background_add fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" 
+onclick="cancelAddAttendance()">
+</div> 
+
+<!-- Add Attendance Popup -->
+<div id="add-popup" class="add_attendance fixed w-[80%] xs:w-[90%] sm:w-[70%] md:w-[50%] lg:w-[50%] 
+                      h-auto min-h-[250px] py-4 md:py-5 px-4 sm:px-6 md:px-10 
+                      bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                      flex flex-col justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden
+                      shadow-lg">
+<h1 class="text-xl sm:text-2xl md:text-3xl font-[League Spartan] font-semibold mb-2 md:mb-0">Add Attendance</h1>
+<form id="add-form" class="size-full flex flex-col" method="post" action="">
+   {% csrf_token %}
+   <input type="hidden" name="add_attendance" value="true">
+   <div class="w-full my-3 md:my-5 flex flex-col lg:flex-row gap-2 sm:gap-1">
+       <div class="w-full bg-[#EFEDE6] rounded-lg sm:rounded-l-xl sm:rounded-r-none">
+           <div class="w-full py-1">
+               <label for="add_date" class="mx-3 font-[Inter] text-xs sm:text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
+           </div>
+           <div class="w-full pb-1 sm:pb-0">
+               <input type="date" name="date" id="add_date" class="w-full h-8 sm:h-full px-3 sm:px-5 outline-none border-none bg-transparent" required>
+           </div>
+       </div>
+       <div class="w-full bg-[#EFEDE6] rounded-lg sm:rounded-none">
+           <div class="w-full py-1">
+               <label for="add_time_in" class="mx-3 font-[Inter] text-xs sm:text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time in</label>
+           </div>
+           <div class="w-full pb-1 sm:pb-0">
+               <input type="time" name="time_in" id="add_time_in" class="w-full h-8 sm:h-full px-3 sm:px-5 outline-none border-none bg-transparent" required>
+           </div>
+       </div>
+       <div class="w-full bg-[#EFEDE6] rounded-lg sm:rounded-l-none sm:rounded-r-xl">
+           <div class="w-full py-1">
+               <label for="add_time_out" class="mx-3 font-[Inter] text-xs sm:text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time out</label>
+           </div>
+           <div class="w-full pb-1 sm:pb-0">
+               <input type="time" name="time_out" id="add_time_out" class="w-full h-8 sm:h-full px-3 sm:px-5 outline-none border-none bg-transparent">
+           </div>
+       </div>
+   </div>
+   <div class="w-full h-[40px] mt-2 md:mt-1 flex justify-center sm:justify-end gap-3">
+       <input type="button" class="w-full sm:w-auto px-4 text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddAttendance()">
+       <input type="submit" class="w-full sm:w-auto px-4 text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+   </div>           
+</form>
+</div>
+
+<!-- Background Overlay for Edit Attendance -->
+<div id="background_edit" class="background_edit fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" 
+onclick="cancelEditAttendance()">
+</div> 
+
+<!-- Edit Attendance Popup -->
+<div id="edit-popup" class="edit_attendance fixed w-[95%] xs:w-[90%] sm:w-[70%] md:w-[50%] lg:w-[40%] 
+                       h-auto min-h-[250px] py-4 md:py-5 px-4 sm:px-6 md:px-10 
+                       bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                       flex flex-col justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden
+                       shadow-lg">
+<h1 class="text-xl sm:text-2xl md:text-3xl font-[League Spartan] font-semibold mb-2 md:mb-0">Edit Attendance</h1>
+<form id="edit-form" class="size-full flex flex-col" method="post" action="">
+   {% csrf_token %}
+   <input type="hidden" name="edit_attendance" value="true">
+   <input type="hidden" name="attendance_id" id="edit_attendance_id">
+   <div class="w-full my-3 md:my-5 flex flex-col sm:flex-row gap-2 sm:gap-1">
+       <div class="w-full bg-[#EFEDE6] rounded-lg sm:rounded-l-xl sm:rounded-r-none">
+           <div class="w-full py-1">
+               <label for="edit_date" class="mx-3 font-[Inter] text-xs sm:text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
+           </div>
+           <div class="w-full pb-1 sm:pb-0">
+               <input type="date" name="date" id="edit_date" class="w-full h-8 sm:h-full px-3 sm:px-5 outline-none border-none bg-transparent" required>
+           </div>
+       </div>
+       <div class="w-full bg-[#EFEDE6] rounded-lg sm:rounded-none">
+           <div class="w-full py-1">
+               <label for="edit_time_in" class="mx-3 font-[Inter] text-xs sm:text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time in</label>
+           </div>
+           <div class="w-full pb-1 sm:pb-0">
+               <input type="time" name="time_in" id="edit_time_in" class="w-full h-8 sm:h-full px-3 sm:px-5 outline-none border-none bg-transparent" required>
+           </div>
+       </div>
+       <div class="w-full bg-[#EFEDE6] rounded-lg sm:rounded-l-none sm:rounded-r-xl">
+           <div class="w-full py-1">
+               <label for="edit_time_out" class="mx-3 font-[Inter] text-xs sm:text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time out</label>
+           </div>
+           <div class="w-full pb-1 sm:pb-0">
+               <input type="time" name="time_out" id="edit_time_out" class="w-full h-8 sm:h-full px-3 sm:px-5 outline-none border-none bg-transparent">
+           </div>
+       </div>
+   </div>
+   <div class="w-full h-[40px] flex justify-center sm:justify-end gap-3">
+       <input type="button" class="w-full sm:w-auto px-4 text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditAttendance()">
+       <input type="submit" class="w-full sm:w-auto px-4 text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+   </div>           
+</form>
+</div>
 
     <div id="background_edit" class="background_edit fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelEditAttendance()">
         
@@ -219,54 +278,64 @@
             </div>
             
         </div>
-        <div class="bottom">
-            <div class="employee_info2">
-                <div class="info_content1">
+        <div class="w-full px-4">
+            <!-- Employee Info Section 2 -->
+            <div class="flex flex-col md:flex-row w-full gap-4 mb-6 pl-5">
+                <!-- Left Column -->
+                <div class="w-full md:w-1/2 space-y-4">
                     <div class="gender">
-                        <h1>GENDER</h1>
-                        {{ employee.gender }}
+                        <h1 class="text-sm font-bold text-gray-500">GENDER</h1>
+                        <p class="text-base">{{ employee.gender }}</p>
                     </div>
                     <div class="date_of_birth">
-                        <h1>DATE OF BIRTH</h1>
-                        {{ employee.date_of_birth }}
+                        <h1 class="text-sm font-bold text-gray-500">DATE OF BIRTH</h1>
+                        <p class="text-base">{{ employee.date_of_birth }}</p>
                     </div>
                     <div class="contact_number">
-                        <h1>CONTACT NUMBER</h1>
-                        {{ employee.contact_number }}
+                        <h1 class="text-sm font-bold text-gray-500">CONTACT NUMBER</h1>
+                        <p class="text-base">{{ employee.contact_number }}</p>
                     </div>
                     <div class="emergency_contact">
-                        <h1>EMERGENCY CONTACT</h1>
-                        {{ employee.emergency_contact }}
+                        <h1 class="text-sm font-bold text-gray-500">EMERGENCY CONTACT</h1>
+                        <p class="text-base">{{ employee.emergency_contact }}</p>
                     </div>
                 </div>
                 
-                <div class="info_content2">
+                <!-- Right Column -->
+                <div class="w-full md:w-1/2 space-y-4 mt-4 md:mt-0">
                     <div class="barangay">
-                        <h1>BARANGAY</h1>
-                        <p>Brgy. {{ employee.barangay }}, {{ employee.city }}, {{employee.province }}</p>
+                        <h1 class="text-sm font-bold text-gray-500">BARANGAY</h1>
+                        <p class="text-base">Brgy. {{ employee.barangay }}, {{ employee.city }}, {{employee.province }}</p>
                     </div>
                     <div class="education">
-                        <h1>EDUCATION</h1>
-                        {{ employee.highest_education }}
+                        <h1 class="text-sm font-bold text-gray-500">EDUCATION</h1>
+                        <p class="text-base">{{ employee.highest_education }}</p>
                     </div>
                 </div>
             </div>
-            <div class="hr2"></div>
-            <div class="employee_info3">
-                <div class="info_content1">
+            
+            <!-- Divider -->
+            <div class="w-full h-px bg-gray-300 my-6"></div>
+            
+            <!-- Employee Info Section 3 -->
+            <div class="flex flex-col md:flex-row w-full gap-4">
+                <!-- Left Column -->
+                <div class="w-full md:w-1/2 space-y-4">
                     <div class="work_experience">
-                        <h1>WORK EXPERIENCE</h1>
-                        {{ employee.work_experience }}
+                        <h1 class="text-sm font-bold text-gray-500">WORK EXPERIENCE</h1>
+                        <p class="text-base">{{ employee.work_experience }}</p>
                     </div>
                 </div>
-                <div class="info_content2">
+                
+                <!-- Right Column -->
+                <div class="w-full md:w-1/2 space-y-4 mt-4 md:mt-0">
                     <div class="date_of_employment">
-                        <h1>DATE OF EMPLOYMENT</h1>
-                        {{ employee.date_of_employment }}
+                        <h1 class="text-sm font-bold text-gray-500">DATE OF EMPLOYMENT</h1>
+                        <p class="text-base">{{ employee.date_of_employment }}</p>
                     </div>
-                    <div class="employee_status">
-                        <h1>EMPLOYEE STATUS</h1>
-                        {{ employee.employee_status}}
+                    <div class="employee_status mt-4">
+                        <h1 class="text-sm font-bold text-gray-500">EMPLOYEE STATUS</h1>
+                        <p class="text-base pb-5">{{ employee.employee_status }}</p>
                     </div>
                 </div>
             </div>
