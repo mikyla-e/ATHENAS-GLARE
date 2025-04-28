@@ -39,18 +39,18 @@
             </thead>
             <tbody>
             {% for customer in customers %}
-                <tr id="customer-data">
-                    <td>{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
-                    <td>{{ customer.contact_number }}</td>
-                    <td>{{ customer.region }}, {{ customer.province }}, {{ customer.city }}, {{ customer.barangay }}</td>
-                    <td>
+                <tr id="customer-data" class="text-center">
+                    <td class="p-2">{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
+                    <td class="p-2">{{ customer.contact_number }}</td>
+                    <td class="p-2">{{ customer.region }}, {{ customer.province }}, {{ customer.city }}, {{ customer.barangay }}</td>
+                    <td class="p-2">
                         <a class="" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
                     </td>
                 </tr>
             {% empty %}
                 <tr id="customer-data">
-                    <td colspan="4">No customer records found</td>
-                    <td>
+                    <td class="p-2" colspan="4">No customer records found</td>
+                    <td class="p-2">
                         MORE
                     </td>
                 </tr>

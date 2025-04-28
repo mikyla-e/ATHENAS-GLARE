@@ -1200,3 +1200,5 @@ def update_incentives_individual(request, employee_id):
         return JsonResponse({'success': True, 'new_incentive': str(new_incentives), 'new_salary': str(new_salary)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+def customer_edit(request):
+    return render(request, 'payroll_system/customer_edit.html')

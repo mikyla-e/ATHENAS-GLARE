@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!--title-->
+{% block title %}Customers Edit{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<!-- <link rel="stylesheet" href="{% static 'css/settings.css' %}"> -->
+{% endblock %}
+
+<!--header-->
+{% block header %}CUSTOMERS EDIT{% endblock %} 
+
+<!--page content-->
+{% block content %}
+<form class="grid grid-row-[1fr_1fr] md:grid-row-1 md:grid-cols-[40%_40%] md:gap-10" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="order-1">
+        <div class="flex flex-col my-1">
+            <div class="">
+                <label for="first-name" class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]">first name</label>
+                {% if form.first_name.errors %}
+                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.first_name.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            {{ form.first_name }}
+        </div>
+        <div class="flex flex-col my-1">
+            <div class="">
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="middle-name">middle name</label>
+                {% if form.middle_name.errors %}
+                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.middle_name.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            {{ form.middle_name }}
+        </div>
+        <div class="flex flex-col my-1">
+            <div class="">
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="last-name">last name</label>
+                {% if form.last_name.errors %}
+                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.last_name.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            {{ form.last_name }}
+        </div>
+        <div class="flex flex-col my-1">
+            <div class="">
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="date-of-birth">date of birth</label>
+                {% if form.date_of_birth.errors %}
+                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.date_of_birth.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            {{ form.date_of_birth }}
+        </div>
+        <div class="flex flex-col my-1">
+            <div class="">
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="contact-number">contact number</label>
+                {% if form.contact_number.errors %}
+                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.contact_number.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            {{ form.contact_number }}
+        </div>
+        <div class="flex flex-col my-1">
+            <div class="">
+                <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="emergency-contact">emergency contact</label>
+                {% if form.emergency_contact.errors %}
+                    <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.emergency_contact.errors.0 }}</div>
+                {% endif %}
+            </div>
+            {{ form.emergency_contact }}
+        </div>
+    </div>
+</form>
+{% endblock %}
