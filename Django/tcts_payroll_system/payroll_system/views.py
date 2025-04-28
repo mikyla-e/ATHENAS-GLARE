@@ -1205,33 +1205,21 @@ def customer_edit(request, customer_id):
         form = CustomerEditForm(instance=customer)
     
     # Get location data for dropdowns
-    regions = Region.objects.all().order_by('regDesc')
+    regions = Region.objects.list(Region.objects.all().values('regDesc', 'regCode'))
     
-    # Get related provinces, cities, and barangays
+    # Get related provinces, cities, and barangays based on selected values
     provinces = []
     cities = []
     barangays = []
     
-    # Try to get the region object
-    region = None
     if customer.region:
-        region = Region.objects.filter(regDesc=customer.region).first()
-        if region:
-            provinces = Province.objects.filter(regCode=region.regCode).order_by('provDesc')
-    
-    # Try to get the province object
-    province = None
-    if customer.province and region:
-        province = Province.objects.filter(provDesc=customer.province, regCode=region.regCode).first()
-        if province:
-            cities = City.objects.filter(provCode=province.provCode).order_by('citymunDesc')
-    
-    # Try to get the city object
-    city = None
-    if customer.city and province:
-        city = City.objects.filter(citymunDesc=customer.city, provCode=province.provCode).first()
-        if city:
-            barangays = Barangay.objects.filter(citymunCode=city.citymunCode).order_by('brgyDesc')
+        provinces = Province.objects.filter(regCode=customer.region.regCode).order_by('provDesc')
+        
+        if customer.province:
+            cities = City.objects.filter(provCode=customer.province.provCode).order_by('citymunDesc')
+            
+            if customer.city:
+                barangays = Barangay.objects.filter(citymunCode=customer.city.citymunCode).order_by('brgyDesc')
     
     context = {
         'form': form,

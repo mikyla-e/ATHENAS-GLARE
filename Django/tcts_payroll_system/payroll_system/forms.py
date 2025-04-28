@@ -570,26 +570,29 @@ class CustomerEditForm(forms.ModelForm):
     
     # Keep your existing validation methods...
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        instance = kwargs.get('instance')
-        if instance:
-            # Check if the foreign key objects exist and set their descriptions as initial values
-            if instance.region:
-                self.fields['region'].initial = instance.region  # This stores the object for value
-                self.fields['region'].label = f"Region: {instance.region.regDesc}"  # This shows the description
-                
-            if instance.province:
-                self.fields['province'].initial = instance.province
-                self.fields['province'].label = f"Province: {instance.province.provDesc}"
-                
-            if instance.city:
-                self.fields['city'].initial = instance.city
-                self.fields['city'].label = f"City/Municipality: {instance.city.citymunDesc}"
-                
-            if instance.barangay:
-                self.fields['barangay'].initial = instance.barangay
-                self.fields['barangay'].label = f"Barangay: {instance.barangay.brgyDesc}"
+    def save(self, commit=True):
+        customer = super().save(commit=False)
+        
+        # Set location fields based on validated data
+        region_name = self.cleaned_data.get('region')
+        province_name = self.cleaned_data.get('province')
+        city_name = self.cleaned_data.get('city')
+        barangay_name = self.cleaned_data.get('barangay')
+        
+        region = Region.objects.filter(regDesc=region_name).first()
+        province = Province.objects.filter(provDesc=province_name, regCode=region.regCode).first()
+        city = City.objects.filter(citymunDesc=city_name, provCode=province.provCode).first()
+        barangay = Barangay.objects.filter(brgyDesc=barangay_name, citymunCode=city.citymunCode).first()
+        
+        customer.region = region
+        customer.province = province
+        customer.city = city
+        customer.barangay = barangay
+        
+        if commit:
+            customer.save()
+        
+        return customer
 
 class VehicleForm(forms.ModelForm):
     vehicle_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}))
