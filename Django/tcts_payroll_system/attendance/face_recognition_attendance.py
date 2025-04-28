@@ -56,8 +56,6 @@ def compare_faces(known_encoding, captured_encoding):
     # Return True only if the built-in comparison says it's a match AND the distance is small enough
     return match and distance < 0.6  # Slightly more lenient for web camera
 
-# Additional function for face_recognition_attendance.py
-
 def check_attendance_status(employee, start_date=None, end_date=None):
     """
     Check the attendance status of an employee with optional date filtering.
@@ -80,7 +78,8 @@ def check_attendance_status(employee, start_date=None, end_date=None):
     ).order_by('time_in')
     
     # Check if employee has an open session (time_in but no time_out)
-    has_open_session = today_logs.filter(time_in__isnull=False, time_out__isnull=True).exists()
+    open_session = today_logs.filter(time_in__isnull=False, time_out__isnull=True).first()
+    has_open_session = open_session is not None
     
     # Format today's logs for frontend
     formatted_today_logs = []
@@ -120,12 +119,18 @@ def check_attendance_status(employee, start_date=None, end_date=None):
             'time_out': log.time_out.strftime('%H:%M:%S') if log.time_out else None,
         })
     
-    return {
+    result = {
         'status': 'success',
         'has_open_session': has_open_session,
         'today_logs': formatted_today_logs,
         'history_logs': formatted_history_logs
     }
+    
+    # Add the open session ID if there is one
+    if has_open_session:
+        result['current_log_id'] = open_session.attendance_id
+    
+    return result
 
 def get_filtered_attendance(employee, start_date, end_date):
     
@@ -189,7 +194,7 @@ def mark_attendance(employee, action=None):
     has_open_session = status_info["has_open_session"]
     
     # Handle time_in action
-    if action == "time_in":
+    if action == "time_in" or (action is None and not has_open_session):
         if has_open_session:
             return {
                 "status": "warning", 
@@ -213,74 +218,58 @@ def mark_attendance(employee, action=None):
             return {"status": "error", "message": str(e)}
     
     # Handle time_out action
-    elif action == "time_out":
+    elif action == "time_out" or (action is None and has_open_session):
         if not has_open_session:
-            # Create an attendance record with only time_out for admin to fix later
-            try:
-                log = Attendance.objects.create(
-                    employee_id_fk=employee, 
-                    date=today,
-                    time_in=None,
-                    time_out=current_time
-                )
-                
-                return {
-                    "status": "warning", 
-                    "message": f"Time Out recorded without Time In. Admin will need to adjust this."
-                }
-            except Exception as e:
-                return {"status": "error", "message": str(e)}
+            return {
+                "status": "warning", 
+                "message": f"No open session found for {employee.first_name}. Please time in first."
+            }
         
         # Update open session with time_out
         try:
-            log = Attendance.objects.get(
-                attendance_id=status_info["current_log_id"],
-                employee_id_fk=employee, 
-                date=today
-            )
-            log.time_out = current_time
-            log.save()
-            
-            return {
-                "status": "success", 
-                "message": f"Time Out recorded: {employee.first_name} at {current_time}"
-            }
+            # Get the open session ID
+            if 'current_log_id' in status_info:
+                log = Attendance.objects.get(
+                    attendance_id=status_info["current_log_id"],
+                    employee_id_fk=employee
+                )
+                log.time_out = current_time
+                log.save()
+                
+                return {
+                    "status": "success", 
+                    "message": f"Time Out recorded: {employee.first_name} at {current_time}"
+                }
+            else:
+                # Fallback if we don't have the ID (should not happen with the updated code)
+                open_log = Attendance.objects.filter(
+                    employee_id_fk=employee,
+                    date=today,
+                    time_in__isnull=False,
+                    time_out__isnull=True
+                ).first()
+                
+                if open_log:
+                    open_log.time_out = current_time
+                    open_log.save()
+                    return {
+                        "status": "success", 
+                        "message": f"Time Out recorded: {employee.first_name} at {current_time}"
+                    }
+                else:
+                    return {
+                        "status": "error", 
+                        "message": "Could not find the open session to time out."
+                    }
         except Exception as e:
             return {"status": "error", "message": str(e)}
     
-    # Default behavior (for backward compatibility)
-    else:
-        if has_open_session:
-            # Close open session
-            try:
-                log = Attendance.objects.get(attendance_id=status_info["current_log_id"])
-                log.time_out = current_time
-                log.save()
-                message = f"Time Out recorded: {employee.first_name} at {current_time}"
-                status = "success"
-            except Exception as e:
-                message = f"Error: {str(e)}"
-                status = "error"
-        else:
-            # Create new session
-            try:
-                log = Attendance.objects.create(
-                    employee_id_fk=employee, 
-                    date=today,
-                    time_in=current_time,
-                    time_out=None
-                )
-                message = f"Time In recorded: {employee.first_name} at {current_time}"
-                status = "success"
-            except Exception as e:
-                message = f"Error: {str(e)}"
-                status = "error"
-                
-        return {"message": message, "status": status}
+    # Default fallback
+    return {"status": "error", "message": "Invalid action"}
 
 # Process a single frame from the web interface
 def process_frame_recognition(frame):
-    # Resize frame to 1/4 size for faster processing
+    # Resize frame for faster processing
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
     
     # Convert to RGB for face_recognition library
