@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from django.views.decorators.csrf import csrf_protect
-from .forms import EmployeeForm, PayrollForm, ServiceForm, CustomerForm, VehicleForm
+from .forms import EmployeeForm, PayrollForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
 from .models import Employee, Payroll, Attendance, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -1191,5 +1191,55 @@ def update_incentives_individual(request, employee_id):
         return JsonResponse({'success': True, 'new_incentive': str(new_incentives), 'new_salary': str(new_salary)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
-def customer_edit(request):
-    return render(request, 'payroll_system/customer_edit.html')
+
+def customer_edit(request, customer_id):
+    customer = get_object_or_404(Customer, customer_id=customer_id)
+    
+    if request.method == 'POST':
+        form = CustomerEditForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Customer information updated successfully.")
+            return redirect('payroll_system:customer_page', customer_id=customer.customer_id)
+    else:
+        form = CustomerEditForm(instance=customer)
+    
+    # Get location data for dropdowns
+    regions = Region.objects.all().order_by('regDesc')
+    
+    # Get related provinces, cities, and barangays
+    provinces = []
+    cities = []
+    barangays = []
+    
+    # Try to get the region object
+    region = None
+    if customer.region:
+        region = Region.objects.filter(regDesc=customer.region).first()
+        if region:
+            provinces = Province.objects.filter(regCode=region.regCode).order_by('provDesc')
+    
+    # Try to get the province object
+    province = None
+    if customer.province and region:
+        province = Province.objects.filter(provDesc=customer.province, regCode=region.regCode).first()
+        if province:
+            cities = City.objects.filter(provCode=province.provCode).order_by('citymunDesc')
+    
+    # Try to get the city object
+    city = None
+    if customer.city and province:
+        city = City.objects.filter(citymunDesc=customer.city, provCode=province.provCode).first()
+        if city:
+            barangays = Barangay.objects.filter(citymunCode=city.citymunCode).order_by('brgyDesc')
+    
+    context = {
+        'form': form,
+        'customer': customer,
+        'regions': regions,
+        'provinces': provinces,
+        'cities': cities,
+        'barangays': barangays,
+    }
+    
+    return render(request, 'payroll_system/customer_edit.html', context)

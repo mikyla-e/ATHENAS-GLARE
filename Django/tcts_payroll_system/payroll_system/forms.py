@@ -542,6 +542,55 @@ class CustomerForm(forms.ModelForm):
         
         return customer
 
+class CustomerEditForm(forms.ModelForm):
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-12'}))
+    middle_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-12'}), required=False)
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-12'}))
+    contact_number = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-12', 'type': 'tel'}))
+    region = forms.CharField(
+        label='region', 
+        widget=forms.TextInput(attrs={'class': 'h-12', 'id': 'region-dropdown', 'list': 'region-list', 'autocomplete': 'off'})
+    )
+    province = forms.CharField(
+        label='province', 
+        widget=forms.TextInput(attrs={'class': 'h-12', 'id': 'province-dropdown', 'list': 'province-list', 'autocomplete': 'off'})
+    )
+    city = forms.CharField(
+        label='city', 
+        widget=forms.TextInput(attrs={'class': 'h-12', 'id': 'city-dropdown', 'list': 'city-list', 'autocomplete': 'off'})
+    )
+    barangay = forms.CharField(
+        label='barangay', 
+        widget=forms.TextInput(attrs={'class': 'h-12', 'id': 'barangay-dropdown', 'list': 'barangay-list', 'autocomplete': 'off'})
+    )
+    
+    class Meta:
+        model = Customer
+        fields = ('first_name', 'middle_name', 'last_name', 'contact_number', 'region', 'province', 'city', 'barangay')
+    
+    # Keep your existing validation methods...
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = kwargs.get('instance')
+        if instance:
+            # Check if the foreign key objects exist and set their descriptions as initial values
+            if instance.region:
+                self.fields['region'].initial = instance.region  # This stores the object for value
+                self.fields['region'].label = f"Region: {instance.region.regDesc}"  # This shows the description
+                
+            if instance.province:
+                self.fields['province'].initial = instance.province
+                self.fields['province'].label = f"Province: {instance.province.provDesc}"
+                
+            if instance.city:
+                self.fields['city'].initial = instance.city
+                self.fields['city'].label = f"City/Municipality: {instance.city.citymunDesc}"
+                
+            if instance.barangay:
+                self.fields['barangay'].initial = instance.barangay
+                self.fields['barangay'].label = f"Barangay: {instance.barangay.brgyDesc}"
+
 class VehicleForm(forms.ModelForm):
     vehicle_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}))
     vehicle_color = forms.CharField(widget=forms.TextInput(attrs={'class': 'h-[50px]'}))
@@ -601,31 +650,3 @@ class VehicleForm(forms.ModelForm):
             raise forms.ValidationError("All fields must be filled.")
             
         return cleaned_data
-
-# Greg Edit NOT YET FINISH
-class CustomerForm(forms.ModelForm):
-    first_name = forms.CharField(max_length=100, label='old password', widget=forms.TextInput(attrs={
-        'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            'placeholder': 'Enter Old Password'
-    }))
-    middle_name = forms.CharField(max_length=100, label='old password', widget=forms.TextInput(attrs={
-        'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            'placeholder': 'Enter Old Password'
-    }))
-    last_name = forms.CharField(max_length=100, label='old password', widget=forms.TextInput(attrs={
-        'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            'placeholder': 'Enter Old Password'
-    }))
-    date_of_birth = forms.CharField(max_length=100, label='old password', widget=forms.DateInput(attrs={
-        'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            'placeholder': 'Enter Old Password'
-    }))
-    contact_number = forms.CharField(max_length=100, label='old password', widget=forms.TextInput(attrs={
-        'class': 'w-full bg-white px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
-            'placeholder': 'Enter Old Password'
-    }))
-
-    class Meta:
-        model = Customer
-        fields = ('first_name', 'middle_name', 'last_name', 'date_of_birth','contact_number')
-
