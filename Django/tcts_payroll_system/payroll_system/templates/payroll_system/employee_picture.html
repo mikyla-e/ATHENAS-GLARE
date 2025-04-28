@@ -6,7 +6,6 @@
 
 <!--(optional)head content-->
 {% block headcontent %}
-
 <link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 <style>
     .background.show,
@@ -23,12 +22,13 @@
 <!--page content-->
 {% block outsidecontent %}
 <div id="background" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelPicture()">
-        
 </div> 
 
 <div id="picture-popup" class="picture fixed w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
     <h1 class="text-3xl font-[League Spartan] font-semibold">Save Picture to Employee Profile?</h1>
-    <form id="picture-form" class="flex flex-col" method="post" onsubmit="event.preventDefault();">
+    <form id="picture-form" class="flex flex-col" method="post" action="">
+        {% csrf_token %}
+        <input type="hidden" name="image_data" id="image_data">
         <div class="w-full my-5 flex justify-center">
             <img id="capturedImage" src="" alt="Captured Image" class="w-full h-full m-0 rounded-xl" style="display: none;"/>
         </div>
@@ -50,21 +50,12 @@
                     <div class="w-full mb-[20px] flex">
                         <video id="video" autoplay playsinline class="w-full h-full bg-white rounded-xl"></video>
                         <canvas id="canvas" style="display: none;"></canvas>
-                        
                     </div>
-                    
-                    <!-- Hide the original file input but keep it in the form for file submission -->
-                    <div style="display: none;">
-                        {{ form.employee_image }}
-                    </div>
-                    {% if form.employee_image.errors %}
-                        <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ form.employee_image.errors.0 }}</div>
-                    {% endif %}
                 </div>
     
                 <div class="w-full flex justify-between items-center">
                     <p class="font-[League Spartan] text-3xl/10 font-bold text-[#1E1E1E]">Smile for the camera!</p>
-                    <button type="button" id="captureButton" onclick="confirmPicture()" class="w-fit px-4 py-2 rounded-full flex flex-row flex-nowrap gap-2 items-center bg-[#1E1E1E] text-white">
+                    <button type="button" id="captureButton" class="w-fit px-4 py-2 rounded-full flex flex-row flex-nowrap gap-2 items-center bg-[#1E1E1E] text-white">
                         <p class="m-0 font-[Roboto] text-xl pt-[1px] font-bold">TAKE A PICTURE</p>
                         <img src="{% static 'images/camera.png' %}" alt="" class="w-[30px] h-[30px]">
                     </button>
@@ -84,21 +75,22 @@
         const canvas = document.getElementById('canvas');
         const capturedImage = document.getElementById('capturedImage');
         const captureButton = document.getElementById('captureButton');
-        const fileInput = document.querySelector('input[type="file"]'); // This should get the Django file input
+        const imageDataInput = document.getElementById('image_data');
+        const pictureForm = document.getElementById('picture-form');
 
         // Initialize webcam
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(stream) {
-            video.srcObject = stream;
-            video.play();
-            })
-            .catch(function(error) {
-            console.error('Could not access webcam:', error);
-            alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
-            });
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function(error) {
+                    console.error('Could not access webcam:', error);
+                    alert('Could not access webcam. Please make sure your camera is connected and permissions are granted.');
+                });
         } else {
-        alert('Your browser does not support webcam access. Please try a different browser.');
+            alert('Your browser does not support webcam access. Please try a different browser.');
         }
 
         // Capture button click handler
@@ -115,21 +107,21 @@
             const dataURL = canvas.toDataURL('image/jpeg');
             capturedImage.src = dataURL;
             capturedImage.style.display = 'block';
+            
+            // Store the image data in the hidden input
+            imageDataInput.value = dataURL;
+            
+            // Show the confirmation dialog
+            confirmPicture();
+        });
         
-            // Convert canvas content to a File object for form submission
-            canvas.toBlob(function(blob) {
-                // Create a File object from the Blob
-                const imageFile = new File([blob], "employee_image.jpg", { type: "image/jpeg" });
-                
-                // Create a FileList-like object
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(imageFile);
-                
-                // Set the file to the file input
-                fileInput.files = dataTransfer.files;
-                
-                console.log("Image captured and file created");
-            }, 'image/jpeg', 0.95); // High quality JPEG
+        // Handle form submission
+        pictureForm.addEventListener('submit', function(event) {
+            // Make sure we have image data
+            if (!imageDataInput.value) {
+                event.preventDefault();
+                alert('Please take a picture first!');
+            }
         });
     });
 
@@ -146,6 +138,5 @@
         bg.classList.remove("show");
         popup.classList.remove("show");
     }
-
 </script>
 {% endblock %}

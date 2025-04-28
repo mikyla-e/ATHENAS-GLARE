@@ -1,3 +1,7 @@
+import re
+import base64
+from datetime import datetime
+from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
@@ -124,16 +128,17 @@ def get_barangays(request):
 
 def employee_registration(request):
     if request.method == "POST":
-        form = EmployeeForm(request.POST, request.FILES)
+        form = EmployeeForm(request.POST)
         
         if form.is_valid():
-            employee = form.save()
+            # Save form data to session instead of database
+            request.session['employee_form_data'] = form.cleaned_data
+            # Convert date objects to strings for session storage
+            for key, value in request.session['employee_form_data'].items():
+                if hasattr(value, 'isoformat'):  # For date objects
+                    request.session['employee_form_data'][key] = value.isoformat()
             
-            # Create history entry
-            History.objects.create(
-                description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was added."
-            )
-            return redirect('payroll_system:payroll_individual', employee_id=employee.employee_id)
+            return redirect('payroll_system:employee_picture')
     else:
         form = EmployeeForm()
     
@@ -147,7 +152,59 @@ def employee_registration(request):
     return render(request, 'payroll_system/employee_registration.html', context)
 
 def employee_picture(request):
+    # Ensure we have form data in session
+    if 'employee_form_data' not in request.session:
+        messages.error(request, "Please fill out employee details first")
+        return redirect('payroll_system:employee_registration')
+    
+    if request.method == "POST":
+        image_data = request.POST.get('image_data')
+        
+        if image_data:
+            # Extract the base64 encoded image data
+            format, imgstr = image_data.split(';base64,')
+            ext = format.split('/')[-1]
+            
+            # Create a ContentFile from the base64 data
+            image_file = ContentFile(base64.b64decode(imgstr), name=f'employee_image.{ext}')
+            
+            # Get employee data from session
+            employee_data = request.session['employee_form_data']
+            
+            # Convert date strings back to date objects
+            for date_field in ['date_of_birth', 'date_of_employment']:
+                if date_field in employee_data and employee_data[date_field]:
+                    employee_data[date_field] = parse_date(employee_data[date_field])
+            
+            # Create and save the employee with all data
+            form = EmployeeForm(employee_data)
+            
+            if form.is_valid():
+                employee = form.save(commit=False)
+                employee.employee_image = image_file
+                employee.save()
+                
+                # Create history entry
+                History.objects.create(
+                    description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was added."
+                )
+                
+                # Clear session data
+                del request.session['employee_form_data']
+                
+                messages.success(request, "Employee registered successfully!")
+                return redirect('payroll_system:payroll_individual', employee_id=employee.employee_id)
+            else:
+                messages.error(request, "Error in form data. Please try again.")
+                return redirect('payroll_system:employee_registration')
+        else:
+            messages.error(request, "No image was captured. Please take a picture.")
+    
     return render(request, 'payroll_system/employee_picture.html')
+
+# Helper function to parse date strings
+def parse_date(date_str):
+    return datetime.strptime(date_str, '%Y-%m-%d').date()
 
 @login_required
 def employees(request):
