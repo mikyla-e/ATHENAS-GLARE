@@ -1,4 +1,92 @@
 {% load static %}
+
+{% block headcontent %}
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="{% static 'css/admin_login.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+{% for message in messages %}
+        <div class="flex gap-3 bg-[#fffbeb80] p-5 message {{ message.tags }}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="#f7c028" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+            </svg>              
+            <p class="text-[#8f4311]">{{ message }}</p>
+        </div>
+    {% endfor %}
+    
+    <div class="container">
+        <div class="logo_container">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <circle cx="19.7037" cy="19.7037" r="19.7037" fill="url(#paint0_linear_148_136)"/>
+                <defs>
+                  <linearGradient id="paint0_linear_148_136" x1="19.7037" y1="0" x2="19.7037" y2="39.4074" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#F8D146"/>
+                    <stop offset="1" stop-color="#F5B93F"/>
+                  </linearGradient>
+                </defs>
+            </svg>
+            <p class="logo_name">PAYROLL SYSTEM</p>
+        </div>
+        <div class="login_container">
+            <div class="login_title">
+                <h1 class="welcome-to">WELCOME TO</h1>
+                <h1 class="totos-payroll">TOTO’S PAYROLL SYSTEM</h1>
+                <p>ADMIN CONTROL</p>
+            </div>
+            <div class="login_field">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <label for="admin-name">username</label><br>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                            {% for error in form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <br><br>
+
+                    <label for="admin-password">password</label><br>
+                    {{ form.password }}
+
+                    {% if form.password.errors %}
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                            {% for error in form.password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="login_buttons">
+                        <input type="submit" value="LOGIN">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="clientlogo_img">
+            <img src="{% static 'images/clients_logo.png' %}" alt="Toto's Car Tinting Shop">
+        </div>
+        
+    </div>
+{% endblock %}
+
+
+<!-- {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,4 +173,4 @@
         
     </div>
 </body>
-</html>
+</html> -->

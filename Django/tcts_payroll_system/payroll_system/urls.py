@@ -33,4 +33,5 @@ urlpatterns = [
     path('update-incentives/', views.update_incentives, name='update_incentives'),
     path('update_incentives_individual/<int:employee_id>/', views.update_incentives_individual, name='update_incentives_individual'),
 
+    path('customer_edit/', views.customer_edit, name='customer_edit'),
 ]
