@@ -51,47 +51,7 @@
             <input type="button" class="size-full" value="CANCEL" onclick="cancelEditIncentives()">
             <input type="submit" class="size-full" value="CONFIRM">
         </div>
-    </form>
-    <script>
-        document.querySelector('#incentive-popup form').addEventListener('submit', function() {
-            const incentiveValue = parseFloat(document.getElementById('field').value);
-            const actionType = document.getElementById('add').checked ? 'add' : 'subtract';
-    
-            if (isNaN(incentiveValue) || incentiveValue <= 0) {
-                alert('Please enter a valid positive number for incentives.');
-                return;
-            }
-    
-            fetch("{% url 'payroll_system:update_incentives_individual' employee.employee_id %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-                body: JSON.stringify({
-                    incentive: incentiveValue,
-                    action: actionType,
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Successfully updated incentive for {{ employee.first_name }} {{ employee.last_name }}!');
-                    window.location.reload();
-                } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while updating incentive.');
-            });
-        });
-    
-        function cancelEditIncentives() {
-            document.getElementById('incentive-popup').classList.add('invisible', 'opacity-0');
-        }
-    </script>    
+    </form>   
 </div>
 {% endblock %}
 
@@ -432,6 +392,6 @@
         const popup = document.getElementById("incentive-popup");
         bg.classList.remove("show");
         popup.classList.remove("show");
-    }
+    }    
 </script>
 {% endblock %}
