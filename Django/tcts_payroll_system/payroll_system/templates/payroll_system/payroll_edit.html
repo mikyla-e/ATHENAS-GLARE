@@ -7,103 +7,161 @@
 <!--(optional)head content-->
 {% block headcontent %}
 <link rel="stylesheet" href="{% static 'css/payroll_edit.css' %}">
+<link rel="stylesheet" href="{% static 'css/default_design.css'  %}">
+
+<style>
+    .background.show,
+    .cash_advance.show,
+    .edit_payroll.show
+     {
+        visibility: visible;
+        opacity: 1;
+    }
+</style>
 {% endblock %}
 
 <!--header-->
 {% block header %}PAYROLL{% endblock %} 
 
 <!--page content-->
+{% block outsidecontent %}
+<div id="background_cash" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelCashAdvance()">
+        
+</div> 
+
+<div id="cash-popup" class="cash_advance fixed h-[30%] w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden">
+    <h1 class="text-3xl font-[League Spartan] font-semibold">Cash Advance for this Employee</h1>
+    <form id="cash-form" class="size-full flex flex-col" method="post" action="">
+        {% csrf_token %}
+        <input type="hidden" name="cash_advance" value="true">
+        <div class="w-full h-[50%] my-5 flex justify-center gap-1">
+            <div class="w-[90%] bg-[#EFEDE6] rounded-xl">
+                <div class="w-full h-[25%]">
+                    <label for="cash_advance" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">amount</label>
+                </div>
+                <div class="w-full h-[75%]">
+                    <input type="number" name="number" id="cash_advance" class="w-full h-full px-5 outline-none border-none font-[Inter] font-semibold text-3xl" required>
+                </div>
+            </div>
+        </div>
+        <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
+            <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelCashAdvance()">
+            <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+        </div>           
+    </form>
+</div>
+
+<div id="background_payroll" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelEditPayroll()">
+        
+</div> 
+
+
+{% endblock %}
+
 {% block content %}
-
-<div class="profile-picture">
-    <img src="{{ employee.employee_image.url }}" alt="">
-    <div class="employee_name">
-        <h1>
-            {{ employee.first_name }} {{ employee.last_name }}
-        </h1>
+<div class="py-5 px-5 md:px-10 flex flex-col gap-5">
+    <div class="w-full flex items-end justify-between">
+        <div class="w-fit flex flex-row items-end gap-3">
+            <img src="{{ employee.employee_image.url }}" alt="" class="size-[110px] rounded-full object-cover">
+            <div class="mx-[15px] flex flex-col gap-2">
+                <h1 class="font-[League Spartan] text-4xl font-bold">
+                    {{ employee.first_name }} {{ employee.last_name }}
+                </h1>
+                <p class="font-[Roboto] text-lg font-extrabold text-[#1E1E1E96]">{{ employee.employee_status }} Employee | {{ employee.contact_number }}</p>
+            </div>
+        </div>
+        <div id="cash_advance" class="h-[40px]">
+            <button id="button" class="size-full text-xs/3 lg:text-base/4 font-bold text-[League Spartan] text-center" onclick="addCashAdvance()">CASH ADVANCE</button>
+        </div>
     </div>
-</div>
 
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-        {{ message }}
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
-{% endif %}
+    {% endif %}
 
-<!-- Display form errors -->
-{% if form.non_field_errors %}
-<div class="form-errors">
-    {% for error in form.non_field_errors %}
-    <div class="error">{{ error }}</div>
-    {% endfor %}
-</div>
-{% endif %}
+    <!-- Display form errors -->
+    {% if form.non_field_errors %}
+    <div class="form-errors">
+        {% for error in form.non_field_errors %}
+        <div class="error">{{ error }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-<div class="edit_container">
-    <table>
-        <tr>
-            <th>Rate per Day</th>
-            <!-- <th>Deductions</th> -->
-            <th>Date of Pay</th>
-            <th>Payroll Status</th>
-            <th></th>
-        </tr>
-        <tr>
-            <form class="edit_field" method="POST">
-                {% csrf_token %}
-                <td>{{ form.rate }}</td>
-                <!-- <td>{{ form.deductions }}</td> -->
-                <td>{{ form.payment_date }}</td>
-                <td>{{ form.payroll_status }}</td>
-                <td>
-                    <a href=""><input type="button" value=""></a>
-                    <input type="submit" value="">
-                </td>
-            </form>
-        </tr>
-    </table>
+    <div class="flex flex-col">
+        <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden">
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr>
+                    <th class="p-2 text-base font-[League Spartan]">RATE PER DAY</th>
+                    <th class="p-2 text-base font-[League Spartan]">DATE OF PAYMENT</th>
+                    <th class="p-2 text-base font-[League Spartan]">PAYROLL STATUS</th>
+                    <th class="p-2 text-base font-[League Spartan]"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <form class="edit_field" method="POST">
+                        {% csrf_token %}
+                        <td>{{ form.rate }}</td>
+                        <td>{{ form.payment_date }}</td>
+                        <td>{{ form.payroll_status }}</td>
+                        <td>
+                            <a href=""><input id="cancel" type="button" value=""></a>
+                            <input id="save" type="button" value="" onclick="editPayroll()">
+                        </td>
+
+                        <div id="payroll-popup" class="edit_payroll fixed h-fit w-[60%] md:w-[50%] lg:w-[40%] gap-5 py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-between items-center invisible opacity-0 rounded-lg z-60 overflow-hidden">
+                            <h1 class="text-3xl font-[League Spartan] font-semibold text-center">Are you sure about these Payroll details?</h1>
+                            <div class="w-full h-[40px] my-1 flex justify-center gap-3">
+                                <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CANCEL" onclick="cancelEditPayroll()">
+                                <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CONFIRM">
+                            </div>
+                        </div>
+                    </form>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
 
 <!--(optional)script-->
 {% block script %}
-
-{% endblock %}
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registering Employees...</title>
-    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    <link rel="stylesheet" href="{% static 'css/payroll_edit.css' %}">
-
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-</head>
-<body class="bg-[#EFEDE6]">
-
-
-    <div class="h-dvh w-full grid grid-cols-[80px_1fr] md:grid-cols-[190px_1fr] grid-rows-[70px_1fr] z-25">
-        <div class="bg-[#FFFFFF] row-span-2">
-
-        </div>
+<script>
+    function addCashAdvance(){
+        let bg = document.getElementById("background_cash");
+        const popup = document.getElementById("cash-popup");
         
-        <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">PAYROLL</h1>
-        </div>
+        bg.classList.add("show");
+        popup.classList.add("show");
+    }
+    
+    function cancelCashAdvance(){
+        let bg = document.getElementById("background_cash");
+        const popup = document.getElementById("cash-popup");
+        bg.classList.remove("show");
+        popup.classList.remove("show");
+    }
 
-        <div class="size-full py-4 px-3" id="thing">
-            
-        </div>
-    </div>
-</body>
-
-{{ redirect_to_login_immediately }}
-
-</html> -->
+    function editPayroll(){
+        let bg = document.getElementById("background_payroll");
+        const popup = document.getElementById("payroll-popup");
+        
+        bg.classList.add("show");
+        popup.classList.add("show");
+    }
+    
+    function cancelEditPayroll(){
+        let bg = document.getElementById("background_payroll");
+        const popup = document.getElementById("payroll-popup");
+        bg.classList.remove("show");
+        popup.classList.remove("show");
+    }
+</script>
+{% endblock %}

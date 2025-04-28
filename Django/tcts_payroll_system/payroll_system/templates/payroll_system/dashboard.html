@@ -13,19 +13,40 @@
     
     }
 
-    #philippine-time{
-        font-size: clamp(3rem, 4rem, 4.5rem);
-    }
-
     #date{
         background: -webkit-linear-gradient(#F8D146, #F5B93F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
-    @media screen {
-        
+    @media (min-width: 80rem){
+    #philippines-time {
+            font-size: clamp(4.5rem, 6vw, 6rem);
+            line-height: 100%;
+        }
     }
+
+    @media (min-width: 64rem) and (max-width: 80rem) {
+        #philippines-time {
+            font-size: clamp(3.6rem, 5.5vw, 5.8rem);
+            line-height: 100%;
+        }
+    }
+
+    @media (min-width: 40rem) and (max-width: 64rem) {
+        #philippines-time {
+            font-size: 2rem;
+            line-height: 100%;
+        }
+    }
+
+    @media (max-width: 40rem){
+        #philippines-time {
+            font-size: clamp(1rem, 5vw, 2rem);
+            line-height: 100%;
+        }
+    }
+
 </style>
 {% endblock %}
 
@@ -33,9 +54,9 @@
 {% block header %}DASHBOARD{% endblock %}
 
 {% block content %}
-    <div class="h-dvh w-full grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] grid-rows-[1fr_1fr_2fr_2fr_1fr] lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-[2.75fr_4fr_5.25fr] gap-3">
+    <div class="h-auto w-full grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] grid-rows-[auto_1fr_200px_200px_325px] lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-[180px_4fr_325px] gap-3">
         <!-- Total Employees Container -->
-        <div class="order-2 col-span-5 lg:order-1 lg:col-span-4 p-3 bg-[#1E1E1E] rounded-xl flex flex-col md:flex-row justify-evenly items-center shadow-lg" id="emp">
+        <div class="order-6 col-span-5 lg:order-1 lg:col-span-4 p-3 bg-[#1E1E1E] rounded-xl flex flex-col md:flex-row justify-evenly items-center shadow-lg" id="emp">
             <div class="w-full h-[50%] md:h-full flex flex-col justify-center items-center " id="ttl_emp">
                 <div class="w-full h-full px-4 flex flex-col justify-around items-end" id="content">
                     <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
@@ -66,23 +87,23 @@
         </div>
 
         <!-- Weather Container -->
-        <div class="order-1 col-span-10 lg:order-3 lg:col-span-4 flex flex-col flex-nowrap justify-end items-end" id="time">
-            <div id="weather" class="flex flex-nowrap items-center gap-3">
+        <div class="order-1 col-span-10 lg:order-3 lg:col-span-4 flex lg:flex-col h-full justify-start lg:justify-end gap-3 lg:gap-0" id="weather-time">
+            <div id="weather" class="hidden lg:flex flex-row flex-nowrap items-center justify-end gap-1">
                 <img src="{% static 'images/weather_icon.png' %}" alt="">
-                <p class="text-[Roboto] font-bold text-4xl">WEATHER</p>
+                <p class="text-[Roboto] font-bold text-right text-4xl">WEATHER</p>
             </div>
 
-            <div id="time" class="text-[League Spartan] font-bold text-right">
-                <h1 id="philippines-time" class="text-base" style="font-size: clamp(3.5rem, 6vw, 7rem); line-height: 100%;"></h1>
+            <div id="time" class="flex items-end lg:items-center lg:justify-end">
+                <h1 id="philippines-time" class="text-[League Spartan] font-bold lg:text-right"></h1>
             </div>
 
-            <div id="date" class="flex flex-nowrap justify-start items-center gap-3">
-                <p class="text-[Roboto] text-2xl md:text-[28px] xl:text-4xl text-right"><span id="philippines-day" class="font-extrabold text"></span> | <span id="philippines-date" class="font-extrabold"></span></p>
+            <div id="date" class="flex flex-nowrap justify-end items-end lg:items-center gap-3">
+                <p class="text-[Roboto] text-lg sm:text-2xl md:text-[28px] xl:text-4xl lg:text-right leading-[100%]"><span id="philippines-day" class="hidden sm:inline-block font-extrabold text"></span> <span class="hidden sm:inline-block">|</span> <span id="philippines-date" class="font-extrabold"></span></p>
             </div>
         </div>
 
         <!-- Payroll Status Container -->
-        <div class="order-4 col-span-5 lg:order-2 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center overflow-hidden shadow-lg" id="payroll-status">
+        <div class="order-4 col-span-5 lg:order-2 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center outline-none border-none overflow-hidden shadow-lg" id="payroll-status">
             <div class="w-[45%] h-full p-3 flex flex-col justify-between" id="processed-pending">
                 <div class="text-[#FFFFFF] text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
                     <p >PAYROLL STATUS</p>
@@ -100,7 +121,7 @@
                     </div>
                 </div>
             </div>
-            <div class="w-[55%] h-full p-3 rounded-xl " id="payroll-info">
+            <div class="w-[55%] ml-2 h-full p-3 rounded-xl " id="payroll-info">
                 <div class="h-full flex flex-col justify-between items-end" id="content2">
                     <div class="h-fit my-2 mx-4 flex flex-col items-end" id="total_payroll">
                         <p class="font-[Roboto] font-semibold text-right text-white">TOTAL PAYROLL</p>
@@ -119,12 +140,12 @@
         </div>
         
         <!-- Donut Chart -->
-        <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 border border-black shadow-lg" id="attendance">
-            <canvas id="donut" class=""></canvas>
+        <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 xl:col-span-3 flex justify-center items-center bg-white rounded-xl shadow-lg" id="attendance">
+            <canvas id="donut" class="p-[15px]"></canvas>
         </div>
 
         <!-- Recent History Chart -->
-        <div class="relative order-3 col-span-5 lg:col-span-3 row-span-2 rounded-xl overflow-hidden shadow-lg" id="recent-history">
+        <div class="relative order-3 col-span-5 lg:col-span-3 row-span-2 rounded-xl overflow-hidden shadow-lg bg-[#FAFAFA]" id="recent-history">
             <table id="history_table" class="absolute w-full border-none outline-none bg-white z-10 rounded-xl z-50">
                 <thead class="border-b-[3px] border-b-[#e2e1e1]">
                     <tr>
@@ -159,61 +180,17 @@
                         {% endfor %}
                     </tbody>
                 </table>
-    
-                <table id="history_table" class="absolute w-full border-none outline-none bg-white z-30">
-                    <thead class="border-b-[3px] border-b-[#e2e1e1]">
-                        <tr>
-                            <th class="py-2 px-3 text-left text-[#F8D146]">RECENT HISTORY</th>
-                        </tr>
-                    </thead>
-                    <tbody class="">
-                        <tr>
-                            <td class="px-3">
-    
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3">
-                                
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3">
-                                
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3">
-                                
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3">
-                                
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3">
-                                
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3">
-                                
-                            </td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
             </div>
         </div>
 
         <!-- Bar Chart -->
-        <div class="order-6 border border col-span-5 shadow-lg" id="payroll-per-week">
-            <canvas id="bar"></canvas>
+        <div class="order-2 lg:order-6 col-span-5 lg:col-span-5 xl:col-span-6 bg-white rounded-xl shadow-lg" id="payroll-per-week">
+            <div style="height: 250px; width: 100%; position: relative;">
+                <canvas id="bar" class="p-[15px]"></canvas>
+            </div>
         </div>
 
-        <div class="order-7 relative col-span-10 lg:col-span-9 shadow-lg overflow-hidden rounded-xl" id="preview">
+        <div class="order-7 relative col-span-10 lg:col-span-9 shadow-lg overflow-hidden rounded-xl bg-[#FAFAFA]" id="preview">
             <table id="preview-table" class="absolute bg-white w-full rounded-2xl text-xs-center z-40">
                 <thead class="text-[#1E1E1E] border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                     <tr class="text-base font-[League Spartan]">
@@ -250,38 +227,6 @@
                         <td colspan="4">No employees found.</td>
                     </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-
-            <table id="preview-table" class="bg-white w-full rounded-2xl text-xs-center overflow-hidden">
-                <thead class="text-[#1E1E1E] border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                    <tr class="text-base font-[League Spartan]">
-                        <th class="py-1">EMPLOYEE</th>
-                        <th>PAYMENT AMOUNT</th>
-                        <th>STATUS</th>
-                        <th>LAST ATTENDANCE</th>
-                    </tr>
-                </thead>
-                
-                <tbody>
-                    <tr>
-                        <td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4"></td>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -437,8 +382,13 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            onResize: function(chart, size) {
+                // This ensures height stays fixed at container height
+                chart.height = size.height;
+            },
             layout: {
-                padding: 0
+                padding: 10
             },
             plugins: {
                 title: {
@@ -455,8 +405,13 @@
                     }
                 }
             }
-            
         }
+    });
+
+    // Handle responsive behavior
+    window.addEventListener('resize', function() {
+        // Force redraw when window is resized
+        payroll_chart.resize();
     });
 </script>
 {% endblock %}

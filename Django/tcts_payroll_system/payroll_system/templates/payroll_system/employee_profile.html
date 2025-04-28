@@ -314,13 +314,7 @@
         </div>
     
         <div class="w-[75%] h-full flex flex-col gap-5">
-            <div class="w-full h-[25%] flex flex-row flex-nowrap justify-between gap-5">
-                <div class="w-[60%] h-full flex justify-center items-center bg-[#FFFFFF] rounded-xl overflow-hidden gap-3">
-                    <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
-                        <img class="h-[25px] w-[25px]" src="{% static 'images/search_icon.png' %}" alt="Search">
-                    </button>
-                    <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
-                </div>
+            <div class="w-full h-[25%] flex flex-row flex-nowrap justify-end gap-5">
                 <div class="w-fit h-full flex gap-2">
                     <button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addAttendance()">ADD ATTENDANCE</button>
 

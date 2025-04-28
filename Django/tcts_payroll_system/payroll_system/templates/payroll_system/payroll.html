@@ -159,19 +159,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="w-full grid grid-cols-4 grid-rows-[75px_75px_75px] lg:grid-cols-6 lg:grid-rows-[70px_70px] gap-4">
+<div class="w-full grid grid-cols-4 grid-rows-[30px_75px_75px] md:grid-rows-[55px_75px_75px] lg:grid-cols-6 lg:grid-rows-[70px_70px] gap-4">
     <div class="bg-[#1E1E1E] px-4 order-1 col-span-4 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
 
         <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
-            <p class="md:hidden text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">TOTAL PAYROLL</p>
-            <p class="hidden md:block text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">TOTAL PAYROLL</p>
+            <p class="text-[10px]/3 sm:text-sm/3.5 md:text-base/4 lg:text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">TOTAL PAYROLL</p>
             <div class="flex flex-col justify-end items-end text-right">
                 {% if total_payroll == "No total payroll yet" %}
-                <p class="text-[#FFF] text-3xl font-[Inter] font-semibold">₱ 0.00</p>
+                <p class="text-[#FFF] text-[18px] sm:text-[24px] md:text-[26px] lg:text-3xl font-[Inter] font-semibold">₱ 0.00</p>
                 {% else %}
-                <p class="text-[#FFF] text-3xl font-[Inter] font-semibold">₱{{ total_payroll|floatformat:2 }}</p>
+                <p class="text-[#FFF] text-[18px] sm:text-[24px] md:text-[26px] lg:text-3xl font-[Inter] font-semibold">₱{{ total_payroll|floatformat:2 }}</p>
                 {% endif %}
-                <p id="" class="text-lg font-[Inter] font-semibold {% if payroll_percentage >= 0 %} text-[#F8D146]  {% elif payroll_percentage <= -1 %} text-[#DC4646]  {% endif %}">
+                <p id="" class="text-base sm:text-lg font-[Inter] font-semibold {% if payroll_percentage >= 0 %} text-[#F8D146]  {% elif payroll_percentage <= -1 %} text-[#DC4646]  {% endif %}">
                     {% if payroll_percentage > 0 %}+{% endif %}{{ payroll_percentage|floatformat:1 }}%
                 </p>
             </div>
@@ -179,33 +178,35 @@
 
         <span class="w-[3px] h-[80%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
 
-        <div class="h-full w-[30%] py-5 flex flex-col justify-between">
-            <p class="text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">EMPLOYEES AVR. RATE</p>
+        <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
+            <p class="text-[10px]/3 sm:text-sm/3.5 md:text-base/4 lg:text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">EMPLOYEES AVR. RATE</p>
             <div class="flex flex-col justify-end items-end text-right">
-                <p class="text-[#FFF] text-3xl font-[Inter] font-semibold">{% if avg_rate == "No rate data" %} No rate data {% else %} ₱{{ avg_rate|floatformat:2 }} {% endif %}</p>
+                <p class="text-[#FFF] text-[18px] sm:text-[24px] md:text-[26px] lg:text-3xl font-[Inter] font-semibold">{% if avg_rate == "No rate data" %} No rate data {% else %} ₱{{ avg_rate|floatformat:2 }} {% endif %}</p>
                 {% if rate_percentage >= 0 %}
-                    <p id="" class="text-lg font-[Inter] font-semibold text-[#F8D146]">{% if rate_percentage > 0 %}+{% endif %}{{ rate_percentage|floatformat:1 }}%</p>
+                    <p id="" class="text-base sm:text-lg font-[Inter] font-semibold text-[#F8D146]">{% if rate_percentage > 0 %}+{% endif %}{{ rate_percentage|floatformat:1 }}%</p>
                 {% elif rate_percentage <= -1 %}
-                    <p id="" class="text-lg font-[Inter] font-semibold text-[#DC4646]">{{ rate_percentage|floatformat:1 }}%</p>
+                    <p id="" class="text-base sm:text-lg font-[Inter] font-semibold text-[#DC4646]">{{ rate_percentage|floatformat:1 }}%</p>
                 {% endif %}
             </div>
         </div>
 
         <span class="w-[3px] h-[80%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
         
-        <div class="h-full py-5 flex flex-col justify-around md:justify-between">
-            <p class="text-white text-lg font-bold font-[League Spartan] text-left">TOTAL PAYROLL</p>
+        <div class="h-full py-4 md:py-4.5 flex flex-col justify-between md:justify-between overflow-hidden">
+            <p class="text-white text-[10px] sm:text-sm md:text-lg font-bold font-[League Spartan] text-left">TOTAL PAYROLL</p>
             <div class="flex flex-row justify-evenly">
                 <div id="processed" class="flex flex-col justify-evenly">
-                    <h1 class="text-sm md:text-lg font-bold">PROCESSED</h1>
-                    <p class="text-[45px]/13 md:text-5xl font-[Inter] font-medium">{{ processed_payroll_count }}</p>  
+                    <h1 class="sm:hidden text-xs font-bold">PROC</h1>
+                    <h1 class="hidden sm:block sm:text-xs md:text-base lg:text-lg font-bold">PROCESSED</h1>
+                    <p class="text-[35px]/11 sm:text-[45px]/13 md:text-5xl font-[Inter] font-medium">{{ processed_payroll_count }}</p>  
                 </div>
 
                 <span class="w-[3px] h-[100%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
                 
                 <div id="pending" class="flex flex-col justify-evenly">
-                    <h1 class="text-sm md:text-lg font-bold">PENDING</h1>
-                    <p class="text-[45px]/13 md:text-5xl font-[Inter] font-medium">{{ pending_payroll_count }}</p>
+                    <h1 class="sm:hidden text-xs font-bold">PEND</h1>
+                    <h1 class="hidden sm:block sm:text-xs md:text-base lg:text-lg font-bold">PENDING</h1>
+                    <p class="text-[35px]/11 sm:text-[45px]/13 md:text-5xl font-[Inter] font-medium">{{ pending_payroll_count }}</p>
                 </div>
             </div>
         </div>
@@ -224,7 +225,7 @@
 
     <div class="order-3 col-span-2 rows-span-1">
         <div class="size-full bg-white p-5 flex flex-col justify-center rounded-md overflow-hidden">
-            <p class="text-sm font-extrabold">PAYDAY:</p>
+            <p class="hidden lg:block text-sm font-extrabold">PAYDAY:</p>
             <div id="date" class="w-full flex justify-end gap-2">
                 <p class="text-[16px]/8 sm:text-[18px]/8 md:text-[22px]/7 xl:text-[28px]/7 font-semibold" id="paydate">XX/XX/XXXX, SAT</p>
                 <button class="w-8 h-8 bg-no-repeat bg-center" id="calendar"></button>
@@ -255,11 +256,11 @@
     <div class="md:hidden flex flex-col justify-center">
         <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="payroll-table-1">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                <tr class="text-base font-[League Spartan]">
-                    <th class="py-2">EMPLOYEE</th>
-                    <th>STATUS</th>
-                    <th id="payment-amount">PAYMENT AMOUNT</th>
-                    <th></th>
+                <tr>
+                    <th class="p-2 text-sm font-[League Spartan]">EMPLOYEE</th>
+                    <th class="p-2 text-sm font-[League Spartan]">STATUS</th>
+                    <th class="p-2 text-sm font-[League Spartan]" id="payment-amount">PAYMENT AMOUNT</th>
+                    <th class="p-2 text-sm font-[League Spartan]"></th>
                 </tr>
             </thead>
             <tbody>
@@ -267,15 +268,15 @@
                 {% with employee=data.employee latest_payroll=data.latest_payroll %}
                     {% if latest_payroll %}
                     <tr id="payroll-data">
-                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td>{{ latest_payroll.payroll_status }}</td>
-                        <td id="payment-amount">₱{{ latest_payroll.salary }}</td>
-                        <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                        <td class="p-2 text-xs font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="p-2 text-xs font-[Inter]">{{ latest_payroll.payroll_status }}</td>
+                        <td class="p-2 text-xs font-[Inter]" id="payment-amount">₱{{ latest_payroll.salary }}</td>
+                        <td class="p-2 text-xs font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% else %}
                     <tr id="payroll-data">
-                        <td colspan="3">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                        <td class="p-2 text-xs font-[Inter]" colspan="3">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="p-2 text-xs font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% endif %}
                 {% endwith %}
@@ -288,10 +289,10 @@
         <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="payroll-table-2">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="text-base text-center font-[League Spartan]">
-                    <th class="py-2">EMPLOYEE</th>
-                    <th>STATUS</th>
-                    <th>RATE PER DAY</th>
-                    <th id="payment-amount">PAYMENT AMOUNT</th>
+                    <th class="p-2 text-base font-[League Spartan]">EMPLOYEE</th>
+                    <th class="p-2 text-base font-[League Spartan]">STATUS</th>
+                    <th class="p-2 text-base font-[League Spartan]">RATE PER DAY</th>
+                    <th class="p-2 text-base font-[League Spartan]" id="payment-amount">PAYMENT AMOUNT</th>
                     <th></th>
                 </tr>
             </thead>
@@ -300,16 +301,16 @@
                 {% with employee=data.employee latest_payroll=data.latest_payroll %}
                     {% if latest_payroll %}
                     <tr id="payroll-data">
-                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td>{{ latest_payroll.payroll_status }}</td>
-                        <td>{{ latest_payroll.rate }}</td>
-                        <td id="payment-amount">₱{{ latest_payroll.salary }}</td>
-                        <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                        <td class="p-2 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="p-2 text-sm font-[Inter]">{{ latest_payroll.payroll_status }}</td>
+                        <td class="p-2 text-sm font-[Inter]">{{ latest_payroll.rate }}</td>
+                        <td class="p-2 text-sm font-[Inter]" id="payment-amount">₱{{ latest_payroll.salary }}</td>
+                        <td class="p-2 text-sm font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% else %}
                     <tr id="payroll-data">
-                        <td colspan="5">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                        <td class="p-2 text-sm font-[Inter]" colspan="5">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="p-2 text-sm font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% endif %}
                 {% endwith %}
@@ -328,20 +329,22 @@
     <script src="{% static 'javascript/dataTables.js' %}"></script>
 
     <script>
-        let table;
+        let table_1;
+        let table_2;
     
         $(document).ready(function () {
-            table = $('#payroll-table-1').DataTable({
+            table_1 = $('#payroll-table-1').DataTable({
                 responsive: true
             });
 
-            table = $('#payroll-table-2').DataTable({
+            table_2 = $('#payroll-table-2').DataTable({
                 responsive: true
             });
     
             // Make search input work with DataTables
             $('#search-input').on('keyup', function () {
-                table.search(this.value).draw();
+                table_1.search(this.value).draw();
+                table_2.search(this.value).draw();
             });
         });
 

@@ -35,45 +35,22 @@
 }
 
 #history_table tbody tr:nth-child(odd) {
-    background-color: #f2f2f2;
+    background-color: #f1f1f1;
+}
+
+#history_table tbody tr:nth-child(even) {
+    background-color: #fff;
 }
 
 
-
-.donut_chart {
-    width: 100%;
-    grid-area: empchart;
-
-    display: flex;
-    justify-content: center; 
-    overflow: hidden;
-
-    overflow: hidden;
-    background: white;
-    border-radius: 10px;
-}
-
-#donut{
-    width: 100%;
-    height: 100%;
-    padding: 15px;
-}
-
-.bar_chart{
-    overflow: hidden;
-    background: white;
-    border-radius: 10px;
-}
-
-#bar{
-    width: 100%;
-    height: 100%;
-    padding: 15px;
-}
 
 
 #preview-table tbody tr:nth-child(odd) td{
-    background-color: #f2f2f2 !important;
+    background-color: #f1f1f1 !important;
+}
+
+#preview-table tbody tr:nth-child(even) td{
+    background-color: #fff !important;
 }
 
 #preview-table tbody tr{

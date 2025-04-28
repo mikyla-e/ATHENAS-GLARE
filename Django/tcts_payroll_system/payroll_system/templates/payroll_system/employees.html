@@ -133,182 +133,23 @@
     <script src="{% static 'javascript/dataTables.js' %}"></script>
 
     <script>
-        let table;
+        let table_1;
+        let table_2;
 
         $(document).ready(function () {
-            table = $('#employee-table-2').DataTable({
+            table_1 = $('#employee-table-2').DataTable({
                 responsive: true
             });
 
-            table = $('#employee-table-1').DataTable({
+            table_2 = $('#employee-table-1').DataTable({
                 responsive: true
             });
 
             //bind to search api
             $('#search-input').on('keyup', function () {
-                table.search(this.value).draw();
+                table_1.search(this.value).draw();
+                table_2.search(this.value).draw();
             });
         });
     </script>
 {% endblock %}
-<!-- 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employees</title>
-    <link rel="stylesheet" href="{% static 'css/template_new.css' %}">
-    
-</head>
-<body class="bg-[#EFEDE6]">
-    <nav class="fixed w-[80px] md:w-[190px] h-full bg-[#FFFFFF] shadow-lg/30 z-50">
-        <div class="bg-[#FFFFFF] cols-span-1 row-span-1">
-            <div class="h-[70px] flex flex-wrap justify-center place-items-center md:gap-2" id="logo">
-                <div class="-mb-2 md:mb-0" id="logo-picture">
-                    <img class="h-8 md:h-10" src="{% static 'images/logo_icon.png' %}" alt="">
-                </div>
-                <div class="text-[#1E1E1E] text-xs/3 md:text-lg/5 font-[League Spartan] font-extrabold" id="logo-name">
-                    <p class="text-center md:text-left ">PAYROLL</p>
-                    <p class="text-center md:text-left">SYSTEM</p>
-                </div>
-            </div>
-        </div>
-        <div class="overflow-hidden" id="menu">
-            <ul class="h-auto w-[80px] md:w-[190px]">
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:dashboard' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/dashboard_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">DASHBOARD</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/payroll_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start" id="focused">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/employee_icon_focused.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/services_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:status' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/status_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">STATUS</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:customers' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/customers_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
-                    </a>
-                </li>
-                <li class="px-5 py-2.5 flex justify-center md:justify-start">
-                    <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:settings' %}">
-                        <img class="w-auto h-auto" src="{% static 'images/settings_icon.png' %}" alt="">
-                        <div class="hidden md:block text-base font-[League Spartan] font-semibold">SETTINGS</div>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="h-dvh w-full grid grid-cols-[80px_1fr] md:grid-cols-[190px_1fr] grid-rows-[70px_1fr] z-25">
-        <div class="bg-[#FFFFFF] row-span-2">
-
-        </div>
-        
-        <div class="bg-[#1E1E1E] flex justify-start items-center px-4">
-            <h1 class="text-[#f8d146] font-[League Spartan] text-3xl font-bold ">EMPLOYEES</h1>
-        </div>
-
-        <div class="size-full py-4 px-3" id="thing">
-            <div class="container">
-                <div class="search">
-                    <div class="search-box">
-                        <button type="button"><img src="{% static 'images/search_icon.png' %}" alt="Search"></button>
-                        <input type="text" id="search-input" placeholder="Search">
-                    </div>
-                </div>
-                
-
-                <div class="table">
-                    <table class="" id="employee-table">
-                        <thead>
-                            <tr>
-                                <th>EMPLOYEE NAME</th>
-                                <th>ID</th>
-                                <th>CONTACT NUMBER</th>
-                                <th>EMPLOYMENT STATUS</th>
-                                <th>PAYROLL STATUS</th>
-                                <th>LAST ATTENDANCE</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for employee in employees %}
-                            <tr class="emp1">
-                                <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                                <td>{{ employee.employee_id }}</td>
-                                <td>{{ employee.contact_number}}</td>
-                                <td>{{ employee.employee_status }}</td>
-                                <td>
-                                    {% if employee.latest_payroll_status %}
-                                        {{ employee.latest_payroll_status }}
-                                    {% else %}
-                                        No Payroll Data
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if employee.latest_attendance_date %}
-                                        {{ employee.latest_attendance_date }}
-                                    {% else %}
-                                        No Attendance Data
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <a href="{% url 'payroll_system:employee_profile' employee.employee_id %}">MORE</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <div class="button">
-                        <a href="{% url 'payroll_system:employee_registration' %}"><button class="addemployeebutton">ADD EMPLOYEE +</button></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
-    <script src="{% static 'css/dataTables.js' %}"></script>
-
-    <script>
-        let table;
-
-        $(document).ready(function () {
-            table = $('#employee-table').DataTable({
-                responsive: true
-            });
-
-            //bind to search api
-            $('#search-input').on('keyup', function () {
-                table.search(this.value).draw();
-            });
-        });
-    </script>
-</body>
-
-{{ redirect_to_login_immediately }}
-
-</html> -->

@@ -39,10 +39,10 @@
             </thead>
             <tbody>
             {% for customer in customers %}
-                <tr id="customer-data" class="text-center">
+                <tr id="customer-data">
                     <td class="p-2">{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
                     <td class="p-2">{{ customer.contact_number }}</td>
-                    <td class="p-2">{{ customer.region }}, {{ customer.province }}, {{ customer.city }}, {{ customer.barangay }}</td>
+                    <td class="p-2">{{ customer.city }}, {{ customer.barangay }}</td>
                     <td class="p-2">
                         <a class="" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
                     </td>
