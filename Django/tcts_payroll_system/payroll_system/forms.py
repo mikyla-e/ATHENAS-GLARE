@@ -24,13 +24,11 @@ class EmployeeForm(forms.ModelForm):
                                'autocomplete': 'off'}))
     work_experience = forms.CharField(widget=forms.Textarea(), required=False)
     date_of_employment = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), initial=timezone.now)
-    employee_image = forms.ImageField(widget=forms.ClearableFileInput())
-
+    
     class Meta:
         model = Employee
         fields = ('first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
-                  'highest_education', 'work_experience', 'date_of_employment',
-                  'employee_status', 'employee_image')
+                  'highest_education', 'work_experience', 'date_of_employment', 'employee_status')
         widgets = {
             'gender': forms.Select(),
             'highest_education': forms.Select(),
@@ -213,22 +211,6 @@ class EmployeeForm(forms.ModelForm):
         if work_experience and len(work_experience) > 1000:
             raise forms.ValidationError("Work experience description is too long (max 1000 characters).")
         return work_experience
-    
-    def clean_employee_image(self):
-        employee_image = self.cleaned_data.get('employee_image')
-        
-        if employee_image:
-            # Check file size (limit to 5MB)
-            if employee_image.size > 5 * 1024 * 1024:
-                raise forms.ValidationError("Image file is too large. Maximum size is 5MB.")
-                
-            # Check file extension
-            allowed_extensions = ['jpg', 'jpeg', 'png']
-            ext = employee_image.name.split('.')[-1].lower()
-            if ext not in allowed_extensions:
-                raise forms.ValidationError(f"Only {', '.join(allowed_extensions)} files are allowed.")
-                
-        return employee_image
     
     def clean(self):
         cleaned_data = super().clean()
