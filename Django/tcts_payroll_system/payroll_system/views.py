@@ -1192,6 +1192,7 @@ def update_incentives_individual(request, employee_id):
 
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
 
+@login_required
 def customer_edit(request, customer_id):
     customer = get_object_or_404(Customer, customer_id=customer_id)
     
@@ -1205,7 +1206,7 @@ def customer_edit(request, customer_id):
         form = CustomerEditForm(instance=customer)
     
     # Get location data for dropdowns
-    regions = Region.objects.list(Region.objects.all().values('regDesc', 'regCode'))
+    regions = Region.objects.all().values('regDesc', 'regCode')
     
     # Get related provinces, cities, and barangays based on selected values
     provinces = []

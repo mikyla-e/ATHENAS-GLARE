@@ -566,9 +566,124 @@ class CustomerEditForm(forms.ModelForm):
     
     class Meta:
         model = Customer
-        fields = ('first_name', 'middle_name', 'last_name', 'contact_number', 'region', 'province', 'city', 'barangay')
+        fields = ('first_name', 'middle_name', 'last_name', 'contact_number')
     
-    # Keep your existing validation methods...
+    # Copy validation methods from CustomerForm...
+    def validate_contact_number(self, contact_number):
+        if not contact_number.isdigit() or len(contact_number) != 11:
+            raise forms.ValidationError("Contact number must be exactly 11 digits.")
+        return contact_number
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name', '')
+        if len(first_name) < 2:
+            raise forms.ValidationError("First name must be at least 2 characters.")
+        if not all(char.isalpha() or char.isspace() or char == '-' for char in first_name):
+            raise forms.ValidationError("First name should contain only letters, spaces, or hyphens.")
+        return first_name.strip()
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name', '')
+        if len(last_name) < 2:
+            raise forms.ValidationError("Last name must be at least 2 characters.")
+        if not all(char.isalpha() or char.isspace() or char == '-' for char in last_name):
+            raise forms.ValidationError("Last name should contain only letters, spaces, or hyphens.")
+        return last_name.strip()
+
+    def clean_middle_name(self):
+        middle_name = self.cleaned_data.get('middle_name', '')
+        if middle_name and not all(char.isalpha() or char.isspace() or char == '-' for char in middle_name):
+            raise forms.ValidationError("Middle name should contain only letters, spaces, or hyphens.")
+        return middle_name.strip() if middle_name else middle_name
+    
+    def clean_contact_number(self):
+        return self.validate_contact_number(self.cleaned_data.get('contact_number', ''))
+    
+    def clean_region(self):
+        region_name = self.cleaned_data.get('region')
+        if not region_name:
+            raise forms.ValidationError("Region is required.")
+            
+        region = Region.objects.filter(regDesc=region_name).first()
+        if not region:
+            raise forms.ValidationError("Please select a valid region.")
+            
+        return region_name
+    
+    def clean_province(self):
+        province_name = self.cleaned_data.get('province')
+        region_name = self.cleaned_data.get('region')
+        
+        if not province_name:
+            raise forms.ValidationError("Province is required.")
+            
+        if region_name:
+            region = Region.objects.filter(regDesc=region_name).first()
+            if region:
+                province = Province.objects.filter(
+                    provDesc=province_name,
+                    regCode=region.regCode
+                ).first()
+                
+                if not province:
+                    raise forms.ValidationError("Province must belong to the selected region.")
+        
+        return province_name
+    
+    def clean_city(self):
+        city_name = self.cleaned_data.get('city')
+        province_name = self.cleaned_data.get('province')
+        
+        if not city_name:
+            raise forms.ValidationError("City is required.")
+            
+        if province_name:
+            province = Province.objects.filter(provDesc=province_name).first()
+            if province:
+                city = City.objects.filter(
+                    citymunDesc=city_name,
+                    provCode=province.provCode
+                ).first()
+                
+                if not city:
+                    raise forms.ValidationError("City must belong to the selected province.")
+        
+        return city_name
+    
+    def clean_barangay(self):
+        barangay_name = self.cleaned_data.get('barangay')
+        city_name = self.cleaned_data.get('city')
+        
+        if not barangay_name:
+            raise forms.ValidationError("Barangay is required.")
+            
+        if city_name:
+            city = City.objects.filter(citymunDesc=city_name).first()
+            if city:
+                barangay = Barangay.objects.filter(
+                    brgyDesc=barangay_name,
+                    citymunCode=city.citymunCode
+                ).first()
+                
+                if not barangay:
+                    raise forms.ValidationError("Barangay must belong to the selected city.")
+        
+        return barangay_name
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Set initial values for location fields using descriptive names
+        instance = kwargs.get('instance')
+        if instance:
+            if instance.region:
+                self.initial['region'] = instance.region.regDesc
+            if instance.province:
+                self.initial['province'] = instance.province.provDesc
+            if instance.city:
+                self.initial['city'] = instance.city.citymunDesc
+            if instance.barangay:
+                self.initial['barangay'] = instance.barangay.brgyDesc
     
     def save(self, commit=True):
         customer = super().save(commit=False)
@@ -579,15 +694,34 @@ class CustomerEditForm(forms.ModelForm):
         city_name = self.cleaned_data.get('city')
         barangay_name = self.cleaned_data.get('barangay')
         
+        # Get region object
         region = Region.objects.filter(regDesc=region_name).first()
-        province = Province.objects.filter(provDesc=province_name, regCode=region.regCode).first()
-        city = City.objects.filter(citymunDesc=city_name, provCode=province.provCode).first()
-        barangay = Barangay.objects.filter(brgyDesc=barangay_name, citymunCode=city.citymunCode).first()
-        
-        customer.region = region
-        customer.province = province
-        customer.city = city
-        customer.barangay = barangay
+        if region:
+            customer.region = region
+            
+            # Get province object
+            province = Province.objects.filter(
+                provDesc=province_name,
+                regCode=region.regCode
+            ).first()
+            if province:
+                customer.province = province
+                
+                # Get city object
+                city = City.objects.filter(
+                    citymunDesc=city_name,
+                    provCode=province.provCode
+                ).first()
+                if city:
+                    customer.city = city
+                    
+                    # Get barangay object
+                    barangay = Barangay.objects.filter(
+                        brgyDesc=barangay_name,
+                        citymunCode=city.citymunCode
+                    ).first()
+                    if barangay:
+                        customer.barangay = barangay
         
         if commit:
             customer.save()
