@@ -1112,25 +1112,25 @@ def update_incentives(request):
             
             # Calculate the base payment (rate x attendance)
             base_payment = emp.rate * attendance
-            
-            if action == 'add':
-                # Update the incentives field by adding the new value
-                new_incentives = emp.incentives + incentive_value
-                
-                # For the salary, we only add the new incentive_value to the current salary
-                new_salary = emp.salary + incentive_value
 
+            # Correct salary is base payment + incentives
+            correct_salary = base_payment + emp.incentives
+
+            # Update the salary to reflect correct base
+            Payroll.objects.filter(pk=emp.payroll_id).update(
+                salary=correct_salary
+            )
+
+            if action == 'add':
+                new_incentives = emp.incentives + incentive_value
+                new_salary = correct_salary + incentive_value  # base payment + new incentives
                 Payroll.objects.filter(pk=emp.payroll_id).update(
                     incentives=new_incentives,
                     salary=new_salary
                 )
             elif action == 'subtract':
-                # Keep incentives value unchanged when subtracting
                 new_incentives = emp.incentives
-                
-                # For salary, simply subtract the incentive_value from the current salary
-                new_salary = emp.salary - incentive_value
-
+                new_salary = correct_salary - incentive_value  # base payment - incentive deduction
                 Payroll.objects.filter(pk=emp.payroll_id).update(
                     incentives=new_incentives,
                     salary=new_salary
@@ -1154,7 +1154,7 @@ def update_incentives_individual(request, employee_id):
         action = data.get('action')
 
         try:
-            emp = Payroll.objects.get(employee_id_fk=employee_id, payroll_status='PENDING')
+            emp = Payroll.objects.filter(employee_id_fk=employee_id, payroll_status='PENDING').first()
         except Payroll.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Employee payroll not found.'})
 
@@ -1166,12 +1166,19 @@ def update_incentives_individual(request, employee_id):
 
         base_payment = emp.rate * attendance
 
+        # Correct salary should first be refreshed
+        correct_salary = base_payment + emp.incentives
+
+        Payroll.objects.filter(pk=emp.payroll_id).update(
+            salary=correct_salary
+        )
+
         if action == 'add':
             new_incentives = emp.incentives + incentive_value
-            new_salary = emp.salary + incentive_value
+            new_salary = correct_salary + incentive_value
         elif action == 'subtract':
             new_incentives = emp.incentives
-            new_salary = emp.salary - incentive_value
+            new_salary = correct_salary - incentive_value
         else:
             return JsonResponse({'success': False, 'error': 'Invalid action.'})
 
@@ -1179,6 +1186,7 @@ def update_incentives_individual(request, employee_id):
             incentives=new_incentives,
             salary=new_salary
         )
+
 
         return JsonResponse({'success': True, 'new_incentive': str(new_incentives), 'new_salary': str(new_salary)})
 
