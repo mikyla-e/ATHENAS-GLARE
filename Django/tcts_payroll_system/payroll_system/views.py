@@ -1053,7 +1053,7 @@ def print(request):
 
     return render(request, 'payroll_system/print.html', context)
 
-
+@login_required
 @csrf_exempt 
 def update_incentives(request):
     if request.method == 'POST':
@@ -1104,3 +1104,42 @@ def update_incentives(request):
         return JsonResponse({'success': True, 'new_incentive': str(new_incentive), 'new_salary': str(new_salary)})
     
     return JsonResponse({'success': False})
+
+@login_required
+@csrf_exempt
+def update_incentives_individual(request, employee_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        incentive_value = float(data.get('incentive', 0))
+        action = data.get('action')
+
+        try:
+            emp = Payroll.objects.get(employee_id_fk=employee_id, payroll_status='PENDING')
+        except Payroll.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Employee payroll not found.'})
+
+        try:
+            attendance = Attendance.objects.filter(employee_id_fk=emp.employee_id_fk).count()
+        except Exception as e:
+            print(f"Error fetching attendance for employee {emp.employee_id_fk}: {e}")
+            attendance = 0
+
+        base_payment = emp.rate * attendance
+
+        if action == 'add':
+            new_incentives = emp.incentives + incentive_value
+            new_salary = emp.salary + incentive_value
+        elif action == 'subtract':
+            new_incentives = emp.incentives
+            new_salary = emp.salary - incentive_value
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid action.'})
+
+        Payroll.objects.filter(pk=emp.payroll_id).update(
+            incentives=new_incentives,
+            salary=new_salary
+        )
+
+        return JsonResponse({'success': True, 'new_incentive': str(new_incentives), 'new_salary': str(new_salary)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
