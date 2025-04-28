@@ -4,17 +4,13 @@ from datetime import datetime
 from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import PasswordChangeView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import OuterRef, Subquery, Count, Sum, Min, Avg
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
-from django.views import generic
 from django.views.decorators.csrf import csrf_protect
-from .forms import EmployeeForm, PayrollForm, ServiceForm, CustomerForm, VehicleForm, AdminEditProfileForm, PasswordChangingForm
+from .forms import EmployeeForm, PayrollForm, ServiceForm, CustomerForm, VehicleForm
 from .models import Employee, Payroll, Attendance, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -31,11 +27,20 @@ def dashboard(request):
         .values('date')[:1]
     )
 
-    latest_payroll_subquery = (
+    # Payroll status subquery
+    latest_payroll_status_subquery = (
         Payroll.objects
         .filter(employee_id_fk=OuterRef('pk'))
         .order_by('-payment_date')
-        .values('rate')[:1]
+        .values('payroll_status')[:1]
+    )
+    
+    # Payroll rate/salary subquery - Add this for the payment calculation
+    latest_payroll_rate_subquery = (
+        Payroll.objects
+        .filter(employee_id_fk=OuterRef('pk'))
+        .order_by('-payment_date')
+        .values('salary')[:1]
     )
 
     # Total Employees
@@ -59,14 +64,8 @@ def dashboard(request):
 
     avg_active_employees = total_active_counts / days_counted
     
-    latest_payroll_subquery = (
-    Payroll.objects.filter(employee_id_fk=OuterRef('pk'))
-    .order_by('-payment_date')
-    .values('payroll_status')[:1]
-    )
-    
     employees_with_latest_payroll = Employee.objects.annotate(
-    latest_payroll_status=Subquery(latest_payroll_subquery)
+        latest_payroll_status=Subquery(latest_payroll_status_subquery)
     )
     
     processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
@@ -88,16 +87,20 @@ def dashboard(request):
         Employee.objects
         .annotate(
             latest_attendance_date=Subquery(latest_attendance_subquery),
-            latest_payroll=Subquery(latest_payroll_subquery)
+            latest_payroll_status=Subquery(latest_payroll_status_subquery),
+            latest_payroll_rate=Subquery(latest_payroll_rate_subquery)
         )
         .order_by('-latest_attendance_date', 'last_name')[:5] # Order by most recent attendance date
     )
 
-    # Modified: Limit history to 7 rows instead of 8
-    histories = History.objects.order_by('-date_time')[:7]
+    histories = History.objects.order_by('-date_time')
 
+    # Calculate the total payment correctly using the rate/salary
     for employee in recent_employees:
-        employee.total_payment = (employee.latest_payroll or 0) * employee.attendances.count()
+        if employee.latest_payroll_rate:
+            employee.total_payment = f"₱{employee.latest_payroll_rate:.2f}"
+        else:
+            employee.total_payment = "₱0.00"
      
     context = { 
         'histories': histories,
@@ -966,26 +969,6 @@ def customer_page(request, customer_id):
         'customer': customer
     }
     return render(request, 'payroll_system/customer_page.html', context)
-
-@login_required
-def settings(request):
-    return render(request, 'payroll_system/settings.html')
-
-class AdminEditView(LoginRequiredMixin, generic.UpdateView):
-    form_class = AdminEditProfileForm
-    template_name = 'payroll_system/admin_edit_profile.html'
-    success_url = reverse_lazy('payroll_system:settings')
-
-    def get_object(self):
-        return self.request.user
-    
-class PasswordsChangeView(LoginRequiredMixin, PasswordChangeView):
-    form_class = PasswordChangingForm
-    success_url = reverse_lazy('payroll_system:settings')
-
-@login_required
-def about(request):
-    return render(request, 'payroll_system/about.html')
 
 @login_required
 def print(request):

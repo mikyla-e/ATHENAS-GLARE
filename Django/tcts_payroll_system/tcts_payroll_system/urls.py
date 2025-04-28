@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('attendance/', include('attendance.urls', namespace="attendance")),
     path('users/', include('users.urls', namespace="users")),
+    path('settings/', include('settings.urls', namespace="settings")),
     path('payroll_system/', include('payroll_system.urls', namespace="payroll_system")),
 ]
 

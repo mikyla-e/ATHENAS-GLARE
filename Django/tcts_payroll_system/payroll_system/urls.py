@@ -1,4 +1,3 @@
-from .views import AdminEditView, PasswordsChangeView
 from django.contrib import admin
 from django.urls import path
 from . import views
@@ -19,10 +18,6 @@ urlpatterns = [
     path('services/services_client/', views.services_client, name='services_client'),
     path('services/services_assign/', views.services_assign, name='services_assign'),
     path('status/', views.status, name='status'),
-    path('settings/', views.settings, name='settings'),
-    path('settings/admin_edit_profile/', AdminEditView.as_view(), name='admin_edit_profile'),
-    path('settings/password/', PasswordsChangeView.as_view(template_name='payroll_system/change_password.html')),
-    path('about/', views.about, name='about'),
     path('customers/', views.customers, name='customers'),
     path('customer_page/<int:customer_id>/', views.customer_page, name='customer_page'),
     path('print/', views.print, name='print'),

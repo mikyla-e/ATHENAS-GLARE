@@ -14,7 +14,7 @@
 
 <!--page content-->
 {% block content %}
-<a href="{% url 'payroll_system:admin_edit_profile' %}">
+<a href="{% url 'settings:admin_edit_profile' %}">
     <div class=" bg-white rounded-xl manage_user p-5 mb-5">
         <div class="flex items-center content">
             <img src="{% static 'images/user_icon.png' %}" alt="">
@@ -23,7 +23,7 @@
     </div>
 </a>
 
-<a href="{% url 'payroll_system:about' %}">
+<a href="{% url 'settings:about' %}">
     <div class=" bg-white rounded-xl manage_user p-5 mb-5">
         <div class="flex items-center content">
             <img src="{% static 'images/about_icon.png' %}" alt="">
