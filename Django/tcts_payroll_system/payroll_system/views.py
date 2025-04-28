@@ -4,7 +4,7 @@ from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import OuterRef, Subquery, Count, Sum, Min, Avg
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
@@ -201,10 +201,57 @@ def employees(request):
 def employee_profile(request, employee_id):
     employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
     
+    # Handle add attendance form submission
+    if request.method == 'POST' and 'add_attendance' in request.POST:
+        date = request.POST.get('date')
+        time_in = request.POST.get('time_in')
+        time_out = request.POST.get('time_out') or None  # Handle empty time_out
+        
+        try:
+            attendance = Attendance(
+                employee_id_fk=employee,
+                date=date,
+                time_in=time_in,
+                time_out=time_out
+            )
+            attendance.save()
+            
+            if time_out:  # Calculate hours if time_out is provided
+                attendance.calculate_hours_worked()
+                
+            messages.success(request, 'Attendance added successfully!')
+            return redirect('payroll_system:employee_profile', employee_id=employee_id)
+        except Exception as e:
+            messages.error(request, f'Error adding attendance: {str(e)}')
+    
+    # Handle edit attendance form submission
+    if request.method == 'POST' and 'edit_attendance' in request.POST:
+        attendance_id = request.POST.get('attendance_id')
+        
+        try:
+            # Convert to integer to avoid issues 
+            attendance_id = int(attendance_id)
+            date = request.POST.get('date')
+            time_in = request.POST.get('time_in')
+            time_out = request.POST.get('time_out') or None
+
+            attendance = get_object_or_404(Attendance, attendance_id=attendance_id, employee_id_fk=employee)
+            attendance.date = date
+            attendance.time_in = time_in
+            attendance.time_out = time_out
+            attendance.save()
+            
+            if time_out:
+                attendance.calculate_hours_worked()
+                
+            messages.success(request, 'Attendance updated successfully!')
+        except Exception as e:
+            messages.error(request, f'Error updating attendance: {str(e)}')
+        
+        return redirect('payroll_system:employee_profile', employee_id=employee_id)
+    
     employee.update_attendance_stats()
     employee.refresh_from_db()
-
-    employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
     
     # Get latest attendance and calculate hours worked
     latest_attendance = employee.attendances.order_by('-date').first()
@@ -731,7 +778,7 @@ def services_assign(request):
                         request.session['customer_id'] = customer.customer_id
                         request.session['vehicle_id'] = vehicle.vehicle_id
                         
-                        # Process any additional vehicles - code remains the same
+                        # Process any additional vehicles
                         additional_vehicle_ids = []
                         i = 1
                         while f'additional_vehicle_name_{i}' in request.POST:

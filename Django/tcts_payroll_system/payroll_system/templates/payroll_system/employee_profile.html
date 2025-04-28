@@ -86,6 +86,17 @@
         background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
         color: #F8D146;
     }
+    
+    /* Cursor pointer for edit links */
+    .edit-link {
+        cursor: pointer;
+        color: #1e1e1e;
+        text-decoration: underline;
+    }
+    
+    .edit-link:hover {
+        color: #F8D146;
+    }
 </style>
 {% endblock %}
 
@@ -100,30 +111,32 @@
 
     <div id="add-popup" class="add_attendance fixed h-[30%] w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden">
         <h1 class="text-3xl font-[League Spartan] font-semibold">Add Attendance</h1>
-        <form id="add-form" class="size-full flex flex-col" method="post" onsubmit="event.preventDefault();">
+        <form id="add-form" class="size-full flex flex-col" method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="add_attendance" value="true">
             <div class="w-full h-[50%] my-5 flex gap-1">
                 <div class="w-full bg-[#EFEDE6] rounded-l-xl">
                     <div class="w-full h-[25%]">
-                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
+                        <label for="add_date" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
                     </div>
                     <div class="w-full h-[75%]">
-                        <input type="date" name="" id="" class="w-full h-full px-5 outline-none border-none">
+                        <input type="date" name="date" id="add_date" class="w-full h-full px-5 outline-none border-none" required>
                     </div>
                 </div>
                 <div class="w-full bg-[#EFEDE6]">
                     <div class="w-full h-[25%]">
-                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time in</label>
+                        <label for="add_time_in" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time in</label>
                     </div>
                     <div class="w-full h-[75%]">
-                        <input type="time" name="" id="" class="w-full h-full px-5 outline-none border-none">
+                        <input type="time" name="time_in" id="add_time_in" class="w-full h-full px-5 outline-none border-none" required>
                     </div>
                 </div>
                 <div class="w-full bg-[#EFEDE6] rounded-r-xl">
                     <div class="w-full h-[25%]">
-                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time out</label>
+                        <label for="add_time_out" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time out</label>
                     </div>
                     <div class="w-full h-[75%]">
-                        <input type="time" name="" id="" class="w-full h-full px-5 outline-none border-none">
+                        <input type="time" name="time_out" id="add_time_out" class="w-full h-full px-5 outline-none border-none">
                     </div>
                 </div>
             </div>
@@ -140,30 +153,33 @@
 
     <div id="edit-popup" class="edit_attendance fixed h-[30%] w-[80%] sm:w-[60%] md:w-[40%] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden">
         <h1 class="text-3xl font-[League Spartan] font-semibold">Edit Attendance</h1>
-        <form id="edit-form" class="size-full flex flex-col" method="post" onsubmit="event.preventDefault();">
+        <form id="edit-form" class="size-full flex flex-col" method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="edit_attendance" value="true">
+            <input type="hidden" name="attendance_id" id="edit_attendance_id">
             <div class="w-full h-[50%] my-5 flex gap-1">
                 <div class="w-full bg-[#EFEDE6] rounded-l-xl">
                     <div class="w-full h-[25%]">
-                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
+                        <label for="edit_date" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
                     </div>
                     <div class="w-full h-[75%]">
-                        <input type="date" name="" id="" class="w-full h-full px-5 outline-none border-none" value="2025-04-04">
+                        <input type="date" name="date" id="edit_date" class="w-full h-full px-5 outline-none border-none" required>
                     </div>
                 </div>
                 <div class="w-full bg-[#EFEDE6]">
                     <div class="w-full h-[25%]">
-                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time in</label>
+                        <label for="edit_time_in" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time in</label>
                     </div>
                     <div class="w-full h-[75%]">
-                        <input type="time" name="" id="" class="w-full h-full px-5 outline-none border-none" value="11:00">
+                        <input type="time" name="time_in" id="edit_time_in" class="w-full h-full px-5 outline-none border-none" required>
                     </div>
                 </div>
                 <div class="w-full bg-[#EFEDE6] rounded-r-xl">
                     <div class="w-full h-[25%]">
-                        <label for="" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time out</label>
+                        <label for="edit_time_out" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">time out</label>
                     </div>
                     <div class="w-full h-[75%]">
-                        <input type="time" name="" id="" class="w-full h-full px-5 outline-none border-none" value="11:00">
+                        <input type="time" name="time_out" id="edit_time_out" class="w-full h-full px-5 outline-none border-none">
                     </div>
                 </div>
             </div>
@@ -173,6 +189,16 @@
             </div>           
         </form>
     </div>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -218,10 +244,6 @@
                     <div class="barangay">
                         <h1>BARANGAY</h1>
                         <p>Brgy. {{ employee.barangay }}, {{ employee.city }}, {{employee.province }}</p>
-                    </div>
-                    <div class="postal_address">
-                        <h1>POSTAL CODE</h1> <!-- postal address-->
-                        {{ employee.postal_address}}
                     </div>
                     <div class="education">
                         <h1>EDUCATION</h1>
@@ -321,14 +343,13 @@
                             <th>TIME IN</th>
                             <th>TIME OUT</th>
                             <th>TIME WORKED</th>
-                            <th></th>
+                            <th>ACTION</th>
                         </tr>
                     </thead>
                     
-                    <!--New-->
                     <tbody>
                         {% for attendance in employee.attendances.all %}
-                        <tr>
+                        <tr data-attendance-id="{{ attendance.id }}">
                             <td>{{ attendance.date }}</td>
                             <td>{{ attendance.time_in }}</td>
                             <td>
@@ -348,16 +369,24 @@
                                         Calculating...
                                     </span>
                                 {% endif %}
-                            </td>      
-                            <td onclick="editAttendance()">EDIT</td>                      
+                            </td>
+                            <td>
+                                <span class="edit-link" 
+                                    data-id="{{ attendance.attendance_id }}"
+                                    data-date="{{ attendance.date|date:'Y-m-d' }}"
+                                    data-time-in="{{ attendance.time_in|time:'H:i' }}"
+                                    data-time-out="{% if attendance.time_out %}{{ attendance.time_out|time:'H:i' }}{% endif %}"
+                                    onclick="editAttendance(this)">
+                                    EDIT
+                                </span>
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4">No attendance records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                            <td colspan="5">No attendance records found for {{ employee.first_name }} {{ employee.last_name }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
-                    <!--New End-->
                 </table>
             </div>
         </div>
@@ -404,7 +433,6 @@
     setInterval(calculateLiveHours, 10000);
 </script>
 
-
 <script>
     let table;
 
@@ -416,10 +444,14 @@
 </script>
 
 <script>
-
     function addAttendance(){
         let bg = document.getElementById("background_add");
         const popup = document.getElementById("add-popup");
+        
+        // Set today's date as default
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById("add_date").value = today;
+        
         bg.classList.add("show");
         popup.classList.add("show");
     }
@@ -431,7 +463,18 @@
         popup.classList.remove("show");
     }
 
-    function editAttendance(){
+    function editAttendance(element) {
+        const id = element.getAttribute('data-id');
+        const date = element.getAttribute('data-date');
+        const timeIn = element.getAttribute('data-time-in');
+        const timeOut = element.getAttribute('data-time-out');
+        
+        document.getElementById("edit_attendance_id").value = id;
+        document.getElementById("edit_date").value = date;
+        document.getElementById("edit_time_in").value = timeIn;
+        document.getElementById("edit_time_out").value = timeOut || '';
+        
+        // Show the popup
         let bg = document.getElementById("background_edit");
         const popup = document.getElementById("edit-popup");
         bg.classList.add("show");
@@ -444,6 +487,10 @@
         bg.classList.remove("show");
         popup.classList.remove("show");
     }
+    
+    // Hide message alerts after 3 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.messages .message');
+    });
 </script>
-
 {% endblock %}

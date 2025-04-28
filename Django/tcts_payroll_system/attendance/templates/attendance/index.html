@@ -152,51 +152,6 @@
         updateTime();
         updateDate();
 
-        // Initialize webcam with better mobile support
-        function initializeCamera() {
-            const constraints = {
-                video: {
-                    facingMode: "user",  // Prefer front camera on mobile
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            };
-            
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia(constraints)
-                    .then(function(stream) {
-                        video.srcObject = stream;
-                        // Play after metadata is loaded to prevent black screen issues on some mobile browsers
-                        video.onloadedmetadata = function() {
-                            video.play();
-                            setTimeout(processFrame, 1000);
-                        };
-                    })
-                    .catch(function(error) {
-                        console.error('Could not access webcam:', error);
-                        showNotification('Could not access camera. Please check permissions and make sure no other app is using it.', 'error');
-                        
-                        // If we can't get user-facing camera, try any available camera as fallback
-                        if (error.name === 'OverconstrainedError') {
-                            navigator.mediaDevices.getUserMedia({ video: true })
-                                .then(function(stream) {
-                                    video.srcObject = stream;
-                                    video.onloadedmetadata = function() {
-                                        video.play();
-                                        setTimeout(processFrame, 1000);
-                                    };
-                                })
-                                .catch(function(fallbackError) {
-                                    console.error('Could not access any camera:', fallbackError);
-                                    showNotification('Could not access any camera. Please check browser permissions.', 'error');
-                                });
-                        }
-                    });
-            } else {
-                showNotification('Your browser does not support camera access. Please try a modern browser.', 'error');
-            }
-        }
-
         // Main attendance functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Elements
@@ -232,7 +187,66 @@
             const REQUIRED_MATCHES = 3;
             const PROCESS_INTERVAL = 300;
             
-           initializeCamera();
+            // Initialize webcam with cross-device support
+            function initializeCamera() {
+                // Define constraints that work well on both desktop and mobile
+                const constraints = {
+                    video: {
+                        facingMode: "user",  // Prefer front camera on mobile
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                };
+                
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia(constraints)
+                        .then(function(stream) {
+                            video.srcObject = stream;
+                            
+                            // Play after metadata is loaded - helps with mobile browsers
+                            video.onloadedmetadata = function() {
+                                video.play()
+                                    .then(() => {
+                                        // Start processing frames after a short delay
+                                        setTimeout(processFrame, 1000);
+                                        statusMessage.textContent = "Camera ready. Looking for faces...";
+                                    })
+                                    .catch(err => {
+                                        console.error('Error playing video:', err);
+                                        statusMessage.textContent = "Error starting video. Please refresh.";
+                                    });
+                            };
+                        })
+                        .catch(function(error) {
+                            console.error('Could not access webcam with preferred settings:', error);
+                            
+                            // Try again with simpler constraints as fallback
+                            navigator.mediaDevices.getUserMedia({ video: true })
+                                .then(function(stream) {
+                                    video.srcObject = stream;
+                                    video.onloadedmetadata = function() {
+                                        video.play()
+                                            .then(() => {
+                                                setTimeout(processFrame, 1000);
+                                                statusMessage.textContent = "Camera ready. Looking for faces...";
+                                            })
+                                            .catch(err => {
+                                                console.error('Error playing video:', err);
+                                                statusMessage.textContent = "Error starting video. Please refresh.";
+                                            });
+                                    };
+                                })
+                                .catch(function(fallbackError) {
+                                    console.error('Could not access any camera:', fallbackError);
+                                    showNotification('Camera access denied. Please check browser permissions.', 'error');
+                                    statusMessage.textContent = "No camera access. Check permissions.";
+                                });
+                        });
+                } else {
+                    showNotification('Your browser does not support camera access.', 'error');
+                    statusMessage.textContent = "Camera not supported by browser.";
+                }
+            }
             
             // Initialize date inputs with default values
             const today = new Date();
@@ -241,6 +255,9 @@
             
             startDateInput.valueAsDate = oneMonthAgo;
             endDateInput.valueAsDate = today;
+            
+            // Start camera initialization
+            initializeCamera();
             
             // Date filter event listeners
             applyFilterBtn.addEventListener('click', function() {
@@ -328,36 +345,55 @@
                 
                 isProcessing = true;
                 
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const context = canvas.getContext('2d');
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                const imageData = canvas.toDataURL('image/jpeg', 0.7);
-                
-                $.ajax({
-                    url: window.location.href,
-                    type: 'POST',
-                    data: {
-                        'image_data': imageData
-                    },
-                    success: function(response) {
-                        handleRecognitionResponse(response);
+                try {
+                    // Make sure video is actually playing and has dimensions
+                    if (video.videoWidth === 0 || video.videoHeight === 0 || video.paused || video.ended) {
+                        console.log("Video not ready for processing yet");
                         isProcessing = false;
-                        
-                        if (!isPaused) {
-                            setTimeout(processFrame, PROCESS_INTERVAL);
-                        }
-                    },
-                    error: function(error) {
-                        console.error('Error processing frame:', error);
-                        isProcessing = false;
-                        
-                        if (!isPaused) {
-                            setTimeout(processFrame, PROCESS_INTERVAL);
-                        }
+                        setTimeout(processFrame, PROCESS_INTERVAL);
+                        return;
                     }
-                });
+                    
+                    // Set canvas dimensions to match video
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const context = canvas.getContext('2d');
+                    
+                    // Draw current video frame to canvas
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // Get image data for processing
+                    const imageData = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    // Send to server for face recognition
+                    $.ajax({
+                        url: window.location.href,
+                        type: 'POST',
+                        data: {
+                            'image_data': imageData
+                        },
+                        success: function(response) {
+                            handleRecognitionResponse(response);
+                            isProcessing = false;
+                            
+                            if (!isPaused) {
+                                setTimeout(processFrame, PROCESS_INTERVAL);
+                            }
+                        },
+                        error: function(error) {
+                            console.error('Error processing frame:', error);
+                            isProcessing = false;
+                            
+                            if (!isPaused) {
+                                setTimeout(processFrame, PROCESS_INTERVAL);
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error("Error in processing frame:", e);
+                    isProcessing = false;
+                    setTimeout(processFrame, PROCESS_INTERVAL);
+                }
             }
             
             // Handle recognition response

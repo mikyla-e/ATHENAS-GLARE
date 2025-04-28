@@ -306,7 +306,7 @@ class Attendance(models.Model):
                 self.hours_worked = round(worked_seconds / 3600, 2)
         
         super().save(*args, **kwargs)
-    #New        
+            
     def get_formatted_hours_worked(self):
         #eturns time worked as hh:mm:ss if time_out exists
         if self.time_in and self.time_out:
