@@ -9,105 +9,10 @@
 <link rel="stylesheet" href="{% static 'css/employee_profile.css' %}">
 <link rel="stylesheet" href="{% static 'css/table.css' %}">
 
-<style>
-    #button{
-        padding: 0 20px;
-        width: fit-content;
-
-        border-radius: 30px;
-        border: none;
-
-        background-image: linear-gradient(to right, #1e1e1e , #1e1e1e); 
-        color: #F8D146;
-        
-    }
-
-    #button:hover{
-        cursor: pointer;
-        scale: 1.05;
-        transition: 0.5s;
-    }
-
-    .dt-layout-row{
-        margin: 0 !important;
-    }
-
-    /*pop up*/
-
-    .background_add.show,
-    .background_edit.show,
-    .add_attendance.show,
-    .edit_attendance.show {
-        visibility: visible;
-        opacity: 1;
-    }
-
-    tbody tr td{
-        padding: 8px;
-        text-align: center;
-        border-bottom: 2px solid rgba(30, 30, 30, 0.20) !important;
-    }
-
-    input[type=button]{
-        padding: 0 20px;
-        width: fit-content;
-
-        border-radius: 30px;
-        border: none;
-
-        background-image: linear-gradient(to right, #DC4646 , #DC4646); 
-        color: white;
-        
-    }
-
-    input[type=button]:hover{
-        cursor: pointer;
-        scale: 1.05;
-        transition: 0.2s;
-        background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
-        color: white;
-    }
-
-    input[type=submit]{
-        padding: 0 20px;
-        width: fit-content;
-
-        border-radius: 30px;
-        border: none;
-
-        background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
-        
-    }
-
-    input[type=submit]:hover{
-        cursor: pointer;
-        scale: 1.05;
-        transition: 0.5s;
-        background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
-        color: #F8D146;
-    }
-    
-    /* Cursor pointer for edit links */
-    .edit-link {
-        cursor: pointer;
-        color: #1e1e1e;
-        text-decoration: underline;
-    }
-    
-    .edit-link:hover {
-        color: #F8D146;
-    }
-
-    #title{
-        background: -webkit-linear-gradient(#F8D146, #F5B93F);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-</style>
 {% endblock %}
 
 <!--header-->
-{% block header %}EMPLOYEES PROFILE{% endblock %} 
+{% block header %}EMPLOYEES{% endblock %} 
 
 <!--page content-->
 {% block outsidecontent %} 
@@ -264,80 +169,83 @@ onclick="cancelEditAttendance()">
 {% endblock %}
 
 {% block content %}
-<div class="w-full h-[60%] flex flex-col gap-5">
-    <div class="profile h-dvh bg-white">
-        <div class="top">
-            <div class="employee_pic">
-                <img src="{{ employee.employee_image.url }}" alt="Employee Image">
+<div class="w-full h-full flex flex-col gap-5">
+    <div class="w-full h-fit p-7 flex flex-col gap-3 bg-white rounded-xl">
+        <div class="w-full flex gap-4">
+
+            <div class="w-[125px] h-[125px]">
+                <img src="{{ employee.employee_image.url }}" alt="Employee Image" class="size-full object-cover rounded-xl">
             </div>
-            <div class="employee_info1">
-                <div class="employee_name">
-                    <h1>{{ employee.first_name }} {{ employee.last_name }} <span>{{ employee.employee_id }}</span></h1>
-                </div>
-                <div class="line">
-                    <div class="details">DETAILS</div>
-                    <div class="hr1"></div>
+            <div class="w-full flex flex-col justify-end gap-2">
+                <h1 class="text-4xl font-[League Spartan] font-semibold">{{ employee.first_name }} {{ employee.last_name }} <span class="text-3xl text-[#1e1e1e80] font-semibold">{{ employee.employee_id }}</span></h1>
+                
+                <div class="flex items-center gap-3">
+                    <div class="font-[League Spartan] text-sm font-extrabold text-[#1e1e1e80]">DETAILS</div>
+                    <div class="border-2 border-[#1e1e1e20] w-[100%] h-[1px] rounded-full"></div>
                 </div>
             </div>
-            
         </div>
-        <div class="w-full px-4 bg-white rounded-2xl">
-            <!-- Employee Info Section 2 -->
-            <div class="flex flex-col md:flex-row w-full gap-4 mb-6 pl-5">
-                <!-- Left Column -->
-                <div class="w-full md:w-1/2 space-y-4">
-                    <div class="gender">
-                        <h1 class="text-sm font-bold text-gray-500">GENDER</h1>
-                        <p class="text-base">{{ employee.gender }}</p>
+        <div class="w-full px-5 rounded-2xl">
+            <div class="flex flex-col gap-4 sm:flex-row w-full">
+                <div class="w-full sm:w-[50%] flex flex-row sm:flex-col gap-4">
+                    <div class="w-[50%] flex flex-col gap-4">
+                        <div class="gender">
+                            <h1 class="text-sm font-bold text-[#1E1E1E66]">GENDER</h1>
+                            <p class="text-base">{{ employee.gender }}</p>
+                        </div>
+                        <div class="date_of_birth">
+                            <h1 class="text-sm font-bold text-[#1E1E1E66]">DATE OF BIRTH</h1>
+                            <p class="text-base">{{ employee.date_of_birth }}</p>
+                        </div>
                     </div>
-                    <div class="date_of_birth">
-                        <h1 class="text-sm font-bold text-gray-500">DATE OF BIRTH</h1>
-                        <p class="text-base">{{ employee.date_of_birth }}</p>
+                    <div class="w-[50%] flex flex-col gap-4">
+                        <div class="contact_number">
+                            <h1 class="text-sm font-bold text-[#1E1E1E66]">CONTACT NUMBER</h1>
+                            <p class="text-base">{{ employee.contact_number }}</p>
+                        </div>
+                        <div class="emergency_contact">
+                            <h1 class="text-sm font-bold text-[#1E1E1E66]">EMERGENCY CONTACT</h1>
+                            <p class="text-base">{{ employee.emergency_contact }}</p>
+                        </div>
                     </div>
-                    <div class="contact_number">
-                        <h1 class="text-sm font-bold text-gray-500">CONTACT NUMBER</h1>
-                        <p class="text-base">{{ employee.contact_number }}</p>
-                    </div>
-                    <div class="emergency_contact">
-                        <h1 class="text-sm font-bold text-gray-500">EMERGENCY CONTACT</h1>
-                        <p class="text-base">{{ employee.emergency_contact }}</p>
-                    </div>
+                    
                 </div>
                 
-                <!-- Right Column -->
-                <div class="w-full md:w-1/2 space-y-4 mt-4 md:mt-0">
+                <div class="w-full sm:w-[50%] flex flex-col gap-4">
                     <div class="barangay">
-                        <h1 class="text-sm font-bold text-gray-500">BARANGAY</h1>
+                        <h1 class="text-sm font-bold text-[#1E1E1E66]">BARANGAY</h1>
                         <p class="text-base">Brgy. {{ employee.barangay }}, {{ employee.city }}, {{employee.province }}</p>
                     </div>
                     <div class="education">
-                        <h1 class="text-sm font-bold text-gray-500">EDUCATION</h1>
+                        <h1 class="text-sm font-bold text-[#1E1E1E66]">EDUCATION</h1>
                         <p class="text-base">{{ employee.highest_education }}</p>
                     </div>
                 </div>
             </div>
+        </div>
             
-            <!-- Divider -->
-            <div class="w-full h-px bg-gray-300 my-6"></div>
-            
-            <!-- Employee Info Section 3 -->
+        <div class="border-2 border-[#1e1e1e20] w-[100%] h-[1px] rounded-full"></div>
+
+        <div class="w-full px-5 rounded-2xl">
             <div class="flex flex-col md:flex-row w-full gap-4 bg-white rounded-2xl">
-                <!-- Left Column -->
-                <div class="w-full md:w-1/2 space-y-4 ">
+                <div class="w-full md:w-[50%] gap-4">
                     <div class="work_experience">
-                        <h1 class="text-sm font-bold text-gray-500">WORK EXPERIENCE</h1>
-                        <p class="text-base">{{ employee.work_experience }}</p>
+                        <h1 class="text-sm font-bold text-[#1E1E1E66]">WORK EXPERIENCE</h1>
+                        {% if employee.work_experience %}
+                            <p class="text-base">{{ employee.work_experience }}</p>
+                        {% else %}
+                            <p class="text-base">No work experience provided.</p>
+                        {% endif %}
                     </div>
                 </div>
                 
-                <!-- Right Column -->
-                <div class="w-full md:w-1/2 space-y-4 mt-4 md:mt-0">
+                <div class="w-full sm:w-[50%] gap-4">
                     <div class="date_of_employment">
-                        <h1 class="text-sm font-bold text-gray-500">DATE OF EMPLOYMENT</h1>
+                        <h1 class="text-sm font-bold text-[#1E1E1E66]">DATE OF EMPLOYMENT</h1>
                         <p class="text-base">{{ employee.date_of_employment }}</p>
                     </div>
                     <div class="employee_status mt-4">
-                        <h1 class="text-sm font-bold text-gray-500">EMPLOYEE STATUS</h1>
+                        <h1 class="text-sm font-bold text-[#1E1E1E66]">EMPLOYEE STATUS</h1>
                         <p class="text-base pb-5">{{ employee.employee_status }}</p>
                     </div>
                 </div>
@@ -346,7 +254,7 @@ onclick="cancelEditAttendance()">
     </div>
 
 
-    
+
     <div class="w-full h-fit flex flex-col lg:flex-row justify-between gap-5">
         <div class="lg:hidden w-full h-[60px] flex flex-row flex-nowrap justify-end gap-5">
             <div class="w-fit h-full flex gap-2">

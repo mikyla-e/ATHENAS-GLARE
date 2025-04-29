@@ -118,7 +118,7 @@
                 <div class="w-[85%] h-full flex flex-col justify-between">
                     <div class="w-full h-[30%]">
                         <div class="size-full flex flex-col gap-1">
-                            <h1 id="name" class="text-xl/5 sm:text-3xl/9.5 font-[League Spartan] font-semibold">
+                            <h1 id="name" class="text-xl/7.5 sm:text-3xl/9.5 font-[League Spartan] font-semibold">
                                 {{ task.customer.first_name }} {{ task.customer.last_name }}
                             </h1>
                             <p class="text-nowrap"><span class="text-lg/6 sm:text-2xl/7 text-[#1E1E1E]">{{ task.vehicle.vehicle_name }} {{ task.vehicle.plate_number }}</span> - <span class="text-base sm:text-xl opacity-50">{{ task.service.title }}</span></p>
@@ -129,7 +129,7 @@
                     </div>
                 </div>
                 <div class="w-[15%] h-fit flex justify-end">
-                    <div class="flex justify-end items-center pointer" onclick="confirmTask()">
+                    <div class="flex justify-end items-center cursor-pointer" onclick="confirmTask()">
                         <h1 class="text-[#F8D146] font-bold text-xs sm:text-lg text-nowrap text-right">{{ task.task_status }}</h1>
                     </div> 
                 </div> 
