@@ -57,8 +57,6 @@ crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!--page content-->
 {% block content %}
 <div class="flex justify-end gap-3 sm:text-sm">
-    <button id="print-button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center cursor-pointer
-    bg-black text-[#F8D146] rounded-2xl p-3 hover:bg-[#F8D146] hover:text-black duration-200 hover:scale-105">SEND TO PRINT</button>
     <!-- <button id="pdf-button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center cursor-pointer">SAVE AS PDF</button>
     <button id="csv-button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">SAVE AS CSV</button> -->
 </div>
@@ -130,6 +128,10 @@ crossorigin="anonymous" referrerpolicy="no-referrer"></script>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+    <div class="flex justify-end">
+        <button id="print-button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center cursor-pointer
+    bg-black text-[#F8D146] rounded-2xl p-3 hover:bg-[#F8D146] hover:text-black duration-200 hover:scale-105">SEND TO PRINT</button>
     </div>
 </div>
 {% endblock %}
