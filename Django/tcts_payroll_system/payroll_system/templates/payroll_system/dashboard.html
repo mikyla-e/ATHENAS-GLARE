@@ -54,32 +54,31 @@
 {% block header %}DASHBOARD{% endblock %}
 
 {% block content %}
-    <div class="h-auto w-full grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] grid-rows-[auto_1fr_200px_200px_325px] lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-[180px_4fr_325px] gap-3">
+    <div class="h-auto w-full grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] grid-rows-[auto_1fr_150px_150px_325px] md:grid-rows-[auto_1fr_160px_160px_325px] lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-[180px_4fr_325px] gap-3">
         <!-- Total Employees Container -->
-        <div class="order-6 col-span-5 lg:order-1 lg:col-span-4 p-3 bg-[#1E1E1E] rounded-xl flex flex-col md:flex-row justify-evenly items-center shadow-lg" id="emp">
+        <div class="order-6 col-span-5 lg:order-1 lg:col-span-4 p-3 bg-[#1E1E1E] rounded-xl flex flex-row justify-center md:justify-evenly items-center shadow-lg" id="emp">
             <div class="w-full h-[50%] md:h-full flex flex-col justify-center items-center " id="ttl_emp">
-                <div class="w-full h-full px-4 flex flex-col justify-around items-end" id="content">
+                <div class="w-full h-full px-4 flex flex-col justify-center items-end object-nowrap" id="content">
                     <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
                         <p class="text-sm/5 sm:text-base/5 md:text-lg/6 font-bold text-right">TOTAL EMPLOYEES</p>
                         <p class="text-xs/5 sm:text-sm/5 md:text-sm/6 font-light text-right">currently</p>
                     </div>
 
-                    <div class="text-[4.5rem]/15 md:text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
+                    <div class="text-[3rem]/13 sm:text-[4.5rem]/15 md:text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
                         <p class="">{{ total_employees }}</p>
                     </div>
                 </div>
             </div>
-
-            <span class="md:hidden w-[80%] h-[3px] my-3 bg-[#f8d14625] rounded-xl"></span> <!--horizontal line-->
-            <span class="hidden md:block w-[3px] h-[80%] mr-3 ml-2 bg-[#f8d14625] rounded-xl"></span> <!--horizontal line-->
+            
+            <div class="w-[0] h-[90%] mr-2 ml-1 md:mr-3 md:ml-2 border-1 border-[#f8d14625] rounded-xl"></div> <!--horizontal line-->
             
             <div class="w-full h-[50%] md:h-full flex flex-col justify-center items-center" id="act_emp">
-                <div class="w-full h-full px-4 flex flex-col justify-around items-end" id="content">
+                <div class="w-full h-full px-4 flex flex-col justify-center items-end object-nowrap" id="content">
                     <div class="flex flex-col items-end text-[#FFFFFF] font-[League Spartan]" id="title">
                         <p class="text-sm/5 sm:text-base/5 md:text-lg/6 font-bold text-right">ACTIVE EMPLOYEES</p>
                         <p class="text-xs/5 sm:text-sm/5 md:text-sm/6 font-light text-right">within the week</p>
                     </div>
-                    <div class="text-[4.5rem]/15 md:text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
+                    <div class="text-[3rem]/13 sm:text-[4.5rem]/15 md:text-[5.5rem]/20 font-bold font-[Inter]" id="amount">
                         <p class="">{{ avg_active_employees }}</p>
                     </div>
                 </div>
@@ -103,37 +102,37 @@
         </div>
 
         <!-- Payroll Status Container -->
-        <div class="order-4 col-span-5 lg:order-2 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center outline-none border-none overflow-hidden shadow-lg" id="payroll-status">
-            <div class="w-[45%] h-full p-3 flex flex-col justify-between" id="processed-pending">
-                <div class="text-[#FFFFFF] text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
+        <div class="order-6 col-span-5 lg:order-2 lg:col-span-4 bg-[#1E1E1E] rounded-xl flex items-center outline-none border-none overflow-hidden shadow-lg" id="payroll-status">
+            <div class="w-[45%] h-full p-3 flex flex-col justify-center sm:justify-between" id="processed-pending">
+                <div class="text-[#FFFFFF] text-[.7rem] sm:text-xs lg:text-sm font-[League Spartan] font-bold" id="title">
                     <p >PAYROLL STATUS</p>
                 </div>
                 
                 <div class="flex flex-col items-start" id="content">
                     <div class="my-[10px]" id="processed">
-                        <h2 class="text-sm/5 lg:text-base/5 font-bold">PROCESSED</h2>
-                        <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ processed_payroll_count }}</p>  
+                        <h2 class="text-xs/5 sm:text-sm/5 lg:text-base/5 font-bold">PROCESSED</h2>
+                        <p class="text-lg/5 sm:text-2xl/6 lg:text-3xl/7 font-bold">{{ processed_payroll_count }}</p>  
                     </div>
                     <span class="w-[80%] h-[3px] bg-[#f8d14625] rounded-xl"></span> <!--horizontal line-->
                     <div class="my-[10px]" id="pending">
-                        <h2 class="text-sm/5 lg:text-base/5 font-bold">PENDING</h2>
-                        <p class="text-2xl/6 lg:text-3xl/7 font-bold">{{ pending_payroll_count }}</p>
+                        <h2 class="text-xs/5 sm:text-sm/5 lg:text-base/5 font-bold">PENDING</h2>
+                        <p class="text-lg/5 sm:text-2xl/6 lg:text-3xl/7 font-bold">{{ pending_payroll_count }}</p>
                     </div>
                 </div>
             </div>
             <div class="w-[55%] ml-2 h-full p-3 rounded-xl " id="payroll-info">
                 <div class="h-full flex flex-col justify-between items-end" id="content2">
                     <div class="h-fit my-2 mx-4 flex flex-col items-end" id="total_payroll">
-                        <p class="font-[Roboto] font-semibold text-right text-white">TOTAL PAYROLL</p>
+                        <p class="font-[Roboto] font-semibold text-right text-xs sm:text-base text-white md:text-nowrap">TOTAL PAYROLL</p>
                         {% if total_payroll == "No total payroll yet" %}
-                            <h1 class="font-[Inter] font-semibold text-3xl text-right">₱0.00</h1>    
+                            <h1 class="font-[Inter] font-semibold text-lg sm:text-2xl xl:text-3xl text-right">₱0.00</h1>    
                         {% else %}
-                            <h1 class="font-[Inter] font-semibold text-3xl text-right">₱{{ total_payroll|floatformat:2 }}</h1>
+                            <h1 class="font-[Inter] font-semibold text-lg sm:text-2xl xl:text-3xl text-right">₱{{ total_payroll|floatformat:2 }}</h1>
                         {% endif %}
                     </div>
                     <div class="h-fit my-2 mx-4 flex flex-col items-end" id="next_payday">
-                        <h1 class="font-[Inter] font-semibold text-2xl text-right">{{ next_payday|default:"N/A" }}</h1>
-                        <p class="font-[Roboto] font-semibold text-right text-white">NEXT PAYDAY</p>    
+                        <h1 class="font-[Inter] font-semibold text-sm sm:text-xl xl:text-2xl text-right text-nowrap">{{ next_payday|default:"N/A" }}</h1>
+                        <p class="font-[Roboto] font-semibold text-xs sm:text-base text-right text-white md:text-nowrap">NEXT PAYDAY</p>    
                     </div>
                 </div>
             </div>
@@ -145,7 +144,7 @@
         </div>
 
         <!-- Recent History Chart -->
-        <div class="relative order-3 col-span-5 lg:col-span-3 row-span-2 rounded-xl overflow-hidden shadow-lg bg-[#FAFAFA]" id="recent-history">
+        <div class="relative order-4 col-span-5 lg:col-span-3 row-span-2 rounded-xl overflow-hidden shadow-lg bg-[#FAFAFA]" id="recent-history">
             <table id="history_table" class="absolute w-full border-none outline-none bg-white z-10 rounded-xl z-50">
                 <thead class="border-b-[3px] border-b-[#e2e1e1]">
                     <tr>
@@ -184,7 +183,7 @@
         </div>
 
         <!-- Bar Chart -->
-        <div class="order-2 lg:order-6 col-span-5 lg:col-span-5 xl:col-span-6 bg-white rounded-xl shadow-lg" id="payroll-per-week">
+        <div class="order-2 lg:order-6 col-span-5 lg:col-span-5 xl:col-span-6 bg-white rounded-xl shadow-lg flex justify-center items-center" id="payroll-per-week">
             <div style="height: 250px; width: 100%; position: relative;">
                 <canvas id="bar" class="p-[15px]"></canvas>
             </div>
