@@ -6,6 +6,51 @@
 
 <!--(optional)head content-->
 {% block headcontent %}
+<style>
+    /* Add these styles to your CSS file or in a style tag in the head */
+    .background {
+        transition: opacity 0.3s ease;
+        z-index: 50;
+    }
+
+    .edit_incentives_popup {
+        transition: opacity 0.3s ease;
+        z-index: 60;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .background.show, 
+    .edit_incentives_popup.show {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Button styling */
+    input[type="button"], 
+    input[type="submit"] {
+        background-color: #F8D146;
+        color: #000;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+
+    input[type="button"]:hover, 
+    input[type="submit"]:hover {
+        background-color: #e9c13b;
+    }
+
+    /* Input field styling */
+    input[type="text"].field {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 100%;
+    }
+</style>
 <link rel="stylesheet" href="{% static 'css/payroll_individual.css'%}">
 <link rel="stylesheet" href="{% static 'css/table.css'%}">
 <link rel="stylesheet" href="{% static 'css/default_design.css' %}">
@@ -25,6 +70,7 @@
 <div id="incentive-popup" class="edit_incentives_popup absolute w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
     <h1>Add/Deduct for {{ employee.first_name }} {{ employee.last_name }}</h1>
     <form class="flex flex-col" method="post" onsubmit="event.preventDefault(); saveIncentives();">
+        {% csrf_token %}
         <div class="flex items-center my-2" >
             <div id="add-radio" class="flex flex-wrap">
                 <label class="relative flex items-center cursor-pointer" for="add">
@@ -53,6 +99,17 @@
         </div>
     </form>   
 </div>
+
+{% if messages %}
+<div class="messages my-3">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} p-2 rounded-lg mb-2 {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block content %}
@@ -188,11 +245,6 @@
                         <td class="p-2 text-sm font-[Inter]"><!--{OTHERS }-->0.00</td>
                         <td class="p-2 text-sm font-[Inter]"><!--{deductions}-->0.00</td>
                         <td class="p-2 text-sm font-[Inter]">{{ payroll.payment_date }}</td>
-                        <td class="p-3 w-full h-[30%] flex justify-center items-center">
-                            <a class="h-8.5 w-8.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}?payroll_id={{ payroll.payroll_id }}">
-                                <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
-                            </a>
-                        </td>
                     </tr>
                     {% empty %}
                     <tr id="payroll-data" class="h-[50px]">
@@ -378,21 +430,77 @@
         bg.classList.add("show");
         popup.classList.add("show");
         
-        // Load existing incentives if any
-        const currentIncentive = employeeIncentives[employeeId] || { type: 'add', amount: '' };
-        
-        // Set the radio button for the incentive type
-        document.getElementById(currentIncentive.type).checked = true;
-        
-        // Set the amount field
-        document.getElementById('field').value = currentIncentive.amount || '';
+        // Reset the form
+        document.getElementById("add").checked = true;
+        document.getElementById("field").value = "";
     }
-    
+
     function cancelEditIncentives(){
         const bg = document.getElementById("background");
         const popup = document.getElementById("incentive-popup");
         bg.classList.remove("show");
         popup.classList.remove("show");
     }
+
+    function saveIncentives(){
+        // Get the selected action (add or subtract)
+        const action = document.getElementById("add").checked ? "add" : "subtract";
+        const amount = document.getElementById("field").value;
+        
+        // Validate the amount
+        if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+            alert('Please enter a valid positive number for the amount.');
+            return false;
+        }
+        
+        // Prepare form data
+        const formData = new FormData();
+        formData.append('action', action);
+        formData.append('amount', amount);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        // Send AJAX request to update incentives
+        fetch('{% url "payroll_system:update_employee_incentives" employee.employee_id %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the displayed incentives and salary values
+                document.querySelectorAll('.incentive-display').forEach(el => {
+                    el.textContent = data.new_incentives;
+                });
+                document.querySelectorAll('.salary-display').forEach(el => {
+                    el.textContent = data.new_salary;
+                });
+                
+                // Close the popup
+                cancelEditIncentives();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating incentives.');
+        });
+    }
+
+    // Make sure the background is clickable to close the popup
+    document.addEventListener('DOMContentLoaded', function() {
+        const background = document.getElementById('background');
+        if (background) {
+            background.addEventListener('click', function(event) {
+                // Only close if the click was directly on the background
+                if (event.target === background) {
+                    cancelEditIncentives();
+                }
+            });
+        }
+    });
 </script>
 {% endblock %}

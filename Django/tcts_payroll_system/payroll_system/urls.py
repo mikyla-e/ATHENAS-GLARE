@@ -22,11 +22,11 @@ urlpatterns = [
     path('customers/', views.customers, name='customers'),
     path('customer_page/<int:customer_id>/', views.customer_page, name='customer_page'),
     path('customer_edit/<int:customer_id>/', views.customer_edit, name='customer_edit'),
+    path('update-all-incentives/', views.update_all_incentives, name='update_all_incentives'),
+    path('payroll/<str:employee_id>/update-incentives/', views.update_employee_incentives, name='update_employee_incentives'),
     path('print/', views.print, name='print'),
     path('ajax/get-provinces/', views.get_provinces, name='get_provinces'),
     path('ajax/get-cities/', views.get_cities, name='get_cities'),
     path('ajax/get-barangays/', views.get_barangays, name='get_barangays'),
     path('ajax/customer/<int:customer_id>/', views.get_customer_details, name='get_customer_details'),
-    # path('edit-incentives/', views.edit_incentives, name='edit_incentives'),
-    # path('update_incentives/', views.update_incentives, name='update_incentives'),
 ]

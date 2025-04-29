@@ -331,7 +331,6 @@ class Payroll(models.Model):
     deductions = models.FloatField(default=0, null=False)
     salary = models.FloatField(default=0, null=False)  
     cash_advance = models.FloatField(default=0, null=False)  
-    under_time = models.FloatField(default=0, null=False)  
     payment_date = models.DateField(null=False)
     employee_id_fk = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='payrolls')
     attendance_id_fk = models.ForeignKey(Attendance, null=True, blank=True, on_delete=models.CASCADE)
@@ -343,8 +342,53 @@ class Payroll(models.Model):
         status = f"[{self.payroll_status}]"
         
         return f"Payroll #{self.payroll_id} - {employee} - {date_str} - {amount} {status}"
+    
+    def calculate_salary(self, attendance_count=None):
+        if attendance_count is None:
+            if self.payment_date:
+                end_date = self.payment_date
+                start_date = end_date - timedelta(days=6)  
+                
+                unique_days = Attendance.objects.filter(
+                    employee_id_fk=self.employee_id_fk,
+                    date__range=[start_date, end_date],
+                    attendance_status='Present'
+                ).values_list('date', flat=True).distinct().count()
+                
+                attendance_count = unique_days
+            else:
+                attendance_count = 0
+        
+        base_salary = self.rate * attendance_count
+        
+        self.salary = base_salary + self.incentives - self.deductions
+        
+        if self.salary < 0:
+            self.salary = 0
+            
+        return self.salary
+    
+    def get_next_saturday(self, from_date=None):
+        if from_date is None:
+            from_date = timezone.now().date()
+        
+        days_until_saturday = (5 - from_date.weekday()) % 7
+        
+        if days_until_saturday == 0:
+            days_until_saturday = 7
+            
+        return from_date + timedelta(days=days_until_saturday)
             
     def save(self, *args, **kwargs):
+        # If this is a new payroll record (no ID yet)
+        if not self.payroll_id:
+            # If payment_date is not set, set it to the next Saturday
+            if not self.payment_date:
+                self.payment_date = self.get_next_saturday()
+        
+        # Calculate salary before saving
+        self.calculate_salary()
+        
         self.full_clean()
         super().save(*args, **kwargs)
 

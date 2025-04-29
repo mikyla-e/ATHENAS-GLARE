@@ -366,20 +366,16 @@ def payrolls(request):
             latest_payroll = employee.payrolls.order_by('-payment_date').first()
             
             if latest_payroll:
-                # Calculate attendance for the current week
+                # Count attendance for the current week
                 weekly_attendance_count = Attendance.objects.filter(
                     employee_id_fk=employee,
                     date__range=[start_of_week, end_of_week],
                     attendance_status='Present'
                 ).count()
                 
-                # Calculate salary based on weekly attendance and rate
-                latest_payroll.salary = latest_payroll.rate * weekly_attendance_count
-                
-                # Update the salary in the database
-                Payroll.objects.filter(payroll_id=latest_payroll.payroll_id).update(
-                    salary=latest_payroll.salary
-                )
+                # Calculate salary using the model method
+                latest_payroll.calculate_salary(weekly_attendance_count)
+                latest_payroll.save()  # Save the updated salary
             
             employee_data.append({
                 'employee': employee,
@@ -498,6 +494,129 @@ def payrolls(request):
     return render(request, 'payroll_system/payroll.html', context)
 
 @login_required
+def update_all_incentives(request):
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        amount = request.POST.get('amount')
+        
+        try:
+            amount = float(amount)
+            
+            # Get all employees
+            employees = Employee.objects.all()
+            
+            # For each employee, get their most recent payroll
+            for employee in employees:
+                latest_payroll = employee.payrolls.order_by('-payment_date').first()
+                
+                if latest_payroll:
+                    current_incentives = latest_payroll.incentives or 0  # Handle None values
+                    
+                    if action == 'add':
+                        # Add to incentives
+                        latest_payroll.incentives = current_incentives + amount
+                    elif action == 'subtract':
+                        # Subtract from incentives (ensure it doesn't go below zero)
+                        latest_payroll.incentives = max(0, current_incentives - amount)
+                    
+                    latest_payroll.save()
+            
+            messages.success(request, f'Successfully updated incentives for all employees!')
+        except ValueError:
+            messages.error(request, 'Please enter a valid number for amount')
+        except Exception as e:
+            messages.error(request, f'An error occurred: {str(e)}')
+    
+    return redirect('payroll_system:payrolls')
+
+@login_required
+def update_employee_incentives(request, employee_id):
+    """Update incentives for a specific employee."""
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        amount_str = request.POST.get('amount')
+        
+        try:
+            # Get the employee
+            employee = Employee.objects.get(employee_id=employee_id)
+            
+            # Get the most recent payroll for this employee
+            current_payroll = employee.payrolls.order_by('-payment_date').first()
+            
+            if not current_payroll:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'No payroll record exists for this employee.'
+                    })
+                else:
+                    messages.error(request, 'No payroll record exists for this employee.')
+                    return redirect('payroll_system:payroll_individual', employee_id=employee_id)
+            
+            # Convert amount to float
+            amount = float(amount_str)
+            
+            # Update incentives based on action
+            current_incentives = current_payroll.incentives or 0  # Handle None values
+            
+            if action == 'add':
+                current_payroll.incentives = current_incentives + amount
+            elif action == 'subtract':
+                # Ensure we don't go below zero
+                current_payroll.incentives = max(0, current_incentives - amount)
+            
+            # Recalculate salary with updated incentives
+            # Get the attendance count
+            today = now().date()
+            start_of_week = today - timedelta(days=today.weekday())  # Monday
+            end_of_week = start_of_week + timedelta(days=6)  # Sunday
+            
+            weekly_attendance_count = Attendance.objects.filter(
+                employee_id_fk=employee,
+                date__range=[start_of_week, end_of_week],
+                attendance_status='Present'
+            ).count()
+            
+            current_payroll.calculate_salary(weekly_attendance_count)
+            current_payroll.save()
+            
+            # Format the values for display
+            formatted_incentives = "{:.2f}".format(current_payroll.incentives)
+            formatted_salary = "{:.2f}".format(current_payroll.salary)
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Return JSON response for AJAX request
+                return JsonResponse({
+                    'success': True,
+                    'new_incentives': formatted_incentives,
+                    'new_salary': formatted_salary
+                })
+            else:
+                # Regular form submission
+                messages.success(
+                    request, 
+                    f'Successfully {"added to" if action == "add" else "subtracted from"} incentives for {employee.first_name} {employee.last_name}.'
+                )
+                return redirect('payroll_system:payroll_individual', employee_id=employee_id)
+                
+        except Employee.DoesNotExist:
+            error_msg = 'Employee not found.'
+        except ValueError:
+            error_msg = 'Please enter a valid number for amount.'
+        except Exception as e:
+            error_msg = f'An error occurred: {str(e)}'
+        
+        # Handle errors
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': error_msg})
+        else:
+            messages.error(request, error_msg)
+            return redirect('payroll_system:payroll_individual', employee_id=employee_id)
+    
+    # If not POST, redirect back to the payroll page
+    return redirect('payroll_system:payroll_individual', employee_id=employee_id)
+
+@login_required
 def confirm_payroll(request):
     if request.method == 'POST':
         try:
@@ -506,8 +625,8 @@ def confirm_payroll(request):
             
             # Calculate the next Saturday for the new payroll payment date
             today = now().date()
-            days_until_saturday = (5 - today.weekday()) % 7  # 5 is Saturday
-            next_saturday = today + timedelta(days=days_until_saturday)
+            temp_payroll = Payroll()  # Temporary instance to use the get_next_saturday method
+            next_saturday = temp_payroll.get_next_saturday(today)
             
             # Process each pending payroll
             for payroll in pending_payrolls:
@@ -523,7 +642,6 @@ def confirm_payroll(request):
                     deductions=0,  # Reset deductions
                     salary=0,  # Reset salary
                     cash_advance=0,  # Reset cash advance
-                    under_time=0,  # Reset under time
                     payment_date=next_saturday,  # Set payment date to next Saturday
                     employee_id_fk=payroll.employee_id_fk  # Keep the same employee
                 )
@@ -531,7 +649,7 @@ def confirm_payroll(request):
             
             return redirect('payroll_system:payrolls')
         except Exception as e:
-            print(f"Error confirming payroll: {e}")
+            messages.error(request, f'Error confirming payroll: {e}')
             # Return to payroll page with error message
             return redirect('payroll_system:payrolls')
     
@@ -560,19 +678,18 @@ def payroll_individual(request, employee_id):
         attendance_status='Present'
     ).count()
     
+    # Re-calculate the current payroll using the attendance count
+    if current_payroll:
+        current_payroll.calculate_salary(weekly_attendance_count)
+        current_payroll.save()
+    
     # Calculate attendance counts for each historical payroll
-    # For each payroll, we need to determine its period and count attendances within that period
     for payroll in payroll_history:
         # Determine the payment period for this payroll
-        # Assuming each payroll covers time since the previous payroll
         payment_date = payroll.payment_date
         
-        # Find the previous payment date (or employment date if this is the first payroll)
-        previous_payrolls = employee.payrolls.filter(payment_date__lt=payment_date).order_by('-payment_date')
-        if previous_payrolls.exists():
-            start_date = previous_payrolls.first().payment_date + timedelta(days=1)
-        else:
-            start_date = employee.date_of_employment
+        # Payment date is typically a Saturday, so subtract 6 days to get Monday
+        start_date = payment_date - timedelta(days=5)  # Monday to Saturday (6 days)
         
         # Count attendance records within this payroll period
         payroll.attendance_count = Attendance.objects.filter(
@@ -614,8 +731,7 @@ def payroll_edit(request, employee_id):
         # No active payroll - create a new one
         payroll = Payroll(employee_id_fk=employee)
         
-        # Set payment date to one week from today
-        payroll.payment_date = today + timezone.timedelta(days=7)
+        # Payment date will be set to next Saturday automatically in the save method
         
         # Copy data from the most recent payroll if it exists
         try:
@@ -634,7 +750,7 @@ def payroll_edit(request, employee_id):
     if request.method == 'POST':
         form = PayrollForm(request.POST, instance=payroll)
         if form.is_valid():
-            form.save()
+            form.save()  # This will trigger the salary calculation in the model's save method
 
             History.objects.create(description=f"Payroll for {employee.first_name} {employee.last_name} ({employee.employee_id}) was updated.")
 
