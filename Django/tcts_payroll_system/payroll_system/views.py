@@ -14,6 +14,7 @@ from .forms import EmployeeForm, PayrollForm, ServiceForm, CustomerForm, Custome
 from .models import Employee, Payroll, Attendance, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.views.decorators.http import require_POST
 
 @csrf_protect  # Ensure CSRF protection
 
@@ -1162,3 +1163,24 @@ def edit_incentives(request):
             return JsonResponse({'error': 'Failed to update payroll records.'}, status=500)
 
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+@login_required
+@require_POST
+def update_incentives(request):
+    data = json.loads(request.body)
+    employee_id = data.get('employee_id')
+    incentive_type = data.get('incentive_type')
+    incentive_amount = data.get('incentive_amount')
+    
+    # Update your Payroll model
+    payroll = Payroll.objects.get(employee__employee_id=employee_id)
+    if incentive_type == 'add':
+        payroll.incentives = incentive_amount
+    else:
+        payroll.incentives = -incentive_amount
+    
+    # Recalculate salary based on rate, attendance and incentives
+    payroll.salary = (payroll.rate * attendance_count) + payroll.incentives
+    payroll.save()
+    
+    return JsonResponse({'status': 'success'})

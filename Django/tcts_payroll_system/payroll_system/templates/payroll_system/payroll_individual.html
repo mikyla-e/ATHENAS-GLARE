@@ -24,7 +24,7 @@
 
 <div id="incentive-popup" class="edit_incentives_popup absolute w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
     <h1>Add/Deduct for {{ employee.first_name }} {{ employee.last_name }}</h1>
-    <form class="flex flex-col" method="post" onsubmit="event.preventDefault();">
+    <form class="flex flex-col" method="post" onsubmit="event.preventDefault(); saveIncentives();">
         <div class="flex items-center my-2" >
             <div id="add-radio" class="flex flex-wrap">
                 <label class="relative flex items-center cursor-pointer" for="add">
@@ -129,8 +129,8 @@
                     {% if current_payroll %}
                         <td class="p-2 text-sm font-[Inter]">{{ current_payroll.rate }}</td>
                         <td class="p-2 text-sm font-[Inter]">{{ attendance_count }}</td>
-                        <td id="total-incentives" class="p-2 text-sm font-[Inter]">{{ current_payroll.incentives|default:"0.00" }}</td>                        
-                        <td class="p-2 text-sm font-[Inter]">{{ current_payroll.salary }}</td>
+                        <td id="total-incentives" class="p-2 text-sm font-[Inter] incentive-display">{{ current_payroll.incentives|default:"0.00" }}</td>                        
+                        <td class="p-2 text-sm font-[Inter] salary-display">{{ current_payroll.salary }}</td>
                         <td class="p-2 text-sm font-[Inter]"><!--{ other ++pay cash advance }}--> 0.00</td>
                         <td class="p-2 text-sm font-[Inter]"><!--{ deductions }}--> 0.00</td>
                         <td class="p-2 text-sm font-[Inter]">{{ current_payroll.payment_date }}</td>
@@ -223,8 +223,8 @@
                     {% if current_payroll %}
                         <td class="p-2 text-xs font-[Inter]">{{ current_payroll.rate }}</td>
                         <td class="px-2 text-xs font-[Inter]">{{ attendance_count }}</td>
-                        <td class="px-2 text-xs font-[Inter]">INCENTIVES</td>
-                        <td class="px-2 text-xs font-[Inter]">{{ current_payroll.salary }}</td>
+                        <td class="px-2 text-xs font-[Inter] incentive-display">{{ current_payroll.incentives|default:"0.00" }}</td>
+                        <td class="px-2 text-xs font-[Inter] salary-display">{{ current_payroll.salary }}</td>
                         <td class="px-2 text-xs font-[Inter]">{{ current_payroll.payment_date }}</td>
                         <td class="p-3 flex justify-center items-center">
                             <a class="h-7.5 w-7.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
@@ -308,8 +308,8 @@
                     {% if current_payroll %}
                         <td class="p-2 text-[10px] font-[Inter]">{{ current_payroll.rate }}</td>
                         <td class="px-2 text-[10px] font-[Inter]">{{ attendance_count }}</td>
-                        <td class="px-2 text-[10px] font-[Inter]">INCENTIVES</td>
-                        <td class="px-2 text-[10px] font-[Inter]">{{ current_payroll.salary }}</td>
+                        <td class="px-2 text-[10px] font-[Inter] incentive-display">{{ current_payroll.incentives|default:"0.00" }}</td>
+                        <td class="px-2 text-[10px] font-[Inter] salary-display">{{ current_payroll.salary }}</td>
                         <td class="px-2 text-[10px] font-[Inter]">{{ current_payroll.payment_date }}</td>
                         <td class="p-3 flex justify-center items-center">
                             <a class="h-7.5 w-7.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
@@ -380,11 +380,24 @@
 <!--(optional)script-->
 {% block script %}
 <script>
+    // Global variables to keep track of incentives
+    let employeeIncentives = {};
+    const employeeId = {{ employee.employee_id }};  // Get the current employee ID from Django context
+    
     function editIncentives(){
         const bg = document.getElementById("background");
         const popup = document.getElementById("incentive-popup");
         bg.classList.add("show");
         popup.classList.add("show");
+        
+        // Load existing incentives if any
+        const currentIncentive = employeeIncentives[employeeId] || { type: 'add', amount: '' };
+        
+        // Set the radio button for the incentive type
+        document.getElementById(currentIncentive.type).checked = true;
+        
+        // Set the amount field
+        document.getElementById('field').value = currentIncentive.amount || '';
     }
     
     function cancelEditIncentives(){
@@ -392,6 +405,141 @@
         const popup = document.getElementById("incentive-popup");
         bg.classList.remove("show");
         popup.classList.remove("show");
-    }    
+    }
+    
+    // Function to calculate salary based on rate, attendance and incentives
+    function calculateSalary() {
+        // Get data from the current payroll table
+        const ratePerDay = parseFloat("{{ current_payroll.rate|default:'0' }}");
+        const totalAttendance = parseInt("{{ attendance_count|default:'0' }}");
+        const baseSalary = ratePerDay * totalAttendance;
+        
+        // Get incentives for this employee (default to 0 if not set)
+        const incentiveAmount = parseFloat(employeeIncentives[employeeId]?.amount || 0);
+        const incentiveType = employeeIncentives[employeeId]?.type || 'add';
+        
+        // Calculate total salary based on incentive type
+        let totalSalary = baseSalary;
+        let totalIncentives = 0;
+        
+        if (incentiveType === 'add') {
+            totalSalary += incentiveAmount;
+            totalIncentives = incentiveAmount;
+        } else if (incentiveType === 'subtract') {
+            totalSalary -= incentiveAmount;
+            totalIncentives = -incentiveAmount;
+        }
+        
+        // Ensure salary doesn't go below zero
+        totalSalary = Math.max(totalSalary, 0);
+        
+        return {
+            totalSalary: totalSalary.toFixed(2),
+            totalIncentives: totalIncentives.toFixed(2)
+        };
+    }
+    
+    // Function to save incentives and update salary
+    function saveIncentives() {
+        // Get the selected incentive type
+        const addRadio = document.getElementById('add');
+        const incentiveType = addRadio.checked ? 'add' : 'subtract';
+        
+        // Get the incentive amount
+        const incentiveAmount = parseFloat(document.getElementById('field').value) || 0;
+        
+        // Save incentives for this employee
+        employeeIncentives[employeeId] = {
+            type: incentiveType,
+            amount: incentiveAmount
+        };
+        
+        // Update salary display
+        updateSalaryDisplay();
+        
+        // Save to localStorage for persistence
+        localStorage.setItem('employeeIncentives', JSON.stringify(employeeIncentives));
+        
+        // Close the popup
+        cancelEditIncentives();
+        
+        // Optional: Send data to backend via AJAX
+        // sendIncentivesToBackend(employeeId, incentiveType, incentiveAmount);
+    }
+    
+    // Function to update the salary display in the tables
+    function updateSalaryDisplay() {
+        const calculatedValues = calculateSalary();
+        
+        // Update all salary cells in the payroll tables
+        const salaryCells = document.querySelectorAll('.salary-display');
+        salaryCells.forEach(cell => {
+            cell.textContent = calculatedValues.totalSalary;
+        });
+        
+        // Update all incentive cells
+        const incentiveCells = document.querySelectorAll('.incentive-display');
+        incentiveCells.forEach(cell => {
+            cell.textContent = calculatedValues.totalIncentives;
+        });
+    }
+    
+    // Optional: Function to send incentives to backend
+    function sendIncentivesToBackend(employeeId, incentiveType, incentiveAmount) {
+        fetch('{% url "payroll_system:update_incentives" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                employee_id: employeeId,
+                incentive_type: incentiveType,
+                incentive_amount: incentiveAmount
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Load incentives from localStorage when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load saved incentives from localStorage
+        const savedIncentives = localStorage.getItem('employeeIncentives');
+        if (savedIncentives) {
+            employeeIncentives = JSON.parse(savedIncentives);
+        }
+        
+        // Update salary display with any existing incentives
+        updateSalaryDisplay();
+        
+        // Add event listeners
+        const form = document.querySelector('#incentive-popup form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            saveIncentives();
+        });
+    });
 </script>
 {% endblock %}
