@@ -60,7 +60,24 @@
 <!--page content-->
 
 {% block outsidecontent %}
-<div id="background" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelEditIncentives()">
+<div id="background_payroll" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50">
+        
+</div> 
+
+<div id="payroll-popup" class="payroll fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
+    <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
+
+    <span class="w-full h-[2px] my-1 bg-[#1e1e1e40] rounded-full"></span>
+
+    <h1 class="text-lg sm:text-xl my-2 font-[League Spartan] font-semibold text-center">Are you sure this week's Payroll is finished?</h1>
+    
+    <div class="w-full h-[40px] my-1 flex justify-evenly items-center gap-3">
+        <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelConfirmPayroll()">CANCEL</button>
+        <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">CONFIRM</button>
+    </div>
+</div>
+
+<div id="background_incentive" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelEditIncentives()">
     
 </div> 
 
@@ -248,7 +265,7 @@
 
         <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
             <a class="size-full" href="####">
-                <button class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" id="button">CONFIRM PAYROLL</button>
+                <button class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" id="button" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
             </a>
         </div>
     </div>
@@ -355,15 +372,30 @@
 
     <script>
         function editIncentives(){
-            const bg = document.getElementById("background");
+            const bg = document.getElementById("background_incentive");
             const popup = document.getElementById("incentive-popup");
             bg.classList.add("show");
             popup.classList.add("show");
         }
         
         function cancelEditIncentives(){
-            const bg = document.getElementById("background");
+            const bg = document.getElementById("background_incentive");
             const popup = document.getElementById("incentive-popup");
+            bg.classList.remove("show");
+            popup.classList.remove("show");
+        }
+
+        
+        function confirmPayroll(){
+            const bg = document.getElementById("background_payroll");
+            const popup = document.getElementById("payroll-popup");
+            bg.classList.add("show");
+            popup.classList.add("show");
+        }
+        
+        function cancelConfirmPayroll(){
+            const bg = document.getElementById("background_payroll");
+            const popup = document.getElementById("payroll-popup");
             bg.classList.remove("show");
             popup.classList.remove("show");
         }
