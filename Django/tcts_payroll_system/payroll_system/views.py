@@ -639,24 +639,41 @@ def confirm_payroll(request):
             temp_payroll = Payroll()  # Temporary instance to use the get_next_saturday method
             next_saturday = temp_payroll.get_next_saturday(today)
             
-            # Process each pending payroll
+            # Process all the pending payrolls first
+            processed_payrolls = []
             for payroll in pending_payrolls:
-                # Update the current payroll to PROCESSED
+                # Store the cash advance amount for later use
+                cash_advance_amount = payroll.cash_advance
+                employee = payroll.employee_id_fk
+                
+                # Update the payroll status to PROCESSED but keep the cash_advance value
                 payroll.payroll_status = 'PROCESSED'
                 payroll.save()
                 
-                # Create a new payroll for the next week
+                # Store information needed for creating new payrolls
+                processed_payrolls.append({
+                    'employee': employee,
+                    'rate': payroll.rate,
+                    'cash_advance': cash_advance_amount
+                })
+            
+            # Now create new payrolls with cash advance transferred to deductions
+            for payroll_info in processed_payrolls:
+                # Create a new payroll with the cash advance as deductions
                 new_payroll = Payroll(
-                    rate=payroll.rate,  # Keep the same rate
+                    rate=payroll_info['rate'],  # Keep the same rate
                     incentives=0,  # Reset incentives
                     payroll_status='PENDING',  # Set status to PENDING
-                    deductions=0,  # Reset deductions
+                    deductions=payroll_info['cash_advance'],  # Transfer cash advance to deductions
                     salary=0,  # Reset salary
-                    cash_advance=0,  # Reset cash advance
+                    cash_advance=0,  # Start with zero cash advance
                     payment_date=next_saturday,  # Set payment date to next Saturday
-                    employee_id_fk=payroll.employee_id_fk  # Keep the same employee
+                    employee_id_fk=payroll_info['employee']  # Keep the same employee
                 )
                 new_payroll.save()
+            
+            # Log history
+            History.objects.create(description=f"Payroll confirmed. Cash advances transferred to next payroll's deductions.")
             
             return redirect('payroll_system:payrolls')
         except Exception as e:
@@ -734,14 +751,15 @@ def payroll_edit(request, employee_id):
     employee = Employee.objects.get(employee_id=employee_id)
     today = timezone.now().date()
     
-    # Get an active payroll, or create a new one
+    # Get an active pending payroll, or create a new one
     try:
         payroll = Payroll.objects.get(
             employee_id_fk=employee,
-            payment_date__gte=today
+            payment_date__gte=today,
+            payroll_status=Payroll.PayrollStatus.PENDING  # Only get PENDING payrolls
         )
     except Payroll.DoesNotExist:
-        # No active payroll - create a new one
+        # If no pending payroll exists, try to get the most recent one as a starting point
         payroll = Payroll(employee_id_fk=employee)
         
         # Payment date will be set to next Saturday automatically in the save method
@@ -755,19 +773,43 @@ def payroll_edit(request, employee_id):
             # Copy relevant fields
             payroll.rate = prev_payroll.rate
             payroll.incentives = prev_payroll.incentives
-            payroll.payroll_status = prev_payroll.payroll_status
+            payroll.payroll_status = Payroll.PayrollStatus.PENDING  
         except Payroll.DoesNotExist:
             # First payroll for this employee, use defaults
             pass
+    except Payroll.MultipleObjectsReturned:
+        # If multiple pending payrolls exist, get the most recent one
+        payroll = Payroll.objects.filter(
+            employee_id_fk=employee,
+            payment_date__gte=today,
+            payroll_status=Payroll.PayrollStatus.PENDING
+        ).order_by('-payment_date').first()
     
     if request.method == 'POST':
-        form = PayrollForm(request.POST, instance=payroll)
-        if form.is_valid():
-            form.save()  # This will trigger the salary calculation in the model's save method
-
-            History.objects.create(description=f"Payroll for {employee.first_name} {employee.last_name} ({employee.employee_id}) was updated.")
-
-            return redirect('payroll_system:payroll_individual', employee_id=employee_id)
+        # Check if this is a cash advance submission
+        if 'cash_advance' in request.POST and request.POST.get('number'):
+            try:
+                cash_amount = float(request.POST.get('number', 0))
+                if cash_amount > 0:
+                    payroll.cash_advance += cash_amount
+                    payroll.save()
+                    messages.success(request, f"Cash advance of ₱{cash_amount:,.2f} added successfully.")
+                else:
+                    messages.error(request, "Cash advance amount must be greater than zero.")
+            except ValueError:
+                messages.error(request, "Invalid cash advance amount.")
+            
+            return redirect('payroll_system:payroll_edit', employee_id=employee_id)
+        else:
+            # Regular payroll form submission
+            form = PayrollForm(request.POST, instance=payroll)
+            if form.is_valid():
+                form.save()  # This will trigger the salary calculation in the model's save method
+                
+                # Log the history
+                History.objects.create(description=f"Payroll for {employee.first_name} {employee.last_name} ({employee.employee_id}) was updated.")
+                
+                return redirect('payroll_system:payroll_individual', employee_id=employee_id)
     else:
         form = PayrollForm(instance=payroll)
 
@@ -1042,7 +1084,25 @@ def services_assign(request):
 
 @login_required
 def status(request):
-    # Get all tasks for display
+    if request.method == 'POST':
+        task_id = request.POST.get('task_id')
+        
+        if task_id and task_id != 'undefined':
+            task = get_object_or_404(Task, task_id=task_id)
+            
+            if 'incentives' in request.POST:
+                amount = request.POST.get('number')
+                if amount and float(amount) > 0:
+                    payroll = Payroll.objects.filter(employee_id_fk=task.employee).latest('payment_date')
+                    
+                    payroll.incentives = payroll.incentives + float(amount)
+                    payroll.save()
+                    
+                task.task_status = 'Completed'
+                task.save()
+                
+                return redirect('payroll_system:status')
+    
     tasks = Task.objects.all().order_by('-created_at')
     context = {
         'tasks': tasks
@@ -1242,54 +1302,3 @@ def update_payday(request):
             return JsonResponse({'success': True, 'updated_payday': formatted_display})
         return JsonResponse({'success': False, 'error': 'Invalid date'})
     return JsonResponse({'success': False, 'error': 'Invalid request'})
-
-
-# @login_required
-# @csrf_exempt
-# def edit_incentives(request):
-#     if request.method == 'POST':
-#         try:
-#             data = json.loads(request.body)
-#             action = data.get('action')
-#             amount = float(data.get('amount'))
-
-#             if action not in ['add', 'subtract']:
-#                 return JsonResponse({'error': 'Invalid action.'}, status=400)
-
-#             payrolls = Payroll.objects.all()
-
-#             for payroll in payrolls:
-#                 if action == 'add':
-#                     payroll.salary += amount
-#                     payroll.incentives += amount
-#                 elif action == 'subtract':
-#                     payroll.salary = max(0, payroll.salary - amount)  # incentives untouched
-#                 payroll.save()
-
-#             return JsonResponse({'status': 'success'})
-#         except Exception as e:
-#             print(f"Error while editing incentives: {e}")
-#             return JsonResponse({'error': 'Failed to update payroll records.'}, status=500)
-
-#     return JsonResponse({'error': 'Invalid request method.'}, status=405)
-
-# @login_required
-# @require_POST
-# def update_incentives(request):
-#     data = json.loads(request.body)
-#     employee_id = data.get('employee_id')
-#     incentive_type = data.get('incentive_type')
-#     incentive_amount = data.get('incentive_amount')
-    
-#     # Update your Payroll model
-#     payroll = Payroll.objects.get(employee__employee_id=employee_id)
-#     if incentive_type == 'add':
-#         payroll.incentives = incentive_amount
-#     else:
-#         payroll.incentives = -incentive_amount
-    
-#     # Recalculate salary based on rate, attendance and incentives
-#     payroll.salary = (payroll.rate * attendance_count) + payroll.incentives
-#     payroll.save()
-    
-#     return JsonResponse({'status': 'success'})
