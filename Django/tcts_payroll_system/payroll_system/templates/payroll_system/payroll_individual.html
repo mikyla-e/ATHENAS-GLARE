@@ -99,8 +99,10 @@
         </div>
     </form>   
 </div>
+{% endblock %}
 
-{% if messages %}
+{% block content %}
+<!-- {% if messages %}
 <div class="messages my-3">
     {% for message in messages %}
     <div class="alert {{ message.tags }} p-2 rounded-lg mb-2 {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% endif %}">
@@ -108,11 +110,8 @@
     </div>
     {% endfor %}
 </div>
-{% endif %}
+{% endif %} -->
 
-{% endblock %}
-
-{% block content %}
 <div class="w-full grid grid-cols-2 grid-rows-[1fr_1fr_auto_auto] md:grid-cols-[2fr_6fr] md:grid-rows-[1fr_80px_120px_auto] lg:grid-cols-[1fr_6fr_6fr] lg:grid-rows-[100px_auto_auto] gap-3 z-10">
 
     <div class="order-1 col-span-2 md:col-span-1 rounded-full w-full flex justify-center min-w-[125px] md:min-w-[100px]">
