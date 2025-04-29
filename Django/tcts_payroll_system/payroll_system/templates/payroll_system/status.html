@@ -22,6 +22,29 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
+    
+    /* Hide tasks based on status */
+    .task-item.complete {
+        display: none;
+    }
+    
+    .task-item.in-progress {
+        display: flex;
+    }
+    
+    /* When viewing complete tasks */
+    body.show-complete .task-item.complete {
+        display: flex;
+    }
+    
+    body.show-complete .task-item.in-progress {
+        display: none;
+    }
+    
+    /* Status button active states */
+    .status-link.active {
+        color: #F8D146;
+    }
 </style>
 {% endblock %}
 
@@ -78,10 +101,10 @@
             <p class="text-3xl font-[League Spartan] font-bold">TASKS</p>
         </div>
         <div class="w-fit h-full py-2 flex flex-row justify-end items-end gap-2 md:gap-3">
-            <a href="">
+            <a href="javascript:void(0)" class="status-link active" id="in-progress-link" onclick="showInProgressTasks()">
                 <p class="text-sm sm:text-base md:text-lg font-[Roboto] font-extrabold text-[#1E1E1E] hover:text-[#F8D146] duration-300">IN PROGRESS</p>
             </a>
-            <a href="">
+            <a href="javascript:void(0)" class="status-link" id="complete-link" onclick="showCompleteTasks()">
                 <p class="text-sm sm:text-base md:text-lg font-[Roboto] font-extrabold text-[#1E1E1E] hover:text-[#F8D146] duration-300">COMPLETE</p>
             </a>
         </div>
@@ -89,9 +112,9 @@
     
     <span class="w-full h-[2px] bg-[#1E1E1E80] rounded-xl"></span> <!--horizontal line-->
     
-    <div class="size-full my-5 flex flex-col gap-5">
+    <div class="size-full my-5 flex flex-col gap-5" id="tasks-container">
         {% for task in tasks %}
-            <div class="w-full h-[23%] flex justify-between rounded-xl bg-white py-4 px-6 gap-2">
+            <div class="w-full h-[23%] flex justify-between rounded-xl bg-white py-4 px-6 gap-2 task-item {% if task.task_status == 'COMPLETE' %}complete{% else %}in-progress{% endif %}">
                 <div class="w-[85%] h-full flex flex-col justify-between">
                     <div class="w-full h-[30%]">
                         <div class="size-full flex flex-col gap-1">
@@ -111,11 +134,20 @@
                     </div> 
                 </div> 
             </div>
-            {% empty %}
-            <div class="flex justify-center items-center p-10">
+        {% empty %}
+            <div class="flex justify-center items-center p-10" id="no-tasks-message">
                 <h2>No tasks available.</h2>
             </div>
         {% endfor %}
+        
+        <!-- Empty state messages -->
+        <div id="no-complete-tasks" class="flex justify-center items-center p-10" style="display: none;">
+            <h2>No complete tasks available.</h2>
+        </div>
+        
+        <div id="no-in-progress-tasks" class="flex justify-center items-center p-10" style="display: none;">
+            <h2>No in-progress tasks available.</h2>
+        </div>
     </div>
 </div>
 
@@ -152,5 +184,59 @@
         bg.classList.remove("show");
         popup.classList.remove("show");
     }
+    
+    // Task filtering functionality
+    function showCompleteTasks() {
+        document.body.classList.add('show-complete');
+        document.getElementById('complete-link').classList.add('active');
+        document.getElementById('in-progress-link').classList.remove('active');
+        
+        // Check if there are complete tasks
+        const completeTasks = document.querySelectorAll('.task-item.complete');
+        
+        // Show/hide empty state messages
+        document.getElementById('no-in-progress-tasks').style.display = 'none';
+        
+        if (completeTasks.length === 0) {
+            document.getElementById('no-complete-tasks').style.display = 'flex';
+        } else {
+            document.getElementById('no-complete-tasks').style.display = 'none';
+        }
+        
+        // Hide the default "no tasks available" message if it exists
+        const defaultNoTasksMessage = document.getElementById('no-tasks-message');
+        if (defaultNoTasksMessage) {
+            defaultNoTasksMessage.style.display = 'none';
+        }
+    }
+    
+    function showInProgressTasks() {
+        document.body.classList.remove('show-complete');
+        document.getElementById('in-progress-link').classList.add('active');
+        document.getElementById('complete-link').classList.remove('active');
+        
+        // Check if there are in-progress tasks
+        const inProgressTasks = document.querySelectorAll('.task-item.in-progress');
+        
+        // Show/hide empty state messages
+        document.getElementById('no-complete-tasks').style.display = 'none';
+        
+        if (inProgressTasks.length === 0) {
+            document.getElementById('no-in-progress-tasks').style.display = 'flex';
+        } else {
+            document.getElementById('no-in-progress-tasks').style.display = 'none';
+        }
+        
+        // Hide the default "no tasks available" message if it exists
+        const defaultNoTasksMessage = document.getElementById('no-tasks-message');
+        if (defaultNoTasksMessage) {
+            defaultNoTasksMessage.style.display = 'none';
+        }
+    }
+    
+    // Initialize with in-progress tasks shown
+    document.addEventListener('DOMContentLoaded', function() {
+        showInProgressTasks();
+    });
 </script>
 {% endblock %}
