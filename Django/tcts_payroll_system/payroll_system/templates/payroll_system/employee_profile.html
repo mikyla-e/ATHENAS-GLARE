@@ -6,6 +6,27 @@
 
 <!--(optional)head content-->
 {% block headcontent %}
+<style>
+    /* Add this to your employee_profile.css file */
+    .message_background, .message_popup {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .message_background.show {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .message_popup.show {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Remove the old message styling */
+    .messages {
+        display: none;
+    }
+</style>
 <link rel="stylesheet" href="{% static 'css/employee_profile.css' %}">
 <link rel="stylesheet" href="{% static 'css/table.css' %}">
 
@@ -156,16 +177,6 @@ onclick="cancelEditAttendance()">
             </div>           
         </form>
     </div>
-    
-    {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-        <div class="message {{ message.tags }}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 {% endblock %}
 
 {% block content %}

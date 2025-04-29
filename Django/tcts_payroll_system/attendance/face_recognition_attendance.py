@@ -182,90 +182,138 @@ def get_filtered_attendance(employee, start_date, end_date):
         'has_open_session': any(log.time_in and not log.time_out for log in today_logs),
     }
         
-def mark_attendance(employee, action=None):
-    timezone_ph = pytz.timezone("Asia/Manila")
-    time_now = datetime.now(timezone_ph)
+def mark_attendance(employee, action):
+    """
+    Marks employee attendance for time_in or time_out actions
+    Returns appropriate status message
+    """
+    from django.utils import timezone
+    from datetime import datetime, time
+    from django.core.exceptions import ValidationError
+    from payroll_system.models import Attendance
     
-    today = time_now.strftime("%Y-%m-%d")
-    current_time = time_now.strftime("%H:%M:%S")
+    today = timezone.now().date()
+    current_time = timezone.now().time()
     
-    # Get current status
-    status_info = check_attendance_status(employee)
-    has_open_session = status_info["has_open_session"]
+    # Define work hour boundaries
+    WORK_START_TIME = time(8, 0)  # 8:00 AM
+    WORK_END_TIME = time(17, 0)   # 5:00 PM
     
-    # Handle time_in action
-    if action == "time_in" or (action is None and not has_open_session):
-        if has_open_session:
-            return {
-                "status": "warning", 
-                "message": f"You already have an open session. Please time out first."
-            }
-        
-        # Create new time in entry
+    # For time_in action
+    if action == 'time_in':
+        # Check if employee already has an attendance record for today
         try:
-            log = Attendance.objects.create(
-                employee_id_fk=employee, 
-                date=today,
-                time_in=current_time,
-                time_out=None
-            )
-                
-            return {
-                "status": "success", 
-                "message": f"Time In recorded: {employee.first_name} at {current_time}"
-            }
-        except Exception as e:
-            return {"status": "error", "message": str(e)}
-    
-    # Handle time_out action
-    elif action == "time_out" or (action is None and has_open_session):
-        if not has_open_session:
-            return {
-                "status": "warning", 
-                "message": f"No open session found for {employee.first_name}. Please time in first."
-            }
-        
-        # Update open session with time_out
-        try:
-            # Get the open session ID
-            if 'current_log_id' in status_info:
-                log = Attendance.objects.get(
-                    attendance_id=status_info["current_log_id"],
-                    employee_id_fk=employee
-                )
-                log.time_out = current_time
-                log.save()
-                
+            today_attendance = Attendance.objects.get(employee_id_fk=employee, date=today)
+            
+            # If already timed in
+            if today_attendance.time_in:
                 return {
-                    "status": "success", 
-                    "message": f"Time Out recorded: {employee.first_name} at {current_time}"
+                    'status': 'info',
+                    'message': f'You have already timed in at {today_attendance.time_in.strftime("%I:%M %p")}.'
                 }
-            else:
-                # Fallback if we don't have the ID (should not happen with the updated code)
-                open_log = Attendance.objects.filter(
+        except Attendance.DoesNotExist:
+            # Create new attendance record
+            try:
+                # Validate against work hours
+                if current_time < WORK_START_TIME:
+                    return {
+                        'status': 'warning',
+                        'message': 'Cannot time in before 8:00 AM. Work hours start at 8:00 AM.'
+                    }
+                
+                # Create new attendance record
+                attendance = Attendance(
                     employee_id_fk=employee,
                     date=today,
-                    time_in__isnull=False,
-                    time_out__isnull=True
-                ).first()
+                    time_in=current_time,
+                    attendance_status=Attendance.AttendanceStatus.PRESENT
+                )
+                attendance.save()
                 
-                if open_log:
-                    open_log.time_out = current_time
-                    open_log.save()
-                    return {
-                        "status": "success", 
-                        "message": f"Time Out recorded: {employee.first_name} at {current_time}"
-                    }
-                else:
-                    return {
-                        "status": "error", 
-                        "message": "Could not find the open session to time out."
-                    }
-        except Exception as e:
-            return {"status": "error", "message": str(e)}
+                return {
+                    'status': 'success',
+                    'message': f'Time in recorded at {current_time.strftime("%I:%M %p")}.',
+                    'employee_name': f'{employee.first_name} {employee.last_name}',
+                    'employee_id': employee.employee_id,
+                    'time': current_time.strftime("%I:%M %p")
+                }
+            except ValidationError as e:
+                return {
+                    'status': 'error',
+                    'message': str(e)
+                }
+            except Exception as e:
+                return {
+                    'status': 'error',
+                    'message': f'Error recording time in: {str(e)}'
+                }
     
-    # Default fallback
-    return {"status": "error", "message": "Invalid action"}
+    # For time_out action
+    elif action == 'time_out':
+        try:
+            # Find today's attendance record
+            today_attendance = Attendance.objects.get(employee_id_fk=employee, date=today)
+            
+            # If already timed out
+            if today_attendance.time_out:
+                return {
+                    'status': 'info',
+                    'message': f'You have already timed out at {today_attendance.time_out.strftime("%I:%M %p")}.'
+                }
+            
+            # If not timed in yet
+            if not today_attendance.time_in:
+                return {
+                    'status': 'warning', 
+                    'message': 'You must time in before timing out.'
+                }
+            
+            # Validate against work hours
+            if current_time > WORK_END_TIME:
+                return {
+                    'status': 'warning',
+                    'message': 'Cannot time out after 5:00 PM. Work hours end at 5:00 PM.'
+                }
+            
+            # Record time out
+            today_attendance.time_out = current_time
+            today_attendance.save()
+            
+            # Calculate hours worked
+            today_attendance.calculate_hours_worked()
+            
+            # Format the time for display
+            formatted_hours = today_attendance.get_formatted_hours_worked()
+            
+            return {
+                'status': 'success',
+                'message': f'Time out recorded at {current_time.strftime("%I:%M %p")}. You worked {formatted_hours}.',
+                'employee_name': f'{employee.first_name} {employee.last_name}',
+                'employee_id': employee.employee_id,
+                'time': current_time.strftime("%I:%M %p"),
+                'hours_worked': formatted_hours
+            }
+        
+        except Attendance.DoesNotExist:
+            return {
+                'status': 'warning',
+                'message': 'No time in record found for today. Please time in first.'
+            }
+        except ValidationError as e:
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f'Error recording time out: {str(e)}'
+            }
+    
+    return {
+        'status': 'error',
+        'message': 'Invalid action specified.'
+    }
 
 # Process a single frame from the web interface
 def process_frame_recognition(frame):
