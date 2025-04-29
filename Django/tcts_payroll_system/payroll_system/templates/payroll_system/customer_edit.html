@@ -6,19 +6,22 @@
 
 <!--(optional)head content-->
 {% block headcontent %}
-<!-- <link rel="stylesheet" href="{% static 'css/settings.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 {% endblock %}
 
 <!--header-->
-{% block header %}CUSTOMER EDIT{% endblock %} 
+{% block header %}CUSTOMERS{% endblock %} 
 
 <!--page content-->
 {% block content %}
-<form class="grid grid-row-[1fr_1fr] md:grid-row-1 md:grid-cols-[40%_40%] md:gap-10" method="POST" enctype="multipart/form-data">
+<div class="my-4 mx-5 font-[League Spartan] text-3xl/10 font-bold">
+    <p id="title" class="text-[#1E1E1E] px-2">Edit Customer!</p>
+</div>
+<form class="grid grid-row-[1fr_1fr] md:grid-row-1 md:grid-cols-[1fr_1fr] gap-5" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div class="order-1">
-        <div class="flex flex-col my-1">
+        <div class="flex flex-col">
             <div class="">
                 <label for="first-name" class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]">First Name</label>
                 {% if form.first_name.errors %}
@@ -27,7 +30,7 @@
             </div>
             {{ form.first_name }}
         </div>
-        <div class="flex flex-col my-1">
+        <div class="flex flex-col">
             <div class="">
                 <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="middle-name">Middle Name</label>
                 {% if form.middle_name.errors %}
@@ -36,7 +39,7 @@
             </div>
             {{ form.middle_name }}
         </div>
-        <div class="flex flex-col my-1">
+        <div class="flex flex-col">
             <div class="">
                 <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="last-name">Last Name</label>
                 {% if form.last_name.errors %}
@@ -45,7 +48,7 @@
             </div>
             {{ form.last_name }}
         </div>
-        <div class="flex flex-col my-1">
+        <div class="flex flex-col">
             <div class="">
                 <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="contact-number">Contact Number</label>
                 {% if form.contact_number.errors %}
@@ -57,7 +60,7 @@
     </div>
 
     <div class="order-2">
-        <div class="flex flex-col my-1">
+        <div class="flex flex-col">
             <div class="">
                 <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="{{ form.region.id_for_label }}">Region</label>
                 {% if form.region.errors %}
@@ -71,7 +74,7 @@
                 {% endfor %}
             </datalist>
         </div>
-        <div class="flex flex-col my-1">
+        <div class="flex flex-col">
             <div class="">
                 <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="province">Province</label>
                 {% if form.province.errors %}
@@ -85,7 +88,7 @@
                 {% endfor %}
             </datalist>
         </div>
-        <div class="flex flex-col my-1">
+        <div class="flex flex-col">
             <div class="">
                 <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="city">City/Municipality</label>
                 {% if form.city.errors %}
@@ -99,7 +102,7 @@
                 {% endfor %}
             </datalist>
         </div>
-        <div class="flex flex-col my-1">
+        <div class="flex flex-col">
             <div class="">
                 <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="barangay">Barangay</label>
                 {% if form.barangay.errors %}
@@ -115,9 +118,9 @@
         </div>
     </div>
 
-    <div class="col-span-2 flex justify-center mt-6">
-        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded">
-            Update Customer
+    <div class="order-3 col-span-2 h-[40px] flex justify-end">
+        <button type="submit" id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center">
+            UPDATE CUSTOMER
         </button>
     </div>
 </form>
