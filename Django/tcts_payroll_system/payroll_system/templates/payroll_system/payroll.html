@@ -64,6 +64,7 @@
         
 </div> 
 
+<!-- Confirmation Dialogue -->
 <div id="payroll-popup" class="payroll fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
     <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
 
@@ -76,6 +77,7 @@
         <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">CONFIRM</button>
     </div>
 </div>
+<!-- End of Confirmation Dialogue -->
 
 <div id="background_incentive" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelEditIncentives()">
     
@@ -203,9 +205,10 @@
         </div>
 
         <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
-            <a class="size-full" href="####">
-                <button class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" id="button" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
-            </a>
+            <form action="{% url 'payroll_system:confirm_payroll' %}" method="post" id="confirm-payroll-form">
+                {% csrf_token %}
+                <button type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" id="button" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
+            </form>
         </div>
     </div>
 
@@ -338,5 +341,13 @@
             bg.classList.remove("show");
             popup.classList.remove("show");
         }
+        
+        // Add this to connect the confirm button to the form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('#payroll-popup #button').addEventListener('click', function() {
+                document.getElementById('confirm-payroll-form').submit();
+                cancelConfirmPayroll();
+            });
+        });
     </script>
 {% endblock %}
