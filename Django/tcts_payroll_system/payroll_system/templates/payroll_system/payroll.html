@@ -51,6 +51,21 @@
             font-weight: 600;
             color: #1e1e1e;
         }
+
+        input[type=date]{
+            height: 50px;
+            margin: 8px 0;
+            padding: 2px 15px;
+            border: none;
+
+            font-family: 'Inter';
+            font-size: 1rem;
+
+            background-color: #EFEDE6;
+            height: 50px;
+            border-radius: 20px;
+            resize: none
+        }
     </style>
 {% endblock %}
 
@@ -239,7 +254,7 @@
         <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
             <form action="{% url 'payroll_system:confirm_payroll' %}" method="post" id="confirm-payroll-form" class="h-full">
                 {% csrf_token %}
-                <button type="button_1" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" id="button" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
+                <button type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center !text-[#1E1E1E]" id="button_1" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
             </form>
         </div>
 
@@ -376,17 +391,29 @@
             popup.classList.remove("show");
         }
         
+        function changePayday(){
+            const bg = document.getElementById("background_payday");
+            const popup = document.getElementById("payday-popup");
+            bg.classList.add("show");
+            popup.classList.add("show");
+        }
+        
+        function cancelChangePayday(){
+            const bg = document.getElementById("background_payday");
+            const popup = document.getElementById("payday-popup");
+            bg.classList.remove("show");
+            popup.classList.remove("show");
+
+            document.getElementById("payday-form").reset();
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // For confirm payroll
             document.querySelector('#payroll-popup #button').addEventListener('click', function() {
                 document.getElementById('confirm-payroll-form').submit();
                 cancelConfirmPayroll();
             });
-        });
-    </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
             const paydayForm = document.getElementById('payday-form');
             paydayForm.addEventListener('submit', function (e) {
                 e.preventDefault();
@@ -421,5 +448,5 @@
                 });
             });
         });
-    </script> 
+    </script>
 {% endblock %}
