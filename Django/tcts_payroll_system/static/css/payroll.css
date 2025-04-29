@@ -24,6 +24,7 @@
 /*pop up*/
 
 .background.show,
+.payroll.show,
 .edit_incentives_popup.show {
     visibility: visible;
     opacity: 1;
