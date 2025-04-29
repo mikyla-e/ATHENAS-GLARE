@@ -368,12 +368,30 @@ class Payroll(models.Model):
         
         base_salary = self.rate * attendance_count
         
+        # Calculate salary without including cash_advance in calculations
+        # Cash advance is only considered when creating a new payroll
         self.salary = base_salary + self.incentives - self.deductions
         
         if self.salary < 0:
             self.salary = 0
             
         return self.salary
+    
+    def process_payroll(self):
+        """
+        Process the payroll - just return the cash advance amount for the next payroll
+        Without resetting the cash advance on the current payroll
+        """
+        # Just return the cash advance amount so it can be transferred to next payroll
+        cash_advance_amount = self.cash_advance
+        
+        # Set status to PROCESSED
+        self.payroll_status = self.PayrollStatus.PROCESSED
+        
+        # Recalculate salary
+        self.calculate_salary()
+        
+        return cash_advance_amount
     
     def get_next_saturday(self, from_date=None):
         if from_date is None:
@@ -393,8 +411,24 @@ class Payroll(models.Model):
             if not self.payment_date:
                 self.payment_date = self.get_next_saturday()
         
+        # Check if payroll is being processed (status changing from PENDING to PROCESSED)
+        is_processing = False
+        
+        if self.payroll_id:
+            try:
+                old_payroll = Payroll.objects.get(payroll_id=self.payroll_id)
+                if (old_payroll.payroll_status == self.PayrollStatus.PENDING and 
+                    self.payroll_status == self.PayrollStatus.PROCESSED):
+                    is_processing = True
+            except Payroll.DoesNotExist:
+                pass
+        
         # Calculate salary before saving
         self.calculate_salary()
+        
+        # Process payroll if needed (but don't reset cash advance)
+        if is_processing:
+            self.process_payroll()
         
         self.full_clean()
         super().save(*args, **kwargs)

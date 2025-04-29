@@ -188,8 +188,8 @@
                         <td class="p-2 text-sm font-[Inter]">{{ attendance_count }}</td>
                         <td id="total-incentives" class="p-2 text-sm font-[Inter] incentive-display">{{ current_payroll.incentives|default:"0.00" }}</td>                        
                         <td class="p-2 text-sm font-[Inter] salary-display">{{ current_payroll.salary }}</td>
-                        <td class="p-2 text-sm font-[Inter]"><!--{ other ++pay cash advance }}--> 0.00</td>
-                        <td class="p-2 text-sm font-[Inter]"><!--{ deductions }}--> 0.00</td>
+                        <td class="p-2 text-sm font-[Inter]">{{ current_payroll.cash_advance }}</td>
+                        <td class="p-2 text-sm font-[Inter]">{{ current_payroll.deductions }}</td>
                         <td class="p-2 text-sm font-[Inter]">{{ current_payroll.payment_date }}</td>
                         <td class="p-3 w-full h-[30%] flex justify-center items-center">
                             <a class="h-8.5 w-8.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
@@ -242,8 +242,8 @@
                         </td>
                         <td class="p-2 text-sm font-[Inter]">{{ payroll.incentives|default:"0.00" }}</td>
                         <td class="p-2 text-sm font-[Inter]">{{ payroll.salary|default:"0.00" }}</td>
-                        <td class="p-2 text-sm font-[Inter]"><!--{OTHERS }-->0.00</td>
-                        <td class="p-2 text-sm font-[Inter]"><!--{deductions}-->0.00</td>
+                        <td class="p-2 text-sm font-[Inter]">{{ payroll.cash_advance }}</td>
+                        <td class="p-2 text-sm font-[Inter]">{{ payroll.deductions }}</td>
                         <td class="p-2 text-sm font-[Inter]">{{ payroll.payment_date }}</td>
                     </tr>
                     {% empty %}
