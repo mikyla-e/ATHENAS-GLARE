@@ -14,6 +14,7 @@ from .forms import EmployeeForm, PayrollForm, ServiceForm, CustomerForm, Custome
 from .models import Employee, Payroll, Attendance, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.views.decorators.http import require_POST
 
 @csrf_protect  # Ensure CSRF protection
 
@@ -27,7 +28,6 @@ def dashboard(request):
         .values('date')[:1]
     )
 
-    # Payroll status subquery
     latest_payroll_status_subquery = (
         Payroll.objects
         .filter(employee_id_fk=OuterRef('pk'))
@@ -35,7 +35,6 @@ def dashboard(request):
         .values('payroll_status')[:1]
     )
     
-    # Payroll rate/salary subquery - Add this for the payment calculation
     latest_payroll_rate_subquery = (
         Payroll.objects
         .filter(employee_id_fk=OuterRef('pk'))
@@ -43,7 +42,6 @@ def dashboard(request):
         .values('salary')[:1]
     )
 
-    # Total Employees
     total_employees = Employee.objects.count()
 
     # Get current week range (Monday to Sunday)
@@ -51,7 +49,6 @@ def dashboard(request):
     start_of_week = today - timedelta(days=today.weekday())  # Get Monday of current week
     end_of_week = start_of_week + timedelta(days=6)  # Get Sunday of current week
 
-    # Count unique active employees per day within the week
     active_employees_per_day = (
         Attendance.objects.filter(date__range=[start_of_week, end_of_week])
         .values('date')
@@ -129,13 +126,14 @@ def get_barangays(request):
     barangays = list(Barangay.objects.filter(citymunCode=city_code).values('brgyDesc', 'brgyCode'))
     return JsonResponse({'barangays': barangays})
 
+@login_required
 def employee_registration(request):
     if request.method == "POST":
         form = EmployeeForm(request.POST)
         
         if form.is_valid():
-            # Save form data to session instead of database
             request.session['employee_form_data'] = form.cleaned_data
+            
             # Convert date objects to strings for session storage
             for key, value in request.session['employee_form_data'].items():
                 if hasattr(value, 'isoformat'):  # For date objects
@@ -154,8 +152,11 @@ def employee_registration(request):
 
     return render(request, 'payroll_system/employee_registration.html', context)
 
+def parse_date(date_str):
+    return datetime.strptime(date_str, '%Y-%m-%d').date()
+
+@login_required
 def employee_picture(request):
-    # Ensure we have form data in session
     if 'employee_form_data' not in request.session:
         messages.error(request, "Please fill out employee details first")
         return redirect('payroll_system:employee_registration')
@@ -171,15 +172,12 @@ def employee_picture(request):
             # Create a ContentFile from the base64 data
             image_file = ContentFile(base64.b64decode(imgstr), name=f'employee_image.{ext}')
             
-            # Get employee data from session
             employee_data = request.session['employee_form_data']
             
-            # Convert date strings back to date objects
             for date_field in ['date_of_birth', 'date_of_employment']:
                 if date_field in employee_data and employee_data[date_field]:
                     employee_data[date_field] = parse_date(employee_data[date_field])
             
-            # Create and save the employee with all data
             form = EmployeeForm(employee_data)
             
             if form.is_valid():
@@ -187,12 +185,10 @@ def employee_picture(request):
                 employee.employee_image = image_file
                 employee.save()
                 
-                # Create history entry
                 History.objects.create(
                     description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was added."
                 )
                 
-                # Clear session data
                 del request.session['employee_form_data']
                 
                 messages.success(request, "Employee registered successfully!")
@@ -205,16 +201,11 @@ def employee_picture(request):
     
     return render(request, 'payroll_system/employee_picture.html')
 
-# Helper function to parse date strings
-def parse_date(date_str):
-    return datetime.strptime(date_str, '%Y-%m-%d').date()
-
 @login_required
 def employees(request):
     #new
     query = request.GET.get('q', '')
 
-    # Get latest attendance for each employee using a subquery
     latest_attendance_subquery = (
         Attendance.objects
         .filter(employee_id_fk=OuterRef('pk'))
@@ -222,7 +213,6 @@ def employees(request):
         .values('date')[:1]
     )
 
-    # Get latest payroll status for each employee using a subquery
     latest_payroll_subquery = (
         Payroll.objects
         .filter(employee_id_fk=OuterRef('pk'))
@@ -253,7 +243,7 @@ def employees(request):
     
     context = {
         'employees': employees,
-        'query': query #new
+        'query': query
     }
     return render(request, 'payroll_system/employees.html', context)
 
@@ -261,22 +251,16 @@ def employees(request):
 def employee_profile(request, employee_id):
     employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
     
-    # Handle add attendance form submission
     if request.method == 'POST' and 'add_attendance' in request.POST:
         date = request.POST.get('date')
         time_in = request.POST.get('time_in')
-        time_out = request.POST.get('time_out') or None  # Handle empty time_out
+        time_out = request.POST.get('time_out') or None  
         
         try:
-            attendance = Attendance(
-                employee_id_fk=employee,
-                date=date,
-                time_in=time_in,
-                time_out=time_out
-            )
+            attendance = Attendance( employee_id_fk=employee, date=date, time_in=time_in, time_out=time_out)
             attendance.save()
             
-            if time_out:  # Calculate hours if time_out is provided
+            if time_out:  
                 attendance.calculate_hours_worked()
                 
             messages.success(request, 'Attendance added successfully!')
@@ -284,12 +268,10 @@ def employee_profile(request, employee_id):
         except Exception as e:
             messages.error(request, f'Error adding attendance: {str(e)}')
     
-    # Handle edit attendance form submission
     if request.method == 'POST' and 'edit_attendance' in request.POST:
         attendance_id = request.POST.get('attendance_id')
         
         try:
-            # Convert to integer to avoid issues 
             attendance_id = int(attendance_id)
             date = request.POST.get('date')
             time_in = request.POST.get('time_in')
@@ -316,7 +298,7 @@ def employee_profile(request, employee_id):
     # Get latest attendance and calculate hours worked
     latest_attendance = employee.attendances.order_by('-date').first()
     if latest_attendance:
-        latest_attendance.calculate_hours_worked()  # Ensure hours are updated
+        latest_attendance.calculate_hours_worked()  
 
     latest_payroll = employee.payrolls.order_by('-payment_date').first()
     payroll_status = latest_payroll.payroll_status if latest_payroll else "No Payroll Data"
@@ -331,7 +313,6 @@ def employee_profile(request, employee_id):
 
 @login_required
 def payrolls(request):
-    # Get all employees with prefetched payroll data for efficiency
     employees = Employee.objects.prefetch_related('payrolls', 'attendances').all()
     
     #new
@@ -344,7 +325,6 @@ def payrolls(request):
         .values('date')[:1]
     )
     
-    # Get the latest payroll for each employee using a subquery (new)
     latest_payroll_subquery = (
         Payroll.objects
         .filter(employee_id_fk=OuterRef('pk'))
@@ -366,7 +346,6 @@ def payrolls(request):
             employee_id__icontains=query
         )
     
-    # Total Employees
     total_employees = employees.count()
     
     # Count employees with different payroll statuses
@@ -391,9 +370,6 @@ def payrolls(request):
     except:
         pass
     
-    #new (end)
-
-    # Get current week range (Monday to Sunday)
     today = now().date()
     start_of_week = today - timedelta(days=today.weekday())  # Get Monday of current week
     end_of_week = start_of_week + timedelta(days=6)  # Get Sunday of current week
@@ -401,37 +377,30 @@ def payrolls(request):
     previous_month_end = current_month_start - timedelta(days=1)
     previous_month_start = previous_month_end.replace(day=1)
 
-    # Count unique active employees per day within the week
     active_employees_per_day = (
         Attendance.objects.filter(date__range=[start_of_week, end_of_week])
         .values('date')
         .annotate(active_count=Count('employee_id_fk', distinct=True))
     )
 
-    # Calculate the average number of active employees within the week
     total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
     days_counted = len(active_employees_per_day) or 1  # Avoid division by zero
     avg_active_employees = total_active_counts / days_counted
 
-    # Count employees by their latest payroll status
     employees_with_latest_payroll = Employee.objects.annotate(latest_payroll_status=Subquery(latest_payroll_subquery))
 
     processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
 
     pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
     
-    #(new end)
-
     # Calculate Total Payroll (Sum of all processed salaries)
     total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']
 
     if total_payroll is None:
         total_payroll = "No total payroll yet"
 
-    # Get Next Payday (earliest upcoming payment date)
     next_payday = Payroll.objects.filter(payment_date__gt=today).aggregate(Min('payment_date'))['payment_date__min']
 
-    # Calculate Average Rate of Employees
     avg_rate = Payroll.objects.filter(rate__gt=0).aggregate(Avg('rate'))['rate__avg']
 
     if avg_rate is None:
@@ -468,7 +437,6 @@ def payrolls(request):
         payment_date__lte=previous_month_end
     ).aggregate(Avg('rate'))['rate__avg'] or 0
 
-    # Calculate percentage change for average rate
     rate_percentage = 0
     if previous_avg_rate > 0:
         rate_percentage = ((current_avg_rate - previous_avg_rate) / previous_avg_rate) * 100
@@ -497,10 +465,10 @@ def payrolls(request):
             'avg_active_employees': round(avg_active_employees),
             'processed_payroll_count': processed_payroll_count,
             'pending_payroll_count': pending_payroll_count,
-            'total_payroll': total_payroll,  # Total payroll amount
+            'total_payroll': total_payroll,  
             'previous_total_payroll': previous_total_payroll,
             'payroll_percentage': payroll_percentage,
-            'next_payday': next_payday,  # Next payday date
+            'next_payday': next_payday,  
             'previous_avg_rate': previous_avg_rate,
             'rate_percentage': rate_percentage,
             'avg_rate': current_avg_rate,
@@ -510,16 +478,15 @@ def payrolls(request):
         context = {
             'processed_payroll_count': processed_payroll_count,
             'pending_payroll_count': pending_payroll_count,
-            'total_payroll': total_payroll,  # Total payroll amount
+            'total_payroll': total_payroll,  
             'previous_total_payroll': previous_total_payroll,
             'payroll_percentage': payroll_percentage,
-            'next_payday': next_payday,  # Next payday date
+            'next_payday': next_payday,  
             'previous_avg_rate': previous_avg_rate,
             'rate_percentage': rate_percentage,
             'avg_rate': current_avg_rate,
             'query': query,
         }
-
 
     return render(request, 'payroll_system/payroll.html', context)
 
@@ -629,16 +596,15 @@ def services_add(request):
 
 @login_required
 def services_client(request):
-    # Store selected service in session
+    response = None
+    
     service_id = request.GET.get('service_id')
     if service_id:
         request.session['selected_service_id'] = service_id
     
-    # Forms for customer and vehicle
     customer_form = CustomerForm()
     vehicle_form = VehicleForm()
 
-    # Get all necessary data for the template
     regions = list(Region.objects.all().values('regDesc', 'regCode'))
     customers = Customer.objects.all()
     
@@ -647,18 +613,17 @@ def services_client(request):
         'vehicle_form': vehicle_form,
         'regions': regions,
         'customers': customers,
+        'should_clear_storage': True,
     }
     
     return render(request, 'payroll_system/services_client.html', context)
 
-# API endpoint to get customer details and vehicles
 @login_required
 def get_customer_details(request, customer_id):
     try:
         customer = Customer.objects.get(pk=customer_id)
         vehicles = Vehicle.objects.filter(customer=customer)
 
-        # Prepare response data - simplify this to match the expected format
         customer_data = {
             'first_name': customer.first_name,
             'middle_name': customer.middle_name,
@@ -680,29 +645,18 @@ def get_customer_details(request, customer_id):
             for vehicle in vehicles
         ]
 
-        return JsonResponse({
-            'success': True,
-            'customer': customer_data,
-            'vehicles': vehicles_data
-        })
+        return JsonResponse({'success': True, 'customer': customer_data, 'vehicles': vehicles_data})
 
     except Customer.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'message': 'Customer not found'
-        })
+        return JsonResponse({'success': False, 'message': 'Customer not found'})
 
     except Customer.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'message': 'Customer not found'
-        })
+        return JsonResponse({'success': False, 'message': 'Customer not found'})
 
 @login_required
 def services_assign(request):
     if request.method == 'POST':
         if 'assigned_employee' in request.POST:
-            # This is the employee assignment form submission
             employee_id = request.POST.get('assigned_employee')
             
             # Get stored data from session
@@ -711,7 +665,6 @@ def services_assign(request):
             vehicle_id = request.session.get('vehicle_id')
             
             if service_id and customer_id and vehicle_id and employee_id:
-                # Get the objects
                 service = Service.objects.get(pk=service_id)
                 customer = Customer.objects.get(pk=customer_id)
                 vehicle = Vehicle.objects.get(pk=vehicle_id)
@@ -719,15 +672,13 @@ def services_assign(request):
                 
                 # Check for duplicate task (same service for same vehicle that's still in progress)
                 existing_task = Task.objects.filter(
-                    service=service,
+                    service=service, 
                     vehicle=vehicle,
                     task_status=Task.TaskStatus.IN_PROGRESS
                 ).exists()
                 
                 if existing_task:
-                    # Duplicate task found - send error message
                     messages.error(request, f"This vehicle already has an active '{service.title}' service in progress.")
-                    # Return to the assignment page with the error
                     return render(request, 'payroll_system/services_assign.html', {
                         'employees': Employee.objects.all(),
                         'customer': customer,
@@ -735,7 +686,6 @@ def services_assign(request):
                         'duplicate_error': True
                     })
                 
-                # No duplicate - create the task
                 task = Task(
                     task_name=f"{service.title} for {customer.first_name} {customer.last_name}",
                     service=service,
@@ -745,37 +695,18 @@ def services_assign(request):
                 )
                 task.save()
                 
-                # Check if there are additional vehicles to process
-                additional_vehicle_ids = request.session.get('additional_vehicle_ids', [])
-                for add_vehicle_id in additional_vehicle_ids:
-                    add_vehicle = Vehicle.objects.get(pk=add_vehicle_id)
-                    
-                    # Check for duplicate task on additional vehicle
-                    existing_additional_task = Task.objects.filter(
-                        service=service,
-                        vehicle=add_vehicle,
-                        task_status=Task.TaskStatus.IN_PROGRESS
-                    ).exists()
-                    
-                    if not existing_additional_task:  # Only create if no duplicate
-                        add_task = Task(
-                            task_name=f"{service.title} for {customer.first_name} {customer.last_name} - Additional Vehicle",
-                            service=service,
-                            customer=customer,
-                            vehicle=add_vehicle,
-                            employee=employee
-                        )
-                        add_task.save()
-                
-                # Clear session data
-                for key in ['selected_service_id', 'customer_id', 'vehicle_id', 'additional_vehicle_ids']:
+                # Clear ALL session data related to the form
+                keys_to_clear = ['selected_service_id', 'customer_id', 'vehicle_id']
+                for key in keys_to_clear:
                     if key in request.session:
                         del request.session[key]
                 
-                return redirect('payroll_system:status')
+                # Add response header to clear sessionStorage JavaScript values
+                response = redirect('payroll_system:status')
+                response.headers['X-Clear-Form-Storage'] = 'true'
+                return response
                 
         else:
-            # This is the customer and vehicle form submission from services_client
             customer_id = request.POST.get('customer_id')
             
             if customer_id:
@@ -792,29 +723,6 @@ def services_assign(request):
                     # Store primary vehicle in session
                     request.session['customer_id'] = customer.customer_id
                     request.session['vehicle_id'] = vehicle.vehicle_id
-                    
-                    # Process any additional vehicles - code remains the same
-                    additional_vehicle_ids = []
-                    i = 1
-                    while f'additional_vehicle_name_{i}' in request.POST:
-                        vehicle_name = request.POST.get(f'additional_vehicle_name_{i}')
-                        vehicle_color = request.POST.get(f'additional_vehicle_color_{i}')
-                        plate_number = request.POST.get(f'additional_plate_number_{i}')
-                        
-                        # Create and save the additional vehicle
-                        new_vehicle = Vehicle(
-                            customer=customer,
-                            vehicle_name=vehicle_name,
-                            vehicle_color=vehicle_color,
-                            plate_number=plate_number
-                        )
-                        new_vehicle.save()
-                        additional_vehicle_ids.append(new_vehicle.vehicle_id)
-                        i += 1
-                    
-                    # Store additional vehicle IDs in session
-                    if additional_vehicle_ids:
-                        request.session['additional_vehicle_ids'] = additional_vehicle_ids
                     
                     # Get employees to display for assignment
                     employees = Employee.objects.all()
@@ -837,29 +745,6 @@ def services_assign(request):
                         # Store primary vehicle in session
                         request.session['customer_id'] = customer.customer_id
                         request.session['vehicle_id'] = vehicle.vehicle_id
-                        
-                        # Process any additional vehicles
-                        additional_vehicle_ids = []
-                        i = 1
-                        while f'additional_vehicle_name_{i}' in request.POST:
-                            vehicle_name = request.POST.get(f'additional_vehicle_name_{i}')
-                            vehicle_color = request.POST.get(f'additional_vehicle_color_{i}')
-                            plate_number = request.POST.get(f'additional_plate_number_{i}')
-                            
-                            # Create and save the additional vehicle
-                            new_vehicle = Vehicle(
-                                customer=customer,
-                                vehicle_name=vehicle_name,
-                                vehicle_color=vehicle_color,
-                                plate_number=plate_number
-                            )
-                            new_vehicle.save()
-                            additional_vehicle_ids.append(new_vehicle.vehicle_id)
-                            i += 1
-                        
-                        # Store additional vehicle IDs in session
-                        if additional_vehicle_ids:
-                            request.session['additional_vehicle_ids'] = additional_vehicle_ids
                         
                         # Get employees to display for assignment
                         employees = Employee.objects.all()
@@ -918,7 +803,7 @@ def services_assign(request):
                         'customer_form': customer_form, 
                         'vehicle_form': vehicle_form,
                         'customers': Customer.objects.all(),
-                        'regions': regions,  # Add regions data back
+                        'regions': regions,
                     })
     
     # If this is a GET request, check if we have customer and vehicle in session
@@ -969,6 +854,47 @@ def customer_page(request, customer_id):
         'customer': customer
     }
     return render(request, 'payroll_system/customer_page.html', context)
+
+@login_required
+def customer_edit(request, customer_id):
+    customer = get_object_or_404(Customer, customer_id=customer_id)
+    
+    if request.method == 'POST':
+        form = CustomerEditForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            # messages.success(request, "Customer information updated successfully.")
+            return redirect('payroll_system:customer_page', customer_id=customer.customer_id)
+    else:
+        form = CustomerEditForm(instance=customer)
+    
+    # Get location data for dropdowns
+    regions = Region.objects.all().values('regDesc', 'regCode')
+    
+    # Get related provinces, cities, and barangays based on selected values
+    provinces = []
+    cities = []
+    barangays = []
+    
+    if customer.region:
+        provinces = Province.objects.filter(regCode=customer.region.regCode).order_by('provDesc')
+        
+        if customer.province:
+            cities = City.objects.filter(provCode=customer.province.provCode).order_by('citymunDesc')
+            
+            if customer.city:
+                barangays = Barangay.objects.filter(citymunCode=customer.city.citymunCode).order_by('brgyDesc')
+    
+    context = {
+        'form': form,
+        'customer': customer,
+        'regions': regions,
+        'provinces': provinces,
+        'cities': cities,
+        'barangays': barangays,
+    }
+    
+    return render(request, 'payroll_system/customer_edit.html', context)
 
 @login_required
 def print(request):
@@ -1093,142 +1019,53 @@ def print(request):
 
     return render(request, 'payroll_system/print.html', context)
 
-@login_required
-@csrf_exempt 
-def update_incentives(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        incentive_value = float(data.get('incentive', 0))
-        action = data.get('action')
-        employees = Payroll.objects.filter(payroll_status='PENDING')
-        
-        for emp in employees:
-            try:
-                # Get attendance count for the employee
-                attendance = Attendance.objects.filter(employee_id_fk=emp.employee_id_fk).count()
-            except Exception as e:
-                print(f"Error fetching attendance for employee {emp.employee_id_fk}: {e}")
-                attendance = 0  # Default to 0 if attendance retrieval fails
-            
-            # Calculate the base payment (rate x attendance)
-            base_payment = emp.rate * attendance
 
-            # Correct salary is base payment + incentives
-            correct_salary = base_payment + emp.incentives
+# @login_required
+# @csrf_exempt
+# def edit_incentives(request):
+#     if request.method == 'POST':
+#         try:
+#             data = json.loads(request.body)
+#             action = data.get('action')
+#             amount = float(data.get('amount'))
 
-            # Update the salary to reflect correct base
-            Payroll.objects.filter(pk=emp.payroll_id).update(
-                salary=correct_salary
-            )
+#             if action not in ['add', 'subtract']:
+#                 return JsonResponse({'error': 'Invalid action.'}, status=400)
 
-            if action == 'add':
-                new_incentives = emp.incentives + incentive_value
-                new_salary = correct_salary + incentive_value  # base payment + new incentives
-                Payroll.objects.filter(pk=emp.payroll_id).update(
-                    incentives=new_incentives,
-                    salary=new_salary
-                )
-            elif action == 'subtract':
-                new_incentives = emp.incentives
-                new_salary = correct_salary - incentive_value  # base payment - incentive deduction
-                Payroll.objects.filter(pk=emp.payroll_id).update(
-                    incentives=new_incentives,
-                    salary=new_salary
-                )
-                
-        # Get updated values for the response
-        first_emp = Payroll.objects.filter(payroll_status='PENDING').first()
-        new_incentive = first_emp.incentives if first_emp else 0.0
-        new_salary = first_emp.salary if first_emp else 0.0
-        
-        return JsonResponse({'success': True, 'new_incentive': str(new_incentive), 'new_salary': str(new_salary)})
+#             payrolls = Payroll.objects.all()
+
+#             for payroll in payrolls:
+#                 if action == 'add':
+#                     payroll.salary += amount
+#                     payroll.incentives += amount
+#                 elif action == 'subtract':
+#                     payroll.salary = max(0, payroll.salary - amount)  # incentives untouched
+#                 payroll.save()
+
+#             return JsonResponse({'status': 'success'})
+#         except Exception as e:
+#             print(f"Error while editing incentives: {e}")
+#             return JsonResponse({'error': 'Failed to update payroll records.'}, status=500)
+
+#     return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+# @login_required
+# @require_POST
+# def update_incentives(request):
+#     data = json.loads(request.body)
+#     employee_id = data.get('employee_id')
+#     incentive_type = data.get('incentive_type')
+#     incentive_amount = data.get('incentive_amount')
     
-    return JsonResponse({'success': False})
-
-@login_required
-@csrf_exempt
-def update_incentives_individual(request, employee_id):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        incentive_value = float(data.get('incentive', 0))
-        action = data.get('action')
-
-        try:
-            emp = Payroll.objects.filter(employee_id_fk=employee_id, payroll_status='PENDING').first()
-        except Payroll.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Employee payroll not found.'})
-
-        try:
-            attendance = Attendance.objects.filter(employee_id_fk=emp.employee_id_fk).count()
-        except Exception as e:
-            print(f"Error fetching attendance for employee {emp.employee_id_fk}: {e}")
-            attendance = 0
-
-        base_payment = emp.rate * attendance
-
-        # Correct salary should first be refreshed
-        correct_salary = base_payment + emp.incentives
-
-        Payroll.objects.filter(pk=emp.payroll_id).update(
-            salary=correct_salary
-        )
-
-        if action == 'add':
-            new_incentives = emp.incentives + incentive_value
-            new_salary = correct_salary + incentive_value
-        elif action == 'subtract':
-            new_incentives = emp.incentives
-            new_salary = correct_salary - incentive_value
-        else:
-            return JsonResponse({'success': False, 'error': 'Invalid action.'})
-
-        Payroll.objects.filter(pk=emp.payroll_id).update(
-            incentives=new_incentives,
-            salary=new_salary
-        )
-
-
-        return JsonResponse({'success': True, 'new_incentive': str(new_incentives), 'new_salary': str(new_salary)})
-
-    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
-
-@login_required
-def customer_edit(request, customer_id):
-    customer = get_object_or_404(Customer, customer_id=customer_id)
+#     # Update your Payroll model
+#     payroll = Payroll.objects.get(employee__employee_id=employee_id)
+#     if incentive_type == 'add':
+#         payroll.incentives = incentive_amount
+#     else:
+#         payroll.incentives = -incentive_amount
     
-    if request.method == 'POST':
-        form = CustomerEditForm(request.POST, instance=customer)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Customer information updated successfully.")
-            return redirect('payroll_system:customer_page', customer_id=customer.customer_id)
-    else:
-        form = CustomerEditForm(instance=customer)
+#     # Recalculate salary based on rate, attendance and incentives
+#     payroll.salary = (payroll.rate * attendance_count) + payroll.incentives
+#     payroll.save()
     
-    # Get location data for dropdowns
-    regions = Region.objects.all().values('regDesc', 'regCode')
-    
-    # Get related provinces, cities, and barangays based on selected values
-    provinces = []
-    cities = []
-    barangays = []
-    
-    if customer.region:
-        provinces = Province.objects.filter(regCode=customer.region.regCode).order_by('provDesc')
-        
-        if customer.province:
-            cities = City.objects.filter(provCode=customer.province.provCode).order_by('citymunDesc')
-            
-            if customer.city:
-                barangays = Barangay.objects.filter(citymunCode=customer.city.citymunCode).order_by('brgyDesc')
-    
-    context = {
-        'form': form,
-        'customer': customer,
-        'regions': regions,
-        'provinces': provinces,
-        'cities': cities,
-        'barangays': barangays,
-    }
-    
-    return render(request, 'payroll_system/customer_edit.html', context)
+#     return JsonResponse({'status': 'success'})
