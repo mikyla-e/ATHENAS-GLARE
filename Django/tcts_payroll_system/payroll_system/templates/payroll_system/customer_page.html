@@ -17,14 +17,17 @@
 
     <!-- Customer Card dito -->
     <div class="bg-white rounded-xl px-4 sm:px-6 md:px-10 py-5 mb-6 md:mb-10 shadow-sm">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-2">
-            <h1 class="font-bold text-xl sm:text-2xl">{{ customer.first_name}} {{ customer.middle_name}} {{ customer.last_name}}</h1>
-            <a href="{% url 'payroll_system:customer_edit' customer.customer_id %}" class="w-full sm:w-auto">
-                <button class="w-full sm:w-auto p-2 cursor-pointer bg-black text-[#F8D146] rounded-2xl font-bold
-                hover:bg-[#F8D146] hover:text-black duration-200 hover:scale-105">
-                    Edit Customer
-                </button>
-            </a>
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-2" id="editButton">
+            <!-- Modified section with much smaller text on mobile -->
+            <div class="flex flex-row items-center justify-between w-full gap-2">
+                <h1 class="font-bold flex flex-wrap text-sm sm:text-2xl truncate max-w-[60%] sm:max-w-none">{{ customer.first_name}} {{ customer.middle_name}} {{ customer.last_name}}</h1>
+                <a href="{% url 'payroll_system:customer_edit' customer.customer_id %}" class="w-auto">
+                    <button class="w-full text-xs sm:text-base py-1 px-2 sm:p-2 cursor-pointer bg-black text-[#F8D146] rounded-lg sm:rounded-2xl font-bold
+                    hover:bg-[#F8D146] hover:text-black duration-200 hover:scale-105">
+                        Edit Customer
+                    </button>
+                </a>
+            </div>
         </div>
         
         <div class="mt-4">
@@ -85,5 +88,30 @@
             </div>
         {% endfor %}
     </div>
+
+    {% block script %}
+    <script>
+        // Function to update button text based on screen width
+        function updateButtonText() {
+            const editButton = document.querySelector('#editButton button');
+            
+            if (editButton) {
+                if (window.innerWidth <= 640) {
+                    editButton.textContent = 'Edit';
+                } else {
+                    editButton.textContent = 'Edit Customer';
+                }
+            }
+        }
+        
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateButtonText();
+            
+            // Add resize event listener
+            window.addEventListener('resize', updateButtonText);
+        });
+        </script>
+        {% endblock %}
 
 {% endblock %}
