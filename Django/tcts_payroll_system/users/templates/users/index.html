@@ -1,89 +1,119 @@
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{% block headcontent %}
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Admin Login</title>
     <link rel="stylesheet" href="{% static 'css/admin_login.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=League+Spartan:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-{% endblock %}
 
-{% block content %}
+    <style>
+    label{
+        margin: 0 10px;
+        font-family: 'Inter';
+        font-size: 14px;
+        font-weight: 600;
+        color: #1e1e1e;
+    }
 
-{% for message in messages %}
-        <div class="flex gap-3 bg-[#fffbeb80] p-5 message {{ message.tags }}">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="#f7c028" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-            </svg>              
-            <p class="text-[#8f4311]">{{ message }}</p>
-        </div>
-    {% endfor %}
-    
-    <div class="container">
-        <div class="logo_container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
-                <circle cx="19.7037" cy="19.7037" r="19.7037" fill="url(#paint0_linear_148_136)"/>
-                <defs>
-                  <linearGradient id="paint0_linear_148_136" x1="19.7037" y1="0" x2="19.7037" y2="39.4074" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#F8D146"/>
-                    <stop offset="1" stop-color="#F5B93F"/>
-                  </linearGradient>
-                </defs>
-            </svg>
-            <p class="logo_name">PAYROLL SYSTEM</p>
-        </div>
-        <div class="login_container">
-            <div class="login_title">
-                <h1 class="welcome-to">WELCOME TO</h1>
-                <h1 class="totos-payroll">TOTO’S PAYROLL SYSTEM</h1>
-                <p>ADMIN CONTROL</p>
+    input[type=submit]{
+        border: none;
+        border-radius: 100px;
+
+        padding: 15px 15%;
+        
+        background: linear-gradient(180deg, #F8D146 0%, #F5B93F 100%);
+        color: #fff;
+    }
+
+    #id_username, #id_password{
+        height: 50px;
+        width: 100%;
+        margin: 8px 0;
+        padding: 2px 15px;
+        border: none;
+
+        font-family: 'Inter';
+        font-size: 1rem;
+
+        background-color: rgba(75, 66, 57, 0.258);
+        border-radius: 20px;
+    }
+    </style>
+</head>
+<body class="size-full bg-cover bg-no-repeat bg-fixed bg-[#1e1e1e]">
+    <div class="h-dvh w-full flex flex-col items-center p-20">
+        {% for message in messages %}
+            <div class="flex gap-3 bg-[#fffbeb80] p-5 message {{ message.tags }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="#f7c028" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>              
+                <p class="text-[#8f4311]">{{ message }}</p>
             </div>
-            <div class="login_field">
-                <form method="post">
+        {% endfor %}
+        
+        <div class="size-full flex flex-col justify-between">
+            <div class="h-full w-fit flex flex-col justify-center items-center gap-15">
+                <div class="flex flex-col items-center md:items-start gap-2 sm:gap-1 md:gap-3">
+                    <h1 class="font-[League Spartan] text-lg/5 sm:text-2xl text-center md:text-4xl md:text-start font-bold tracking-[6px]">WELCOME TO</h1>
+                    <h1 id="totos-payroll" class="font-[League Spartan] text-4xl text-center md:text-6xl md:text-start font-extrabold">TOTO’S PAYROLL SYSTEM</h1>
+                    <p class="font-[Inter] text-[.75rem] sm:text-[1rem] text-center md:text-[1.8rem] md:text-start font-extrabold tracking-[3px] sm:tracking-[10px]">ADMIN CONTROL</p>
+                </div>
+                <form method="post" class="w-full flex flex-col justify-center gap-3">
                     {% csrf_token %}
-                    
-                    <label for="admin-name">username</label><br>
-                    {{ form.username }}
-                    {% if form.username.errors %}
-                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
-                            {% for error in form.username.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    
-                    <br><br>
+                    <div class="h-fit w-full md:w-[50%] flex flex-col gap-2">
+                        <label for="admin-name">username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="text-[#e74c3c] text-xs md:text-sm font-bold">
+                                {% for error in form.username.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
 
-                    <label for="admin-password">password</label><br>
-                    {{ form.password }}
-
-                    {% if form.password.errors %}
-                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
-                            {% for error in form.password.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+                    <div class="h-fit w-full md:w-[50%] flex flex-col gap-2">
+                        <label for="admin-password">password</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <div class="text-[#e74c3c] text-xs md:text-sm font-bold">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
 
                     {% if form.non_field_errors %}
-                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold mx-4">
+                        <div class="text-[#e74c3c] text-xs md:text-sm font-bold">
                             {% for error in form.non_field_errors %}
                                 {{ error }}
                             {% endfor %}
                         </div>
                     {% endif %}
 
-                    <div class="login_buttons">
-                        <input type="submit" value="LOGIN">
+                    <div class="w-full md:w-[50%] flex justify-center items-center h-[50px]">
+                        <div class="w-full md:w-[50%] flex justify-center">
+                            <input type="submit" value="LOGIN" class="w-[50%] md:w-[90%]">
+                        </div>
                     </div>
                 </form>
             </div>
+
+            
+            
         </div>
-        <div class="clientlogo_img">
-            <img src="{% static 'images/clients_logo.png' %}" alt="Toto's Car Tinting Shop">
+        <div class="fixed bottom-4 right-4 z-50">
+            <img src="{% static 'images/clients_logo.png' %}" alt="Toto's Car Tinting Shop" class="hidden sm:block sm:w-40 md:w-60 h-auto drop-shadow-md">
         </div>
-        
     </div>
-{% endblock %}
+</body>
+</html>
+
 
 
 <!-- {% load static %}

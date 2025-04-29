@@ -102,19 +102,6 @@ input[type=text], input[type=email], input[type=password], input[type=tel], sele
     border-radius: 20px;
 }
 
-#id_username, #id_password{
-    height: 50px;
-    margin: 8px 0;
-    padding: 2px 15px;
-    border: none;
-
-    font-family: 'Inter';
-    font-size: 1rem;
-
-    background-color: rgba(111, 81, 21, 0.10);
-    border-radius: 20px;
-}
-
 textarea{
     margin: 8px 0;
     padding: 10px 15px;
@@ -139,7 +126,6 @@ input[type=date]{
     font-size: 1rem;
 
     background-color: #fff;
-    height: 50px;
     border-radius: 20px;
     resize: none
 }
