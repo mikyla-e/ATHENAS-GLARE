@@ -26,6 +26,6 @@ urlpatterns = [
     path('ajax/get-cities/', views.get_cities, name='get_cities'),
     path('ajax/get-barangays/', views.get_barangays, name='get_barangays'),
     path('ajax/customer/<int:customer_id>/', views.get_customer_details, name='get_customer_details'),
-    path('edit-incentives/', views.edit_incentives, name='edit_incentives'),
-    path('update_incentives/', views.update_incentives, name='update_incentives'),
+    # path('edit-incentives/', views.edit_incentives, name='edit_incentives'),
+    # path('update_incentives/', views.update_incentives, name='update_incentives'),
 ]

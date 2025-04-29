@@ -306,43 +306,5 @@
             bg.classList.remove("show");
             popup.classList.remove("show");
         }
-
-        document.getElementById('incentives-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-    
-            const amountField = document.getElementById('field');
-            const amount = parseFloat(amountField.value);
-            const addRadio = document.getElementById('add');
-            const action = addRadio.checked ? 'add' : 'subtract';
-    
-            if (isNaN(amount) || amount <= 0) {
-                alert('Please enter a valid positive amount.');
-                return;
-            }
-    
-            fetch("{% url 'payroll_system:edit_incentives' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-                body: JSON.stringify({
-                    action: action,
-                    amount: amount
-                }),
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to update incentives.');
-                return response.json();
-            })
-            .then(data => {
-                alert('Successfully updated payroll incentives!');
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while updating incentives.');
-            });
-        });
     </script>
 {% endblock %}
