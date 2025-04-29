@@ -25,6 +25,7 @@
 
 .background.show,
 .payroll.show,
+.payday_popup.show,
 .edit_incentives_popup.show {
     visibility: visible;
     opacity: 1;

@@ -51,6 +51,10 @@
             font-weight: 600;
             color: #1e1e1e;
         }
+        
+        input[type=date]{
+            background-color: #EFEDE6;
+        }
     </style>
 {% endblock %}
 
@@ -64,7 +68,6 @@
         
 </div> 
 
-<!-- Confirmation Dialogue -->
 <div id="payroll-popup" class="payroll fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
     <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
 
@@ -77,7 +80,6 @@
         <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">CONFIRM</button>
     </div>
 </div>
-<!-- End of Confirmation Dialogue -->
 
 <div id="background_incentive" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelEditIncentives()">
     
@@ -112,6 +114,32 @@
             <input type="button" class="size-full" value="CANCEL" onclick="cancelEditIncentives()">
             <input type="submit" class="size-full" value="CONFIRM">
         </div>                      
+    </form>
+</div>
+
+<div id="background_payday" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelChangePayday()">
+    
+</div> 
+
+<div id="payday-popup" class="payday_popup absolute w-[300px] sm:w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
+    <h1>Change Payday</h1>
+    <form id="payday-form" class="size-full flex flex-col" method="post" action="">
+        {% csrf_token %}
+        <input type="hidden" name="payday" value="true">
+        <div class="w-full h-[50%] my-5 flex justify-center gap-1">
+            <div class="w-[90%] bg-[#EFEDE6] rounded-xl">
+                <div class="w-full h-[25%]">
+                    <label for="payday" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
+                </div>
+                <div class="w-full h-[75%]">
+                    <input type="date" name="date" id="payday" class="w-full h-full px-5 outline-none border-none font-[Inter] font-semibold text-3xl" required>
+                </div>
+            </div>
+        </div>
+        <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
+            <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelChangePayday()">
+            <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+        </div>           
     </form>
 </div>
 {% endblock %}
@@ -186,7 +214,7 @@
             <p class="hidden lg:block text-sm font-extrabold">PAYDAY:</p>
             <div id="date" class="w-full flex justify-end gap-2">
                 <p class="text-[16px]/8 sm:text-[18px]/8 md:text-[22px]/7 xl:text-[28px]/7 font-semibold" id="paydate">XX/XX/XXXX, SAT</p>
-                <button class="w-8 h-8 bg-no-repeat bg-center" id="calendar"></button>
+                <button class="w-8 h-8 bg-no-repeat bg-center" id="calendar" onclick="changePayday()"></button>
             </div>
         </div>
     </div>
@@ -205,11 +233,16 @@
         </div>
 
         <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
-            <form action="{% url 'payroll_system:confirm_payroll' %}" method="post" id="confirm-payroll-form">
+            <form action="{% url 'payroll_system:confirm_payroll' %}" method="post" id="confirm-payroll-form" class="h-full">
                 {% csrf_token %}
-                <button type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" id="button" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
+                <button type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center !text-[#1e1e1e]" id="button_1" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
             </form>
         </div>
+
+        <a href="{% url 'payroll_system:print' %}">
+            <button id="button_2" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">PRINT</button>
+        </a>
+
     </div>
 
     <div class="md:hidden flex flex-col justify-center">
@@ -276,7 +309,6 @@
             {% endfor %}
             </tbody>
         </table>
-        <a href="{% url 'payroll_system:print' %}"><button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">PRINT</button></a>
     </div>
 
 </div>
@@ -338,6 +370,20 @@
         function cancelConfirmPayroll(){
             const bg = document.getElementById("background_payroll");
             const popup = document.getElementById("payroll-popup");
+            bg.classList.remove("show");
+            popup.classList.remove("show");
+        }
+
+        function changePayday(){
+            const bg = document.getElementById("background_payday");
+            const popup = document.getElementById("payday-popup");
+            bg.classList.add("show");
+            popup.classList.add("show");
+        }
+        
+        function cancelChangePayday(){
+            const bg = document.getElementById("background_payday");
+            const popup = document.getElementById("payday-popup");
             bg.classList.remove("show");
             popup.classList.remove("show");
         }
