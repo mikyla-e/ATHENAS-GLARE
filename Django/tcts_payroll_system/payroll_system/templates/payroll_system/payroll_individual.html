@@ -177,29 +177,28 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for payroll in payroll_history %}
                     <tr id="payroll-data" class="h-[50px]">
-                        {% if current_payroll %}
-                            <td class="p-2 text-sm font-[Inter]">{{ current_payroll.rate }}</td>
-                            <td class="p-2 text-sm font-[Inter]">
-                                {% with attendance_count=employee.attendances.count %}
-                                    {{ attendance_count|default:"0" }}
-                                {% endwith %}
-                            </td>
-                            <td class="p-2 text-sm font-[Inter]">{{ current_payroll.incentives }}</td>
-                            <td class="p-2 text-sm font-[Inter]">{{ current_payroll.salary }}</td>
-                            <td class="p-2 text-sm font-[Inter]"><!--{OTHERS }-->0.00</td>
-                            <td class="p-2 text-sm font-[Inter]"><!--{deductions}-->0.00</td>
-                            <td class="p-2 text-sm font-[Inter]">{{ current_payroll.payment_date }}</td>
-                        {% else %}
-                            <td class="p-2 text-sm font-[Inter]">0.00</td>
-                            <td class="p-2 text-sm font-[Inter]">N/A</td>
-                            <td class="p-2 text-sm font-[Inter]">0.00</td>
-                            <td class="p-2 text-sm font-[Inter]">0.00</td>
-                            <td class="p-2 text-sm font-[Inter]">0.00</td>
-                            <td class="p-2 text-sm font-[Inter]">0.00</td>
-                            <td class="p-2 text-sm font-[Inter]">N/A</td>
-                        {% endif %}
+                        <td class="p-2 text-sm font-[Inter]">{{ payroll.rate }}</td>
+                        <td class="p-2 text-sm font-[Inter]">
+                            {{ payroll.attendance_count|default:"N/A" }}
+                        </td>
+                        <td class="p-2 text-sm font-[Inter]">{{ payroll.incentives|default:"0.00" }}</td>
+                        <td class="p-2 text-sm font-[Inter]">{{ payroll.salary|default:"0.00" }}</td>
+                        <td class="p-2 text-sm font-[Inter]"><!--{OTHERS }-->0.00</td>
+                        <td class="p-2 text-sm font-[Inter]"><!--{deductions}-->0.00</td>
+                        <td class="p-2 text-sm font-[Inter]">{{ payroll.payment_date }}</td>
+                        <td class="p-3 w-full h-[30%] flex justify-center items-center">
+                            <a class="h-8.5 w-8.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}?payroll_id={{ payroll.payroll_id }}">
+                                <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
+                            </a>
+                        </td>
                     </tr>
+                    {% empty %}
+                    <tr id="payroll-data" class="h-[50px]">
+                        <td colspan="8" class="p-2 text-sm font-[Inter] text-center">No previous payroll records found.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -264,27 +263,26 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for payroll in payroll_history %}
                     <tr id="payroll-data" class="h-[50px]">
-                        {% if current_payroll %}
-                            <td class="px-2 text-xs font-[Inter]">{{ current_payroll.rate }}</td>
-                            <td class="px-2 text-xs font-[Inter]">
-                                {% with attendance_count=employee.attendances.count %}
-                                    {{ attendance_count|default:"0" }}
-                                {% endwith %}
-                            </td>
-                            <td class="px-2 text-xs font-[Inter]">{{ current_payroll.incentives }}</td>
-                            <!-- <td>{{ current_payroll.deductions }}</td> -->
-                            <td class="px-2 text-xs font-[Inter]">{{ current_payroll.salary }}</td>
-                            <td class="px-2 text-xs font-[Inter]">{{ current_payroll.payment_date }}</td>
-                        {% else %}
-                            <td class="px-2 text-xs font-[Inter]">0.00</td>
-                            <td class="px-2 text-xs font-[Inter]">N/A</td>
-                            <td class="px-2 text-xs font-[Inter]">0.00</td>
-                            <!-- <td>0.00</td> -->
-                            <td class="px-2 text-xs font-[Inter]">0.00</td>
-                            <td class="px-2 text-xs font-[Inter]">N/A</td>
-                        {% endif %}
+                        <td class="px-2 text-xs font-[Inter]">{{ payroll.rate }}</td>
+                        <td class="px-2 text-xs font-[Inter]">
+                            {{ payroll.attendance_count|default:"N/A" }}
+                        </td>
+                        <td class="px-2 text-xs font-[Inter]">{{ payroll.incentives|default:"0.00" }}</td>
+                        <td class="px-2 text-xs font-[Inter]">{{ payroll.salary|default:"0.00" }}</td>
+                        <td class="px-2 text-xs font-[Inter]">{{ payroll.payment_date }}</td>
+                        <td class="p-3 flex justify-center items-center">
+                            <a class="h-7.5 w-7.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}?payroll_id={{ payroll.payroll_id }}">
+                                <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
+                            </a>
+                        </td>
                     </tr>
+                    {% empty %}
+                    <tr id="payroll-data" class="h-[50px]">
+                        <td colspan="6" class="p-2 text-xs font-[Inter] text-center">No previous payroll records found.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -349,27 +347,21 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for payroll in payroll_history %}
                     <tr id="payroll-data" class="h-[50px]">
-                        {% if current_payroll %}
-                            <td class="px-2 text-[10px] font-[Inter]">{{ current_payroll.rate }}</td>
-                            <td class="px-2 text-[10px] font-[Inter]">
-                                {% with attendance_count=employee.attendances.count %}
-                                    {{ attendance_count|default:"0" }}
-                                {% endwith %}
-                            </td>
-                            <td class="px-2 text-[10px] font-[Inter]">{{ current_payroll.incentives }}</td>
-                            <!-- <td>{{ current_payroll.deductions }}</td> -->
-                            <td class="px-2 text-[10px] font-[Inter]">{{ current_payroll.salary }}</td>
-                            <td class="px-2 text-[10px] font-[Inter]">{{ current_payroll.payment_date }}</td>
-                        {% else %}
-                            <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                            <td class="px-2 text-[10px] font-[Inter]">N/A</td>
-                            <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                            <!-- <td>0.00</td> -->
-                            <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                            <td class="px-2 text-[10px] font-[Inter]">N/A</td>
-                        {% endif %}
+                        <td class="px-2 text-[10px] font-[Inter]">{{ payroll.rate }}</td>
+                        <td class="px-2 text-[10px] font-[Inter]">
+                            {{ payroll.attendance_count|default:"N/A" }}
+                        </td>
+                        <td class="px-2 text-[10px] font-[Inter]">{{ payroll.incentives|default:"0.00" }}</td>
+                        <td class="px-2 text-[10px] font-[Inter]">{{ payroll.salary|default:"0.00" }}</td>
+                        <td class="px-2 text-[10px] font-[Inter]">{{ payroll.payment_date }}</td>
                     </tr>
+                    {% empty %}
+                    <tr id="payroll-data" class="h-[50px]">
+                        <td colspan="5" class="p-2 text-[10px] font-[Inter] text-center">No previous payroll records found.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -380,10 +372,6 @@
 <!--(optional)script-->
 {% block script %}
 <script>
-    // Global variables to keep track of incentives
-    let employeeIncentives = {};
-    const employeeId = {{ employee.employee_id }};  // Get the current employee ID from Django context
-    
     function editIncentives(){
         const bg = document.getElementById("background");
         const popup = document.getElementById("incentive-popup");
