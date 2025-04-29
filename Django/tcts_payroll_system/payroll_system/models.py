@@ -536,3 +536,6 @@ class Task(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+        
+class PayrollSettings(models.Model):
+    global_payday = models.DateField()

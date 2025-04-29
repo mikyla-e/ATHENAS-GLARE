@@ -410,7 +410,16 @@ def payrolls(request):
     if total_payroll is None:
         total_payroll = "No total payroll yet"
 
-    next_payday = next_saturday
+    # Get the earliest payment_date from PENDING payrolls
+    next_payday = Payroll.objects.filter(payroll_status='PENDING').aggregate(Min('payment_date'))['payment_date__min']
+
+    if next_payday:
+        formatted_payday = next_payday.strftime('%m/%d/%Y')
+        day_of_week = next_payday.strftime('%a').upper()
+        current_payday = f"{formatted_payday}, {day_of_week}"
+    else:
+        current_payday = "XX/XX/XXXX, SAT"
+
 
     avg_rate = Payroll.objects.filter(rate__gt=0).aggregate(Avg('rate'))['rate__avg']
 
@@ -456,6 +465,7 @@ def payrolls(request):
     formatted_payday = next_payday.strftime('%m/%d/%Y')
     day_of_week = next_payday.strftime('%a').upper()
     formatted_payday_display = f"{formatted_payday}, {day_of_week}"
+    current_payday = formatted_payday_display
 
     # Pass all data to the template
     try:
@@ -470,6 +480,7 @@ def payrolls(request):
             'payroll_percentage': payroll_percentage,
             'next_payday': next_payday,  
             'formatted_payday': formatted_payday_display,
+            'current_payday': current_payday,
             'previous_avg_rate': previous_avg_rate,
             'rate_percentage': rate_percentage,
             'avg_rate': current_avg_rate,
@@ -1215,6 +1226,20 @@ def print(request):
     }
 
     return render(request, 'payroll_system/print.html', context)
+
+@login_required
+def update_payday(request):
+    if request.method == 'POST' and request.POST.get('payday') == 'true':
+        new_date = request.POST.get('date')
+        if new_date:
+            formatted_date = datetime.strptime(new_date, "%Y-%m-%d").date()
+            Payroll.objects.filter(payroll_status='PENDING').update(payment_date=formatted_date)
+
+            # Format for frontend display (e.g., "05/03/2025, SAT")
+            formatted_display = formatted_date.strftime("%m/%d/%Y") + ", " + formatted_date.strftime("%a").upper()
+            return JsonResponse({'success': True, 'updated_payday': formatted_display})
+        return JsonResponse({'success': False, 'error': 'Invalid date'})
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 
 # @login_required
