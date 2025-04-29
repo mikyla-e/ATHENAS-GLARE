@@ -248,6 +248,12 @@ class Employee(models.Model):
         self.days_worked = present_days
         self.absences = absences
 
+from django.db import models
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
+from datetime import datetime, time
+
 class Attendance(models.Model):
     class AttendanceStatus(models.TextChoices):
         PRESENT = 'Present', _('Present')
@@ -263,6 +269,10 @@ class Attendance(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     employee_id_fk = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='attendances')
+    
+    # Define work hour boundaries
+    WORK_START_TIME = time(8, 0)  # 8:00 AM
+    WORK_END_TIME = time(17, 0)   # 5:00 PM
     
     class Meta:
         ordering = ['date', 'time_in']
@@ -283,6 +293,14 @@ class Attendance(models.Model):
         # Validate attendance_status is consistent with times
         if self.attendance_status == self.AttendanceStatus.PRESENT and not self.time_in:
             raise ValidationError(_('Present status requires time in to be set.'))
+        
+        # Validate work hours: time_in must not be earlier than 8:00 AM
+        if self.time_in and self.time_in < self.WORK_START_TIME:
+            raise ValidationError(_('Cannot time in before 8:00 AM. Work hours start at 8:00 AM.'))
+        
+        # Validate work hours: time_out must not be later than 5:00 PM
+        if self.time_out and self.time_out > self.WORK_END_TIME:
+            raise ValidationError(_('Cannot time out after 5:00 PM. Work hours end at 5:00 PM.'))
             
     def calculate_hours_worked(self):
         # Calculate hours worked for the day
@@ -291,8 +309,6 @@ class Attendance(models.Model):
             time_out_dt = datetime.combine(self.date, self.time_out)
             worked_seconds = (time_out_dt - time_in_dt).total_seconds()
             self.hours_worked = round(worked_seconds / 3600, 2)
-            # Remove this line to prevent infinite recursion
-            # self.save()  
 
     def save(self, *args, **kwargs):
         self.full_clean()  # Run validation before saving
@@ -308,7 +324,7 @@ class Attendance(models.Model):
         super().save(*args, **kwargs)
             
     def get_formatted_hours_worked(self):
-        #eturns time worked as hh:mm:ss if time_out exists
+        # Returns time worked as hh:mm:ss if time_out exists
         if self.time_in and self.time_out:
             time_in_dt = datetime.combine(self.date, self.time_in)
             time_out_dt = datetime.combine(self.date, self.time_out)
@@ -351,10 +367,18 @@ class Payroll(models.Model):
         """
         if attendance_count is None:
             if self.payment_date:
-                # Get the Monday (start of week) for this payment period
-                # Payment date is typically a Saturday
-                end_date = self.payment_date
-                start_date = end_date - timedelta(days=5)  # Monday (5 days before Saturday)
+                # Get current week's Monday and Sunday
+                # This ensures we only count attendance in the current week
+                # regardless of payment date
+                payment_date = self.payment_date
+                current_weekday = payment_date.weekday()  # 0=Monday, 6=Sunday
+                
+                # Calculate the Monday of the current week
+                start_date = payment_date - timedelta(days=current_weekday)
+                
+                # End date is either the payment date or Sunday of current week, whichever is earlier
+                sunday_of_week = start_date + timedelta(days=6)
+                end_date = min(payment_date, sunday_of_week)
                 
                 unique_days = Attendance.objects.filter(
                     employee_id_fk=self.employee_id_fk,
@@ -393,21 +417,40 @@ class Payroll(models.Model):
         
         return cash_advance_amount
     
-    def get_next_saturday(self, from_date=None):
+    def get_next_payment_date(self, from_date=None, target_weekday=5):
+        """
+        Calculate the next payment date.
+        
+        Args:
+            from_date: The reference date (defaults to today)
+            target_weekday: The target day of week (0=Monday, 5=Saturday [default], 6=Sunday)
+        
+        Returns:
+            The next date corresponding to the target weekday
+        """
         if from_date is None:
             from_date = timezone.now().date()
         
-        days_until_saturday = (5 - from_date.weekday()) % 7
+        # Calculate days until target weekday (e.g., Saturday=5)
+        days_until_target = (target_weekday - from_date.weekday()) % 7
         
-        if days_until_saturday == 0:
-            days_until_saturday = 7
+        # If today is the target day, return next week's target day
+        if days_until_target == 0:
+            days_until_target = 7
             
-        return from_date + timedelta(days=days_until_saturday)
+        return from_date + timedelta(days=days_until_target)
+        
+    def get_next_saturday(self, from_date=None):
+        """
+        Maintained for backward compatibility.
+        Returns the next Saturday from the given date.
+        """
+        return self.get_next_payment_date(from_date, target_weekday=5)
             
     def save(self, *args, **kwargs):
         # If this is a new payroll record (no ID yet)
         if not self.payroll_id:
-            # If payment_date is not set, set it to the next Saturday
+            # If payment_date is not set, set it to the next Saturday by default
             if not self.payment_date:
                 self.payment_date = self.get_next_saturday()
         

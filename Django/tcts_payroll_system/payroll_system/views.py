@@ -5,6 +5,7 @@ from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery, Count, Sum, Min, Avg
+from django.forms import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -257,13 +258,20 @@ def employee_profile(request, employee_id):
         time_out = request.POST.get('time_out') or None  
         
         try:
+            # Create attendance object but don't save yet
             attendance = Attendance(employee_id_fk=employee, date=date, time_in=time_in, time_out=time_out)
+            
+            # This will run the clean method and validate work hours
             attendance.save()
+            
             if time_out:  
                 attendance.calculate_hours_worked()
                 
             messages.success(request, 'Attendance added successfully!')
             return redirect('payroll_system:employee_profile', employee_id=employee_id)
+        except ValidationError as e:
+            # Handle validation errors explicitly
+            messages.error(request, f'Validation error: {e}')
         except Exception as e:
             messages.error(request, f'Error adding attendance: {str(e)}')
     
@@ -280,12 +288,17 @@ def employee_profile(request, employee_id):
             attendance.date = date
             attendance.time_in = time_in
             attendance.time_out = time_out
+            
+            # This will run validation through clean() method
             attendance.save()
             
             if time_out:
                 attendance.calculate_hours_worked()
                 
             messages.success(request, 'Attendance updated successfully!')
+        except ValidationError as e:
+            # Handle validation errors explicitly
+            messages.error(request, f'Validation error: {e}')
         except Exception as e:
             messages.error(request, f'Error updating attendance: {str(e)}')
         
@@ -634,10 +647,13 @@ def confirm_payroll(request):
             # Find all pending payrolls
             pending_payrolls = Payroll.objects.filter(payroll_status='PENDING')
             
-            # Calculate the next Saturday for the new payroll payment date
+            # Calculate the next payment date for the new payroll
             today = now().date()
-            temp_payroll = Payroll()  # Temporary instance to use the get_next_saturday method
-            next_saturday = temp_payroll.get_next_saturday(today)
+            temp_payroll = Payroll()  # Temporary instance to use the method
+            
+            # Default to Saturday (5), but this could be configurable via settings or form
+            payment_weekday = 5  # 0=Monday, 5=Saturday, 6=Sunday
+            next_payment_date = temp_payroll.get_next_payment_date(today, payment_weekday)
             
             # Process all the pending payrolls first
             processed_payrolls = []
@@ -667,7 +683,7 @@ def confirm_payroll(request):
                     deductions=payroll_info['cash_advance'],  # Transfer cash advance to deductions
                     salary=0,  # Reset salary
                     cash_advance=0,  # Start with zero cash advance
-                    payment_date=next_saturday,  # Set payment date to next Saturday
+                    payment_date=next_payment_date,  # Set payment date to next payment day
                     employee_id_fk=payroll_info['employee']  # Keep the same employee
                 )
                 new_payroll.save()
@@ -681,7 +697,6 @@ def confirm_payroll(request):
             # Return to payroll page with error message
             return redirect('payroll_system:payrolls')
     
-    # If not POST method, redirect to payroll page
     return redirect('payroll_system:payrolls')
 
 @login_required
@@ -800,6 +815,20 @@ def payroll_edit(request, employee_id):
                 messages.error(request, "Invalid cash advance amount.")
             
             return redirect('payroll_system:payroll_edit', employee_id=employee_id)
+        # Check if this is a payment date change
+        elif 'payment_date' in request.POST and request.POST.get('payment_date'):
+            try:
+                new_date = datetime.strptime(request.POST.get('payment_date'), '%Y-%m-%d').date()
+                if new_date >= today:
+                    payroll.payment_date = new_date
+                    payroll.save()
+                    messages.success(request, f"Payment date updated to {new_date.strftime('%Y-%m-%d')}.")
+                else:
+                    messages.error(request, "Payment date cannot be in the past.")
+            except ValueError:
+                messages.error(request, "Invalid date format.")
+                
+            return redirect('payroll_system:payroll_edit', employee_id=employee_id)
         else:
             # Regular payroll form submission
             form = PayrollForm(request.POST, instance=payroll)
@@ -816,10 +845,18 @@ def payroll_edit(request, employee_id):
     # Get the latest payroll for display purposes
     latest_payroll = employee.payrolls.order_by('-payment_date').first()
     
+    # Get current week's Monday for context display
+    current_weekday = payroll.payment_date.weekday()
+    monday_of_week = payroll.payment_date - timedelta(days=current_weekday)
+    sunday_of_week = monday_of_week + timedelta(days=6)
+    
     context = {
         'form': form,
         'employee': employee,
-        'latest_payroll': latest_payroll
+        'latest_payroll': latest_payroll,
+        'week_start': monday_of_week,
+        'week_end': sunday_of_week,
+        'today': today
     }
     return render(request, 'payroll_system/payroll_edit.html', context)
 
