@@ -232,12 +232,17 @@
             </form>
         </div>
 
+        <a href="{% url 'payroll_system:print' %}">
+            <button id="button_2" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">PRINT</button>
+        </a>
+
         <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
-            <form action="{% url 'payroll_system:confirm_payroll' %}" method="post" id="confirm-payroll-form">
+            <form action="{% url 'payroll_system:confirm_payroll' %}" method="post" id="confirm-payroll-form" class="h-full">
                 {% csrf_token %}
-                <button type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" id="button" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
+                <button type="button_1" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" id="button" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
             </form>
         </div>
+
     </div>
 
     <div class="md:hidden flex flex-col justify-center">
@@ -304,7 +309,6 @@
             {% endfor %}
             </tbody>
         </table>
-        <a href="{% url 'payroll_system:print' %}"><button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">PRINT</button></a>
     </div>
 
 </div>
