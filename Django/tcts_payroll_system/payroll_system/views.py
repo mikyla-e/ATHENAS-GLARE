@@ -677,21 +677,23 @@ def payroll_individual(request, employee_id):
     # Get payroll history (excluding current)
     payroll_history = employee.payrolls.order_by('-payment_date')[1:] if employee.payrolls.count() > 1 else []
     
-    # Get the start and end of the current week (Monday to Sunday)
+    # Get the start and end of the current week (Monday to Saturday)
     today = now().date()
+    # Find Monday of current week
     start_of_week = today - timedelta(days=today.weekday())  # Monday
-    end_of_week = start_of_week + timedelta(days=6)  # Sunday
+    # End of payroll week is Saturday (5 days after Monday)
+    end_of_week = start_of_week + timedelta(days=5)  # Saturday
     
     # Get weekly attendance count for current payroll display
-    weekly_attendance_count = Attendance.objects.filter(
+    weekly_attendance = Attendance.objects.filter(
         employee_id_fk=employee,
         date__range=[start_of_week, end_of_week],
         attendance_status='Present'
-    ).count()
+    ).values_list('date', flat=True).distinct().count()
     
     # Re-calculate the current payroll using the attendance count
     if current_payroll:
-        current_payroll.calculate_salary(weekly_attendance_count)
+        current_payroll.calculate_salary(weekly_attendance)
         current_payroll.save()
     
     # Calculate attendance counts for each historical payroll
@@ -699,15 +701,15 @@ def payroll_individual(request, employee_id):
         # Determine the payment period for this payroll
         payment_date = payroll.payment_date
         
-        # Payment date is typically a Saturday, so subtract 6 days to get Monday
-        start_date = payment_date - timedelta(days=5)  # Monday to Saturday (6 days)
+        # Payment date is typically a Saturday, so subtract 5 days to get Monday
+        start_date = payment_date - timedelta(days=5)  # Monday
         
         # Count attendance records within this payroll period
         payroll.attendance_count = Attendance.objects.filter(
             employee_id_fk=employee,
             date__range=[start_date, payment_date],
             attendance_status='Present'
-        ).count()
+        ).values_list('date', flat=True).distinct().count()
     
     # Check attendance records for today's active status
     latest_time_log = Attendance.objects.filter(employee_id_fk=employee, date=today).order_by('-time_in').first()
@@ -724,7 +726,7 @@ def payroll_individual(request, employee_id):
         'employee': employee,
         'current_payroll': current_payroll,
         'payroll_history': payroll_history,
-        'attendance_count': weekly_attendance_count
+        'attendance_count': weekly_attendance
     })
 
 @login_required

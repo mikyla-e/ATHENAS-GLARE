@@ -344,10 +344,17 @@ class Payroll(models.Model):
         return f"Payroll #{self.payroll_id} - {employee} - {date_str} - {amount} {status}"
     
     def calculate_salary(self, attendance_count=None):
+        """
+        Calculate the salary based on rate, incentives, and deductions.
+        If attendance_count is provided, it will be used for the calculation,
+        otherwise the method will fetch the attendance count from the database.
+        """
         if attendance_count is None:
             if self.payment_date:
+                # Get the Monday (start of week) for this payment period
+                # Payment date is typically a Saturday
                 end_date = self.payment_date
-                start_date = end_date - timedelta(days=6)  
+                start_date = end_date - timedelta(days=5)  # Monday (5 days before Saturday)
                 
                 unique_days = Attendance.objects.filter(
                     employee_id_fk=self.employee_id_fk,
