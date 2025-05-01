@@ -6,6 +6,10 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta, datetime
+from django.utils import timezone
+from django.core.exceptions import ValidationError
+from datetime import datetime, time
+
 
 def rename_employee_image(instance, filename):
     
@@ -247,12 +251,6 @@ class Employee(models.Model):
         )
         self.days_worked = present_days
         self.absences = absences
-
-from django.db import models
-from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
-from datetime import datetime, time
 
 class Attendance(models.Model):
     class AttendanceStatus(models.TextChoices):

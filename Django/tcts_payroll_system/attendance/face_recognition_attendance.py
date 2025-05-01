@@ -2,7 +2,8 @@ import os
 import cv2
 import pytz
 import face_recognition
-from datetime import date, datetime, timedelta
+from django.core.exceptions import ValidationError
+from datetime import date, datetime, time, timedelta, timezone
 from functools import lru_cache
 from payroll_system.models import Employee, Attendance
 
@@ -187,13 +188,8 @@ def mark_attendance(employee, action):
     Marks employee attendance for time_in or time_out actions
     Returns appropriate status message
     """
-    from django.utils import timezone
-    from datetime import datetime, time
-    from django.core.exceptions import ValidationError
-    from payroll_system.models import Attendance
-    
-    today = timezone.now().date()
-    current_time = timezone.now().time()
+    today = datetime.now().date()
+    current_time = datetime.now().time()
     
     # Define work hour boundaries
     WORK_START_TIME = time(8, 0)  # 8:00 AM
