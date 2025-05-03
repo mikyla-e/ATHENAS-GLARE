@@ -33,12 +33,14 @@
 
 <!--page content-->
 {% block outsidecontent %}
-<div id="background" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddPayroll()">
+<div id="background" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddPayroll(); cancelEditDeductions();">
     
 </div> 
 
-<div id="payroll-popup" class="popup absolute w-[40%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
-    <div class="space-y-2">
+
+<!--add payroll-->
+<div id="payroll-popup" class="popup absolute w-[500px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
+    <div class="flex flex-col ">
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Add Payroll</h1>
         <p class="text-sm font-[League Spartan] font-normal text-left m-0">Please select the start and end dates for the payroll period. Make sure the dates are correct before submitting.</p>    
     </div>
@@ -52,7 +54,7 @@
             </div>
         </div>
 
-        <div class="flex gap-5">
+        <div class="flex gap-5 w-full">
             <div class="flex flex-col w-[50%]">
                 <label for="start_date" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Start Date</label>
             
@@ -85,6 +87,39 @@
         
     </form>   
 </div>
+
+
+<!--deductions-->
+
+<div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
+    <div class="space-y-2">
+        <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Edit Deductions</h1>
+        <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>     -->
+    </div>
+    <form class="flex flex-col gap-5" method="post" onsubmit="event.preventDefault();">
+        {% csrf_token %}
+        <div class="flex flex-col">
+            <label for="deduction_type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Deduction Type</label>
+        
+            <div class="w-full h-[60px]">
+                <input type="number" name="deduction_type" id="deduction_type" class="w-full h-full px-5 outline-none border font-[Inter] font-normal text-3xl" required>
+            </div>
+        </div>
+
+        <div class="flex flex-col">
+            <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">amount</label>
+        
+            <div class="w-full h-[60px]">
+                <input type="number" name="deduction" id="deduction" class="w-full h-full px-5 outline-none border font-[Inter] font-normal text-3xl" required>
+            </div>
+        </div>
+
+        <div class="w-full h-[40px] flex justify-end gap-3">
+            <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditDeductions()">CANCEL</button>
+            <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM" onclick="">CONFIRM</button>    
+        </div>
+    </form>   
+</div>
 {% endblock %}
 
 {% block content %}
@@ -94,10 +129,13 @@
 {% endif %}
 
 <div class="size-full flex flex-col gap-4">
-    <div class="w-full flex justify-between items-end">
+    <div class="w-full h-fit flex justify-between items-end">
         <h1 class="text-[League Spartan] text-xl font-bold">CURRENT PAYROLL</h1>
 
-        <button id="button" onclick="addPayroll()">ADD PAYROLL</button> 
+        <div class="h-[40px] space-x-2 flex items-end">
+            <button id="button_1" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="editDeductions()">EDIT DEDUCTIONS</button> 
+            <button id="button_2" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addPayroll()">ADD PAYROLL</button> 
+        </div>
     </div>
     <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-md/10">
         <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
@@ -192,6 +230,22 @@
     function cancelAddPayroll(){
         let bg = document.getElementById("background");
         const popup = document.getElementById("payroll-popup");
+        bg.classList.remove("show");
+        popup.classList.remove("show");
+    }
+
+
+    function editDeductions(){
+        let bg = document.getElementById("background");
+        const popup = document.getElementById("deductions-popup");
+        
+        bg.classList.add("show");
+        popup.classList.add("show");
+    }
+
+    function cancelEditDeductions(){
+        let bg = document.getElementById("background");
+        const popup = document.getElementById("deductions-popup");
         bg.classList.remove("show");
         popup.classList.remove("show");
     }
