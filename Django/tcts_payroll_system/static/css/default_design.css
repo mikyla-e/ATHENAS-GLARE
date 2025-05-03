@@ -71,14 +71,12 @@ input[type=button]:hover{
     color: white;
 }
 
-#field{
+#field,
+.field{
     height: 40px;
     margin: 2px;
     padding: 0 15px;
     border: none;
-
-    font-family: 'Inter';
-    font-size: 1rem;
 
     background-color: rgba(111, 81, 21, 0.10);
     border-radius: 10px;
