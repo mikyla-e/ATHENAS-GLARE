@@ -1471,3 +1471,49 @@ def get_attendance_stats(request):
         'period': period,
         'period_display': period_display
     })
+    
+@login_required
+def payroll_by_week(request):
+    """
+    API endpoint that returns payroll totals for the last 5 weeks
+    """
+    today = timezone.now().date()
+    
+    # Get the Saturday of the current week (or the last Saturday if today is Saturday)
+    current_weekday = today.weekday()  # 0=Monday, 6=Sunday
+    days_since_saturday = (current_weekday - 5) % 7  # 5 represents Saturday
+    
+    # Last completed Saturday
+    latest_saturday = today - timedelta(days=days_since_saturday)
+    if days_since_saturday == 0 and current_weekday != 5:  # If calculating for today and it's not Saturday
+        latest_saturday -= timedelta(days=7)  # Go to previous Saturday
+    
+    # Calculate the 5 previous Saturdays
+    saturdays = [latest_saturday - timedelta(days=7*i) for i in range(5)]
+    saturdays.reverse()  # Put them in chronological order
+    
+    # Format dates for labels 
+    labels = [date.strftime("%b %d") for date in saturdays]
+    
+    # Get total payroll amount for each payment date
+    amounts = []
+    for saturday in saturdays:
+        # Get the total of all fields that contribute to the total payroll amount
+        payroll_data = Payroll.objects.filter(
+            payment_date=saturday,
+            payroll_status=Payroll.PayrollStatus.PROCESSED
+        ).aggregate(
+            salary_total=Sum('salary'),
+            incentives_total=Sum('incentives'),
+            deductions_total=Sum('deductions')
+        )
+        
+        # Calculate the total payroll amount (salary already includes incentives and deductions based on the model)
+        weekly_total = payroll_data['salary_total'] or 0
+        
+        amounts.append(round(weekly_total, 2))
+    
+    return JsonResponse({
+        'labels': labels,
+        'amounts': amounts
+    })

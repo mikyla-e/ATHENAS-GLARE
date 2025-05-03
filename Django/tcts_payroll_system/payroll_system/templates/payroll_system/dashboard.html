@@ -313,6 +313,74 @@
     // Display the date
     document.getElementById("current-date").textContent = month + " " + day + ", " + year;
 </script>
+<script>
+    function updateDay() {
+        // Get the current day of the week in the Philippines
+        const options = { timeZone: 'Asia/Manila', weekday: 'short' };
+        const phDay = new Date().toLocaleDateString('en-US', options);
+
+        // Display the day
+        document.getElementById("philippines-day").textContent = phDay;
+    }
+
+    // Call the function immediately
+    updateDay();
+
+    function updateTime() {
+        // Get current time in the Philippines (Asia/Manila)
+        const options = { 
+            timeZone: 'Asia/Manila', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            hour12: true // Use 12-hour format (AM/PM)
+        };
+
+        let phTime = new Date().toLocaleTimeString('en-US', options);
+
+        // Remove the space between time and AM/PM (e.g. "11:45 AM" -> "11:45AM")
+        phTime = phTime.replace(' ', '');
+
+        // Display the time
+        document.getElementById("philippines-time").textContent = phTime;
+    }
+
+        // Update time every second
+        setInterval(updateTime, 1000);
+
+        // Call the function immediately
+        updateTime();
+
+
+        function updateDate() {
+        // Get the current date and format it to Month, Day, Year
+        const options = { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' };
+        const philippineDate = new Date().toLocaleDateString('en-US', options);
+
+        // Update the text inside the <p> tag with the ID "philippines-date"
+        document.getElementById("philippines-date").textContent = philippineDate;
+    }
+
+    // Call the function once when the page loads
+    updateDate();
+
+    function displayWeek() {
+        const weekNumber = getWeekNumber(new Date());
+        document.getElementById("philippines-week").textContent = "Philippines Current Week: " + weekNumber;
+    }
+
+    displayWeek();
+        
+    // Get the current date
+    const today = new Date();
+
+    // Format the date
+    const month = today.toLocaleString('default', { month: 'long' }); // Full month name
+    const day = today.getDate(); // Day of the month
+    const year = today.getFullYear(); // Year
+
+    // Display the date
+    document.getElementById("current-date").textContent = month + " " + day + ", " + year;
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -435,59 +503,288 @@
         loadAttendanceData('day');
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const barChart = document.getElementById('bar');
+        let payrollChart;
+        
+        // Function to fetch payroll data from API
+        function fetchPayrollData() {
+            fetch('/api/payroll-by-week/')
+                .then(response => response.json())
+                .then(data => {
+                    // If chart exists, destroy it before creating a new one
+                    if (payrollChart) {
+                        payrollChart.destroy();
+                    }
+                    
+                    // Create new chart with the data
+                    payrollChart = new Chart(barChart, {
+                        type: "bar",
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: "Total Payroll",
+                                backgroundColor: "#F8D14680",
+                                borderColor: "#F8D146",
+                                data: data.amounts,
+                                borderWidth: 2
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            onResize: function(chart, size) {
+                                // This ensures height stays fixed at container height
+                                chart.height = size.height;
+                            },
+                            layout: {
+                                padding: 10
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: "PAYROLL PER WEEK",
+                                    color: "#1E1E1E",
+                                    align: 'start',
+                                    padding: {
+                                        top: 0,
+                                        bottom: 10
+                                    },
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let value = context.raw || 0;
+                                            return `₱${value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            if (value === 0) return '₱0';
+                                            return '₱' + value.toLocaleString('en-US', {
+                                                notation: 'compact',
+                                                compactDisplay: 'short'
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching payroll data:', error);
+                    
+                    // Create fallback chart with default data if fetch fails
+                    if (payrollChart) {
+                        payrollChart.destroy();
+                    }
+                    
+                    payrollChart = new Chart(barChart, {
+                        type: "bar",
+                        data: {
+                            labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
+                            datasets: [{
+                                label: "Total Payroll",
+                                backgroundColor: "#F8D14680",
+                                borderColor: "#F8D146",
+                                data: [0, 0, 0, 0, 0],
+                                borderWidth: 2
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            layout: {
+                                padding: 10
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: "PAYROLL PER WEEK",
+                                    color: "#1E1E1E",
+                                    align: 'start',
+                                    padding: {
+                                        top: 0,
+                                        bottom: 10
+                                    },
+                                    font: {
+                                        size: 16
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '₱' + value;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+        }
+        
+        // Load payroll data when page loads
+        fetchPayrollData();
+        
+        // Optional: Set up an interval to refresh data every few minutes
+        // setInterval(fetchPayrollData, 300000); // Refresh every 5 minutes
+    });
+</script>
 
 <script>
-    const barChart = document.getElementById('bar');
-    
-    const barLabels = ["Mar 29", "Apr 5", "Apr 12", "Apr 19", "Apr 26"]; //payroll per week
-    const barData = [0, 0, 0, 0, 200]; //payroll data corresponding its nth week
-
-    const barColor = ["#F8D14680"];
-
-    const payroll_chart = new Chart(barChart, {
-        type: "bar",
-        data: {
-            labels: barLabels,
-            datasets: [{
-                label: "Payroll",
-                backgroundColor: barColor,
-                borderColor: ["#F8D146"],
-                data: barData,
-                borderWidth: 2
-            }],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            onResize: function(chart, size) {
-                // This ensures height stays fixed at container height
-                chart.height = size.height;
-            },
-            layout: {
-                padding: 10
-            },
-            plugins: {
-                title: {
-                    display: true,
-                    text: "PAYROLL PER WEEK",
-                    color: "#1E1E1E",
-                    align: 'start',
-                    padding: {
-                        top: 0,
-                        bottom: 10
-                    },
-                    font: {
-                        size: 16
+    // Payroll Chart Script
+    document.addEventListener('DOMContentLoaded', function() {
+        const barChart = document.getElementById('bar');
+        let payrollChart;
+        
+        // Function to fetch payroll data from API
+        function fetchPayrollData() {
+            fetch('/api/payroll-by-week/')
+                .then(response => response.json())
+                .then(data => {
+                    // If chart exists, destroy it before creating a new one
+                    if (payrollChart) {
+                        payrollChart.destroy();
                     }
-                }
-            }
+                    
+                    // Create new chart with the data
+                    payrollChart = new Chart(barChart, {
+                        type: "bar",
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: "Total Payroll",
+                                backgroundColor: "#F8D14680",
+                                borderColor: "#F8D146",
+                                data: data.amounts,
+                                borderWidth: 2
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            onResize: function(chart, size) {
+                                // This ensures height stays fixed at container height
+                                chart.height = size.height;
+                            },
+                            layout: {
+                                padding: 10
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: "TOTAL PAYROLL PER PAYMENT DATE",
+                                    color: "#1E1E1E",
+                                    align: 'start',
+                                    padding: {
+                                        top: 0,
+                                        bottom: 10
+                                    },
+                                    font: {
+                                        size: 16
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let value = context.raw || 0;
+                                            return `₱${value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            if (value === 0) return '₱0';
+                                            return '₱' + value.toLocaleString('en-US', {
+                                                notation: 'compact',
+                                                compactDisplay: 'short'
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching payroll data:', error);
+                    
+                    // Create fallback chart with default data if fetch fails
+                    if (payrollChart) {
+                        payrollChart.destroy();
+                    }
+                    
+                    payrollChart = new Chart(barChart, {
+                        type: "bar",
+                        data: {
+                            labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
+                            datasets: [{
+                                label: "Total Payroll",
+                                backgroundColor: "#F8D14680",
+                                borderColor: "#F8D146",
+                                data: [0, 0, 0, 0, 0],
+                                borderWidth: 2
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            layout: {
+                                padding: 10
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: "PAYROLL PER WEEK",
+                                    color: "#1E1E1E",
+                                    align: 'start',
+                                    padding: {
+                                        top: 0,
+                                        bottom: 10
+                                    },
+                                    font: {
+                                        size: 16
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '₱' + value;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
         }
-    });
-
-    // Handle responsive behavior
-    window.addEventListener('resize', function() {
-        // Force redraw when window is resized
-        payroll_chart.resize();
+        
+        // Load payroll data when page loads
+        fetchPayrollData();
+        
+        // Optional: Set up an interval to refresh data every few minutes
+        // setInterval(fetchPayrollData, 300000); // Refresh every 5 minutes
     });
 </script>
 {% endblock %}
