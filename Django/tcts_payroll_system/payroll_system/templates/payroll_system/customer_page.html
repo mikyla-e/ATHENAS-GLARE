@@ -6,7 +6,7 @@
 
 <!--(optional)head content-->
 {% block headcontent %}
-<!-- <link rel="stylesheet" href="{% static 'css/settings.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 {% endblock %}
 
 <!--header-->
@@ -14,49 +14,33 @@
 
 <!--page content-->
 {% block content %}
-
     <!-- Customer Card dito -->
     <div class="bg-white rounded-xl px-4 sm:px-6 md:px-10 py-5 mb-6 md:mb-10 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-2" id="editButton">
             <!-- Modified section with much smaller text on mobile -->
             <div class="flex flex-row items-center justify-between w-full gap-2">
-                <h1 class="font-bold flex flex-wrap text-sm sm:text-2xl truncate max-w-[60%] sm:max-w-none">{{ customer.first_name}} {{ customer.middle_name}} {{ customer.last_name}}</h1>
-                <a href="{% url 'payroll_system:customer_edit' customer.customer_id %}" class="w-auto">
-                    <button class="w-full text-xs sm:text-base py-1 px-2 sm:p-2 cursor-pointer bg-black text-[#F8D146] rounded-lg sm:rounded-2xl font-bold
-                    hover:bg-[#F8D146] hover:text-black duration-200 hover:scale-105">
-                        Edit Customer
-                    </button>
+                <h1 class="font-bold flex flex-wrap text-sm sm:text-2xl truncate max-w-[60%] sm:max-w-none">{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</h1>
+                
+                <a href="{% url 'payroll_system:customer_edit' customer.customer_id %}" class="w-auto h-[45px]">
+                    <button id="button" class="w-fit h-full px-4 font-bold text-[League Spartan] text-center">EDIT CUSTOMER</button>
                 </a>
+            
             </div>
         </div>
         
         <div class="mt-4">
             <p class="opacity-50 text-sm font-medium">DETAILS</p>
-            <hr class="mb-4 opacity-50 w-full">
+            <div class="w-full h-[1px] border border-"></div>
             
-            <div class="space-y-4 md:space-y-6">
-                <div class="flex flex-col sm:flex-row sm:gap-8">
-                    <div class="w-full sm:w-1/2">
-                        <h2 class="opacity-50 font-bold text-xs md:text-sm">ADDRESS</h2>
-                        <p class="text-sm md:text-base">Brgy. {{ customer.barangay}}, {{ customer.city}}, {{ customer.province}}</p>
-                    </div>
-                    
-                    <div class="w-full sm:w-1/2 mt-4 sm:mt-0">
-                        <h2 class="opacity-50 font-bold text-xs md:text-sm">CONTACT NUMBER</h2>
-                        <p class="text-sm md:text-base">{{ customer.contact_number }}</p>
-                    </div>
+            <div class="flex flex-col sm:flex-row sm:gap-8">
+                <div class="w-full sm:w-1/2">
+                    <h2 class="opacity-50 font-bold text-xs md:text-sm">ADDRESS</h2>
+                    <p class="text-sm md:text-base">Brgy. {{ customer.barangay}}, {{ customer.city}}, {{ customer.province}}</p>
                 </div>
                 
-                <div class="flex flex-col sm:flex-row sm:gap-8">
-                    <div class="w-full sm:w-1/2">
-                        <h2 class="opacity-50 font-bold text-xs md:text-sm">EXAMPLE FIELD</h2>
-                        <p class="text-sm md:text-base">EXAMPLE</p>
-                    </div>
-                    
-                    <div class="w-full sm:w-1/2 mt-4 sm:mt-0">
-                        <h2 class="opacity-50 font-bold text-xs md:text-sm">EXAMPLE FIELD</h2>
-                        <p class="text-sm md:text-base">EXAMPLE</p>
-                    </div>
+                <div class="w-full sm:w-1/2 mt-4 sm:mt-0">
+                    <h2 class="opacity-50 font-bold text-xs md:text-sm">CONTACT NUMBER</h2>
+                    <p class="text-sm md:text-base">{{ customer.contact_number }}</p>
                 </div>
             </div>
         </div>
@@ -67,10 +51,10 @@
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {% for vehicle in customer.vehicles.all %}
-            <div class="bg-white rounded-xl p-4 shadow-sm">
-                <h1 class="font-bold text-lg sm:text-xl md:text-2xl mb-3">{{ vehicle.plate_number }}</h1>
+            <div class="bg-white rounded-xl py-4 px-5 shadow-sm space-y-3">
+                <h1 class="font-bold text-lg sm:text-xl md:text-2xl">{{ vehicle.plate_number }}</h1>
                 
-                <div class="space-y-4 pl-0 sm:pl-4">
+                <div class="space-y-2">
                     <div>
                         <h2 class="opacity-50 font-bold text-xs md:text-sm">VEHICLE NAME</h2>
                         <p class="text-sm md:text-base">{{ vehicle.vehicle_name }}</p>
@@ -92,17 +76,17 @@
     {% block script %}
     <script>
         // Function to update button text based on screen width
-        function updateButtonText() {
-            const editButton = document.querySelector('#editButton button');
+        // function updateButtonText() {
+        //     const editButton = document.querySelector('#editButton button');
             
-            if (editButton) {
-                if (window.innerWidth <= 640) {
-                    editButton.textContent = 'Edit';
-                } else {
-                    editButton.textContent = 'Edit Customer';
-                }
-            }
-        }
+        //     if (editButton) {
+        //         if (window.innerWidth <= 640) {
+        //             editButton.textContent = 'EDIT';
+        //         } else {
+        //             editButton.textContent = 'EDIT CUSTOMER';
+        //         }
+        //     }
+        // }
         
         // Run on page load
         document.addEventListener('DOMContentLoaded', function() {
