@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from django.views.decorators.csrf import csrf_protect
-from .forms import EmployeeForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
+from .forms import EmployeeForm, PayrollPeriodForm, DeductionForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
 from .models import Employee, PayrollPeriod, PayrollRecord, Attendance, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -205,8 +205,7 @@ def employee_picture(request):
 
 @login_required
 def employees(request):
-    query = request.GET.get('q', '')
-
+    
     latest_attendance_subquery = (
         Attendance.objects
         .filter(employee=OuterRef('pk'))
@@ -218,25 +217,10 @@ def employees(request):
     employees = Employee.objects.annotate(
         latest_attendance_date=Subquery(latest_attendance_subquery)
     )
-
-    # Apply search filter if query exists
-    if query:
-        employees = employees.filter(
-            first_name__icontains=query
-        ) | employees.filter(
-            last_name__icontains=query
-        ) | employees.filter(
-            employee_id__icontains=query
-        )
-
-    # Handle AJAX request
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  
-        data = list(employees.values('first_name', 'last_name', 'employee_id', 'contact_number', 'employee_status', 'latest_payroll_status', 'latest_attendance_date'))
-        return JsonResponse({'employees': data})
     
     context = {
         'employees': employees,
-        'query': query
+        # 'query': query
     }
     return render(request, 'payroll_system/employees.html', context)
 
@@ -310,7 +294,36 @@ def employee_profile(request, employee_id):
 
 @login_required
 def payroll(request):
-    return render(request, 'payroll_system/payroll.html')
+    payroll_periods = PayrollPeriod.objects.all()
+    form = PayrollPeriodForm()  # Empty form for modal
+
+    context = {
+        'payroll_periods': payroll_periods,
+        'form': form,  # Include the form in context for modal use
+    }
+
+    return render(request, 'payroll_system/payroll.html', context)
+
+@login_required
+def create_payroll(request):
+    if request.method == 'POST':
+        form = PayrollPeriodForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('payroll_system:payroll')
+        else:
+            # Fetch current payroll periods to re-render the same page
+            payroll_periods = PayrollPeriod.objects.all()
+
+            context = {
+                'form': form,
+                'payroll_periods': payroll_periods,
+                'error': "Please correct the errors below.",
+            }
+
+            return render(request, 'payroll_system/payroll.html', context)
+
+    return redirect('payroll_system:payroll')
 
 @login_required
 def payrolls(request):

@@ -5,7 +5,7 @@ from django.forms import ModelForm
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from datetime import datetime, timedelta
-from .models import Employee, Region, Province, City, Barangay, Service, Customer, Vehicle
+from .models import Employee, PayrollPeriod, Deduction, Region, Province, City, Barangay, Service, Customer, Vehicle
 
 class EmployeeForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput())
@@ -273,6 +273,28 @@ class EmployeeForm(forms.ModelForm):
             employee.save()
         
         return employee
+
+class PayrollPeriodForm(forms.ModelForm):
+    start_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'w-full h-full px-5 outline-none border-none font-[Inter] font-normal text-3xl', 'type': 'date'}))
+    end_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'w-full h-full px-5 outline-none border-none font-[Inter] font-normal text-3xl', 'type': 'date'}))
+    # payment_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'w-full h-full px-5 outline-none border-none font-[Inter] font-normal text-3xl', 'type': 'date'}))
+
+    class Meta:
+        model = PayrollPeriod
+        fields = ('start_date', 'end_date', 'payment_date', 'type')
+        widgets = {
+            'type': forms.Select(),
+        }
+
+class DeductionForm(forms.ModelForm):
+    amount = forms.FloatField(widget=forms.NumberInput())
+
+    class Meta:
+        model = Deduction
+        fields = ('amount', 'deduction_type')
+        widget = {
+            'deduction_type': forms.Select()
+        }
         
 class ServiceForm(forms.ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'w-full outline-none text-lg', 'placeholder': 'Enter Title'}))

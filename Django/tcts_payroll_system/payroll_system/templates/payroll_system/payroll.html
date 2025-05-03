@@ -42,13 +42,13 @@
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Add Payroll</h1>
         <p class="text-sm font-[League Spartan] font-normal text-left m-0">Please select the start and end dates for the payroll period. Make sure the dates are correct before submitting.</p>    
     </div>
-    <form class="flex flex-col gap-5" method="post" onsubmit="event.preventDefault();">
+    <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:create_payroll' %}">
         {% csrf_token %}
         <div class="flex flex-col">
             <label for="type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Payroll Type</label>
         
             <div class="w-full h-[75%]">
-                <input type="text" name="type" id="type" class="w-full h-full px-5 outline-none border-none font-[Inter] font-normal text-3xl" required>
+                {{ form.type}}
             </div>
         </div>
 
@@ -57,7 +57,7 @@
                 <label for="start_date" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Start Date</label>
             
                 <div class="w-full h-[60px]">
-                    <input type="date" name="start_date" id="start_date" class="w-full h-full px-5 outline-none border-none font-[Inter] font-normal text-3xl" required>
+                    {{ form.start_date }}
                 </div>
             </div>
 
@@ -65,20 +65,33 @@
                 <label for="end_date" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">End Date</label>
             
                 <div class="w-full h-[60px]">
-                    <input type="date" name="end_date" id="end_date" class="w-full h-full px-5 outline-none border-none font-[Inter] font-normal text-3xl" required>
+                    {{ form.end_date}}
                 </div>
             </div>
         </div>
 
         <div class="w-full h-[40px] flex justify-end gap-3">
-            <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="canceladdPayroll()">CANCEL</button>
-            <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM" onclick="">CONFIRM</button>    
+            <input type="button" id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddPayroll()">
+            <input type="submit" id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM"> 
         </div>
     </form>   
 </div>
 {% endblock %}
 
 {% block content %}
+
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+{% if form.non_field_errors %}
+  <div class="alert alert-warning">
+    {% for error in form.non_field_errors %}
+      <p>{{ error }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
+
 <div class="size-full flex flex-col gap-4">
     <div class="w-full flex justify-between items-end">
         <h1 class="text-[League Spartan] text-xl font-bold">CURRENT PAYROLL</h1>
@@ -88,23 +101,30 @@
     <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-md/10">
         <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
             <tr class="text-base text-center">
-                <th class="p-2 text-base font-[League Spartan]">PERIOD</th>
                 <th class="p-2 text-base font-[League Spartan]">START</th>
                 <th class="p-2 text-base font-[League Spartan]">END</th>
+                <th class="p-2 text-base font-[League Spartan]">PAYMENT DATE</th>
                 <th class="p-2 text-base font-[League Spartan]">STATUS</th>
-                <th></th>
+                <th class="p-2 text-base font-[League Spartan]">TYPE</th>
             </tr>
         </thead>
         <tbody>
+            {% for payroll_period in payroll_periods %}
             <tr id="payroll-data">
-                <td class="p-2 text-sm font-[Inter]">April 12-19</td>
-                <td class="p-2 text-sm font-[Inter]">00-00-00</td>
-                <td class="p-2 text-sm font-[Inter]">00-00-00</td>
-                <td class="p-2 text-sm font-[Inter]">Pending</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.start_date }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.end_date }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.payment_date }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.payroll_status }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.type }}</td>
                 <td class="p-2 text-sm font-[Inter]">
                     <a href="">more</a>
                 </td>
             </tr>
+            {% empty %}
+            <tr>
+                <td class="p-2 text-center text-sm font-[Inter]" colspan="6">No Payroll Period Existing</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 
@@ -128,25 +148,30 @@
     <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-md/10">
         <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
             <tr class="text-base text-center">
-                <th class="p-2 text-base font-[League Spartan]">PERIOD</th>
                 <th class="p-2 text-base font-[League Spartan]">START</th>
                 <th class="p-2 text-base font-[League Spartan]">END</th>
-                <th class="p-2 text-base font-[League Spartan]">TYPE</th>
+                <th class="p-2 text-base font-[League Spartan]">PAYMENT DATE</th>
                 <th class="p-2 text-base font-[League Spartan]">STATUS</th>
-                <th></th>
+                <th class="p-2 text-base font-[League Spartan]">TYPE</th>
             </tr>
         </thead>
         <tbody>
+            {% for payroll_period in payroll_periods %}
             <tr id="payroll-data">
-                <td class="p-2 text-sm font-[Inter]">April 12-19</td>
-                <td class="p-2 text-sm font-[Inter]">00-00-00</td>
-                <td class="p-2 text-sm font-[Inter]">00-00-00</td>
-                <td class="p-2 text-sm font-[Inter]">Weekly</td>
-                <td class="p-2 text-sm font-[Inter]">Pending</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.start_date }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.end_date }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.payment_date }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.payroll_status }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.type }}</td>
                 <td class="p-2 text-sm font-[Inter]">
                     <a href="">more</a>
                 </td>
             </tr>
+            {% empty %}
+            <tr>
+                <td class="p-2 text-center text-sm font-[Inter]" colspan="6">No Payroll Period Existing</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>

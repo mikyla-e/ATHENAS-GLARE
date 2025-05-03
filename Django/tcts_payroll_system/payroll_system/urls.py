@@ -11,6 +11,7 @@ urlpatterns = [
     path('employees/', views.employees, name='employees'),
     path('employees/employee_profile/<int:employee_id>/', views.employee_profile, name='employee_profile'),
     path('payroll/', views.payroll, name='payroll'),
+    path('create_payroll', views.create_payroll, name='create_payroll'),
     path('payrolls/', views.payrolls, name='payrolls'),
     # path('payrolls/confirm/', views.confirm_payroll, name='confirm_payroll'),
     path('payrolls/payroll_individual/<int:employee_id>/', views.payroll_individual, name='payroll_individual'),
