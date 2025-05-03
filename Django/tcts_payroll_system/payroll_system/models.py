@@ -308,7 +308,11 @@ class PayrollPeriod(models.Model):
     payment_date = models.DateField(null=False)
     payroll_status = models.CharField(max_length=9, choices=PayrollStatus.choices, default=PayrollStatus.PENDING)
     type = models.CharField(max_length=9, choices=Type.choices)
-    employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='payrollperiods')
+
+    def save(self, *args, **kwargs):
+        if self.end_date:
+            self.payment_date = self.end_date
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.employee} - {self.start_date} to {self.end_date} ({self.get_payroll_status_display()})"

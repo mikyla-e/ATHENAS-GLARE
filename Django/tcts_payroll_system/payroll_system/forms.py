@@ -281,7 +281,7 @@ class PayrollPeriodForm(forms.ModelForm):
 
     class Meta:
         model = PayrollPeriod
-        fields = ('start_date', 'end_date', 'payment_date', 'type')
+        fields = ('start_date', 'end_date', 'type')
         widgets = {
             'type': forms.Select(),
         }

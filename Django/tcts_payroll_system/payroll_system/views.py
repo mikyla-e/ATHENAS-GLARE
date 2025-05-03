@@ -327,7 +327,7 @@ def create_payroll(request):
 
 @login_required
 def payrolls(request):
-    employees = Employee.objects.prefetch_related('payrollperiod', 'payrollrecords', 'attendances').all()
+    employees = Employee.objects.prefetch_related('payrollperiods', 'payrollrecords', 'attendances').all()
     
     query = request.GET.get('q', '')
     
