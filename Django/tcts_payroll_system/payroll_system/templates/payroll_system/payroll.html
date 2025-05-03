@@ -80,26 +80,25 @@
 </div> 
 
 <!-- Confirmation Dialogue -->
-<div id="payroll-popup" class="payroll fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
-    <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
+<div id="payroll-popup" class="payroll fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around items-center invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden shadow-lg/20">
+    
+    <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold">Confirm Payroll?</h1>
 
-    <span class="w-full h-[2px] my-1 bg-[#1e1e1e40] rounded-full"></span>
-
-    <h1 class="text-lg sm:text-xl my-2 font-[League Spartan] font-semibold text-center">Are you sure this week's Payroll is finished?</h1>
+    <h1 class="text-sm sm:text-base my-2 py-4 font-[Inter] font-normal text-center">Confirming this will end the payroll period. Are you sure?</h1>
     
     <div class="w-full h-[40px] my-1 flex justify-evenly items-center gap-3">
         <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelConfirmPayroll()">CANCEL</button>
         <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">CONFIRM</button>
     </div>
 </div>
-<!-- End of Confirmation Dialogue -->
 
+<!-- End of Confirmation Dialogue -->
 <div id="background_incentive" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelEditIncentives()">
     
 </div> 
 
-<div id="incentive-popup" class="edit_incentives_popup absolute w-[80%] sm:w-[60%] md:w-[50%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
-    <h1>Add/Deduct for all Employees</h1>
+<div id="incentive-popup" class="edit_incentives_popup absolute w-[300px] sm:w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
+    <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left mb-2">Add/Deduct for all Employees</h1>
     <form id="incentives-form" class="flex flex-col" method="post" action="{% url 'payroll_system:update_all_incentives' %}">
         {% csrf_token %}
         <div class="flex items-center my-2" >
@@ -177,7 +176,7 @@
             </div>
         </div>
 
-        <span class="w-[3px] h-[80%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
+        <span class="w-[3px] h-[80%] mx-2 border border-2 border-[#f8d14640] rounded-full"></span> <!--horizontal line-->
 
         <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
             <p class="text-[10px]/3 sm:text-sm/3.5 md:text-base/4 lg:text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">EMPLOYEES AVR. RATE</p>
@@ -191,7 +190,7 @@
             </div>
         </div>
 
-        <span class="w-[3px] h-[80%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
+        <span class="w-[3px] h-[80%] mx-2 border border-2 border-[#f8d14640] rounded-full"></span> <!--horizontal line-->
         
         <div class="h-full py-4 md:py-4.5 flex flex-col justify-between overflow-hidden">
             <p class="text-white text-[10px] sm:text-xs md:text-lg font-bold font-[League Spartan] text-left">TOTAL PAYROLL</p>
@@ -202,7 +201,7 @@
                     <p class="text-[35px]/11 sm:text-[43px]/13 md:text-5xl font-[Inter] font-medium">{{ processed_payroll_count }}</p>  
                 </div>
 
-                <div class="w-[2px] h-[100%] mx-2 bg-[#f8d14640] rounded-full"></div> <!--horizontal line-->
+                <div class="h-[100%] mx-2 border border-2 border-[#f8d14640] rounded-full"></div> <!--horizontal line-->
                 
                 <div id="pending" class="flex flex-col justify-evenly">
                     <h1 class="sm:hidden text-xs font-bold">PEN...</h1>

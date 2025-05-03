@@ -57,8 +57,11 @@
         
 </div> 
 
-<div id="task-popup" class="task fixed h-[25%] w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around items-center invisible opacity-0 rounded-lg z-60 overflow-hidden">
-    <h1 class="text-3xl sm:text-4xl font-[League Spartan] font-semibold text-center">Confirm Task is Complete?</h1>
+<div id="task-popup" class="task fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around items-center invisible opacity-0 rounded-lg z-60 overflow-hidden shadow-lg/20">
+    
+    <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left">Complete Task?</h1>
+
+    <h1 class="text-sm sm:text-base my-2 py-4 font-[Inter] font-normal text-center">Are you sure you want to mark this task as <i>completed</i>? Confirm to proceed.</h1>
     
     <div class="w-full h-[40px] my-1 flex justify-evenly items-center gap-3">
         <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelTask()">CANCEL</button>
@@ -67,29 +70,21 @@
     <input type="hidden" id="selected-task-id" value="">
 </div>
 
-<div id="background_incentives" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-70" onclick="cancelIncentives()">
-        
-</div> 
-
-<div id="incentives-popup" class="incentives fixed h-[30%] w-[80%] sm:w-[70%] md:w-[60%] lg:w-[635px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-80 overflow-hidden">
-    <h1 class="text-3xl font-[League Spartan] font-semibold">Add Incentives for this Employee?</h1>
+<div id="incentives-popup" class="incentives fixed h-[30%] w-[80%] sm:w-[450px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-80 overflow-hidden">
+    <h1 class="text-2xl font-[League Spartan] font-semibold">Add Incentives for this Employee?</h1>
     <form id="cash-form" class="size-full flex flex-col" method="post" action="{% url 'payroll_system:status' %}">
         {% csrf_token %}
         <input type="hidden" name="incentives" value="true">
         <input type="hidden" name="task_id" id="incentives-task-id" value="">
-        <div class="w-full h-[50%] my-5 flex justify-center gap-1">
-            <div class="w-[90%] bg-[#EFEDE6] rounded-xl">
-                <div class="w-full h-[25%]">
-                    <label for="incentives" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">amount</label>
-                </div>
-                <div class="w-full h-[75%]">
-                    <input type="number" name="number" id="cash_advance" class="w-full h-full px-5 outline-none border-none font-[Inter] font-semibold text-3xl" required>
-                </div>
+        <div class="w-full h-[50%] my-5 flex flex-col justify-center items-start gap-1">
+            <label for="incentives" class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]">AMOUNT</label>
+            <div class="w-full h-[60%] bg-[#EFEDE6] rounded-xl">
+                <input type="number" name="number" id="cash_advance" class="size-full px-5 outline-none border-none font-[Inter] font-normal text-base" required>
             </div>
         </div>
         <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
-            <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelIncentives()">
-            <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+            <input type="button" class="w-[30%] h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelIncentives()">
+            <input type="submit" class="w-[30%] h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
         </div>           
     </form>
 </div>
@@ -116,24 +111,31 @@
     
     <div class="size-full my-5 flex flex-col gap-5" id="tasks-container">
         {% for task in tasks %}
-        <div class="w-full h-[23%] flex justify-between rounded-xl bg-white py-4 px-6 gap-2 task-item {% if task.task_status == 'Completed' %}complete{% else %}in-progress{% endif %}" data-task-id="{{ task.id }}">
+        <div class="w-full h-[22%] flex justify-between rounded-xl bg-white py-4 px-6 gap-2 task-item {% if task.task_status == 'Completed' %}complete{% else %}in-progress{% endif %}" data-task-id="{{ task.id }}">
             <div class="w-[85%] h-full flex flex-col justify-between">
                 <div class="w-full h-[30%]">
                     <div class="size-full flex flex-col gap-1">
-                        <h1 id="name" class="text-xl/7.5 sm:text-3xl/9.5 font-[League Spartan] font-semibold">
+                        <h1 id="name" class="text-xl sm:text-2xl font-[League Spartan] font-semibold">
                             {{ task.customer.first_name }} {{ task.customer.last_name }}
                         </h1>
-                        <p class="text-nowrap"><span class="text-lg/6 sm:text-2xl/7 text-[#1E1E1E]">{{ task.vehicle.vehicle_name }} {{ task.vehicle.plate_number }}</span> - <span class="text-base sm:text-xl opacity-50">{{ task.service.title }}</span></p>
+                        <p class="text-nowrap"><span class="text-lg/6 sm:text-xl text-[#1E1E1E]">{{ task.vehicle.vehicle_name }} {{ task.vehicle.plate_number }}</span> - <span class="text-base sm:text-lg opacity-50">{{ task.service.title }}</span></p>
                     </div>
                 </div>
                 <div class="w-full h-fit flex gap-2">
                     <p class="opacity-35 text-xs sm:text-sm font-[Roboto] font-extrabold">Assigned Employee: {{ task.employee.first_name }} {{ task.employee.last_name }}</p>
                 </div>
             </div>
-            <div class="w-[15%] h-fit flex justify-end">
-                <div class="flex justify-end items-center cursor-pointer" onclick="confirmTask({{ task.task_id }})">
+            <div class="w-[15%] h-full flex flex-col justify-between items-end">
+                <div class="flex justify-end items-center">
                     <h1 class="text-[#F8D146] font-bold text-xs sm:text-lg text-nowrap text-right">{{ task.task_status }}</h1>
-                </div> 
+                </div>
+                {% if task.task_status == "In Progress" %}
+                <div class="h-[35px]">
+                    <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="confirmTask({{ task.task_id }})">COMPLETE TASK</button>
+                </div>
+                {% else %}
+                <!--delete button?-->
+                {% endif %}
             </div> 
         </div>
         {% empty %}
@@ -162,17 +164,13 @@
         const taskId = document.getElementById("selected-task-id").value;
         document.getElementById("incentives-task-id").value = taskId;
         
-        let bg = document.getElementById("background_incentives");
         const popup = document.getElementById("incentives-popup");
         
-        bg.classList.add("show");
         popup.classList.add("show");
     }
 
     function cancelIncentives(){
-        let bg = document.getElementById("background_incentives");
         const popup = document.getElementById("incentives-popup");
-        bg.classList.remove("show");
         popup.classList.remove("show");
     }
 

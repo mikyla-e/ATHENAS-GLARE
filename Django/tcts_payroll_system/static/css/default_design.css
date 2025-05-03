@@ -1,7 +1,6 @@
 #button,
 input[type=submit]{
     padding: 0 20px;
-    width: fit-content;
 
     border-radius: 30px;
     border: none;
@@ -12,7 +11,6 @@ input[type=submit]{
 
 #button_1{
     padding: 0 20px;
-    width: fit-content;
 
     border-radius: 30px;
     border: none;
@@ -23,7 +21,6 @@ input[type=submit]{
 
 #button_2{
     padding: 0 20px;
-    width: fit-content;
 
     border-radius: 30px;
     border: none;
@@ -52,7 +49,6 @@ input[type=submit]:hover{
 #cancel,
 input[type=button]{
     padding: 0 20px;
-    width: fit-content;
 
     border-radius: 30px;
     border: none;

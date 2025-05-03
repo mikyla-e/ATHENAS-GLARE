@@ -56,39 +56,39 @@
             {% csrf_token %}
             <input type="hidden" id="customer_id" name="customer_id" value="">
             <input type="hidden" id="existing_vehicle_id" name="existing_vehicle_id" value="">
-            <div id="client-form" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div id="left" class=" mx-5">
-                    <div class="flex flex-col h-[70px]">
-                        <label for="first-name">first name</label>
+            <div id="client-form" class="grid grid-rows-[1fr_1fr] grid-cols-1 lg:grid-rows-1 lg:grid-cols-[1fr_1fr] gap-4">
+                <div id="left" class="order-1 mx-5">
+                    <div class="flex flex-col my-1">
+                        <label for="first-name">First Name</label>
                         {{ customer_form.first_name }}
                         {% if customer_form.first_name.errors %}
                             <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ customer_form.first_name.errors.0 }}</div>
                         {% endif %}
                     </div>
-                    <div class="flex flex-col h-[70px]">
-                        <label for="middle-name">middle name</label>
+                    <div class="flex flex-col my-1">
+                        <label for="middle-name">Middle Name</label>
                         {{ customer_form.middle_name }}
                         {% if customer_form.middle_name.errors %}
                             <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ customer_form.middle_name.errors.0 }}</div>
                         {% endif %}
                     </div>
-                    <div class="flex flex-col h-[70px]">
-                        <label for="last-name">last name</label>
+                    <div class="flex flex-col my-1">
+                        <label for="last-name">Last Name</label>
                         {{ customer_form.last_name }}
                         {% if customer_form.last_name.errors %}
                             <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ customer_form.last_name.errors.0 }}</div>
                         {% endif %}
                     </div>
-                    <div class="flex flex-col h-[70px]">
-                        <label for="contact-number">contact number</label>
+                    <div class="flex flex-col my-1">
+                        <label for="contact-number">Contact Number</label>
                         {{ customer_form.contact_number }}
                         {% if customer_form.contact_number.errors %}
                             <div class="text-[#e74c3c] text-xs font-bold block">{{ customer_form.contact_number.errors.0 }}</div>
                         {% endif %}
                     </div>
                 </div>
-                <div id="right" class=" mx-5">
-                    <div class="flex flex-col h-[70px]">
+                <div id="right" class="order-2 mx-5">
+                    <div class="flex flex-col my-1">
                         <label for="{{ customer_form.region.id_for_label }}">{{ customer_form.region.label }}</label>
                         {{ customer_form.region }}
                         {% if customer_form.region.errors %}
@@ -100,7 +100,7 @@
                             {% endfor %}
                         </datalist>
                     </div>
-                    <div class="flex flex-col h-[70px]">
+                    <div class="flex flex-col my-1">
                         <label for="{{ customer_form.province.id_for_label }}">{{ customer_form.province.label }}</label>
                         {{ customer_form.province }}
                         {% if customer_form.province.errors %}
@@ -112,7 +112,7 @@
                             {% endfor %}
                         </datalist>
                     </div>
-                    <div class="flex flex-col h-[70px]">
+                    <div class="flex flex-col my-1">
                         <label for="{{ customer_form.city.id_for_label }}">{{ customer_form.city.label }}</label>
                         {{ customer_form.city }}
                         {% if customer_form.city.errors %}
@@ -124,7 +124,7 @@
                             {% endfor %}
                         </datalist>
                     </div>
-                    <div class="flex flex-col h-[70px]">
+                    <div class="flex flex-col my-1">
                         <label for="{{ customer_form.barangay.id_for_label }}">{{ customer_form.barangay.label }}</label>
                         {{ customer_form.barangay }}
                         {% if customer_form.barangay.errors %}
@@ -155,15 +155,15 @@
             <div id="vehicle-form" class="flex">
                 <div class="w-full ">
                     <div id="left" class="mx-5">
-                        <div class="flex flex-col h-[70px]">
-                            <label for="vehicle-name">vehicle name</label>
+                        <div class="flex flex-col my-1">
+                            <label for="vehicle-name">Vehicle Name</label>
                             {{ vehicle_form.vehicle_name }}
                             {% if vehicle_form.vehicle_name.errors %}
                                 <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ vehicle_form.vehicle_name.errors.0 }}</div>
                             {% endif %}
                         </div>
-                        <div class="flex flex-col h-[70px]">
-                            <label for="vehicle-color">vehicle color</label>
+                        <div class="flex flex-col my-1">
+                            <label for="vehicle-color">Vehicle Color</label>
                             {{ vehicle_form.vehicle_color }}
                             {% if vehicle_form.vehicle_color.errors %}
                                 <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ vehicle_form.vehicle_color.errors.0 }}</div>
@@ -171,8 +171,8 @@
                         </div>
                     </div>
                     <div id="right" class="w-full">
-                        <div class="flex flex-col h-[70px] mx-5">
-                            <label for="plate-number">plate number</label>
+                        <div class="flex flex-col my-1 mx-5">
+                            <label for="plate-number">Plate Number</label>
                             {{ vehicle_form.plate_number }}
                             {% if vehicle_form.plate_number.errors %}
                                 <div class="text-[#e74c3c] text-xs font-bold m-3 block">{{ vehicle_form.plate_number.errors.0 }}</div>

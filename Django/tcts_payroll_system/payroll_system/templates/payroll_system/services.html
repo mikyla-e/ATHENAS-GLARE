@@ -14,17 +14,17 @@
 
 <!--page content-->
 {% block content %}
-<div class="size-full px-2 flex flex-col items-center">
+<div class="size-full flex flex-col items-center">
     <div class="w-full h-[40px]">
-        <a class="size-full" href="{% url 'payroll_system:services_add' %}">
-            <button class="size-full px-4 font-bold text-[League Spartan] text-center" id="button">ADD SERVICES</button>
+        <a class="h-full w-full" href="{% url 'payroll_system:services_add' %}">
+            <button class="w-fit h-full px-4 font-bold text-[League Spartan] text-center" id="button" title="Add Services">ADD SERVICES</button>
         </a>
     </div>
     
     <div class="w-full h-auto my-5 flex justify-center items-center">
-        <div class="w-[90%] h-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 xl:gap-6">
+        <div class="w-[95%] h-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 xl:gap-6">
             {% for service in services %}
-            <div id="service" class="h-[200px] md:h-[250px] bg-white rounded-xl overflow-hidden shadow-lg/10">
+            <div id="service" class="h-[200px] md:h-[250px] bg-white rounded-xl overflow-hidden shadow-lg/10" title="{{ service.title }}">
                 <a class="no-underline" href="{% url 'payroll_system:services_client' %}?service_id={{ service.service_id }}">
                     <div id="picture" class="h-[70%] bg-[#1e1e1e]">
                         <img class="w-full h-full object-cover" src="{{ service.service_image.url }}" alt="{{ service.title }}">
