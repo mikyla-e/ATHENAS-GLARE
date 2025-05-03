@@ -6,6 +6,8 @@ from django.core.exceptions import ValidationError
 from datetime import date, datetime, time, timedelta, timezone
 from functools import lru_cache
 from payroll_system.models import Employee, Attendance
+from django.utils import timezone
+from django.core.exceptions import ValidationError    
 
 # Cache the face encodings to avoid reloading them for every frame
 @lru_cache(maxsize=1)
