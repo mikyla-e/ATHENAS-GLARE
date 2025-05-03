@@ -11,8 +11,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from django.views.decorators.csrf import csrf_protect
-from .forms import EmployeeForm, PayrollForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
-from .models import Employee, Payroll, Attendance, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
+from .forms import EmployeeForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
+from .models import Employee, PayrollPeriod, PayrollRecord, Attendance, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.views.decorators.http import require_POST
@@ -25,24 +25,24 @@ def dashboard(request):
     
     latest_attendance_subquery = (
         Attendance.objects
-        .filter(employee_id_fk=OuterRef('pk'))
+        .filter(employee=OuterRef('pk'))
         .order_by('-date')
         .values('date')[:1]
     )
 
-    latest_payroll_status_subquery = (
-        Payroll.objects
-        .filter(employee_id_fk=OuterRef('pk'))
-        .order_by('-payment_date')
-        .values('payroll_status')[:1]
-    )
+    # latest_payroll_status_subquery = (
+    #     Payroll.objects
+    #     .filter(employee_id_fk=OuterRef('pk'))
+    #     .order_by('-payment_date')
+    #     .values('payroll_status')[:1]
+    # )
     
-    latest_payroll_rate_subquery = (
-        Payroll.objects
-        .filter(employee_id_fk=OuterRef('pk'))
-        .order_by('-payment_date')
-        .values('salary')[:1]
-    )
+    # latest_payroll_rate_subquery = (
+    #     Payroll.objects
+    #     .filter(employee_id_fk=OuterRef('pk'))
+    #     .order_by('-payment_date')
+    #     .values('salary')[:1]
+    # )
 
     total_employees = Employee.objects.count()
 
@@ -54,7 +54,7 @@ def dashboard(request):
     active_employees_per_day = (
         Attendance.objects.filter(date__range=[start_of_week, end_of_week])
         .values('date')
-        .annotate(active_count=Count('employee_id_fk', distinct=True))
+        .annotate(active_count=Count('employee', distinct=True))
     )
 
     # Calculate the average number of active employees within the week
@@ -63,52 +63,52 @@ def dashboard(request):
 
     avg_active_employees = total_active_counts / days_counted
     
-    employees_with_latest_payroll = Employee.objects.annotate(
-        latest_payroll_status=Subquery(latest_payroll_status_subquery)
-    )
+    # employees_with_latest_payroll = Employee.objects.annotate(
+    #     latest_payroll_status=Subquery(latest_payroll_status_subquery)
+    # )
     
-    processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
+    # processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
     
-    pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
+    # pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
     
     # Calculate Total Payroll (Sum of all processed salaries)
-    total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']
+    #total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']
     
-    if total_payroll is None:
-        total_payroll = "No total payroll yet"
+    # if total_payroll is None:
+    #     total_payroll = "No total payroll yet"
     
     # Add next payday calculation too
     today = now().date()
-    next_payday = Payroll.objects.filter(payment_date__gt=today).aggregate(Min('payment_date'))['payment_date__min']
+    next_payday = PayrollPeriod.objects.filter(payment_date__gt=today).aggregate(Min('payment_date'))['payment_date__min']
 
     # Modified: Get employees ordered by most recent time-in (attendance date)
-    recent_employees = (
-        Employee.objects
-        .annotate(
-            latest_attendance_date=Subquery(latest_attendance_subquery),
-            latest_payroll_status=Subquery(latest_payroll_status_subquery),
-            latest_payroll_rate=Subquery(latest_payroll_rate_subquery)
-        )
-        .order_by('-latest_attendance_date', 'last_name')[:5] # Order by most recent attendance date
-    )
+    # recent_employees = (
+    #     Employee.objects
+    #     .annotate(
+    #         latest_attendance_date=Subquery(latest_attendance_subquery),
+    #         latest_payroll_status=Subquery(latest_payroll_status_subquery),
+    #         latest_payroll_rate=Subquery(latest_payroll_rate_subquery)
+    #     )
+    #     .order_by('-latest_attendance_date', 'last_name')[:5] # Order by most recent attendance date
+    # )
 
     histories = History.objects.order_by('-date_time')
 
     # Calculate the total payment correctly using the rate/salary
-    for employee in recent_employees:
-        if employee.latest_payroll_rate:
-            employee.total_payment = f"₱{employee.latest_payroll_rate:.2f}"
-        else:
-            employee.total_payment = "₱0.00"
+    # for employee in recent_employees:
+    #     if employee.latest_payroll_rate:
+    #         employee.total_payment = f"₱{employee.latest_payroll_rate:.2f}"
+    #     else:
+    #         employee.total_payment = "₱0.00"
      
     context = { 
         'histories': histories,
-        'employees': recent_employees,
+        # 'employees': recent_employees,
         'total_employees': total_employees,
         'avg_active_employees': round(avg_active_employees),
-        'processed_payroll_count': processed_payroll_count,
-        'pending_payroll_count': pending_payroll_count,
-        'total_payroll': total_payroll,
+        # 'processed_payroll_count': processed_payroll_count,
+        # 'pending_payroll_count': pending_payroll_count,
+        # 'total_payroll': total_payroll,
         'next_payday': next_payday,
     }
     return render(request, 'payroll_system/dashboard.html', context)
@@ -194,7 +194,7 @@ def employee_picture(request):
                 del request.session['employee_form_data']
                 
                 messages.success(request, "Employee registered successfully!")
-                return redirect('payroll_system:payroll_individual', employee_id=employee.employee_id)
+                return redirect('payroll_system:employee_profile', employee_id=employee.employee_id)
             else:
                 messages.error(request, "Error in form data. Please try again.")
                 return redirect('payroll_system:employee_registration')
@@ -205,27 +205,18 @@ def employee_picture(request):
 
 @login_required
 def employees(request):
-    #new
     query = request.GET.get('q', '')
 
     latest_attendance_subquery = (
         Attendance.objects
-        .filter(employee_id_fk=OuterRef('pk'))
+        .filter(employee=OuterRef('pk'))
         .order_by('-date')
         .values('date')[:1]
     )
 
-    latest_payroll_subquery = (
-        Payroll.objects
-        .filter(employee_id_fk=OuterRef('pk'))
-        .order_by('-payment_date')
-        .values('payroll_status')[:1]
-    )
-
     # Base QuerySet with annotations
     employees = Employee.objects.annotate(
-        latest_attendance_date=Subquery(latest_attendance_subquery),
-        latest_payroll_status=Subquery(latest_payroll_subquery)
+        latest_attendance_date=Subquery(latest_attendance_subquery)
     )
 
     # Apply search filter if query exists
@@ -251,7 +242,7 @@ def employees(request):
 
 @login_required
 def employee_profile(request, employee_id):
-    employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
+    employee = Employee.objects.prefetch_related('attendances').get(employee_id=employee_id)
     
     if request.method == 'POST' and 'add_attendance' in request.POST:
         date = request.POST.get('date')
@@ -260,7 +251,7 @@ def employee_profile(request, employee_id):
         
         try:
             # Create attendance object but don't save yet
-            attendance = Attendance(employee_id_fk=employee, date=date, time_in=time_in, time_out=time_out)
+            attendance = Attendance(employee=employee, date=date, time_in=time_in, time_out=time_out)
             
             # This will run the clean method and validate work hours
             attendance.save()
@@ -271,7 +262,6 @@ def employee_profile(request, employee_id):
             messages.success(request, 'Attendance added successfully!')
             return redirect('payroll_system:employee_profile', employee_id=employee_id)
         except ValidationError as e:
-            # Handle validation errors explicitly
             messages.error(request, f'Validation error: {e}')
         except Exception as e:
             messages.error(request, f'Error adding attendance: {str(e)}')
@@ -285,12 +275,11 @@ def employee_profile(request, employee_id):
             time_in = request.POST.get('time_in')
             time_out = request.POST.get('time_out') or None
 
-            attendance = get_object_or_404(Attendance, attendance_id=attendance_id, employee_id_fk=employee)
+            attendance = get_object_or_404(Attendance, attendance_id=attendance_id, employee=employee)
             attendance.date = date
             attendance.time_in = time_in
             attendance.time_out = time_out
             
-            # This will run validation through clean() method
             attendance.save()
             
             if time_out:
@@ -298,56 +287,51 @@ def employee_profile(request, employee_id):
                 
             messages.success(request, 'Attendance updated successfully!')
         except ValidationError as e:
-            # Handle validation errors explicitly
             messages.error(request, f'Validation error: {e}')
         except Exception as e:
             messages.error(request, f'Error updating attendance: {str(e)}')
         
         return redirect('payroll_system:employee_profile', employee_id=employee_id)
     
-    employee.update_attendance_stats()
+    # employee.update_attendance_stats()
     employee.refresh_from_db()
     
     # Get latest attendance and calculate hours worked
     latest_attendance = employee.attendances.order_by('-date').first()
     if latest_attendance:
         latest_attendance.calculate_hours_worked()  
-
-    latest_payroll = employee.payrolls.order_by('-payment_date').first()
-    payroll_status = latest_payroll.payroll_status if latest_payroll else "No Payroll Data"
     
     context = {
         'employee': employee,
         'latest_attendance': latest_attendance,
-        'payroll_status': payroll_status
     }
     
     return render(request, 'payroll_system/employee_profile.html', context)
 
 @login_required
 def payrolls(request):
-    employees = Employee.objects.prefetch_related('payrolls', 'attendances').all()
+    employees = Employee.objects.prefetch_related('payrollperiod', 'payrollrecords', 'attendances').all()
     
     query = request.GET.get('q', '')
     
     latest_attendance_subquery = (
         Attendance.objects
-        .filter(employee_id_fk=OuterRef('pk'))
+        .filter(employee=OuterRef('pk'))
         .order_by('-date')
         .values('date')[:1]
     )
     
-    latest_payroll_subquery = (
-        Payroll.objects
-        .filter(employee_id_fk=OuterRef('pk'))
-        .order_by('-payment_date')
-        .values('payroll_status')[:1]
-    )
+    # latest_payroll_subquery = (
+    #     Payroll.objects
+    #     .filter(employee_id_fk=OuterRef('pk'))
+    #     .order_by('-payment_date')
+    #     .values('payroll_status')[:1]
+    # )
     
-    employees = Employee.objects.annotate(
-        latest_attendance_date=Subquery(latest_attendance_subquery),
-        latest_payroll_status=Subquery(latest_payroll_subquery)
-    )
+    # employees = Employee.objects.annotate(
+    #     latest_attendance_date=Subquery(latest_attendance_subquery),
+    #     latest_payroll_status=Subquery(latest_payroll_subquery)
+    # )
     
     if query:
         employees = employees.filter(
@@ -361,8 +345,8 @@ def payrolls(request):
     total_employees = employees.count()
     
     # Count employees with different payroll statuses
-    processed_payroll_count = employees.filter(latest_payroll_status='PROCESSED').count()
-    pending_payroll_count = employees.filter(latest_payroll_status='PENDING').count()
+    # processed_payroll_count = employees.filter(latest_payroll_status='PROCESSED').count()
+    # pending_payroll_count = employees.filter(latest_payroll_status='PENDING').count()
     
     # Calculate the next Saturday for the payday
     today = now().date()
@@ -406,80 +390,80 @@ def payrolls(request):
     active_employees_per_day = (
         Attendance.objects.filter(date__range=[start_of_week, end_of_week])
         .values('date')
-        .annotate(active_count=Count('employee_id_fk', distinct=True))
+        .annotate(active_count=Count('employee', distinct=True))
     )
 
     total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
     days_counted = len(active_employees_per_day) or 1  # Avoid division by zero
     avg_active_employees = total_active_counts / days_counted
 
-    employees_with_latest_payroll = Employee.objects.annotate(latest_payroll_status=Subquery(latest_payroll_subquery))
+    # employees_with_latest_payroll = Employee.objects.annotate(latest_payroll_status=Subquery(latest_payroll_subquery))
 
-    processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
-    pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
+    # processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
+    # pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
     
     # Calculate Total Payroll (Sum of all processed salaries)
-    total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']
+    # total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']
 
-    if total_payroll is None:
-        total_payroll = "No total payroll yet"
+    # if total_payroll is None:
+    #     total_payroll = "No total payroll yet"
 
     # Get the earliest payment_date from PENDING payrolls
-    next_payday = Payroll.objects.filter(payroll_status='PENDING').aggregate(Min('payment_date'))['payment_date__min']
+    # next_payday = Payroll.objects.filter(payroll_status='PENDING').aggregate(Min('payment_date'))['payment_date__min']
 
-    if next_payday:
-        formatted_payday = next_payday.strftime('%m/%d/%Y')
-        day_of_week = next_payday.strftime('%a').upper()
-        current_payday = f"{formatted_payday}, {day_of_week}"
-    else:
-        current_payday = "XX/XX/XXXX, SAT"
+    # if next_payday:
+    #     formatted_payday = next_payday.strftime('%m/%d/%Y')
+    #     day_of_week = next_payday.strftime('%a').upper()
+    #     current_payday = f"{formatted_payday}, {day_of_week}"
+    # else:
+    #     current_payday = "XX/XX/XXXX, SAT"
 
 
-    avg_rate = Payroll.objects.filter(rate__gt=0).aggregate(Avg('rate'))['rate__avg']
+    # avg_rate = Payroll.objects.filter(rate__gt=0).aggregate(Avg('rate'))['rate__avg']
 
-    if avg_rate is None:
-        avg_rate = "No rate data"
+    # if avg_rate is None:
+    #     avg_rate = "No rate data"
         
     # Calculate Total Payroll for current and previous month
-    current_total_payroll = Payroll.objects.filter(
-        payroll_status='PROCESSED',
-        payment_date__gte=current_month_start,
-        payment_date__lte=today
-    ).aggregate(Sum('salary'))['salary__sum'] or 0
+    # current_total_payroll = Payroll.objects.filter(
+    #     payroll_status='PROCESSED',
+    #     payment_date__gte=current_month_start,
+    #     payment_date__lte=today
+    # ).aggregate(Sum('salary'))['salary__sum'] or 0
 
-    previous_total_payroll = Payroll.objects.filter(
-        payroll_status='PROCESSED',
-        payment_date__gte=previous_month_start,
-        payment_date__lte=previous_month_end
-    ).aggregate(Sum('salary'))['salary__sum'] or 0
+    # previous_total_payroll = Payroll.objects.filter(
+    #     payroll_status='PROCESSED',
+    #     payment_date__gte=previous_month_start,
+    #     payment_date__lte=previous_month_end
+    # ).aggregate(Sum('salary'))['salary__sum'] or 0
 
-    # Calculate percentage change for total payroll
-    payroll_percentage = 0
-    if previous_total_payroll > 0:
-        payroll_percentage = ((current_total_payroll - previous_total_payroll) / previous_total_payroll) * 100
+    # # Calculate percentage change for total payroll
+    # payroll_percentage = 0
+    # if previous_total_payroll > 0:
+    #     payroll_percentage = ((current_total_payroll - previous_total_payroll) / previous_total_payroll) * 100
 
     # Calculate Average Rate for current and previous month
-    current_avg_rate = Payroll.objects.filter(
-        rate__gt=0,
-        payment_date__gte=current_month_start,
-        payment_date__lte=today
-    ).aggregate(Avg('rate'))['rate__avg'] or 0
+    # current_avg_rate = Payroll.objects.filter(
+    #     rate__gt=0,
+    #     payment_date__gte=current_month_start,
+    #     payment_date__lte=today
+    # ).aggregate(Avg('rate'))['rate__avg'] or 0
 
-    previous_avg_rate = Payroll.objects.filter(
-        rate__gt=0,
-        payment_date__gte=previous_month_start,
-        payment_date__lte=previous_month_end
-    ).aggregate(Avg('rate'))['rate__avg'] or 0
+    # previous_avg_rate = Payroll.objects.filter(
+    #     rate__gt=0,
+    #     payment_date__gte=previous_month_start,
+    #     payment_date__lte=previous_month_end
+    # ).aggregate(Avg('rate'))['rate__avg'] or 0
 
-    rate_percentage = 0
-    if previous_avg_rate > 0:
-        rate_percentage = ((current_avg_rate - previous_avg_rate) / previous_avg_rate) * 100
+    # rate_percentage = 0
+    # if previous_avg_rate > 0:
+    #     rate_percentage = ((current_avg_rate - previous_avg_rate) / previous_avg_rate) * 100
 
-    # Format the next payday for display
-    formatted_payday = next_payday.strftime('%m/%d/%Y')
-    day_of_week = next_payday.strftime('%a').upper()
-    formatted_payday_display = f"{formatted_payday}, {day_of_week}"
-    current_payday = formatted_payday_display
+    # # Format the next payday for display
+    # formatted_payday = next_payday.strftime('%m/%d/%Y')
+    # day_of_week = next_payday.strftime('%a').upper()
+    # formatted_payday_display = f"{formatted_payday}, {day_of_week}"
+    # current_payday = formatted_payday_display
 
     # Pass all data to the template
     try:
@@ -487,32 +471,32 @@ def payrolls(request):
             'employee_data': employee_data,
             'total_employees': total_employees,
             'avg_active_employees': round(avg_active_employees),
-            'processed_payroll_count': processed_payroll_count,
-            'pending_payroll_count': pending_payroll_count,
-            'total_payroll': total_payroll,  
-            'previous_total_payroll': previous_total_payroll,
-            'payroll_percentage': payroll_percentage,
-            'next_payday': next_payday,  
-            'formatted_payday': formatted_payday_display,
-            'current_payday': current_payday,
-            'previous_avg_rate': previous_avg_rate,
-            'rate_percentage': rate_percentage,
-            'avg_rate': current_avg_rate,
+            # 'processed_payroll_count': processed_payroll_count,
+            # 'pending_payroll_count': pending_payroll_count,
+            # 'total_payroll': total_payroll,  
+            # # 'previous_total_payroll': previous_total_payroll,
+            # # 'payroll_percentage': payroll_percentage,
+            # # 'next_payday': next_payday,  
+            # 'formatted_payday': formatted_payday_display,
+            # 'current_payday': current_payday,
+            # 'previous_avg_rate': previous_avg_rate,
+            # 'rate_percentage': rate_percentage,
+            # 'avg_rate': current_avg_rate,
             'query': query,
         }
     except Exception as e:
         print(f"Error creating context: {e}")
         context = {
-            'processed_payroll_count': processed_payroll_count,
-            'pending_payroll_count': pending_payroll_count,
-            'total_payroll': total_payroll,  
-            'previous_total_payroll': previous_total_payroll,
-            'payroll_percentage': payroll_percentage,
-            'next_payday': next_payday,
-            'formatted_payday': formatted_payday_display,
-            'previous_avg_rate': previous_avg_rate,
-            'rate_percentage': rate_percentage,
-            'avg_rate': current_avg_rate,
+            # 'processed_payroll_count': processed_payroll_count,
+            # 'pending_payroll_count': pending_payroll_count,
+            # 'total_payroll': total_payroll,  
+            # 'previous_total_payroll': previous_total_payroll,
+            # 'payroll_percentage': payroll_percentage,
+            # 'next_payday': next_payday,
+            # 'formatted_payday': formatted_payday_display,
+            # 'previous_avg_rate': previous_avg_rate,
+            # 'rate_percentage': rate_percentage,
+            # 'avg_rate': current_avg_rate,
             'query': query,
         }
 
@@ -601,7 +585,7 @@ def update_employee_incentives(request, employee_id):
             end_of_week = start_of_week + timedelta(days=6)  # Sunday
             
             weekly_attendance_count = Attendance.objects.filter(
-                employee_id_fk=employee,
+                employee=employee,
                 date__range=[start_of_week, end_of_week],
                 attendance_status='Present'
             ).count()
@@ -645,64 +629,64 @@ def update_employee_incentives(request, employee_id):
     # If not POST, redirect back to the payroll page
     return redirect('payroll_system:payroll_individual', employee_id=employee_id)
 
-@login_required
-def confirm_payroll(request):
-    if request.method == 'POST':
-        try:
-            # Find all pending payrolls
-            pending_payrolls = Payroll.objects.filter(payroll_status='PENDING')
+# @login_required
+# def confirm_payroll(request):
+#     if request.method == 'POST':
+#         try:
+#             # Find all pending payrolls
+#             # pending_payrolls = Payroll.objects.filter(payroll_status='PENDING')
             
-            # Calculate the next payment date for the new payroll
-            today = now().date()
-            temp_payroll = Payroll()  # Temporary instance to use the method
+#             # # Calculate the next payment date for the new payroll
+#             # today = now().date()
+#             # temp_payroll = Payroll()  # Temporary instance to use the method
             
-            # Default to Saturday (5), but this could be configurable via settings or form
-            payment_weekday = 5  # 0=Monday, 5=Saturday, 6=Sunday
-            next_payment_date = temp_payroll.get_next_payment_date(today, payment_weekday)
+#             # Default to Saturday (5), but this could be configurable via settings or form
+#             payment_weekday = 5  # 0=Monday, 5=Saturday, 6=Sunday
+#             next_payment_date = temp_payroll.get_next_payment_date(today, payment_weekday)
             
-            # Process all the pending payrolls first
-            processed_payrolls = []
-            for payroll in pending_payrolls:
-                # Store the cash advance amount for later use
-                cash_advance_amount = payroll.cash_advance
-                employee = payroll.employee_id_fk
+#             # Process all the pending payrolls first
+#             processed_payrolls = []
+#             for payroll in pending_payrolls:
+#                 # Store the cash advance amount for later use
+#                 cash_advance_amount = payroll.cash_advance
+#                 employee = payroll.employee_id_fk
                 
-                # Update the payroll status to PROCESSED but keep the cash_advance value
-                payroll.payroll_status = 'PROCESSED'
-                payroll.save()
+#                 # Update the payroll status to PROCESSED but keep the cash_advance value
+#                 payroll.payroll_status = 'PROCESSED'
+#                 payroll.save()
                 
-                # Store information needed for creating new payrolls
-                processed_payrolls.append({
-                    'employee': employee,
-                    'rate': payroll.rate,
-                    'cash_advance': cash_advance_amount
-                })
+#                 # Store information needed for creating new payrolls
+#                 processed_payrolls.append({
+#                     'employee': employee,
+#                     'rate': payroll.rate,
+#                     'cash_advance': cash_advance_amount
+#                 })
             
-            # Now create new payrolls with cash advance transferred to deductions
-            for payroll_info in processed_payrolls:
-                # Create a new payroll with the cash advance as deductions
-                new_payroll = Payroll(
-                    rate=payroll_info['rate'],  # Keep the same rate
-                    incentives=0,  # Reset incentives
-                    payroll_status='PENDING',  # Set status to PENDING
-                    deductions=payroll_info['cash_advance'],  # Transfer cash advance to deductions
-                    salary=0,  # Reset salary
-                    cash_advance=0,  # Start with zero cash advance
-                    payment_date=next_payment_date,  # Set payment date to next payment day
-                    employee_id_fk=payroll_info['employee']  # Keep the same employee
-                )
-                new_payroll.save()
+#             # Now create new payrolls with cash advance transferred to deductions
+#             for payroll_info in processed_payrolls:
+#                 # Create a new payroll with the cash advance as deductions
+#                 new_payroll = Payroll(
+#                     rate=payroll_info['rate'],  # Keep the same rate
+#                     incentives=0,  # Reset incentives
+#                     payroll_status='PENDING',  # Set status to PENDING
+#                     deductions=payroll_info['cash_advance'],  # Transfer cash advance to deductions
+#                     salary=0,  # Reset salary
+#                     cash_advance=0,  # Start with zero cash advance
+#                     payment_date=next_payment_date,  # Set payment date to next payment day
+#                     employee_id_fk=payroll_info['employee']  # Keep the same employee
+#                 )
+#                 new_payroll.save()
             
-            # Log history
-            History.objects.create(description=f"Payroll confirmed. Cash advances transferred to next payroll's deductions.")
+#             # Log history
+#             History.objects.create(description=f"Payroll confirmed. Cash advances transferred to next payroll's deductions.")
             
-            return redirect('payroll_system:payrolls')
-        except Exception as e:
-            messages.error(request, f'Error confirming payroll: {e}')
-            # Return to payroll page with error message
-            return redirect('payroll_system:payrolls')
+#             return redirect('payroll_system:payrolls')
+#         except Exception as e:
+#             messages.error(request, f'Error confirming payroll: {e}')
+#             # Return to payroll page with error message
+#             return redirect('payroll_system:payrolls')
     
-    return redirect('payroll_system:payrolls')
+#     return redirect('payroll_system:payrolls')
 
 @login_required
 def payroll_individual(request, employee_id):
@@ -766,104 +750,104 @@ def payroll_individual(request, employee_id):
         'attendance_count': weekly_attendance
     })
 
-@login_required
-def payroll_edit(request, employee_id):
-    employee = Employee.objects.get(employee_id=employee_id)
-    today = timezone.now().date()
+# @login_required
+# def payroll_edit(request, employee_id):
+#     employee = Employee.objects.get(employee_id=employee_id)
+#     today = timezone.now().date()
     
-    # Get an active pending payroll, or create a new one
-    try:
-        payroll = Payroll.objects.get(
-            employee_id_fk=employee,
-            payment_date__gte=today,
-            payroll_status=Payroll.PayrollStatus.PENDING  # Only get PENDING payrolls
-        )
-    except Payroll.DoesNotExist:
-        # If no pending payroll exists, try to get the most recent one as a starting point
-        payroll = Payroll(employee_id_fk=employee)
+#     # Get an active pending payroll, or create a new one
+#     try:
+#         payroll = Payroll.objects.get(
+#             employee_id_fk=employee,
+#             payment_date__gte=today,
+#             payroll_status=Payroll.PayrollStatus.PENDING  # Only get PENDING payrolls
+#         )
+#     except Payroll.DoesNotExist:
+#         # If no pending payroll exists, try to get the most recent one as a starting point
+#         payroll = Payroll(employee_id_fk=employee)
         
-        # Payment date will be set to next Saturday automatically in the save method
+#         # Payment date will be set to next Saturday automatically in the save method
         
-        # Copy data from the most recent payroll if it exists
-        try:
-            prev_payroll = Payroll.objects.filter(
-                employee_id_fk=employee
-            ).latest('payment_date')
+#         # Copy data from the most recent payroll if it exists
+#         try:
+#             prev_payroll = Payroll.objects.filter(
+#                 employee_id_fk=employee
+#             ).latest('payment_date')
             
-            # Copy relevant fields
-            payroll.rate = prev_payroll.rate
-            payroll.incentives = prev_payroll.incentives
-            payroll.payroll_status = Payroll.PayrollStatus.PENDING  
-        except Payroll.DoesNotExist:
-            # First payroll for this employee, use defaults
-            pass
-    except Payroll.MultipleObjectsReturned:
-        # If multiple pending payrolls exist, get the most recent one
-        payroll = Payroll.objects.filter(
-            employee_id_fk=employee,
-            payment_date__gte=today,
-            payroll_status=Payroll.PayrollStatus.PENDING
-        ).order_by('-payment_date').first()
+#             # Copy relevant fields
+#             payroll.rate = prev_payroll.rate
+#             payroll.incentives = prev_payroll.incentives
+#             payroll.payroll_status = Payroll.PayrollStatus.PENDING  
+#         except Payroll.DoesNotExist:
+#             # First payroll for this employee, use defaults
+#             pass
+#     except Payroll.MultipleObjectsReturned:
+#         # If multiple pending payrolls exist, get the most recent one
+#         payroll = Payroll.objects.filter(
+#             employee_id_fk=employee,
+#             payment_date__gte=today,
+#             payroll_status=Payroll.PayrollStatus.PENDING
+#         ).order_by('-payment_date').first()
     
-    if request.method == 'POST':
-        # Check if this is a cash advance submission
-        if 'cash_advance' in request.POST and request.POST.get('number'):
-            try:
-                cash_amount = float(request.POST.get('number', 0))
-                if cash_amount > 0:
-                    payroll.cash_advance += cash_amount
-                    payroll.save()
-                    messages.success(request, f"Cash advance of ₱{cash_amount:,.2f} added successfully.")
-                else:
-                    messages.error(request, "Cash advance amount must be greater than zero.")
-            except ValueError:
-                messages.error(request, "Invalid cash advance amount.")
+#     if request.method == 'POST':
+#         # Check if this is a cash advance submission
+#         if 'cash_advance' in request.POST and request.POST.get('number'):
+#             try:
+#                 cash_amount = float(request.POST.get('number', 0))
+#                 if cash_amount > 0:
+#                     payroll.cash_advance += cash_amount
+#                     payroll.save()
+#                     messages.success(request, f"Cash advance of ₱{cash_amount:,.2f} added successfully.")
+#                 else:
+#                     messages.error(request, "Cash advance amount must be greater than zero.")
+#             except ValueError:
+#                 messages.error(request, "Invalid cash advance amount.")
             
-            return redirect('payroll_system:payroll_edit', employee_id=employee_id)
-        # Check if this is a payment date change
-        elif 'payment_date' in request.POST and request.POST.get('payment_date'):
-            try:
-                new_date = datetime.strptime(request.POST.get('payment_date'), '%Y-%m-%d').date()
-                if new_date >= today:
-                    payroll.payment_date = new_date
-                    payroll.save()
-                    messages.success(request, f"Payment date updated to {new_date.strftime('%Y-%m-%d')}.")
-                else:
-                    messages.error(request, "Payment date cannot be in the past.")
-            except ValueError:
-                messages.error(request, "Invalid date format.")
+#             return redirect('payroll_system:payroll_edit', employee_id=employee_id)
+#         # Check if this is a payment date change
+#         elif 'payment_date' in request.POST and request.POST.get('payment_date'):
+#             try:
+#                 new_date = datetime.strptime(request.POST.get('payment_date'), '%Y-%m-%d').date()
+#                 if new_date >= today:
+#                     payroll.payment_date = new_date
+#                     payroll.save()
+#                     messages.success(request, f"Payment date updated to {new_date.strftime('%Y-%m-%d')}.")
+#                 else:
+#                     messages.error(request, "Payment date cannot be in the past.")
+#             except ValueError:
+#                 messages.error(request, "Invalid date format.")
                 
-            return redirect('payroll_system:payroll_edit', employee_id=employee_id)
-        else:
-            # Regular payroll form submission
-            form = PayrollForm(request.POST, instance=payroll)
-            if form.is_valid():
-                form.save()  # This will trigger the salary calculation in the model's save method
+#             return redirect('payroll_system:payroll_edit', employee_id=employee_id)
+#         else:
+#             # Regular payroll form submission
+#             form = PayrollForm(request.POST, instance=payroll)
+#             if form.is_valid():
+#                 form.save()  # This will trigger the salary calculation in the model's save method
                 
-                # Log the history
-                History.objects.create(description=f"Payroll for {employee.first_name} {employee.last_name} ({employee.employee_id}) was updated.")
+#                 # Log the history
+#                 History.objects.create(description=f"Payroll for {employee.first_name} {employee.last_name} ({employee.employee_id}) was updated.")
                 
-                return redirect('payroll_system:payroll_individual', employee_id=employee_id)
-    else:
-        form = PayrollForm(instance=payroll)
+#                 return redirect('payroll_system:payroll_individual', employee_id=employee_id)
+#     else:
+#         form = PayrollForm(instance=payroll)
 
-    # Get the latest payroll for display purposes
-    latest_payroll = employee.payrolls.order_by('-payment_date').first()
+#     # Get the latest payroll for display purposes
+#     latest_payroll = employee.payrolls.order_by('-payment_date').first()
     
-    # Get current week's Monday for context display
-    current_weekday = payroll.payment_date.weekday()
-    monday_of_week = payroll.payment_date - timedelta(days=current_weekday)
-    sunday_of_week = monday_of_week + timedelta(days=6)
+#     # Get current week's Monday for context display
+#     current_weekday = payroll.payment_date.weekday()
+#     monday_of_week = payroll.payment_date - timedelta(days=current_weekday)
+#     sunday_of_week = monday_of_week + timedelta(days=6)
     
-    context = {
-        'form': form,
-        'employee': employee,
-        'latest_payroll': latest_payroll,
-        'week_start': monday_of_week,
-        'week_end': sunday_of_week,
-        'today': today
-    }
-    return render(request, 'payroll_system/payroll_edit.html', context)
+#     context = {
+#         'form': form,
+#         'employee': employee,
+#         'latest_payroll': latest_payroll,
+#         'week_start': monday_of_week,
+#         'week_end': sunday_of_week,
+#         'today': today
+#     }
+#     return render(request, 'payroll_system/payroll_edit.html', context)
 
 @login_required
 def services(request):
@@ -1129,21 +1113,21 @@ def status(request):
     if request.method == 'POST':
         task_id = request.POST.get('task_id')
         
-        if task_id and task_id != 'undefined':
-            task = get_object_or_404(Task, task_id=task_id)
+        # if task_id and task_id != 'undefined':
+        #     task = get_object_or_404(Task, task_id=task_id)
             
-            if 'incentives' in request.POST:
-                amount = request.POST.get('number')
-                if amount and float(amount) > 0:
-                    payroll = Payroll.objects.filter(employee_id_fk=task.employee).latest('payment_date')
+        #     if 'incentives' in request.POST:
+        #         amount = request.POST.get('number')
+        #         if amount and float(amount) > 0:
+        #             payroll = Payroll.objects.filter(employee_id_fk=task.employee).latest('payment_date')
                     
-                    payroll.incentives = payroll.incentives + float(amount)
-                    payroll.save()
+        #             payroll.incentives = payroll.incentives + float(amount)
+        #             payroll.save()
                     
-                task.task_status = 'Completed'
-                task.save()
+        #         task.task_status = 'Completed'
+        #         task.save()
                 
-                return redirect('payroll_system:status')
+        #         return redirect('payroll_system:status')
     
     tasks = Task.objects.all().order_by('-created_at')
     context = {
@@ -1208,213 +1192,213 @@ def customer_edit(request, customer_id):
     
     return render(request, 'payroll_system/customer_edit.html', context)
 
-@login_required
-def print(request):
-    employees = Employee.objects.prefetch_related('payrolls', 'attendances').all()
+# @login_required
+# def print(request):
+#     employees = Employee.objects.prefetch_related('payrolls', 'attendances').all()
     
-    query = request.GET.get('q', '')
+#     query = request.GET.get('q', '')
     
-    latest_attendance_subquery = (
-        Attendance.objects
-        .filter(employee_id_fk=OuterRef('pk'))
-        .order_by('-date')
-        .values('date')[:1]
-    )
+#     latest_attendance_subquery = (
+#         Attendance.objects
+#         .filter(employee_id_fk=OuterRef('pk'))
+#         .order_by('-date')
+#         .values('date')[:1]
+#     )
     
-    latest_payroll_subquery = (
-        Payroll.objects
-        .filter(employee_id_fk=OuterRef('pk'))
-        .order_by('-payment_date')
-        .values('payroll_status')[:1]
-    )
+#     # latest_payroll_subquery = (
+#     #     Payroll.objects
+#     #     .filter(employee_id_fk=OuterRef('pk'))
+#     #     .order_by('-payment_date')
+#     #     .values('payroll_status')[:1]
+#     # )
     
-    employees = Employee.objects.annotate(
-        latest_attendance_date=Subquery(latest_attendance_subquery),
-        latest_payroll_status=Subquery(latest_payroll_subquery)
-    )
+#     # employees = Employee.objects.annotate(
+#     #     latest_attendance_date=Subquery(latest_attendance_subquery),
+#     #     latest_payroll_status=Subquery(latest_payroll_subquery)
+#     # )
     
-    if query:
-        employees = employees.filter(
-            first_name__icontains=query
-        ) | employees.filter(
-            last_name__icontains=query
-        ) | employees.filter(
-            employee_id__icontains=query
-        )
+#     if query:
+#         employees = employees.filter(
+#             first_name__icontains=query
+#         ) | employees.filter(
+#             last_name__icontains=query
+#         ) | employees.filter(
+#             employee_id__icontains=query
+#         )
     
-    total_employees = employees.count()
+#     total_employees = employees.count()
     
-    # Count employees with different payroll statuses
-    processed_payroll_count = employees.filter(latest_payroll_status='PROCESSED').count()
-    pending_payroll_count = employees.filter(latest_payroll_status='PENDING').count()
+#     # Count employees with different payroll statuses
+#     processed_payroll_count = employees.filter(latest_payroll_status='PROCESSED').count()
+#     pending_payroll_count = employees.filter(latest_payroll_status='PENDING').count()
     
-    # Calculate the next Saturday for the payday
-    today = now().date()
-    days_until_saturday = (5 - today.weekday()) % 7  # 5 is Saturday
-    next_saturday = today + timedelta(days=days_until_saturday)
+#     # Calculate the next Saturday for the payday
+#     today = now().date()
+#     days_until_saturday = (5 - today.weekday()) % 7  # 5 is Saturday
+#     next_saturday = today + timedelta(days=days_until_saturday)
     
-    # Get the start and end of the current week (Monday to Sunday)
-    start_of_week = today - timedelta(days=today.weekday())  # Monday
-    end_of_week = start_of_week + timedelta(days=6)  # Sunday
+#     # Get the start and end of the current week (Monday to Sunday)
+#     start_of_week = today - timedelta(days=today.weekday())  # Monday
+#     end_of_week = start_of_week + timedelta(days=6)  # Sunday
     
-    # Get payroll data for each employee with calculated salary
-    employee_data = []
-    try:
-        for employee in employees:
-            latest_payroll = employee.payrolls.order_by('-payment_date').first()
+#     # Get payroll data for each employee with calculated salary
+#     employee_data = []
+#     try:
+#         for employee in employees:
+#             latest_payroll = employee.payrolls.order_by('-payment_date').first()
             
-            if latest_payroll:
-                # Count attendance for the current week
-                weekly_attendance_count = Attendance.objects.filter(
-                    employee_id_fk=employee,
-                    date__range=[start_of_week, end_of_week],
-                    attendance_status='Present'
-                ).count()
+#             if latest_payroll:
+#                 # Count attendance for the current week
+#                 weekly_attendance_count = Attendance.objects.filter(
+#                     employee_id_fk=employee,
+#                     date__range=[start_of_week, end_of_week],
+#                     attendance_status='Present'
+#                 ).count()
                 
-                # Calculate salary using the model method
-                latest_payroll.calculate_salary(weekly_attendance_count)
-                latest_payroll.save()  # Save the updated salary
+#                 # Calculate salary using the model method
+#                 latest_payroll.calculate_salary(weekly_attendance_count)
+#                 latest_payroll.save()  # Save the updated salary
             
-            employee_data.append({
-                'employee': employee,
-                'latest_payroll': latest_payroll
-            })
-    except Exception as e:
-        print(f"Error processing employee data: {e}")
+#             employee_data.append({
+#                 'employee': employee,
+#                 'latest_payroll': latest_payroll
+#             })
+#     except Exception as e:
+#         print(f"Error processing employee data: {e}")
     
-    # Calculate statistics for the dashboard
-    current_month_start = today.replace(day=1)
-    previous_month_end = current_month_start - timedelta(days=1)
-    previous_month_start = previous_month_end.replace(day=1)
+#     # Calculate statistics for the dashboard
+#     current_month_start = today.replace(day=1)
+#     previous_month_end = current_month_start - timedelta(days=1)
+#     previous_month_start = previous_month_end.replace(day=1)
 
-    active_employees_per_day = (
-        Attendance.objects.filter(date__range=[start_of_week, end_of_week])
-        .values('date')
-        .annotate(active_count=Count('employee_id_fk', distinct=True))
-    )
+#     active_employees_per_day = (
+#         Attendance.objects.filter(date__range=[start_of_week, end_of_week])
+#         .values('date')
+#         .annotate(active_count=Count('employee_id_fk', distinct=True))
+#     )
 
-    total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
-    days_counted = len(active_employees_per_day) or 1  # Avoid division by zero
-    avg_active_employees = total_active_counts / days_counted
+#     total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
+#     days_counted = len(active_employees_per_day) or 1  # Avoid division by zero
+#     avg_active_employees = total_active_counts / days_counted
 
-    employees_with_latest_payroll = Employee.objects.annotate(latest_payroll_status=Subquery(latest_payroll_subquery))
+#     employees_with_latest_payroll = Employee.objects.annotate(latest_payroll_status=Subquery(latest_payroll_subquery))
 
-    processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
-    pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
+#     processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
+#     pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
     
-    # Calculate Total Payroll (Sum of all processed salaries)
-    total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']
+#     # Calculate Total Payroll (Sum of all processed salaries)
+#     total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']
 
-    if total_payroll is None:
-        total_payroll = "No total payroll yet"
+#     if total_payroll is None:
+#         total_payroll = "No total payroll yet"
 
-    # Get the earliest payment_date from PENDING payrolls
-    next_payday = Payroll.objects.filter(payroll_status='PENDING').aggregate(Min('payment_date'))['payment_date__min']
+#     # Get the earliest payment_date from PENDING payrolls
+#     next_payday = Payroll.objects.filter(payroll_status='PENDING').aggregate(Min('payment_date'))['payment_date__min']
 
-    if next_payday:
-        formatted_payday = next_payday.strftime('%m/%d/%Y')
-        day_of_week = next_payday.strftime('%a').upper()
-        current_payday = f"{formatted_payday}, {day_of_week}"
-    else:
-        current_payday = "XX/XX/XXXX, SAT"
+#     if next_payday:
+#         formatted_payday = next_payday.strftime('%m/%d/%Y')
+#         day_of_week = next_payday.strftime('%a').upper()
+#         current_payday = f"{formatted_payday}, {day_of_week}"
+#     else:
+#         current_payday = "XX/XX/XXXX, SAT"
 
 
-    avg_rate = Payroll.objects.filter(rate__gt=0).aggregate(Avg('rate'))['rate__avg']
+#     avg_rate = Payroll.objects.filter(rate__gt=0).aggregate(Avg('rate'))['rate__avg']
 
-    if avg_rate is None:
-        avg_rate = "No rate data"
+#     if avg_rate is None:
+#         avg_rate = "No rate data"
         
-    # Calculate Total Payroll for current and previous month
-    current_total_payroll = Payroll.objects.filter(
-        payroll_status='PROCESSED',
-        payment_date__gte=current_month_start,
-        payment_date__lte=today
-    ).aggregate(Sum('salary'))['salary__sum'] or 0
+#     # Calculate Total Payroll for current and previous month
+#     current_total_payroll = Payroll.objects.filter(
+#         payroll_status='PROCESSED',
+#         payment_date__gte=current_month_start,
+#         payment_date__lte=today
+#     ).aggregate(Sum('salary'))['salary__sum'] or 0
 
-    previous_total_payroll = Payroll.objects.filter(
-        payroll_status='PROCESSED',
-        payment_date__gte=previous_month_start,
-        payment_date__lte=previous_month_end
-    ).aggregate(Sum('salary'))['salary__sum'] or 0
+#     previous_total_payroll = Payroll.objects.filter(
+#         payroll_status='PROCESSED',
+#         payment_date__gte=previous_month_start,
+#         payment_date__lte=previous_month_end
+#     ).aggregate(Sum('salary'))['salary__sum'] or 0
 
-    # Calculate percentage change for total payroll
-    payroll_percentage = 0
-    if previous_total_payroll > 0:
-        payroll_percentage = ((current_total_payroll - previous_total_payroll) / previous_total_payroll) * 100
+#     # Calculate percentage change for total payroll
+#     payroll_percentage = 0
+#     if previous_total_payroll > 0:
+#         payroll_percentage = ((current_total_payroll - previous_total_payroll) / previous_total_payroll) * 100
 
-    # Calculate Average Rate for current and previous month
-    current_avg_rate = Payroll.objects.filter(
-        rate__gt=0,
-        payment_date__gte=current_month_start,
-        payment_date__lte=today
-    ).aggregate(Avg('rate'))['rate__avg'] or 0
+#     # Calculate Average Rate for current and previous month
+#     current_avg_rate = Payroll.objects.filter(
+#         rate__gt=0,
+#         payment_date__gte=current_month_start,
+#         payment_date__lte=today
+#     ).aggregate(Avg('rate'))['rate__avg'] or 0
 
-    previous_avg_rate = Payroll.objects.filter(
-        rate__gt=0,
-        payment_date__gte=previous_month_start,
-        payment_date__lte=previous_month_end
-    ).aggregate(Avg('rate'))['rate__avg'] or 0
+#     previous_avg_rate = Payroll.objects.filter(
+#         rate__gt=0,
+#         payment_date__gte=previous_month_start,
+#         payment_date__lte=previous_month_end
+#     ).aggregate(Avg('rate'))['rate__avg'] or 0
 
-    rate_percentage = 0
-    if previous_avg_rate > 0:
-        rate_percentage = ((current_avg_rate - previous_avg_rate) / previous_avg_rate) * 100
+#     rate_percentage = 0
+#     if previous_avg_rate > 0:
+#         rate_percentage = ((current_avg_rate - previous_avg_rate) / previous_avg_rate) * 100
 
-    # Format the next payday for display
-    formatted_payday = next_payday.strftime('%m/%d/%Y')
-    day_of_week = next_payday.strftime('%a').upper()
-    formatted_payday_display = f"{formatted_payday}, {day_of_week}"
-    current_payday = formatted_payday_display
+#     # Format the next payday for display
+#     formatted_payday = next_payday.strftime('%m/%d/%Y')
+#     day_of_week = next_payday.strftime('%a').upper()
+#     formatted_payday_display = f"{formatted_payday}, {day_of_week}"
+#     current_payday = formatted_payday_display
 
-    # Pass all data to the template
-    try:
-        context = {
-            'employee_data': employee_data,
-            'total_employees': total_employees,
-            'avg_active_employees': round(avg_active_employees),
-            'processed_payroll_count': processed_payroll_count,
-            'pending_payroll_count': pending_payroll_count,
-            'total_payroll': total_payroll,  
-            'previous_total_payroll': previous_total_payroll,
-            'payroll_percentage': payroll_percentage,
-            'next_payday': next_payday,  
-            'formatted_payday': formatted_payday_display,
-            'current_payday': current_payday,
-            'previous_avg_rate': previous_avg_rate,
-            'rate_percentage': rate_percentage,
-            'avg_rate': current_avg_rate,
-            'query': query,
-        }
-    except Exception as e:
-        print(f"Error creating context: {e}")
-        context = {
-            'processed_payroll_count': processed_payroll_count,
-            'pending_payroll_count': pending_payroll_count,
-            'total_payroll': total_payroll,  
-            'previous_total_payroll': previous_total_payroll,
-            'payroll_percentage': payroll_percentage,
-            'next_payday': next_payday,
-            'formatted_payday': formatted_payday_display,
-            'previous_avg_rate': previous_avg_rate,
-            'rate_percentage': rate_percentage,
-            'avg_rate': current_avg_rate,
-            'query': query,
-        }
+#     # Pass all data to the template
+#     try:
+#         context = {
+#             'employee_data': employee_data,
+#             'total_employees': total_employees,
+#             'avg_active_employees': round(avg_active_employees),
+#             'processed_payroll_count': processed_payroll_count,
+#             'pending_payroll_count': pending_payroll_count,
+#             'total_payroll': total_payroll,  
+#             'previous_total_payroll': previous_total_payroll,
+#             'payroll_percentage': payroll_percentage,
+#             'next_payday': next_payday,  
+#             'formatted_payday': formatted_payday_display,
+#             'current_payday': current_payday,
+#             'previous_avg_rate': previous_avg_rate,
+#             'rate_percentage': rate_percentage,
+#             'avg_rate': current_avg_rate,
+#             'query': query,
+#         }
+#     except Exception as e:
+#         print(f"Error creating context: {e}")
+#         context = {
+#             'processed_payroll_count': processed_payroll_count,
+#             'pending_payroll_count': pending_payroll_count,
+#             'total_payroll': total_payroll,  
+#             'previous_total_payroll': previous_total_payroll,
+#             'payroll_percentage': payroll_percentage,
+#             'next_payday': next_payday,
+#             'formatted_payday': formatted_payday_display,
+#             'previous_avg_rate': previous_avg_rate,
+#             'rate_percentage': rate_percentage,
+#             'avg_rate': current_avg_rate,
+#             'query': query,
+#         }
 
-    return render(request, 'payroll_system/print.html', context)
+#     return render(request, 'payroll_system/print.html', context)
 
-@login_required
-def update_payday(request):
-    if request.method == 'POST' and request.POST.get('payday') == 'true':
-        new_date = request.POST.get('date')
-        if new_date:
-            formatted_date = datetime.strptime(new_date, "%Y-%m-%d").date()
-            Payroll.objects.filter(payroll_status='PENDING').update(payment_date=formatted_date)
+# @login_required
+# def update_payday(request):
+#     if request.method == 'POST' and request.POST.get('payday') == 'true':
+#         new_date = request.POST.get('date')
+#         if new_date:
+#             formatted_date = datetime.strptime(new_date, "%Y-%m-%d").date()
+#             Payroll.objects.filter(payroll_status='PENDING').update(payment_date=formatted_date)
 
-            # Format for frontend display (e.g., "05/03/2025, SAT")
-            formatted_display = formatted_date.strftime("%m/%d/%Y") + ", " + formatted_date.strftime("%a").upper()
-            return JsonResponse({'success': True, 'updated_payday': formatted_display})
-        return JsonResponse({'success': False, 'error': 'Invalid date'})
-    return JsonResponse({'success': False, 'error': 'Invalid request'})
+#             # Format for frontend display (e.g., "05/03/2025, SAT")
+#             formatted_display = formatted_date.strftime("%m/%d/%Y") + ", " + formatted_date.strftime("%a").upper()
+#             return JsonResponse({'success': True, 'updated_payday': formatted_display})
+#         return JsonResponse({'success': False, 'error': 'Invalid date'})
+#     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 @login_required
 def get_attendance_stats(request):

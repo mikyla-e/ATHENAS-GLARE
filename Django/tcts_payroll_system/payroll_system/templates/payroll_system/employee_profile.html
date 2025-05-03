@@ -288,8 +288,8 @@ onclick="cancelEditAttendance()">
                         <img src="{% static 'images/payroll_status_icon.png' %}" alt="">
                     </div>
                     <div class="flex flex-col justify-between">
-                        <h2 id="title" class="font-bold text-base">PAYROLL STATUS</h2>
-                        <p class="font-extrabold text-xl text-[#1e1e1e80]">{{ payroll_status }}</p>
+                        <h2 id="title" class="font-bold text-base">ACTIVE STATUS</h2>
+                        <p class="font-extrabold text-xl text-[#1e1e1e80]">{% if employee.is_active %} Active {% else%} Inactive {% endif %}</p>
                     </div>
                 </div>
 
@@ -297,7 +297,7 @@ onclick="cancelEditAttendance()">
                     <div class="w-full flex justify-start items-center gap-1">
                         <h2 id="title" class="font-bold text-sm md:text-base">STATUS</h2>
                     </div>
-                    <p class="font-extrabold text-base md:text-lg text-[#1e1e1e80]">{{ payroll_status }}</p>
+                    <p class="font-extrabold text-base md:text-lg text-[#1e1e1e80]">{% if employee.is_active %} Active {% else%} Inactive {% endif %}</p>
                 </div>
             </div>
 

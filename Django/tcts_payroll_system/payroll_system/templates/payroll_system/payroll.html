@@ -100,7 +100,7 @@
 
 <div id="incentive-popup" class="edit_incentives_popup absolute w-[80%] sm:w-[60%] md:w-[50%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
     <h1>Add/Deduct for all Employees</h1>
-    <form id="incentives-form" class="flex flex-col" method="post" action="{% url 'payroll_system:update_all_incentives' %}">
+    <form id="incentives-form" class="flex flex-col" method="post" action="#">
         {% csrf_token %}
         <div class="flex items-center my-2" >
             <div id="add-radio" class="flex flex-wrap">
@@ -137,7 +137,7 @@
 
 <div id="payday-popup" class="payday_popup absolute w-[300px] sm:w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
     <h1>Change Payday</h1>
-    <form id="payday-form" class="size-full flex flex-col" method="post" action="{% url 'payroll_system:update_payday' %}">
+    <form id="payday-form" class="size-full flex flex-col" method="post" action="#">
         {% csrf_token %}
         <input type="hidden" name="payday" value="true">
         <div class="w-full h-[50%] my-5 flex justify-center gap-1">
@@ -248,12 +248,12 @@
             </form>
         </div>
 
-        <a href="{% url 'payroll_system:print' %}">
+        <a href="#">
             <button id="button_2" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">PRINT</button>
         </a>
 
         <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
-            <form action="{% url 'payroll_system:confirm_payroll' %}" method="post" id="confirm-payroll-form" class="h-full">
+            <form action="#" method="post" id="confirm-payroll-form" class="h-full">
                 {% csrf_token %}
                 <button type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center !text-[#1E1E1E]" id="button_1" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
             </form>
@@ -423,7 +423,7 @@
                 const selectedDate = dateInput.value;
                 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         
-                fetch("{% url 'payroll_system:update_payday' %}", {
+                fetch("#", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',

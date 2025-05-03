@@ -166,6 +166,15 @@
                 </div>
                 <div class="flex flex-col my-1">
                     <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="date-of-employment">DAILY RATE</label>
+                        {% if form.daily_rate.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.daily_rate.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    {{ form.daily_rate }}
+                </div>
+                <div class="flex flex-col my-1">
+                    <div class="">
                         <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="date-of-employment">DATE OF EMPLOYEMENT</label>
                         {% if form.date_of_employment.errors %}
                             <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.date_of_employment.errors.0 }}</div>
@@ -181,6 +190,15 @@
                         {% endif %}
                     </div>
                     {{ form.employee_status }}
+                </div>
+                <div class="flex flex-col my-1">
+                    <div class="">
+                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="employee-status">ACTIVE STATUS</label>
+                        {% if form.is_active.errors %}
+                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.is_active.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    {{ form.is_active }}
                 </div>
                 
                 <div class="w-full h-[50px] flex justify-end items-center gap-5">

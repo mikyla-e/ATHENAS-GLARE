@@ -5,7 +5,7 @@ from django.forms import ModelForm
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from datetime import datetime, timedelta
-from .models import Employee, Payroll, Region, Province, City, Barangay, Service, Customer, Vehicle
+from .models import Employee, Region, Province, City, Barangay, Service, Customer, Vehicle
 
 class EmployeeForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput())
@@ -23,12 +23,14 @@ class EmployeeForm(forms.ModelForm):
     barangay = forms.CharField(label='BARANGAY', widget=forms.TextInput(attrs={'id': 'barangay-dropdown', 'list': 'barangay-list', 
                                'autocomplete': 'off'}))
     work_experience = forms.CharField(widget=forms.Textarea(), required=False)
+    daily_rate = forms.FloatField(widget=forms.NumberInput())
     date_of_employment = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), initial=timezone.now)
+    is_active = forms.BooleanField(widget=forms.CheckboxInput())
     
     class Meta:
         model = Employee
         fields = ('first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
-                  'highest_education', 'work_experience', 'date_of_employment', 'employee_status')
+                  'highest_education', 'work_experience', 'daily_rate', 'date_of_employment', 'employee_status', 'is_active')
         widgets = {
             'gender': forms.Select(),
             'highest_education': forms.Select(),
@@ -37,8 +39,6 @@ class EmployeeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # Set custom attributes for the date picker
         self.fields['date_of_birth'].widget = forms.DateInput(
             attrs={
                 'type': 'date',
@@ -273,79 +273,6 @@ class EmployeeForm(forms.ModelForm):
             employee.save()
         
         return employee
-    
-class PayrollForm(ModelForm):
-    rate = forms.FloatField(widget=forms.NumberInput())
-    payment_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    
-    class Meta:
-        model = Payroll
-        fields = ('rate', 'payment_date', 'payroll_status')
-        widget = {
-            'payroll_status': forms.Select(),
-        }
-            
-    # Helper function to validate 'YYYY-MM-DD' format.
-    def validate_date_format(self, date_str):
-        try:
-            datetime.strptime(date_str, "%Y-%m-%d")
-        except ValueError:
-            raise forms.ValidationError("Invalid date format. Use 'YYYY-MM-DD'.")
-
-    def clean_payment_date(self):
-        payment_date = self.cleaned_data.get('payment_date')
-        if payment_date:
-            self.validate_date_format(str(payment_date))
-            
-            # Check if date is not in the past
-            today = datetime.now().date()
-            if payment_date < today:
-                raise forms.ValidationError("Payment date cannot be in the past.")
-                
-            # Check if date is not in the too distant future
-            if payment_date > today + timedelta(days=365):
-                raise forms.ValidationError("Payment date cannot be more than a year in the future.")
-                    
-        return payment_date 
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        # Get values with defaults
-        rate = cleaned_data.get('rate', 0) or 0
-        deductions = cleaned_data.get('deductions', 0) or 0
-        cash_advance = cleaned_data.get('cash_advance', 0) or 0
-        under_time = cleaned_data.get('under_time', 0) or 0
-        incentives = cleaned_data.get('incentives', 0) or 0
-        
-        # Calculate salary
-        calculated_salary = rate - deductions - cash_advance - under_time + incentives
-        
-        # Either validate or auto-set
-        if 'salary' in cleaned_data:
-            salary = cleaned_data.get('salary', 0) or 0
-            if abs(calculated_salary - salary) > 0.01:
-                raise ValidationError(_('Salary does not match the calculated amount based on rates and deductions.'))
-        else:
-            # Auto-set the salary field
-            cleaned_data['salary'] = round(calculated_salary, 2)
-        
-        # Validate non-negative values
-        for field_name, value in [
-            ('rate', rate), ('deductions', deductions), 
-            ('cash_advance', cash_advance), ('under_time', under_time),
-            ('incentives', incentives)
-        ]:
-            if value < 0:
-                self.add_error(field_name, _('This value cannot be negative.'))
-
-        required_fields = ['rate', 'payment_date', 'payroll_status']
-
-        # Check if all required fields are filled
-        if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
-            raise forms.ValidationError("All fields must be filled.")
-        
-        return cleaned_data
         
 class ServiceForm(forms.ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'w-full outline-none text-lg', 'placeholder': 'Enter Title'}))
