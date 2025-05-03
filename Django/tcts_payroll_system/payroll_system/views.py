@@ -295,11 +295,13 @@ def employee_profile(request, employee_id):
 @login_required
 def payroll(request):
     payroll_periods = PayrollPeriod.objects.all()
-    form = PayrollPeriodForm()  # Empty form for modal
+    payroll_period_form = PayrollPeriodForm()  # Empty form for modal
+    deduction_form = DeductionForm()  # Empty form for modal
 
     context = {
         'payroll_periods': payroll_periods,
-        'form': form,  # Include the form in context for modal use
+        'payroll_period_form': payroll_period_form,  # Include the form in context for modal use
+        'deduction_form': deduction_form,
     }
 
     return render(request, 'payroll_system/payroll.html', context)
@@ -307,16 +309,37 @@ def payroll(request):
 @login_required
 def create_payroll(request):
     if request.method == 'POST':
-        form = PayrollPeriodForm(request.POST)
-        if form.is_valid():
-            form.save()
+        payroll_period_form = PayrollPeriodForm(request.POST)
+        if payroll_period_form.is_valid():
+            payroll_period_form.save()
             return redirect('payroll_system:payroll')
         else:
             # Fetch current payroll periods to re-render the same page
             payroll_periods = PayrollPeriod.objects.all()
 
             context = {
-                'form': form,
+                'payroll_period_form': payroll_period_form,
+                'payroll_periods': payroll_periods,
+                'error': "Please correct the errors below.",
+            }
+
+            return render(request, 'payroll_system/payroll.html', context)
+
+    return redirect('payroll_system:payroll')
+
+@login_required
+def edit_deductions(request):
+    if request.method == 'POST':
+        deduction_form = DeductionForm(request.POST)
+        if deduction_form.is_valid():
+            deduction_form.save()
+            return redirect('payroll_system:payroll')
+        else:
+            # Fetch current payroll periods to re-render the same page
+            payroll_periods = PayrollPeriod.objects.all()
+
+            context = {
+                'deduction_form': deduction_form,
                 'payroll_periods': payroll_periods,
                 'error': "Please correct the errors below.",
             }

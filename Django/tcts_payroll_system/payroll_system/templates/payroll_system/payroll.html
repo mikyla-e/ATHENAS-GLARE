@@ -50,7 +50,7 @@
             <label for="type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Payroll Type</label>
         
             <div class="w-full h-[75%]">
-                {{ form.type}}
+                {{ payroll_period_form.type}}
             </div>
         </div>
 
@@ -59,7 +59,7 @@
                 <label for="start_date" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Start Date</label>
             
                 <div class="w-full h-[60px]">
-                    {{ form.start_date }}
+                    {{ payroll_period_form.start_date }}
                 </div>
             </div>
 
@@ -67,7 +67,7 @@
                 <label for="end_date" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">End Date</label>
             
                 <div class="w-full h-[60px]">
-                    {{ form.end_date}}
+                    {{ payroll_period_form.end_date}}
                 </div>
             </div>
         </div>
@@ -75,16 +75,7 @@
         <div class="w-full h-[40px] flex justify-end gap-3">
             <input type="button" id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddPayroll()">
             <input type="submit" id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM"> 
-        </div>
-
-        {% if form.non_field_errors %}
-        <div class="alert alert-warning">
-            {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-            {% endfor %}
-        </div>
-        {% endif %}
-        
+        </div> 
     </form>   
 </div>
 
@@ -96,13 +87,13 @@
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Edit Deductions</h1>
         <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>     -->
     </div>
-    <form class="flex flex-col gap-5" method="post" onsubmit="event.preventDefault();">
+    <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:edit_deductions' %}">
         {% csrf_token %}
         <div class="flex flex-col">
             <label for="deduction_type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Deduction Type</label>
         
             <div class="w-full h-[60px]">
-                <input type="number" name="deduction_type" id="deduction_type" class="w-full h-full px-5 outline-none border font-[Inter] font-normal text-3xl" required>
+                {{ deduction_form.deduction_type }}
             </div>
         </div>
 
@@ -110,7 +101,7 @@
             <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">amount</label>
         
             <div class="w-full h-[60px]">
-                <input type="number" name="deduction" id="deduction" class="w-full h-full px-5 outline-none border font-[Inter] font-normal text-3xl" required>
+                {{ deduction_form.amount }}
             </div>
         </div>
 

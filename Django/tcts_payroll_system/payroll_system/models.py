@@ -310,12 +310,21 @@ class PayrollPeriod(models.Model):
     type = models.CharField(max_length=9, choices=Type.choices)
 
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
         if self.end_date:
             self.payment_date = self.end_date
         super().save(*args, **kwargs)
 
+        if is_new:
+            active_employees = Employee.objects.filter(is_active=True)
+            for employee in active_employees:
+                PayrollRecord.objects.create(
+                    employee=employee,
+                    payroll_period=self
+                )
+
     def __str__(self):
-        return f"{self.employee} - {self.start_date} to {self.end_date} ({self.get_payroll_status_display()})"
+        return f"{self.start_date} to {self.end_date} ({self.get_payroll_status_display()})"
 
 class Deduction(models.Model):
     class DeductionType(models.TextChoices):
