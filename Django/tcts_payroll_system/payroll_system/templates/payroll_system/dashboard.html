@@ -139,7 +139,17 @@
         </div>
         
         <!-- Donut Chart -->
-        <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 xl:col-span-3 flex justify-center items-center bg-white rounded-xl shadow-lg" id="attendance">
+        <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 xl:col-span-3 flex flex-col justify-center items-center bg-white rounded-xl shadow-lg" id="attendance">
+            <div class="w-full px-3 pt-3">
+                <h2 class="text-[#1E1E1E] font-bold text-base">ATTENDANCE</h2>
+                <div class="flex justify-center gap-2 mt-2">
+                    <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#F8D146] text-[#1E1E1E]" data-period="day">Day</button>
+                    <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="week">Week</button>
+                    <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="month">Month</button>
+                    <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="year">Year</button>
+                </div>
+                <p id="attendance-period" class="text-center text-sm text-gray-500 mt-1">Today's Attendance</p>
+            </div>
             <canvas id="donut" class="p-[15px]"></canvas>
         </div>
 
@@ -306,56 +316,123 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const donutChart = document.getElementById('donut');
-    
-    const donutLabels = ["Present", "Absent"];
-    const donutData = [2, 1]; //insert data for attendance here
-
-    const donutColor = ["#F8D146","#DC4646"];
-
-    const attendance = new Chart(donutChart, {
-        type: "doughnut",
-        data: {
-            labels: donutLabels,
-            datasets: [{
-                backgroundColor: donutColor,
-                data: donutData,
-                borderWidth: 0
-            }],
-        },
-        options: {
-            responsive: true,
-            cutout: "40%",
-            layout: {
-                padding: 0
-            },
-            plugins: {
-                legend: {
-                    labels: {
-                        boxWidth: 15,
-                        padding: 5,
-                        font: {
-                            size: 14
-                        }
+    document.addEventListener('DOMContentLoaded', function() {
+        const donutChart = document.getElementById('donut');
+        let attendanceChart;
+        
+        // Function to load attendance data and update chart
+        function loadAttendanceData(period) {
+            fetch(`/api/attendance-stats/?period=${period}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update period display
+                    document.getElementById('attendance-period').innerText = data.period_display;
+                    
+                    // If chart exists, destroy it before creating a new one
+                    if (attendanceChart) {
+                        attendanceChart.destroy();
                     }
                     
-                },
-                title: {
-                    display: true,
-                    text: "ATTENDANCE",
-                    color: "#1E1E1E",
-                    align: 'start',
-                    padding: {
-                        top: 0,
-                        bottom: 10
-                    },
-                    font: {
-                        size: 16
+                    // Create new chart with the data
+                    attendanceChart = new Chart(donutChart, {
+                        type: "doughnut",
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                backgroundColor: ["#F8D146","#DC4646"],
+                                data: data.data,
+                                borderWidth: 0
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            cutout: "40%",
+                            layout: {
+                                padding: 0
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        boxWidth: 15,
+                                        padding: 5,
+                                        font: {
+                                            size: 14
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.raw || 0;
+                                            const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                            return `${label}: ${value} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching attendance data:', error);
+                    
+                    // Create fallback chart with default data if fetch fails
+                    if (attendanceChart) {
+                        attendanceChart.destroy();
                     }
-                }
-            }
-            
+                    
+                    attendanceChart = new Chart(donutChart, {
+                        type: "doughnut",
+                        data: {
+                            labels: ["Present", "Absent"],
+                            datasets: [{
+                                backgroundColor: ["#F8D146","#DC4646"],
+                                data: [2, 1],  // Default fallback data
+                                borderWidth: 0
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            cutout: "40%",
+                            layout: {
+                                padding: 0
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        boxWidth: 15,
+                                        padding: 5,
+                                        font: {
+                                            size: 14
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
         }
+        
+        // Add click event listeners to period toggle buttons
+        document.querySelectorAll('.period-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                // Update button styles
+                document.querySelectorAll('.period-toggle').forEach(btn => {
+                    btn.classList.remove('bg-[#F8D146]');
+                    btn.classList.add('bg-[#E1E1E1]');
+                });
+                this.classList.remove('bg-[#E1E1E1]');
+                this.classList.add('bg-[#F8D146]');
+                
+                // Load data for selected period
+                loadAttendanceData(this.dataset.period);
+            });
+        });
+        
+        // Load initial data for day period
+        loadAttendanceData('day');
     });
 </script>
 

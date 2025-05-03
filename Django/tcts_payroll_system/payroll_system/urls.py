@@ -32,4 +32,5 @@ urlpatterns = [
     path('ajax/get-barangays/', views.get_barangays, name='get_barangays'),
     path('ajax/customer/<int:customer_id>/', views.get_customer_details, name='get_customer_details'),
     path('payroll/update-payday/', views.update_payday, name='update_payday'),
+    path('api/attendance-stats/', views.get_attendance_stats, name='attendance_stats'),
 ]

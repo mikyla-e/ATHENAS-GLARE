@@ -16,6 +16,7 @@ from .models import Employee, Payroll, Attendance, History, Region, Province, Ci
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.views.decorators.http import require_POST
+import calendar
 
 @csrf_protect  # Ensure CSRF protection
 
@@ -1414,3 +1415,59 @@ def update_payday(request):
             return JsonResponse({'success': True, 'updated_payday': formatted_display})
         return JsonResponse({'success': False, 'error': 'Invalid date'})
     return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+@login_required
+def get_attendance_stats(request):
+    period = request.GET.get('period', 'day')
+    
+    # Get current date
+    today = timezone.now().date()
+    
+    # Define date range based on period
+    if period == 'day':
+        start_date = today
+        end_date = today
+        period_display = "Today's Attendance"
+    elif period == 'week':
+        # Get the start of the week (Monday)
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=6)
+        period_display = f"Week: {start_date.strftime('%b %d')} - {end_date.strftime('%b %d')}"
+    elif period == 'month':
+        start_date = today.replace(day=1)
+        # Get last day of month
+        _, last_day = calendar.monthrange(today.year, today.month)
+        end_date = today.replace(day=last_day)
+        period_display = f"Month: {today.strftime('%B %Y')}"
+    elif period == 'year':
+        start_date = today.replace(month=1, day=1)
+        end_date = today.replace(month=12, day=31)
+        period_display = f"Year: {today.year}"
+    else:
+        return JsonResponse({'error': 'Invalid period'}, status=400)
+    
+    # Query for attendance data
+    present_count = Attendance.objects.filter(
+        date__gte=start_date, 
+        date__lte=end_date,
+        attendance_status=Attendance.AttendanceStatus.PRESENT
+    ).count()
+    
+    absent_count = Attendance.objects.filter(
+        date__gte=start_date, 
+        date__lte=end_date,
+        attendance_status=Attendance.AttendanceStatus.ABSENT
+    ).count()
+    
+    # If no data is found, return minimal data to avoid division by zero
+    if present_count == 0 and absent_count == 0:
+        present_count = 0
+        absent_count = 0
+    
+    # Return data as JSON
+    return JsonResponse({
+        'labels': ['Present', 'Absent'],
+        'data': [present_count, absent_count],
+        'period': period,
+        'period_display': period_display
+    })
