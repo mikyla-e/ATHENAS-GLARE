@@ -122,16 +122,42 @@
             </div>
             <div class="w-[55%] ml-2 h-full p-3 rounded-xl " id="payroll-info">
                 <div class="h-full flex flex-col justify-between items-end" id="content2">
+                    <!-- This maintains the original div structure and styling -->
                     <div class="h-fit my-2 mx-4 flex flex-col items-end" id="total_payroll">
-                        <p class="font-[Roboto] font-semibold text-right text-xs sm:text-base text-white md:text-nowrap">TOTAL PAYROLL</p>
-                        {% if total_payroll == "No total payroll yet" %}
-                            <h1 class="font-[Inter] font-semibold text-lg sm:text-2xl xl:text-3xl text-right">₱0.00</h1>    
-                        {% else %}
-                            <h1 class="font-[Inter] font-semibold text-lg sm:text-2xl xl:text-3xl text-right">₱{{ total_payroll|floatformat:2 }}</h1>
-                        {% endif %}
+                        <div class="w-full flex justify-between items-center">
+                            <!-- Dropdown on the left side -->
+                            <div class="relative inline-block">
+                                <select id="payroll-period-dropdown" onchange="togglePayrollView(this.value)" 
+                                        class="bg-gray-700 text-gray-300 text-xs rounded-md px-2 py-1 cursor-pointer appearance-none pr-8 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly" selected>Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                                <!-- Custom dropdown arrow -->
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <!-- Original TOTAL PAYROLL text on the right -->
+                            <p class="font-[Roboto] font-semibold text-right text-xs sm:text-base text-white md:text-nowrap">
+                                TOTAL PAYROLL
+                            </p>
+                        </div>
+                        
+                        <!-- The amount display uses original styling -->
+                        <h1 id="payroll-amount" class="font-[Inter] font-semibold text-lg sm:text-2xl xl:text-3xl text-right">
+                            ₱{{ monthly_payroll|default:"0.00"|floatformat:2 }}
+                        </h1>
                     </div>
                     <div class="h-fit my-2 mx-4 flex flex-col items-end" id="next_payday">
-                        <h1 class="font-[Inter] font-semibold text-sm sm:text-xl xl:text-2xl text-right text-nowrap">{{ next_payday|default:"N/A" }}</h1>
+                        {% if next_payday %}
+                            <h1 class="font-[Inter] font-semibold text-sm sm:text-xl xl:text-2xl text-right text-nowrap">{{ next_payday }}</h1>
+                        {% else %}
+                            <h1 class="font-[Inter] font-semibold text-sm sm:text-base text-right text-nowrap text-gray-400">No upcoming payday</h1>
+                        {% endif %}
                         <p class="font-[Roboto] font-semibold text-xs sm:text-base text-right text-white md:text-nowrap">NEXT PAYDAY</p>    
                     </div>
                 </div>
@@ -488,6 +514,26 @@
     window.addEventListener('resize', function() {
         // Force redraw when window is resized
         payroll_chart.resize();
+    });
+</script>
+
+<script>
+    // Store payroll values from Django context with safe defaults
+    const payrollData = {
+        weekly: '{{ weekly_payroll|default:"0.00"|floatformat:2 }}',
+        monthly: '{{ monthly_payroll|default:"0.00"|floatformat:2 }}',
+        yearly: '{{ yearly_payroll|default:"0.00"|floatformat:2 }}'
+    };
+    
+    function togglePayrollView(period) {
+        // Update the displayed amount
+        const payrollAmount = document.getElementById('payroll-amount');
+        payrollAmount.textContent = `₱${payrollData[period]}`;
+    }
+    
+    // Set the dropdown to monthly by default
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('payroll-period-dropdown').value = 'monthly';
     });
 </script>
 {% endblock %}

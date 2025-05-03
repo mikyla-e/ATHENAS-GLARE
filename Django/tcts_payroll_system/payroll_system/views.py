@@ -1,6 +1,6 @@
 import re
 import base64
-from datetime import datetime
+from datetime import datetime, date as date_class
 from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -50,18 +50,26 @@ def dashboard(request):
     today = now().date()
     start_of_week = today - timedelta(days=today.weekday())  # Get Monday of current week
     end_of_week = start_of_week + timedelta(days=6)  # Get Sunday of current week
+    
+    # Count of unique active employees with at least one 'Present' attendance this week
+    avg_active_employees = Attendance.objects.filter(
+        date__range=[start_of_week, end_of_week],
+        attendance_status=Attendance.AttendanceStatus.PRESENT,
+        employee__is_active=True
+    ).values('employee').distinct().count()
 
-    active_employees_per_day = (
-        Attendance.objects.filter(date__range=[start_of_week, end_of_week])
-        .values('date')
-        .annotate(active_count=Count('employee', distinct=True))
-    )
 
-    # Calculate the average number of active employees within the week
-    total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
-    days_counted = len(active_employees_per_day) or 1  # Avoid division by zero
+    # active_employees_per_day = (
+    #     Attendance.objects.filter(date__range=[start_of_week, end_of_week])
+    #     .values('date')
+    #     .annotate(active_count=Count('employee', distinct=True))
+    # )
 
-    avg_active_employees = total_active_counts / days_counted
+    # # Calculate the average number of active employees within the week
+    # total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
+    # days_counted = len(active_employees_per_day) or 1  # Avoid division by zero
+
+    # avg_active_employees = total_active_counts / days_counted
     
     # employees_with_latest_payroll = Employee.objects.annotate(
     #     latest_payroll_status=Subquery(latest_payroll_status_subquery)
@@ -79,6 +87,14 @@ def dashboard(request):
     
     # Add next payday calculation too
     today = now().date()
+    # Count payroll periods grouped by status
+    processed_payroll_count = PayrollPeriod.objects.filter(
+        payroll_status=PayrollPeriod.PayrollStatus.PROCESSED
+    ).count()
+
+    pending_payroll_count = PayrollPeriod.objects.filter(
+        payroll_status=PayrollPeriod.PayrollStatus.PENDING
+    ).count()
     next_payday = PayrollPeriod.objects.filter(payment_date__gt=today).aggregate(Min('payment_date'))['payment_date__min']
 
     # Modified: Get employees ordered by most recent time-in (attendance date)
@@ -100,16 +116,23 @@ def dashboard(request):
     #         employee.total_payment = f"₱{employee.latest_payroll_rate:.2f}"
     #     else:
     #         employee.total_payment = "₱0.00"
+    
+    #new
+    payroll_totals = calculate_payroll_totals(request)
      
     context = { 
         'histories': histories,
         # 'employees': recent_employees,
         'total_employees': total_employees,
         'avg_active_employees': round(avg_active_employees),
-        # 'processed_payroll_count': processed_payroll_count,
-        # 'pending_payroll_count': pending_payroll_count,
+        'processed_payroll_count': processed_payroll_count,
+        'pending_payroll_count': pending_payroll_count,
         # 'total_payroll': total_payroll,
         'next_payday': next_payday,
+        'total_payroll': payroll_totals.get('monthly_payroll', 0),  # Keep existing behavior for compatibility
+        'weekly_payroll': payroll_totals.get('weekly_payroll', 0),
+        'monthly_payroll': payroll_totals.get('monthly_payroll', 0),
+        'yearly_payroll': payroll_totals.get('yearly_payroll', 0),
     }
     return render(request, 'payroll_system/dashboard.html', context)
 
@@ -1495,3 +1518,67 @@ def get_attendance_stats(request):
         'period': period,
         'period_display': period_display
     })
+    
+#new
+@login_required
+def calculate_payroll_totals(request):
+    """
+    Calculate weekly, monthly, and yearly payroll totals based on PayrollRecord data
+    """
+    today = timezone.now().date()
+    
+    # Calculate the start and end dates for periods
+    week_start = today - timedelta(days=today.weekday())  # Monday of current week
+    week_end = week_start + timedelta(days=6)  # Sunday of current week
+    
+    month_start = date_class(today.year, today.month, 1)  # First day of current month
+    last_day_of_month = calendar.monthrange(today.year, today.month)[1]
+    month_end = date_class(today.year, today.month, last_day_of_month)  # Last day of current month
+    
+    year_start = date_class(today.year, 1, 1)  # First day of current year
+    year_end = date_class(today.year, 12, 31)  # Last day of current year
+
+    # Query for weekly payroll total
+    weekly_payroll = PayrollRecord.objects.filter(
+        payroll_period__start_date__gte=week_start,
+        payroll_period__end_date__lte=week_end
+    ).aggregate(total=Sum('net_pay'))['total'] or 0
+    
+    # Query for monthly payroll total
+    monthly_payroll = PayrollRecord.objects.filter(
+        payroll_period__start_date__gte=month_start,
+        payroll_period__end_date__lte=month_end
+    ).aggregate(total=Sum('net_pay'))['total'] or 0
+    
+    # Query for yearly payroll total
+    yearly_payroll = PayrollRecord.objects.filter(
+        payroll_period__start_date__gte=year_start,
+        payroll_period__end_date__lte=year_end
+    ).aggregate(total=Sum('net_pay'))['total'] or 0
+
+    return {
+        'weekly_payroll': weekly_payroll,
+        'monthly_payroll': monthly_payroll,
+        'yearly_payroll': yearly_payroll
+    }
+
+@login_required    
+def get_next_payday(employee):
+    """
+    Get the next payday for a specific employee.
+    Returns a formatted date string or None if no upcoming payday is found.
+    """
+    today = timezone.now().date()
+    
+    # Get the next upcoming payment date for this employee
+    next_payday = PayrollPeriod.objects.filter(
+        employee=employee,
+        payment_date__gte=today,
+        payroll_status=PayrollPeriod.PayrollStatus.PENDING
+    ).order_by('payment_date').first()
+    
+    if next_payday:
+        # Format the date as desired, e.g., "May 15, 2025"
+        return next_payday.payment_date.strftime("%B %d, %Y")
+    
+    return None
