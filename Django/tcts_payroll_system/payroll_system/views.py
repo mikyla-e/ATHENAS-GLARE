@@ -309,6 +309,10 @@ def employee_profile(request, employee_id):
     return render(request, 'payroll_system/employee_profile.html', context)
 
 @login_required
+def payroll(request):
+    return render(request, 'payroll_system/payroll.html')
+
+@login_required
 def payrolls(request):
     employees = Employee.objects.prefetch_related('payrollperiod', 'payrollrecords', 'attendances').all()
     
@@ -500,7 +504,7 @@ def payrolls(request):
             'query': query,
         }
 
-    return render(request, 'payroll_system/payroll.html', context)
+    return render(request, 'payroll_system/payrolls.html', context)
 
 @login_required
 def payroll_history(request):

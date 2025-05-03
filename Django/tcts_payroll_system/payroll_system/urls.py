@@ -10,6 +10,7 @@ urlpatterns = [
     path('employees/employee_picture/', views.employee_picture, name='employee_picture'),
     path('employees/', views.employees, name='employees'),
     path('employees/employee_profile/<int:employee_id>/', views.employee_profile, name='employee_profile'),
+    path('payroll/', views.payroll, name='payroll'),
     path('payrolls/', views.payrolls, name='payrolls'),
     # path('payrolls/confirm/', views.confirm_payroll, name='confirm_payroll'),
     path('payrolls/payroll_individual/<int:employee_id>/', views.payroll_individual, name='payroll_individual'),
