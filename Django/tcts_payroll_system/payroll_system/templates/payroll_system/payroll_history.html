@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!--title-->
+{% block title %}Payroll History{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<style>
+    .background {
+        transition: opacity 0.3s ease;
+        z-index: 50;
+    }
+
+    .edit_incentives_popup {
+        transition: opacity 0.3s ease;
+        z-index: 60;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .background.show, 
+    .edit_incentives_popup.show {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Button styling */
+    input[type="button"], 
+    input[type="submit"] {
+        background-color: #F8D146;
+        color: #000;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+
+    input[type="button"]:hover, 
+    input[type="submit"]:hover {
+        background-color: #e9c13b;
+    }
+
+    /* Input field styling */
+    input[type="text"].field {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 100%;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/payroll_individual.css'%}">
+<link rel="stylesheet" href="{% static 'css/table.css'%}">
+<link rel="stylesheet" href="{% static 'css/default_design.css' %}">
+{% endblock %}
+
+<!--header-->
+{% block header %}PAYROLL{% endblock %} 
+
+<!--page content-->
+{% block outsidecontent %}
+
+{% endblock %}
+
+{% block content %}
+<!--large-->
+<div class="order-5 hidden xl:block col-span-3 flex flex-col justify-center gap-3">
+    <div class="w-full flex justify-center items-center">
+        <h1 class="py-2 text-xl font-extrabold text-[League Spartan]">PAYROLL HISTORY</h1>
+    </div>
+    <div id="table">
+        <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden">
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr class="text-base font-[League Spartan]">
+                    <th class="p-2 text-base font-[League Spartan]">RATE PER DAY</th>
+                    <th class="p-2 text-base font-[League Spartan]">TOTAL ATTENDANCE</th>
+                    <th class="p-2 text-base font-[League Spartan]">TOTAL INCENTIVES</th>
+                    <th class="p-2 text-base font-[League Spartan]">DEDUCTIONS</th>
+                    <th class="p-2 text-base font-[League Spartan]">TOTAL PAYMENT AMOUNT</th>
+                    <th class="p-2 text-base font-[League Spartan]">DATE OF PAY</th>
+                    <th class="p-2 text-base font-[League Spartan]">CASH ADVANCE</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payroll in payroll_history %}
+                <tr id="payroll-data" class="h-[50px]">
+                    <td class="p-2 text-sm font-[Inter]">{{ payroll.rate }}</td>
+                    <td class="p-2 text-sm font-[Inter]">
+                        {{ payroll.attendance_count|default:"N/A" }}
+                    </td>
+                    <td class="p-2 text-sm font-[Inter]">{{ payroll.incentives|default:"0.00" }}</td>
+                    <td class="p-2 text-sm font-[Inter]">{{ payroll.salary|default:"0.00" }}</td>
+                    <td class="p-2 text-sm font-[Inter]">{{ payroll.deductions }}</td>
+                    <td class="p-2 text-sm font-[Inter]">{{ payroll.payment_date }}</td>
+                    
+                    <td class="p-2 text-sm font-[Inter]">{{ payroll.cash_advance }}</td>
+                </tr>
+                {% empty %}
+                <tr id="payroll-data" class="h-[50px]">
+                    <td colspan="8" class="p-2 text-sm font-[Inter] text-center">No previous payroll records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--medium-->
+<div class="order-5 hidden md:block xl:hidden col-span-3 flex flex-col justify-center gap-3">
+    <div class="w-full flex justify-center items-center">
+        <h1 class="py-2 text-lg font-extrabold text-[League Spartan]">PAYROLL HISTORY</h1>
+    </div>
+    <div id="table">
+        <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden">
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr>
+                    <th class="p-2 text-sm font-[League Spartan]">RATE</th>
+                    <th class="p-2 text-sm font-[League Spartan]">ATTENDANCE</th>
+                    <th class="p-2 text-sm font-[League Spartan]">INCENTIVES</th>
+                    <th class="p-2 text-sm font-[League Spartan]">DEDUCTIONS</th>
+                    <th class="p-2 text-sm font-[League Spartan]">PAYMENT AMOUNT</th>
+                    <th class="p-2 text-sm font-[League Spartan]">PAY DATE</th>
+                    <th class="p-2 text-sm font-[League Spartan]">CASH ADVANCE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payroll in payroll_history %}
+                <tr id="payroll-data" class="h-[50px]">
+                    <td class="px-2 text-xs font-[Inter]">{{ payroll.rate }}</td>
+                    <td class="px-2 text-xs font-[Inter]">
+                        {{ payroll.attendance_count|default:"N/A" }}
+                    </td>
+                    <td class="px-2 text-xs font-[Inter]">{{ payroll.incentives|default:"0.00" }}</td>
+                    <td class="px-2 text-xs font-[Inter]">{{ payroll.deductions }}</td>
+                    <td class="px-2 text-xs font-[Inter]">{{ payroll.salary|default:"0.00" }}</td>
+                    <td class="px-2 text-xs font-[Inter]">{{ payroll.payment_date }}</td>
+                    <td class="px-2 text-xs font-[Inter]">{{ payroll.cash_advance }}</td>
+                </tr>
+                {% empty %}
+                <tr id="payroll-data" class="h-[50px]">
+                    <td colspan="6" class="p-2 text-xs font-[Inter] text-center">No previous payroll records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--small-->
+<div class="order-5 md:hidden col-span-3 flex flex-col justify-center gap-3">
+    <div class="w-full flex justify-center items-center">
+        <h1 class="text-base font-extrabold text-[League Spartan]">PAYROLL HISTORY</h1>
+    </div>
+    <div id="table">
+        <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden">
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr>
+                    <th class="p-2 text-xs font-[League Spartan]">RATE</th>
+                    <th class="p-2 text-xs font-[League Spartan]">ATTENDANCE</th>
+                    <th class="p-2 text-xs font-[League Spartan]">INCENTIVES</th>
+                    <th class="p-2 text-xs font-[League Spartan]">DEDUCTIONS</th>
+                    <th class="p-2 text-xs font-[League Spartan]">PAYMENT AMOUNT</th>
+                    <th class="p-2 text-xs font-[League Spartan]">PAY DATE</th>
+                    <th class="p-2 text-xs font-[League Spartan]">CASH ADVANCE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payroll in payroll_history %}
+                <tr id="payroll-data" class="h-[50px]">
+                    <td class="px-2 text-[10px] font-[Inter]">{{ payroll.rate }}</td>
+                    <td class="px-2 text-[10px] font-[Inter]">
+                        {{ payroll.attendance_count|default:"N/A" }}
+                    </td>
+                    <td class="px-2 text-[10px] font-[Inter]">{{ payroll.incentives|default:"0.00" }}</td>
+                    <td class="px-2 text-[10px] font-[Inter]">{{ payroll.deductions }}</td>
+                    <td class="px-2 text-[10px] font-[Inter]">{{ payroll.salary|default:"0.00" }}</td>
+                    <td class="px-2 text-[10px] font-[Inter]">{{ payroll.payment_date }}</td>
+                    <td class="px-2 text-[10px] font-[Inter]">{{ payroll.cash_advance }}</td>
+                </tr>
+                {% empty %}
+                <tr id="payroll-data" class="h-[50px]">
+                    <td colspan="5" class="p-2 text-[10px] font-[Inter] text-center">No previous payroll records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+<!--(optional)script-->
+{% block script %}
+
+{% endblock %}

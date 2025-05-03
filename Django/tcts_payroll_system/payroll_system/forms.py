@@ -14,13 +14,13 @@ class EmployeeForm(forms.ModelForm):
     date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     contact_number = forms.CharField(widget=forms.TextInput(attrs={'type': 'tel'}))
     emergency_contact = forms.CharField(widget=forms.TextInput(attrs={'type': 'tel'}))
-    region = forms.CharField(label='region', widget=forms.TextInput(attrs={'id': 'region-dropdown', 'list': 'region-list', 
+    region = forms.CharField(label='REGION', widget=forms.TextInput(attrs={'id': 'region-dropdown', 'list': 'region-list', 
                              'autocomplete': 'off'}))
-    province = forms.CharField(label='province', widget=forms.TextInput(attrs={'id': 'province-dropdown', 'list': 'province-list',
+    province = forms.CharField(label='PROVINCE', widget=forms.TextInput(attrs={'id': 'province-dropdown', 'list': 'province-list',
                                'autocomplete': 'off'}))
-    city = forms.CharField(label='city', widget=forms.TextInput(attrs={'id': 'city-dropdown', 'list': 'city-list', 
+    city = forms.CharField(label='CITY', widget=forms.TextInput(attrs={'id': 'city-dropdown', 'list': 'city-list', 
                            'autocomplete': 'off'}))
-    barangay = forms.CharField(label='barangay', widget=forms.TextInput(attrs={'id': 'barangay-dropdown', 'list': 'barangay-list', 
+    barangay = forms.CharField(label='BARANGAY', widget=forms.TextInput(attrs={'id': 'barangay-dropdown', 'list': 'barangay-list', 
                                'autocomplete': 'off'}))
     work_experience = forms.CharField(widget=forms.Textarea(), required=False)
     date_of_employment = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), initial=timezone.now)

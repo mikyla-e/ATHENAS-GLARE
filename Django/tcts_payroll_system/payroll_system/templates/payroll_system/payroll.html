@@ -160,7 +160,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="w-full grid grid-cols-4 grid-rows-[30px_75px_75px] md:grid-rows-[55px_75px_75px] lg:grid-cols-6 lg:grid-rows-[70px_70px] gap-4">
+<div class="w-full grid grid-cols-4 grid-rows-[30px_75px_50px] md:grid-rows-[55px_75px_65px] lg:grid-cols-6 lg:grid-rows-[70px_70px] gap-4">
     <div class="bg-[#1E1E1E] px-4 order-1 col-span-4 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
 
         <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
@@ -193,21 +193,21 @@
 
         <span class="w-[3px] h-[80%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
         
-        <div class="h-full py-4 md:py-4.5 flex flex-col justify-between md:justify-between overflow-hidden">
-            <p class="text-white text-[10px] sm:text-sm md:text-lg font-bold font-[League Spartan] text-left">TOTAL PAYROLL</p>
+        <div class="h-full py-4 md:py-4.5 flex flex-col justify-between overflow-hidden">
+            <p class="text-white text-[10px] sm:text-xs md:text-lg font-bold font-[League Spartan] text-left">TOTAL PAYROLL</p>
             <div class="flex flex-row justify-evenly">
                 <div id="processed" class="flex flex-col justify-evenly">
-                    <h1 class="sm:hidden text-xs font-bold">PROC</h1>
+                    <h1 class="sm:hidden text-xs font-bold">PRO...</h1>
                     <h1 class="hidden sm:block sm:text-xs md:text-base lg:text-lg font-bold">PROCESSED</h1>
-                    <p class="text-[35px]/11 sm:text-[45px]/13 md:text-5xl font-[Inter] font-medium">{{ processed_payroll_count }}</p>  
+                    <p class="text-[35px]/11 sm:text-[43px]/13 md:text-5xl font-[Inter] font-medium">{{ processed_payroll_count }}</p>  
                 </div>
 
-                <span class="w-[3px] h-[100%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
+                <div class="w-[2px] h-[100%] mx-2 bg-[#f8d14640] rounded-full"></div> <!--horizontal line-->
                 
                 <div id="pending" class="flex flex-col justify-evenly">
-                    <h1 class="sm:hidden text-xs font-bold">PEND</h1>
+                    <h1 class="sm:hidden text-xs font-bold">PEN...</h1>
                     <h1 class="hidden sm:block sm:text-xs md:text-base lg:text-lg font-bold">PENDING</h1>
-                    <p class="text-[35px]/11 sm:text-[45px]/13 md:text-5xl font-[Inter] font-medium">{{ pending_payroll_count }}</p>
+                    <p class="text-[35px]/11 sm:text-[43px]/13 md:text-5xl font-[Inter] font-medium">{{ pending_payroll_count }}</p>
                 </div>
             </div>
         </div>
@@ -217,7 +217,8 @@
     <div class="order-2 col-span-2 rows-span-1">
         <div class="size-full flex rounded-full overflow-hidden">
             <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-3 cursor-pointer" id="edit_incentives" onclick="editIncentives()">
-                <p class="xl:hidden m-0 p-0 text-[#FFF] font-bold text-lg">EMPLOYEES' INCENTIVES</p>
+                <p class="sm:hidden m-0 p-0 text-[#FFF] font-bold text-base">ALL INCENTIVES</p>
+                <p class="hidden sm:block xl:hidden m-0 p-0 text-[#FFF] font-bold text-sm md:text-base lg:text-lg">EMPLOYEES' INCENTIVES</p>
                 <p class="hidden xl:block m-0 p-0 text-[#FFF] font-bold text-lg">EDIT ALL EMPLOYEES' INCENTIVES</p>
                 <img src="{% static 'images/edit_icon.png' %}" alt="">
             </button>
@@ -227,9 +228,9 @@
     <div class="order-3 col-span-2 rows-span-1">
         <div class="size-full bg-white p-5 flex flex-col justify-center rounded-md overflow-hidden">
             <p class="hidden lg:block text-sm font-extrabold">PAYDAY:</p>
-            <div id="date" class="w-full flex justify-end gap-2">
+            <div id="date" class="w-full flex justify-around lg:justify-end gap-2">
                 <p class="text-[16px]/8 sm:text-[18px]/8 md:text-[22px]/7 xl:text-[28px]/7 font-semibold" id="paydate">{{ current_payday }}</p>
-                <button class="w-8 h-8 bg-no-repeat bg-center" id="calendar" onclick="changePayday()"></button>
+                <button class="w-8 h-8 bg-no-repeat bg-center" id="calendar" onclick="changePayday()" title="edit calendar"></button>
             </div>
         </div>
     </div>
@@ -316,7 +317,7 @@
                     </tr>
                     {% else %}
                     <tr id="payroll-data">
-                        <td class="p-2 text-sm font-[Inter]" colspan="5">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="p-2 text-sm font-[Inter]" colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
                         <td class="p-2 text-sm font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% endif %}

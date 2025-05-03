@@ -518,6 +518,10 @@ def payrolls(request):
     return render(request, 'payroll_system/payroll.html', context)
 
 @login_required
+def payroll_history(request):
+    return render(request, 'payroll_system/payroll_history.html')
+
+@login_required
 def update_all_incentives(request):
     if request.method == 'POST':
         action = request.POST.get('action')
