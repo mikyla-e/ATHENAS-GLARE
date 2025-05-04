@@ -170,7 +170,6 @@
                         <th class="p-2 text-base font-[League Spartan]">RATE PER DAY</th>
                         <th class="p-2 text-base font-[League Spartan]">TOTAL ATTENDANCE</th>
                         <th class="p-2 text-base font-[League Spartan]">TOTAL INCENTIVES</th>
-                        <!-- <th class="p-2 text-base font-[League Spartan]">DEDUCTIONS</th> -->
                         <th class="p-2 text-base font-[League Spartan]">TOTAL PAYMENT AMOUNT</th>
                         <th class="p-2 text-base font-[League Spartan]">DATE OF PAY</th>
                         <th class="p-2 text-base font-[League Spartan]"></th>
@@ -183,7 +182,6 @@
                             <td class="p-2 text-sm font-[Inter]">{{ employee.daily_rate }}</td>
                             <td class="p-2 text-sm font-[Inter]">{{ record.days_worked }}</td>
                             <td id="total-incentives" class="p-2 text-sm font-[Inter] incentive-display">{{ record.incentives }}</td>                        
-                            <!-- <td class="p-2 text-sm font-[Inter]">{{ current_payroll.deductions }}</td> -->
                             <td class="p-2 text-sm font-[Inter] salary-display">{{ record.net_pay }}</td>
                             <td class="p-2 text-sm font-[Inter]">{{ record.payroll_period.payment_date }}</td>
                             <td class="p-3 w-full h-[30%] flex justify-center items-center">
@@ -213,7 +211,7 @@
                 <table id="current_payroll_table" class="bg-white w-[15%] border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
                     <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                         <tr>
-                            <th class="p-2 text-base font-[League Spartan]">
+                            <th class="p-2 text center text-base font-[League Spartan]">
                                 DEDUCTIONS
                             </th>
                         </tr>

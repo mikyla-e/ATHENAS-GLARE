@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!--title-->
+{% block title %}Payroll{% endblock %}
+
+<!--(optional)head content-->
+{% block headcontent %}
+<link rel="stylesheet" href="{% static 'css/payroll.css' %}">
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
+<link rel="stylesheet" href="{% static 'css/default_design.css' %}">
+
+<!--Datatables-->
+<link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
+<script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+
+<style>
+        table.dataTable th.dt-type-numeric,
+        table.dataTable td.dt-type-numeric{
+            text-align: left;
+        }
+
+        #payroll-table-1_info,
+        #payroll-table-2_info{
+            font-family: 'League Spartan';
+        }
+
+        #payment-amount{
+            text-align: right !important;
+        }
+
+        #more{
+            text-align: center !important;
+        }
+        
+        #label{
+            margin: 0 10px;
+            font-family: 'Inter';
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e1e1e;
+        }
+
+        input[type=date]{
+            height: 50px;
+            margin: 8px 0;
+            padding: 2px 15px;
+            border: none;
+
+            font-family: 'Inter';
+            font-size: 1rem;
+
+            background-color: #EFEDE6;
+            height: 50px;
+            border-radius: 20px;
+            resize: none
+        }
+    </style>
+{% endblock %}
+
+<!--header-->
+{% block header %}PAYROLL{% endblock %} 
+
+<!--page content-->
+
+{% block outsidecontent %}
+<div id="background" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelConfirmPayroll(); cancelEditIncentives(); cancelEditDeductions()">
+        
+</div> 
+
+<!-- Confirmation Dialogue -->
+<div id="payroll-popup" class="popup fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
+    <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
+
+    <div class="w-full h-[2px] my-1 border border-2 border-[#1e1e1e40] rounded-full"></div>
+
+    <h1 class="text-lg sm:text-xl my-2 font-[League Spartan] font-semibold text-center">Are you sure this week's Payroll is finished?</h1>
+    
+    <div class="w-full h-[40px] my-1 flex justify-evenly items-center gap-3">
+        <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelConfirmPayroll()">CANCEL</button>
+        <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">CONFIRM</button>
+    </div>
+</div>
+
+<!-- End of Confirmation Dialogue -->
+
+<div id="incentive-popup" class="edit_incentives_popup popup absolute w-[80%] sm:w-[60%] md:w-[50%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
+    <h1>Add/Deduct for all Employees</h1>
+    <form id="incentives-form" class="flex flex-col" method="post" action="#">
+        {% csrf_token %}
+        <div class="flex items-center my-2" >
+            <div id="add-radio" class="flex flex-wrap">
+                <label class="relative flex items-center cursor-pointer" for="add">
+                    <input id="add" name="incentives" type="radio" class="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-yellow-400 transition-all"/>
+                    <span class="absolute bg-[#F8D146] w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                </label>
+                <p id="label">add</p>
+            </div>
+            
+            <div id="subtract-checkbox" class="flex flex-wrap">
+                <label class="relative flex items-center cursor-pointer" for="subtract">
+                    <input id="subtract" name="incentives" type="radio" class="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-yellow-400 transition-all"/>
+                    <span class="absolute bg-[#F8D146] w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                </label>
+                <p id="label">subtract</p>
+            </div>
+        </div>
+
+        <div class="flex flex-col my-2">
+            <input type="number" name="incentives" id="field" class="field" placeholder="ex. 1000.00" step="0.01" min="0" required>
+        </div>
+
+        <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
+            <input type="button" class="size-full" value="CANCEL" onclick="cancelEditIncentives()">
+            <input type="submit" class="size-full" value="CONFIRM">
+        </div>                      
+    </form>
+</div>
+
+<!--deductions-->
+<div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
+    <div class="space-y-2">
+        <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Edit Deductions</h1>
+        <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>     -->
+    </div>
+    <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:edit_deductions' %}">
+        {% csrf_token %}
+        <div class="flex flex-col">
+            <label for="deduction_type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Deduction Type</label>
+        
+            <div class="w-full h-[60px]">
+                {{ deduction_form.deduction_type }}
+            </div>
+        </div>
+
+        <div class="flex flex-col">
+            <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Amount</label>
+        
+            <div class="w-full h-[60px]">
+                {{ deduction_form.amount }}
+            </div>
+        </div>
+
+        <div class="w-full h-[40px] flex justify-end gap-3">
+            <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditDeductions()">CANCEL</button>
+            <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM" onclick="">CONFIRM</button>    
+        </div>
+    </form>   
+</div>
+
+{% endblock %}
+
+{% block content %}
+<div class="w-full grid grid-cols-4 grid-rows-[50px_50px_70px] md:grid-rows-[60px_60px_70px] lg:grid-cols-[2fr_2fr_2fr_1fr_1fr_1fr_1fr] lg:grid-rows-[90px_50px] gap-5">
+    
+    <div class="bg-[#1E1E1E] px-4 order-1 col-span-3 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
+        <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
+            <p class="text-[10px]/3 sm:text-sm/3.5 md:text-base/4 lg:text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">TOTAL PAYROLL</p>
+            <div class="flex flex-col justify-end items-end text-right">
+                {% if total_payroll == "No total payroll yet" %}
+                <p class="text-[#FFF] text-[18px] sm:text-[24px] md:text-[26px] lg:text-3xl font-[Inter] font-semibold">₱ 0.00</p>
+                {% else %}
+                <p class="text-[#FFF] text-[18px] sm:text-[24px] md:text-[26px] lg:text-3xl font-[Inter] font-semibold">₱{{ total_payroll|floatformat:2 }}</p>
+                {% endif %}
+                <p id="" class="text-base sm:text-lg font-[Inter] font-semibold {% if payroll_percentage >= 0 %} text-[#F8D146]  {% elif payroll_percentage <= -1 %} text-[#DC4646]  {% endif %}">
+                    {% if payroll_percentage > 0 %}+{% endif %}{{ payroll_percentage|floatformat:1 }}%
+                </p>
+            </div>
+        </div>
+
+        <div class="w-[1px] h-[80%] mx-2 border border-2 border-[#f8d14640] rounded-full"></div> <!--horizontal line-->
+
+        <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
+            <p class="text-[10px]/3 sm:text-sm/3.5 md:text-base/4 lg:text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">EMPLOYEES AVR. RATE</p>
+            <div class="flex flex-col justify-end items-end text-right">
+                <p class="text-[#FFF] text-[18px] sm:text-[24px] md:text-[26px] lg:text-3xl font-[Inter] font-semibold">{% if avg_rate == "No rate data" %} No rate data {% else %} ₱{{ avg_rate|floatformat:2 }} {% endif %}</p>
+                {% if rate_percentage >= 0 %}
+                    <p id="" class="text-base sm:text-lg font-[Inter] font-semibold text-[#F8D146]">{% if rate_percentage > 0 %}+{% endif %}{{ rate_percentage|floatformat:1 }}%</p>
+                {% elif rate_percentage <= -1 %}
+                    <p id="" class="text-base sm:text-lg font-[Inter] font-semibold text-[#DC4646]">{{ rate_percentage|floatformat:1 }}%</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="order-4 col-span-4 lg:order-2 lg:col-span-4 lg:row-span-1">
+        <div class="bg-white size-full py-2 px-6 rounded-xl flex flex-row lg:flex-col items-center justify-between overflow-hidden">
+            <div class="flex items-center size-full gap-2">
+                <p class="text-sm font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD:</p>
+
+                <div class=" h-full flex items-center gap-2">
+                    <p class="text-4xl text-nowrap">00-00-00</p>
+                    <p>to</p>
+                    <p class="text-4xl text-nowrap">00-00-00</p>
+                </div>
+            </div>
+            <a href="{% url 'payroll_system:payrolls' %}">
+                <div class="flex items-center h-fit w-fit gap-2">
+                    <p class="hidden md:inline-block text-xs text-nowrap">PAYROLL PERIODS</p>
+                    <img src="{% static 'images/next_icon.png' %}" alt="" class="" title="Check Other Payroll Periods">
+                </div>
+            </a>
+            
+        </div>
+    </div>
+
+    <div class="order-2 col-span-1 lg:order-3 lg:col-span-2 row-span-1">
+        <div class="size-full flex rounded-full overflow-hidden ">
+            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-1 cursor-pointer" id="edit_incentives" onclick="editIncentives()" title="Edit All Employee Incentives">
+                <p class="hidden sm:inline-block m-0 p-0 text-[#FFF] font-bold text-base sm:text-xs md:text-sm xl:text-lg">INCENTIVES</p>
+                <img src="{% static 'images/incentives_icon.png' %}" alt="">
+            </button>
+        </div>
+    </div>
+
+    <div class="order-3 col-span-1 lg:order-4 lg:col-span-2 row-span-1">
+        <div class="size-full flex rounded-full overflow-hidden">
+            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-1 cursor-pointer" id="edit_incentives" onclick="editDeductions()" title="Edit All Employee Deductions">
+                <p class="hidden sm:inline-block m-0 p-0 text-[#FFF] font-bold text-base sm:text-xs md:text-sm xl:text-lg">DEDUCTIONS</p>
+                <img src="{% static 'images/deductions_icon.png' %}" alt="">
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="w-full flex flex-col py-5">
+    <div class="w-full h-[40px] flex flex-nowrap justify-between gap-3">
+        <div class="w-[80%] lg:w-[85%] xl:w-[90%] h-full flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden" id="search">
+            <form class="w-full flex justify-center items-center gap-3" method="get">
+                {% csrf_token %}
+                <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
+                    <img class="h-[25px] w-[25px]" src="{% static 'images/search_icon.png' %}" alt="Search">
+                </button>
+                <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
+            </form>
+        </div>
+
+        <a href="#">
+            <button id="button_2" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">PRINT</button>
+        </a>
+
+        <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
+            <form action="#" method="post" id="confirm-payroll-form" class="h-full">
+                {% csrf_token %}
+                <button type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center !text-[#1E1E1E]" id="button_1" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
+            </form>
+        </div>
+
+    </div>
+
+    <div class="md:hidden flex flex-col justify-center">
+        <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="payroll-table-1">
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr>
+                    <th class="p-2 text-sm font-[League Spartan]">EMPLOYEE</th>
+                    <th class="p-2 text-sm font-[League Spartan]">CASH ADVANCE</th>
+                    <th class="p-2 text-sm font-[League Spartan]">RATE</th>
+                    <th class="p-2 text-sm font-[League Spartan]" id="payment-amount">NET PAY</th>
+                    <th class="p-2 text-sm font-[League Spartan]"></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for employee in employees %}
+                {% if employee.payroll_records.all %}
+                    {% for record in employee.payroll_records.all %}
+                    <tr id="payroll-data">
+                        <td class="p-2 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="p-2 text-sm font-[Inter]"><!--CASH ADVANCE (YES/NO)--></td>
+                        <td class="p-2 text-sm font-[Inter]"><!--RATE--></td>
+                        <td class="p-2 text-sm font-[Inter]" id="payment-amount">₱<!--{{ record.net_pay }}--></td>
+                        <td class="p-2 text-sm font-[Inter]" id="more">
+                            <a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr id="payroll-data">
+                        <td class="p-2 text-sm font-[Inter]" colspan="5">
+                            No payroll records found for {{ employee.first_name }} {{ employee.last_name }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="hidden md:block flex flex-col justify-center">
+        <table class="bg-white w-full my-5 border-none rounded-2xl text-xs-center overflow-hidden" id="payroll-table-2">
+            <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                <tr class="text-base text-center font-[League Spartan]">
+                    <th class="p-2 text-base font-[League Spartan]">EMPLOYEE</th>
+                    <th class="p-2 text-base font-[League Spartan]">CASH ADVANCE</th>
+                    <th class="p-2 text-base font-[League Spartan]">DAILY RATE</th>
+                    <th class="p-2 text-base font-[League Spartan]" id="payment-amount">NET PAY</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for employee in employees %}
+                {% if employee.payroll_records.all %}
+                    {% for record in employee.payroll_records.all %}
+                    <tr id="payroll-data">
+                        <td class="p-2 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="p-2 text-sm font-[Inter]">{% if record.cash_advance %} YES {% else %} NO {% endif %}</td>
+                        <td class="p-2 text-sm font-[Inter]">{{ employee.daily_rate }}</td>
+                        <td class="p-2 text-sm font-[Inter]" id="payment-amount">₱ {{ record.net_pay }}</td>
+                        <td class="p-2 text-sm font-[Inter]" id="more">
+                            <a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr id="payroll-data">
+                        <td class="p-2 text-sm font-[Inter]" colspan="5">
+                            No payroll records found for {{ employee.first_name }} {{ employee.last_name }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}          
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
+
+<!--(optional)script-->
+{% block script %}
+    <script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'javascript/dataTables.js' %}"></script>
+
+    <script>
+        let table_1;
+        let table_2;
+    
+        $(document).ready(function () {
+            table_1 = $('#payroll-table-1').DataTable({
+                responsive: true
+            });
+
+            table_2 = $('#payroll-table-2').DataTable({
+                responsive: true
+            });
+    
+            // Make search input work with DataTables
+            $('#search-input').on('keyup', function () {
+                table_1.search(this.value).draw();
+                table_2.search(this.value).draw();
+            });
+        });
+
+        $(document).on('keypress', '#search-input', function (e) {
+            if (e.which == 13) e.preventDefault();
+        });
+    </script>    
+
+    <script>
+        function editIncentives(){
+            const bg = document.getElementById("background");
+            const popup = document.getElementById("incentive-popup");
+            bg.classList.add("show");
+            popup.classList.add("show");
+        }
+
+        function cancelEditIncentives(){
+            const bg = document.getElementById("background");
+            const popup = document.getElementById("incentive-popup");
+            bg.classList.remove("show");
+            popup.classList.remove("show");
+            
+            // Reset the form
+            document.getElementById("incentives-form").reset();
+        }
+
+        
+        function confirmPayroll(){
+            const bg = document.getElementById("background");
+            const popup = document.getElementById("payroll-popup");
+            bg.classList.add("show");
+            popup.classList.add("show");
+        }
+        
+        function cancelConfirmPayroll(){
+            const bg = document.getElementById("background");
+            const popup = document.getElementById("payroll-popup");
+            bg.classList.remove("show");
+            popup.classList.remove("show");
+        }
+        
+
+        function editDeductions(){
+            let bg = document.getElementById("background");
+            const popup = document.getElementById("deductions-popup");
+            
+            bg.classList.add("show");
+            popup.classList.add("show");
+        }
+
+        function cancelEditDeductions(){
+            let bg = document.getElementById("background");
+            const popup = document.getElementById("deductions-popup");
+            bg.classList.remove("show");
+            popup.classList.remove("show");
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // For confirm payroll
+            document.querySelector('#payroll-popup #button').addEventListener('click', function() {
+                document.getElementById('confirm-payroll-form').submit();
+                cancelConfirmPayroll();
+            });
+
+            const paydayForm = document.getElementById('payday-form');
+            paydayForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+        
+                const dateInput = document.getElementById('payday');
+                const selectedDate = dateInput.value;
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+                fetch("#", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: new URLSearchParams({
+                        payday: 'true',
+                        date: selectedDate
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error("Network response was not ok.");
+                    return response.json(); // we'll return JSON from the view
+                })
+                .then(data => {
+                    if (data.success && data.updated_payday) {
+                        document.getElementById('paydate').textContent = data.updated_payday;
+                        cancelChangePayday(); // Close the modal
+                    }
+                })
+                .catch(error => {
+                    console.error("Error updating payday:", error);
+                });
+            });
+        });
+    </script>
+{% endblock %}

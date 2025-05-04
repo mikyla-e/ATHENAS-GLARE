@@ -42,7 +42,7 @@
                 </a>
             </li>
             <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'payrolls' in request.path %}focused{% endif %}">
-                <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
+                <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payroll_record' %}">
                     <img class="w-auto h-auto" 
                     src="{% if 'payrolls' in request.path %}
                             {% static 'images/payroll_icon_focused.png' %}
