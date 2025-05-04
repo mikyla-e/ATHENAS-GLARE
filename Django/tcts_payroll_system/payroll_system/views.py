@@ -1460,3 +1460,54 @@ def payroll_stats_api(request):
         'amounts': amounts
     })
 
+@login_required
+def payroll_view(request):
+    # Existing view code...
+    
+    # Calculate average employee rate
+    employees = Employee.objects.filter(is_active=True)
+    if employees.exists():
+        # Calculate the average daily rate from all active employees
+        avg_rate = employees.aggregate(Avg('daily_rate'))['daily_rate__avg']
+        
+        # Compare with previous period for percentage change if needed
+        # For example, assuming you have a way to get previous period's average rate
+        previous_avg_rate = get_previous_avg_rate()  # You'll need to implement this function
+        
+        if previous_avg_rate and previous_avg_rate > 0:
+            rate_percentage = ((avg_rate - previous_avg_rate) / previous_avg_rate) * 100
+        else:
+            rate_percentage = 0
+    else:
+        avg_rate = "No rate data"  
+        rate_percentage = 0
+    
+    context = {
+        # Other context data...
+        'avg_rate': avg_rate,
+        'rate_percentage': rate_percentage,
+    }
+    
+    return render(request, 'payroll_record.html', context)
+
+def get_previous_avg_rate():
+    # Implementation to get previous period's average rate
+    # For example, you could get employees' rates from the previous payroll period
+    # or simply store historical data
+    previous_period = PayrollPeriod.objects.filter(
+        end_date__lt=timezone.now()
+    ).order_by('-end_date').first()
+    
+    if previous_period:
+        # Get the employees who were active during the previous period
+        previous_employees = Employee.objects.filter(
+            payroll_records__payroll_period=previous_period,
+            is_active=True
+        ).distinct()
+        
+        if previous_employees.exists():
+            return previous_employees.aggregate(Avg('daily_rate'))['daily_rate__avg']
+    
+    return None
+
+
