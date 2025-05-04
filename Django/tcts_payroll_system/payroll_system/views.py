@@ -1582,3 +1582,41 @@ def get_next_payday(employee):
         return next_payday.payment_date.strftime("%B %d, %Y")
     
     return None
+
+@login_required
+def payroll_stats_api(request):
+    """API endpoint to return payroll data for the chart"""
+    
+    # Get the 5 most recent completed payroll periods that have records
+    recent_periods = PayrollPeriod.objects.order_by('-end_date')
+    
+    dates = []
+    amounts = []
+    
+    # Filter out periods with no payroll records and limit to 5
+    valid_periods = []
+    for period in recent_periods:
+        total = PayrollRecord.objects.filter(payroll_period=period).aggregate(
+            total=Sum('net_pay')
+        )['total'] or 0
+        
+        # Only include periods that have payroll records with non-zero totals
+        if total > 0:
+            valid_periods.append((period, total))
+            
+        # Stop once we have 5 valid periods
+        if len(valid_periods) >= 5:
+            break
+    
+    # If we have valid periods, process them (oldest to newest for the chart)
+    for period, total in reversed(valid_periods):
+        # Format date as "MMM DD" (e.g., "Apr 15")
+        formatted_date = period.end_date.strftime('%b %d')
+        dates.append(formatted_date)
+        amounts.append(float(total))
+    
+    return JsonResponse({
+        'dates': dates,
+        'amounts': amounts
+    })
+
