@@ -325,9 +325,18 @@ class PayrollPeriod(models.Model):
     type = models.CharField(max_length=9, choices=Type.choices)
 
     def save(self, *args, **kwargs):
+        today = timezone.now().date()
+
+        # Block INPROGRESS if start_date is in the future
+        if self.payroll_status == self.PayrollStatus.INPROGRESS and self.start_date > today:
+            raise ValidationError("Cannot generate payroll period before the start date.")
+
         is_new = self.pk is None
+
+        # Auto-set payment date to end_date
         if self.end_date:
             self.payment_date = self.end_date
+
         super().save(*args, **kwargs)
 
         if is_new:
@@ -338,6 +347,18 @@ class PayrollPeriod(models.Model):
                     payroll_period=self
                 )
 
+    def generate(self):
+        today = timezone.now().date()
+
+        if self.start_date > today:
+            raise ValidationError("Cannot generate payroll period before the start date.")
+
+        self.payroll_status = self.PayrollStatus.INPROGRESS
+        self.save()
+
+        for record in self.payroll_records.all():
+            record.save()  # Triggers computation if period is INPROGRESS
+
     def __str__(self):
         return f"{self.start_date} to {self.end_date} ({self.get_payroll_status_display()})"
 
@@ -345,7 +366,7 @@ class Deduction(models.Model):
     class DeductionType(models.TextChoices):
         SSS = 'SSS', _('SSS')
         PHILHEALTH = 'PHILHEALTH', _('PhilHealth')
-        PAGIBIG = 'PAGIBIG', _('Pag-IBIG')
+        PAGIBIG = 'PAGIBIG', _('Pag-Ibig')
 
     deduction_id = models.AutoField(primary_key=True)
     payroll_record = models.ForeignKey('PayrollRecord', on_delete=models.CASCADE, related_name='deductions')
@@ -375,21 +396,22 @@ class PayrollRecord(models.Model):
         total_deductions = self.calculate_total_deductions()
         return self.gross_pay - total_deductions - self.cash_advance
 
-    from django.db.models import Q
-
     def save(self, *args, **kwargs):
-        self.days_worked = Attendance.objects.filter(
-            employee=self.employee,
-            attendance_status=Attendance.AttendanceStatus.PRESENT,
-            date__range=(self.payroll_period.start_date, self.payroll_period.end_date)
-        ).count()
+        # Only compute pay if payroll period is INPROGRESS
+        if self.payroll_period.payroll_status == PayrollPeriod.PayrollStatus.INPROGRESS:
+            self.days_worked = Attendance.objects.filter(
+                employee=self.employee,
+                attendance_status=Attendance.AttendanceStatus.PRESENT,
+                date__range=(self.payroll_period.start_date, self.payroll_period.end_date)
+            ).count()
 
-        self.gross_pay = self.calculate_gross_pay()
-        
-        super().save(*args, **kwargs)
+            self.gross_pay = self.calculate_gross_pay()
+            super().save(*args, **kwargs)
 
-        self.net_pay = self.calculate_net_pay()
-        super().save(update_fields=['net_pay'])
+            self.net_pay = self.calculate_net_pay()
+            super().save(update_fields=['net_pay'])
+        else:
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.employee} | {self.payroll_period.start_date} - {self.net_pay:.2f} net pay"

@@ -308,28 +308,24 @@
                 </tr>
             </thead>
             <tbody>
-            {% for employee in employees %}
-                {% if employee.payroll_records.all %}
-                    {% for record in employee.payroll_records.all %}
-                    <tr id="payroll-data">
-                        <td class="p-2 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td class="p-2 text-sm font-[Inter]">{% if record.cash_advance %} YES {% else %} NO {% endif %}</td>
-                        <td class="p-2 text-sm font-[Inter]">{{ employee.daily_rate }}</td>
-                        <td class="p-2 text-sm font-[Inter]" id="payment-amount">₱ {{ record.net_pay }}</td>
-                        <td class="p-2 text-sm font-[Inter]" id="more">
-                            <a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr id="payroll-data">
-                        <td class="p-2 text-sm font-[Inter]" colspan="5">
-                            No payroll records found for {{ employee.first_name }} {{ employee.last_name }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}          
-            </tbody>
+                {% for record in records %}
+                <tr id="payroll-data">
+                    <td class="p-2 text-sm font-[Inter]">{{ record.employee.first_name }} {{ record.employee.last_name }}</td>
+                    <td class="p-2 text-sm font-[Inter]">{% if record.cash_advance %} YES {% else %} NO {% endif %}</td>
+                    <td class="p-2 text-sm font-[Inter]">{{ record.employee.daily_rate }}</td>
+                    <td class="p-2 text-sm font-[Inter]" id="payment-amount">₱ {{ record.net_pay }}</td>
+                    <td class="p-2 text-sm font-[Inter]" id="more">
+                        <a href="{% url 'payroll_system:payroll_individual' record.employee.employee_id %}">MORE</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr id="payroll-data">
+                    <td class="p-2 text-sm font-[Inter]" colspan="5">
+                        No payroll records found for this period
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>            
         </table>
     </div>
 

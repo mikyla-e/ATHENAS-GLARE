@@ -137,7 +137,7 @@
             <label for="payroll_period" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Payroll Period</label>
         
             <div class="w-full h-[60px]">
-                <input type="text"> <!--example-->
+                {{ deduction_form.payroll_period }}
             </div>
         </div>
 
@@ -145,9 +145,6 @@
             <label for="deduction_type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Deduction Type</label>
         
             <div class="w-full h-[60px]">
-                <select name="" id=""> <!--example-->
-                    <option value="dshakdn"></option>
-                </select>
                 {{ deduction_form.deduction_type }}
             </div>
         </div>
@@ -156,7 +153,6 @@
             <label for="amount" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Amount</label>
         
             <div class="w-full h-[60px]">
-                <input type="number"> <!--example-->
                 {{ deduction_form.amount }}
             </div>
         </div>
@@ -167,6 +163,24 @@
         </div> 
     </form>  
 </div>
+
+{% if messages %}
+<div id="error-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
+    <div class="space-y-2">
+        <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Notice</h1>
+    </div>
+    <div class="messages">
+        {% for message in messages %}
+        <p class="{% if message.tags %}{{ message.tags }}{% endif %} text-sm font-[Inter] font-normal text-left m-0">
+            {{ message }}
+        </p>
+        {% endfor %}
+    </div>
+    <div class="w-full h-[40px] flex justify-end gap-3">
+        <button id="close-error" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="closeErrorPopup()">OK</button>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -176,44 +190,41 @@
 {% endif %}
 
 <div class="size-full px-5 flex flex-col gap-4">
-    {% for payroll_period in payroll_periods %}
+    {% if current_payroll %}
     <div class="flex flex-col py-3 px-4 bg-white rounded-xl">
         <div class="px-2 flex justify-between items-end">
             <div class="w-full flex justify-between items-end gap-2">
                 <div class="flex gap-2 items-end">
                     <p class="text-[League Spartan] text-2xl font-bold">CURRENT PAYROLL</p>
-                    <p class="text-[League Spartan] text-lg font-semibold text-[#1E1E1E80]">{{ payroll_period.payroll_status }}</p>
+                    <p class="text-[League Spartan] text-lg font-semibold text-[#1E1E1E80]">{{ current_payroll.get_payroll_status_display }}</p>
                 </div>
                 <div class="h-[30px]">
                     <button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Confirm Payroll Period" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
                 </div>
             </div>
-            
         </div>
         
         <div class="w-full h-[1px] my-2 border border-2 border-[#1e1e1e40] rounded-full"></div>
         
-        
         <div class="flex justify-between">
             <div class="flex flex-col px-4 py-3 gap-2">
-                <p class="text-base font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD: <span class="text-[#1E1E1E] text-[Inter] font-semibold">{{ payroll_period.start_date }} - {{ payroll_period.end_date }} | {{ payroll_period.type }}</span></p>
+                <p class="text-base font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD: <span class="text-[#1E1E1E] text-[Inter] font-semibold">{{ current_payroll.start_date }} - {{ current_payroll.end_date }} | {{ current_payroll.get_type_display }}</span></p>
                 <div class="flex flex-col gap-1">
-                    <p for="" class="text-base font-[Roboto] font-bold text-[#1E1E1E66]">PAYMENT DATE:</p>
-                    <p class="text-2xl text-[Inter] font-semibold">{{ payroll_period.payment_date }}</p>
-    
+                    <p class="text-base font-[Roboto] font-bold text-[#1E1E1E66]">PAYMENT DATE:</p>
+                    <p class="text-2xl text-[Inter] font-semibold">{{ current_payroll.payment_date }}</p>
                 </div>            
             </div>
             
             <div class="flex gap-3 items-end p-3">
-                <a href="" class="text-base font-bold hover:text-[#F8D146] duration-100" title="View Payroll Records">view more</a>
+                <a href="{% url 'payroll_system:payroll_record' %}?payroll_id={{ current_payroll.id }}" class="text-base font-bold hover:text-[#F8D146] duration-100">view</a>
             </div>
         </div>
-        
-
     </div>
-    {% empty %}
-
-    {% endfor %}
+    {% else %}
+    <div class="flex flex-col py-3 px-4 bg-white rounded-xl">
+        <p class="text-[League Spartan] text-xl font-bold text-gray-500">No active payroll period at the moment</p>
+    </div>
+    {% endif %}
 
     <!-- <div class="w-full h-fit flex justify-between items-end">
         <h1 class="mx-3 text-[League Spartan] text-2xl font-bold">CURRENT PAYROLL</h1>
@@ -280,19 +291,19 @@
                 </tr>
             </thead>
             <tbody>
-                {% for payroll_period in payroll_periods %}
+                {% for payroll in pending_payrolls %}
                 <tr id="payroll-data">
-                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll_period.type }}</td>
-                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll_period.start_date }}</td>
-                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll_period.end_date }}</td>
+                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll.type }}</td>
+                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll.start_date }}</td>
+                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll.end_date }}</td>
                     
-                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll_period.payroll_status }}</td>
+                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll.payroll_status }}</td>
                     
-                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll_period.payment_date }}</td>
+                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll.payment_date }}</td>
                     <td class="px-2 py-4 text-sm font-[Inter] ">
                     <td class="px-2 py-4 text-sm font-[Inter] space-x-2">
-                        <a href="" class="font-bold hover:text-[#F8D146] duration-100">GENERATE</a>
-                        <a href="" class="font-bold hover:text-[#F8D146] duration-100">MORE</a>
+                        <a href="{% url 'payroll_system:generate_payroll' payroll.payroll_period_id %}" class="font-bold hover:text-[#F8D146] duration-100">GENERATE</a>
+                        <a href="{% url 'payroll_system:payroll_record' %}?payroll_id={{ payroll.payroll_period_id }}" class="font-bold hover:text-[#F8D146] duration-100">MORE</a>
                     </td>
                 </tr>
                 {% empty %}
@@ -355,6 +366,31 @@
         const popup = document.getElementById("deductions-popup");
         bg.classList.remove("show");
         popup.classList.remove("show");
+    }
+
+    // When the document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if there are any error messages
+        const errorPopup = document.getElementById('error-popup');
+        if (errorPopup) {
+            // Show the popup
+            errorPopup.classList.remove('invisible', 'opacity-0');
+            errorPopup.classList.add('visible', 'opacity-100');
+        }
+    });
+
+    // Function to close the error popup
+    function closeErrorPopup() {
+        const errorPopup = document.getElementById('error-popup');
+        if (errorPopup) {
+            errorPopup.classList.add('invisible', 'opacity-0');
+            errorPopup.classList.remove('visible', 'opacity-100');
+            
+            // Optional: remove the popup from DOM after animation
+            setTimeout(() => {
+                errorPopup.remove();
+            }, 300);
+        }
     }
 </script>
 {% endblock %}

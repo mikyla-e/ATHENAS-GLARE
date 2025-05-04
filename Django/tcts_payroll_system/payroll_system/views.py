@@ -4,7 +4,7 @@ from datetime import datetime, date as date_class
 from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import OuterRef, Subquery, Count, Sum, Min, Avg
+from django.db.models import OuterRef, Subquery, Sum, Min, Prefetch
 from django.forms import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -243,7 +243,6 @@ def employees(request):
     
     context = {
         'employees': employees,
-        # 'query': query
     }
     return render(request, 'payroll_system/employees.html', context)
 
@@ -336,27 +335,48 @@ def create_payroll(request):
 
 @login_required
 def payroll_record(request):
-    employees = Employee.objects.prefetch_related('payroll_records').all()
-    
-    deduction_form = DeductionForm() 
-       
-    total_employees = employees.count()
-    
-    context = {
-        'employees': employees,
-        'deduction_form': deduction_form,
-        'total_employees': total_employees,
-    }
+    payroll_id = request.GET.get('payroll_id')
+
+    if payroll_id:
+        payroll = get_object_or_404(PayrollPeriod, payroll_period_id=payroll_id)
+
+        # Get all PayrollRecords for the selected period, with employee data
+        records = PayrollRecord.objects.filter(payroll_period=payroll).select_related('employee')
+
+        context = {
+            'records': records,
+            'selected_payroll': payroll,
+        }
+    else:
+        # If no payroll is selected, show nothing or default view
+        records = []
+        context = {
+            'records': records,
+        }
+
     return render(request, 'payroll_system/payroll_record.html', context)
+
 
 @login_required
 def payrolls(request):
-    payroll_periods = PayrollPeriod.objects.all()
-    payroll_period_form = PayrollPeriodForm()  
+    # Get the current in-progress payroll period (if any)
+    current_payroll = PayrollPeriod.objects.filter(
+        payroll_status=PayrollPeriod.PayrollStatus.INPROGRESS
+    ).first()
+    
+    # Get pending payroll periods (for the bottom list)
+    pending_payrolls = PayrollPeriod.objects.filter(
+        payroll_status=PayrollPeriod.PayrollStatus.PENDING
+    ).order_by('start_date')
+
+    payroll_period_form = PayrollPeriodForm()
+    deduction_form = DeductionForm()   
 
     context = {
-        'payroll_periods': payroll_periods,
+        'current_payroll': current_payroll,
+        'pending_payrolls': pending_payrolls,
         'payroll_period_form': payroll_period_form,  
+        'deduction_form': deduction_form,
     }
 
     return render(request, 'payroll_system/payrolls.html', context)
@@ -412,6 +432,21 @@ def edit_deductions(request):
             return render(request, 'payroll_system/payroll_record.html', context)
 
     return redirect('payroll_system:payroll_record')
+
+@login_required
+def generate_payroll(request, payroll_period_id):
+    # Get the payroll period or return 404
+    payroll_period = get_object_or_404(PayrollPeriod, payroll_period_id=payroll_period_id)
+    
+    try:
+        # Try to generate the payroll
+        payroll_period.generate()  
+        messages.success(request, f"Payroll for period {payroll_period.start_date} to {payroll_period.end_date} has been generated successfully!")
+    except ValidationError as e:
+        # Catch the validation error and pass it to the template via messages
+        messages.error(request, e.message)
+
+    return redirect('payroll_system:payrolls')
 
 @login_required
 def update_all_incentives(request):
