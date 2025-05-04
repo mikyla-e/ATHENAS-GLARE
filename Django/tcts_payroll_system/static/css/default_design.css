@@ -87,7 +87,7 @@ input[type=button]:hover{
     box-shadow: 0 0 0 2px #F8D146; /* Tailwind's yellow-400 */
 }
 
-input[type=text], input[type=email], input[type=password], input[type=tel], input[type=number], select{
+input[type=text], input[type=email], input[type=password], input[type=tel], input[type=number]{
     height: 50px;
     margin: 8px 0;
     padding: 2px 15px;
@@ -128,3 +128,11 @@ input[type=date]{
     resize: none
 }
 
+select{
+    margin: 8px 0;
+    padding: 2px 15px;
+    border: none;
+
+    background-color: #fff;
+    border-radius: 20px;
+}

@@ -131,7 +131,7 @@
     </form>
 </div>
 
-<div id="background_payday" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelChangePayday()">
+<!-- <div id="background_payday" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelChangePayday()">
     
 </div> 
 
@@ -155,7 +155,7 @@
             <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
         </div>           
     </form>
-</div>
+</div> -->
 
 {% endblock %}
 
@@ -177,7 +177,7 @@
             </div>
         </div>
 
-        <span class="w-[3px] h-[80%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
+        <div class="w-[1px] h-[80%] mx-2 border border-2 border-[#f8d14640] rounded-full"></div> <!--horizontal line-->
 
         <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
             <p class="text-[10px]/3 sm:text-sm/3.5 md:text-base/4 lg:text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">EMPLOYEES AVR. RATE</p>
@@ -191,34 +191,27 @@
             </div>
         </div>
 
-        <span class="w-[3px] h-[80%] mx-2 bg-[#f8d14640] rounded-full"></span> <!--horizontal line-->
+        <div class="w-[1px] h-[80%] mx-2 border border-2 border-[#f8d14640] rounded-full"></div> <!--horizontal line-->
         
-        <div class="h-full py-4 md:py-4.5 flex flex-col justify-between overflow-hidden">
-            <p class="text-white text-[10px] sm:text-xs md:text-lg font-bold font-[League Spartan] text-left">TOTAL PAYROLL</p>
-            <div class="flex flex-row justify-evenly">
-                <div id="processed" class="flex flex-col justify-evenly">
-                    <h1 class="sm:hidden text-xs font-bold">PRO...</h1>
-                    <h1 class="hidden sm:block sm:text-xs md:text-base lg:text-lg font-bold">PROCESSED</h1>
-                    <p class="text-[35px]/11 sm:text-[43px]/13 md:text-5xl font-[Inter] font-medium">{{ processed_payroll_count }}</p>  
+        <div class="h-full py-4 flex flex-col justify-between items-center overflow-hidden">
+            <p class="text-white text-[10px] sm:text-xs md:text-lg font-bold font-[League Spartan] text-left">PERIOD</p>
+            <div class="flex flex-col justify-evenly items-center">
+                <div class="bg-[#f8d14640] px-2 py-0.5 rounded-xl">
+                    <p>00-00-00</p>
                 </div>
-
-                <div class="w-[2px] h-[100%] mx-2 bg-[#f8d14640] rounded-full"></div> <!--horizontal line-->
-                
-                <div id="pending" class="flex flex-col justify-evenly">
-                    <h1 class="sm:hidden text-xs font-bold">PEN...</h1>
-                    <h1 class="hidden sm:block sm:text-xs md:text-base lg:text-lg font-bold">PENDING</h1>
-                    <p class="text-[35px]/11 sm:text-[43px]/13 md:text-5xl font-[Inter] font-medium">{{ pending_payroll_count }}</p>
+                <p class="text-white">to</p>
+                <div class="bg-[#f8d14640] px-2 py-0.5 rounded-xl">
+                    <p>00-00-00</p>
                 </div>
             </div>
         </div>
-
     </div>
 
     <div class="order-2 col-span-2 rows-span-1">
         <div class="size-full flex rounded-full overflow-hidden">
             <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-3 cursor-pointer" id="edit_incentives" onclick="editIncentives()">
-                <p class="sm:hidden m-0 p-0 text-[#FFF] font-bold text-base">ALL INCENTIVES</p>
-                <p class="hidden sm:block xl:hidden m-0 p-0 text-[#FFF] font-bold text-sm md:text-base lg:text-lg">EMPLOYEES' INCENTIVES</p>
+                <p class="sm:hidden m-0 p-0 text-[#FFF] font-bold text-base text-sm md:text-base lg:text-lg">ALL INCENTIVES</p>
+                <p class="hidden sm:block xl:hidden m-0 p-0 text-[#FFF] font-bold ">EMPLOYEES' INCENTIVES</p>
                 <p class="hidden xl:block m-0 p-0 text-[#FFF] font-bold text-lg">EDIT ALL EMPLOYEES' INCENTIVES</p>
                 <img src="{% static 'images/edit_icon.png' %}" alt="">
             </button>
@@ -226,12 +219,13 @@
     </div>
 
     <div class="order-3 col-span-2 rows-span-1">
-        <div class="size-full bg-white p-5 flex flex-col justify-center rounded-md overflow-hidden">
-            <p class="hidden lg:block text-sm font-extrabold">PAYDAY:</p>
-            <div id="date" class="w-full flex justify-around lg:justify-end gap-2">
-                <p class="text-[16px]/8 sm:text-[18px]/8 md:text-[22px]/7 xl:text-[28px]/7 font-semibold" id="paydate">{{ current_payday }}</p>
-                <button class="w-8 h-8 bg-no-repeat bg-center" id="calendar" onclick="changePayday()" title="edit calendar"></button>
-            </div>
+        <div class="size-full flex rounded-full overflow-hidden">
+            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-3 cursor-pointer" id="edit_incentives" onclick="editIncentives()">
+                <p class="sm:hidden m-0 p-0 text-[#FFF] font-bold text-base text-sm md:text-base lg:text-lg">ALL DEDUCTIONS</p>
+                <p class="hidden sm:block xl:hidden m-0 p-0 text-[#FFF] font-bold ">EMPLOYEES' DEDUCTIONS</p>
+                <p class="hidden xl:block m-0 p-0 text-[#FFF] font-bold text-lg">EDIT ALL EMPLOYEES' DEDUCTIONS</p>
+                <img src="{% static 'images/edit_icon.png' %}" alt="">
+            </button>
         </div>
     </div>
 </div>
@@ -266,8 +260,9 @@
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr>
                     <th class="p-2 text-sm font-[League Spartan]">EMPLOYEE</th>
-                    <th class="p-2 text-sm font-[League Spartan]">STATUS</th>
-                    <th class="p-2 text-sm font-[League Spartan]" id="payment-amount">PAYMENT AMOUNT</th>
+                    <th class="p-2 text-sm font-[League Spartan]">CASH ADVANCE</th>
+                    <th class="p-2 text-sm font-[League Spartan]">RATE</th>
+                    <th class="p-2 text-sm font-[League Spartan]" id="payment-amount">NET PAY</th>
                     <th class="p-2 text-sm font-[League Spartan]"></th>
                 </tr>
             </thead>
@@ -277,13 +272,14 @@
                     {% if latest_payroll %}
                     <tr id="payroll-data">
                         <td class="p-2 text-xs font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td class="p-2 text-xs font-[Inter]">{{ latest_payroll.payroll_status }}</td>
-                        <td class="p-2 text-xs font-[Inter]" id="payment-amount">₱{{ latest_payroll.salary }}</td>
+                        <td class="p-2 text-xs font-[Inter]"><!--CASH ADVANCE (YES/NO)--></td>
+                        <td class="p-2 text-xs font-[Inter]"><!--RATE--></td>
+                        <td class="p-2 text-xs font-[Inter]" id="payment-amount">₱<!--NET PAY--></td>
                         <td class="p-2 text-xs font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% else %}
                     <tr id="payroll-data">
-                        <td class="p-2 text-xs font-[Inter]" colspan="2">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="p-2 text-xs font-[Inter]" colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
                         <td class="p-2 text-xs font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% endif %}
@@ -298,9 +294,9 @@
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="text-base text-center font-[League Spartan]">
                     <th class="p-2 text-base font-[League Spartan]">EMPLOYEE</th>
-                    <th class="p-2 text-base font-[League Spartan]">STATUS</th>
-                    <th class="p-2 text-base font-[League Spartan]">RATE PER DAY</th>
-                    <th class="p-2 text-base font-[League Spartan]" id="payment-amount">PAYMENT AMOUNT</th>
+                    <th class="p-2 text-base font-[League Spartan]">CASH ADVANCE</th>
+                    <th class="p-2 text-base font-[League Spartan]">RATE</th>
+                    <th class="p-2 text-base font-[League Spartan]" id="payment-amount">NET PAY</th>
                     <th></th>
                 </tr>
             </thead>
@@ -310,9 +306,9 @@
                     {% if latest_payroll %}
                     <tr id="payroll-data">
                         <td class="p-2 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td class="p-2 text-sm font-[Inter]">{{ latest_payroll.payroll_status }}</td>
-                        <td class="p-2 text-sm font-[Inter]">{{ latest_payroll.rate }}</td>
-                        <td class="p-2 text-sm font-[Inter]" id="payment-amount">₱{{ latest_payroll.salary }}</td>
+                        <td class="p-2 text-sm font-[Inter]"><!--CASH ADVANCE (YES/NO)--></td>
+                        <td class="p-2 text-sm font-[Inter]"><!--RATE--></td>
+                        <td class="p-2 text-sm font-[Inter]" id="payment-amount">₱<!--NET PAY--></td>
                         <td class="p-2 text-sm font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
                     </tr>
                     {% else %}
