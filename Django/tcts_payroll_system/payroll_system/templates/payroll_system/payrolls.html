@@ -17,13 +17,43 @@
         opacity: 1;
     }
 
-    input[type=date], input[type=text]{
+    input[type=date], input[type=text], input[type=number], select{
+        height: 60px;
+        width: 100%;
         margin: 2px;
         padding: 0 15px;
         border: none;
 
         background-color: rgba(111, 81, 21, 0.10);
         border-radius: 10px;
+    }
+    
+    #edit{
+        padding: 0 20px;
+        width: fit-content;
+
+        border-radius: 10px;
+        border: none;
+
+        background-color: #6EBACC;
+        color: white;
+    }
+
+    #confirm{
+        padding: 0 20px;
+        width: fit-content;
+
+        border-radius: 50px;
+        border: none;
+
+        background-color: #7AB576;
+        color: white;
+    }
+
+    #confirm:hover{
+        cursor: pointer;
+        scale: 1.05;
+        transition: 0.5s;
     }
 </style>
 {% endblock %}
@@ -33,7 +63,7 @@
 
 <!--page content-->
 {% block outsidecontent %}
-<div id="background" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddPayroll()">
+<div id="background" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddPayroll(); cancelEditDeductions();">
     
 </div> 
 
@@ -49,7 +79,7 @@
         <div class="flex flex-col">
             <label for="type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Payroll Type</label>
         
-            <div class="w-full h-[75%]">
+            <div class="w-full h-[60px]">
                 {{ payroll_period_form.type}}
             </div>
         </div>
@@ -74,7 +104,7 @@
 
         <div class="w-full h-[40px] flex justify-end gap-3">
             <input type="button" id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddPayroll()">
-            <input type="submit" id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM"> 
+            <input type="submit" id="confirm" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM"> 
         </div> 
     </form>   
 </div>
@@ -82,35 +112,47 @@
 
 <!--deductions-->
 
-<!-- <div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
+<div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
     <div class="space-y-2">
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Edit Deductions</h1>
-        <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>     
+        <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>     -->
     </div>
     <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:edit_deductions' %}">
         {% csrf_token %}
         <div class="flex flex-col">
+            <label for="payroll_period" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Payroll Period</label>
+        
+            <div class="w-full h-[60px]">
+                <input type="text"> <!--example-->
+            </div>
+        </div>
+
+        <div class="flex flex-col">
             <label for="deduction_type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Deduction Type</label>
         
             <div class="w-full h-[60px]">
+                <select name="" id=""> <!--example-->
+                    <option value="dshakdn"></option>
+                </select>
                 {{ deduction_form.deduction_type }}
             </div>
         </div>
 
         <div class="flex flex-col">
-            <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">amount</label>
+            <label for="amount" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Amount</label>
         
             <div class="w-full h-[60px]">
+                <input type="number"> <!--example-->
                 {{ deduction_form.amount }}
             </div>
         </div>
 
         <div class="w-full h-[40px] flex justify-end gap-3">
-            <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditDeductions()">CANCEL</button>
-            <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM" onclick="">CONFIRM</button>    
-        </div>
-    </form>   
-</div> -->
+            <input type="button" id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditDeductions()">
+            <input type="submit" id="confirm" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM"> 
+        </div> 
+    </form>  
+</div>
 {% endblock %}
 
 {% block content %}
@@ -122,34 +164,34 @@
 <div class="size-full px-5 flex flex-col gap-4">
     {% for payroll_period in payroll_periods %}
     <div class="flex flex-col py-3 px-4 bg-white rounded-xl">
-        <div class="px-2 flex justify-between">
-            <div class="flex items-end gap-2">
-                <p class="text-[League Spartan] text-2xl font-bold">CURRENT PAYROLL</p>
-                <p class="text-[League Spartan] text-lg font-semibold text-[#1E1E1E80]">{{ payroll_period.payroll_status }}</p>
-            </div>
-
-            <div class="h-[40px] space-x-2 flex items-end">
-                <button id="button_2" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addPayroll()">ADD PAYROLL</button> 
-            </div>
-        </div>
-
-        <div class="w-full h-[1px] my-2 border border-2 border-[#1e1e1e40] rounded-full"></div>
-
-        <div class="flex justify-between">
-            <div class="flex flex-col gap-3">
-                <p class="px-2 text-base font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD: {{ payroll_period.start_date }} - {{ payroll_period.end_date }} | {{ payroll_period.type }}</p>
-
-                <div class="flex px-2">
-                    <div class="flex flex-col rounded-xl bg-[#1E1E1E20] py-3 px-5">
-                        <label for="" class="font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]">Payment Date:</label>
-                        <p class="text-3xl text-[Inter]">{{ payroll_period.payment_date }}</p>
-                    </div>
+        <div class="px-2 flex justify-between items-end">
+            <div class="w-full flex justify-between items-end gap-2">
+                <div class="flex gap-2 items-end">
+                    <p class="text-[League Spartan] text-2xl font-bold">CURRENT PAYROLL</p>
+                    <p class="text-[League Spartan] text-lg font-semibold text-[#1E1E1E80]">{{ payroll_period.payroll_status }}</p>
                 </div>
+                <a href="" class="h-[30px]">
+                    <button id="confirm" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Confirm Payroll Period">CONFIRM</button>
+                </a>
+            </div>
+            
+        </div>
+        
+        <div class="w-full h-[1px] my-2 border border-2 border-[#1e1e1e40] rounded-full"></div>
+        
+        
+        <div class="flex justify-between">
+            <div class="flex flex-col px-4 py-3 gap-2">
+                <p class="text-base font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD: <span class="text-[#1E1E1E] text-[Inter] font-semibold">{{ payroll_period.start_date }} - {{ payroll_period.end_date }} | {{ payroll_period.type }}</span></p>
+                <div class="flex flex-col gap-1">
+                    <p for="" class="text-base font-[Roboto] font-bold text-[#1E1E1E66]">PAYMENT DATE:</p>
+                    <p class="text-2xl text-[Inter] font-semibold">{{ payroll_period.payment_date }}</p>
+    
+                </div>            
             </div>
             
             <div class="flex gap-3 items-end p-3">
-                <a href="">generate</a>
-                <a href="">more</a>
+                <a href="" class="text-base font-bold hover:text-[#F8D146] duration-100">view</a>
             </div>
         </div>
         
@@ -200,9 +242,18 @@
     <div class="w-full h-[2px] my-1 border border-2 border-[#1e1e1e40] rounded-full"></div>
 
     <div class="py-2 px-4 space-y-4 text-center">
-        <p class="mx-3 text-[League Spartan] text-2xl font-bold">PENDING</p>
+        <div class="w-full flex justify-between items-end">
+            <p class="mx-3 text-[League Spartan] text-3xl font-bold">Pending Payrolls</p>
+            <div class="h-[40px] space-x-2 flex justify-end items-end">
+                <button id="button_2" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="editDeductions()">EDIT DEDUCTIONS</button> 
+        
+                <button id="button_1" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addPayroll()">ADD PAYROLL</button> 
+            </div>
+        </div>
+       
+
     
-        <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-md/10">
+        <table class="bg-white w-full my-3 border-none rounded-2xl text-xs-center overflow-hidden shadow-md/10">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="text-base text-center">
                     <th class="p-2 text-base font-[League Spartan]">TYPE</th>
@@ -224,8 +275,10 @@
                     <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll_period.payroll_status }}</td>
                     
                     <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll_period.payment_date }}</td>
-                    <td class="px-2 py-4 text-sm font-[Inter]">
-                        <a href="">MORE</a>
+                    <td class="px-2 py-4 text-sm font-[Inter] ">
+                    <td class="px-2 py-4 text-sm font-[Inter] space-x-2">
+                        <a href="" class="font-bold hover:text-[#F8D146] duration-100">GENERATE</a>
+                        <a href="" class="font-bold hover:text-[#F8D146] duration-100">MORE</a>
                     </td>
                 </tr>
                 {% empty %}
@@ -235,6 +288,8 @@
                 {% endfor %}
             </tbody>
         </table>
+        
+        
     </div>
 </div>
 {% endblock %}
@@ -258,19 +313,19 @@
     }
 
 
-    // function editDeductions(){
-    //     let bg = document.getElementById("background");
-    //     const popup = document.getElementById("deductions-popup");
+    function editDeductions(){
+        let bg = document.getElementById("background");
+        const popup = document.getElementById("deductions-popup");
         
-    //     bg.classList.add("show");
-    //     popup.classList.add("show");
-    // }
+        bg.classList.add("show");
+        popup.classList.add("show");
+    }
 
-    // function cancelEditDeductions(){
-    //     let bg = document.getElementById("background");
-    //     const popup = document.getElementById("deductions-popup");
-    //     bg.classList.remove("show");
-    //     popup.classList.remove("show");
-    // }
+    function cancelEditDeductions(){
+        let bg = document.getElementById("background");
+        const popup = document.getElementById("deductions-popup");
+        bg.classList.remove("show");
+        popup.classList.remove("show");
+    }
 </script>
 {% endblock %}
