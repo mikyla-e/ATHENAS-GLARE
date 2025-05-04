@@ -135,7 +135,7 @@
         </div>
 
         <div class="flex flex-col">
-            <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">amount</label>
+            <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Amount</label>
         
             <div class="w-full h-[60px]">
                 {{ deduction_form.amount }}
@@ -152,7 +152,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="w-full grid grid-cols-4 grid-rows-[50px_50px_70px] md:grid-rows-[65px_65px_70px] lg:grid-cols-[2fr_2fr_2fr_1fr_1fr_1fr_1fr] lg:grid-rows-[90px_50px] gap-5">
+<div class="w-full grid grid-cols-4 grid-rows-[50px_50px_70px] md:grid-rows-[60px_60px_70px] lg:grid-cols-[2fr_2fr_2fr_1fr_1fr_1fr_1fr] lg:grid-rows-[90px_50px] gap-5">
     
     <div class="bg-[#1E1E1E] px-4 order-1 col-span-3 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
         <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
@@ -207,8 +207,8 @@
 
     <div class="order-2 col-span-1 lg:order-3 lg:col-span-2 row-span-1">
         <div class="size-full flex rounded-full overflow-hidden ">
-            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-3 cursor-pointer" id="edit_incentives" onclick="editIncentives()" title="Edit All Employee Incentives">
-                <p class="m-0 p-0 text-[#FFF] font-bold text-base text-sm md:text-lg lg:text-base xl:text-lg">INCENTIVES</p>
+            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-1 cursor-pointer" id="edit_incentives" onclick="editIncentives()" title="Edit All Employee Incentives">
+                <p class="hidden sm:inline-block m-0 p-0 text-[#FFF] font-bold text-base sm:text-xs md:text-sm xl:text-lg">INCENTIVES</p>
                 <img src="{% static 'images/incentives_icon.png' %}" alt="">
             </button>
         </div>
@@ -216,8 +216,8 @@
 
     <div class="order-3 col-span-1 lg:order-4 lg:col-span-2 row-span-1">
         <div class="size-full flex rounded-full overflow-hidden">
-            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-3 cursor-pointer" id="edit_incentives" onclick="editDeductions()" title="Edit All Employee Deductions">
-                <p class="m-0 p-0 text-[#FFF] font-bold text-base text-sm md:text-lg lg:text-base xl:text-lg">DEDUCTIONS</p>
+            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-1 cursor-pointer" id="edit_incentives" onclick="editDeductions()" title="Edit All Employee Deductions">
+                <p class="hidden sm:inline-block m-0 p-0 text-[#FFF] font-bold text-base sm:text-xs md:text-sm xl:text-lg">DEDUCTIONS</p>
                 <img src="{% static 'images/deductions_icon.png' %}" alt="">
             </button>
         </div>
