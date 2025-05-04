@@ -70,7 +70,7 @@
 </div> 
 
 <!-- Confirmation Dialogue -->
-<div id="payroll-popup" class="popup fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
+<!-- <div id="payroll-popup" class="popup fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
     <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
 
     <div class="w-full h-[2px] my-1 border border-2 border-[#1e1e1e40] rounded-full"></div>
@@ -81,7 +81,7 @@
         <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelConfirmPayroll()">CANCEL</button>
         <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">CONFIRM</button>
     </div>
-</div>
+</div> -->
 
 <!-- End of Confirmation Dialogue -->
 
@@ -250,12 +250,12 @@
             <button id="button_2" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">PRINT</button>
         </a>
 
-        <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
+        <!-- <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
             <form action="#" method="post" id="confirm-payroll-form" class="h-full">
                 {% csrf_token %}
                 <button type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center !text-[#1E1E1E]" id="button_1" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
             </form>
-        </div>
+        </div> -->
 
     </div>
 
@@ -385,19 +385,19 @@
         }
 
         
-        function confirmPayroll(){
-            const bg = document.getElementById("background");
-            const popup = document.getElementById("payroll-popup");
-            bg.classList.add("show");
-            popup.classList.add("show");
-        }
+        // function confirmPayroll(){
+        //     const bg = document.getElementById("background");
+        //     const popup = document.getElementById("payroll-popup");
+        //     bg.classList.add("show");
+        //     popup.classList.add("show");
+        // }
         
-        function cancelConfirmPayroll(){
-            const bg = document.getElementById("background");
-            const popup = document.getElementById("payroll-popup");
-            bg.classList.remove("show");
-            popup.classList.remove("show");
-        }
+        // function cancelConfirmPayroll(){
+        //     const bg = document.getElementById("background");
+        //     const popup = document.getElementById("payroll-popup");
+        //     bg.classList.remove("show");
+        //     popup.classList.remove("show");
+        // }
         
 
         function editDeductions(){

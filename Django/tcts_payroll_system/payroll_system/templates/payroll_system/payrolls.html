@@ -63,16 +63,30 @@
 
 <!--page content-->
 {% block outsidecontent %}
-<div id="background" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddPayroll(); cancelEditDeductions();">
+<div id="background" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddPayroll(); cancelEditDeductions(); cancelConfirmPayroll();">
     
 </div> 
 
+<!--confirm payroll-->
+<div id="confirm-payroll-popup" class="popup fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
+    <div class="flex flex-col gap-2">
+        <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
+        <div class="w-full h-[2px] my-1 border border-2 border-[#1e1e1e40] rounded-full"></div>
+        <h1 class="text-base sm:text-base my-2 font-[League Spartan] font-normal text-center">Are you sure you want to confirm this payroll period? Once confirmed, no further changes can be made to this cycle.</h1>
+
+    </div>    
+    <div class="w-full h-[40px] my-1 flex justify-around items-center gap-3">
+        <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelConfirmPayroll()">CANCEL</button>
+        <button id="confirm" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">CONFIRM</button>
+    </div>
+</div>
+
 
 <!--add payroll-->
-<div id="payroll-popup" class="popup absolute w-[500px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
-    <div class="flex flex-col ">
+<div id="add-payroll-popup" class="popup fixed w-[500px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
+    <div class="flex flex-col gap-1">
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Add Payroll</h1>
-        <p class="text-sm font-[League Spartan] font-normal text-left m-0">Please select the start and end dates for the payroll period. Make sure the dates are correct before submitting.</p>    
+        <p class="text-sm font-[League Spartan] font-normal text-left m-0 text-justify">Please select the start and end dates for the payroll period. Make sure the dates are correct before submitting.</p>    
     </div>
     <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:create_payroll' %}">
         {% csrf_token %}
@@ -112,7 +126,7 @@
 
 <!--deductions-->
 
-<div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
+<div id="deductions-popup" class="popup fixed w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
     <div class="space-y-2">
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Edit Deductions</h1>
         <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>     -->
@@ -170,9 +184,9 @@
                     <p class="text-[League Spartan] text-2xl font-bold">CURRENT PAYROLL</p>
                     <p class="text-[League Spartan] text-lg font-semibold text-[#1E1E1E80]">{{ payroll_period.payroll_status }}</p>
                 </div>
-                <a href="" class="h-[30px]">
-                    <button id="confirm" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Confirm Payroll Period">CONFIRM</button>
-                </a>
+                <div class="h-[30px]">
+                    <button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Confirm Payroll Period" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
+                </div>
             </div>
             
         </div>
@@ -191,7 +205,7 @@
             </div>
             
             <div class="flex gap-3 items-end p-3">
-                <a href="" class="text-base font-bold hover:text-[#F8D146] duration-100">view</a>
+                <a href="" class="text-base font-bold hover:text-[#F8D146] duration-100" title="View Payroll Records">view more</a>
             </div>
         </div>
         
@@ -245,9 +259,9 @@
         <div class="w-full flex justify-between items-end">
             <p class="mx-3 text-[League Spartan] text-3xl font-bold">Pending Payrolls</p>
             <div class="h-[40px] space-x-2 flex justify-end items-end">
-                <button id="button_2" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="editDeductions()">EDIT DEDUCTIONS</button> 
+                <button id="button_2" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="editDeductions()" title="Edit Deductions">EDIT DEDUCTIONS</button> 
         
-                <button id="button_1" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addPayroll()">ADD PAYROLL</button> 
+                <button id="button_1" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addPayroll()" title="Add New Payroll Period">ADD PAYROLL</button> 
             </div>
         </div>
        
@@ -297,9 +311,24 @@
 <!--(optional)script-->
 {% block script %}
 <script>
+    function confirmPayroll(){
+        const bg = document.getElementById("background");
+        const popup = document.getElementById("confirm-payroll-popup");
+        bg.classList.add("show");
+        popup.classList.add("show");
+    }
+    
+    function cancelConfirmPayroll(){
+        const bg = document.getElementById("background");
+        const popup = document.getElementById("confirm-payroll-popup");
+        bg.classList.remove("show");
+        popup.classList.remove("show");
+    }
+
+
     function addPayroll(){
         let bg = document.getElementById("background");
-        const popup = document.getElementById("payroll-popup");
+        const popup = document.getElementById("add-payroll-popup");
         
         bg.classList.add("show");
         popup.classList.add("show");
@@ -307,7 +336,7 @@
 
     function cancelAddPayroll(){
         let bg = document.getElementById("background");
-        const popup = document.getElementById("payroll-popup");
+        const popup = document.getElementById("add-payroll-popup");
         bg.classList.remove("show");
         popup.classList.remove("show");
     }
