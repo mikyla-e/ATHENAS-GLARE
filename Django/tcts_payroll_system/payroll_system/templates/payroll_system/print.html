@@ -22,6 +22,10 @@
             line-height: 1.5;
             background: white;
             color: black;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         
         body * {
@@ -50,6 +54,7 @@
             border-collapse: collapse;
             margin-bottom: 1cm;
             page-break-inside: auto;
+            font-size: 12px;
         }
         
         tr {
@@ -63,12 +68,16 @@
             padding: 0.3cm;
             text-align: center;
             font-weight: bold;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         
         td {
             border-bottom: 1px solid #ddd;
             padding: 0.2cm;
             text-align: center;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         
         h1 {
@@ -93,7 +102,7 @@
             font-weight: bold;
         }
     }
-    
+
     /* Preview styles (non-print) */
     .print-preview {
         background: white;
@@ -103,25 +112,25 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         margin-bottom: 2rem;
     }
-    
+
     @media (min-width: 768px) {
         .print-preview {
             padding: 2rem;
         }
     }
-    
+
     .table-wrapper {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-    
+
     .print-controls {
         display: flex;
         flex-direction: column;
         gap: 1rem;
         margin-bottom: 1rem;
     }
-    
+
     @media (min-width: 640px) {
         .print-controls {
             flex-direction: row;
@@ -129,7 +138,7 @@
             align-items: center;
         }
     }
-    
+
     .print-button {
         background-color: black;
         color: #F8D146;
@@ -142,38 +151,38 @@
         font-family: 'League Spartan', sans-serif;
         width: 100%;
     }
-    
+
     @media (min-width: 640px) {
         .print-button {
             width: auto;
         }
     }
-    
+
     .print-button:hover {
         background-color: #F8D146;
         color: black;
         transform: scale(1.05);
     }
-    
+
     /* Mobile responsive table styles */
     @media (max-width: 639px) {
         table, thead, tbody, th, td, tr {
             display: block;
         }
-        
+
         thead tr {
             position: absolute;
             top: -9999px;
             left: -9999px;
         }
-        
+
         tr {
             border: 1px solid #ccc;
             margin-bottom: 1rem;
             border-radius: 0.5rem;
             overflow: hidden;
         }
-        
+
         td {
             border: none;
             border-bottom: 1px solid #eee;
@@ -181,11 +190,11 @@
             padding-left: 50%;
             text-align: right;
         }
-        
+
         td:last-child {
             border-bottom: none;
         }
-        
+
         td:before {
             position: absolute;
             top: 12px;
@@ -197,7 +206,7 @@
             font-weight: bold;
             content: attr(data-label);
         }
-        
+
         tfoot tr {
             background-color: #f2f2f2;
         }
@@ -206,7 +215,7 @@
 {% endblock %}
 
 <!--header-->
-{% block header %}PRINT{% endblock %} 
+{% block header %}PRINT{% endblock %}
 
 <!--page content-->
 {% block content %}
@@ -215,8 +224,6 @@
         <h2 class="text-xl font-bold">Payroll Print Preview</h2>
     </div>
     <div>
-        <!-- <button id="pdf-button" class="print-button">SAVE AS PDF</button>
-        <button id="csv-button" class="print-button">SAVE AS CSV</button> -->
         <button id="print-button" class="print-button">SEND TO PRINT</button>
     </div>
 </div>
@@ -299,40 +306,6 @@
         $('#print-button').on('click', function() {
             window.print();
         });
-        
-        // DataTables initialization
-        var payrollTable = $('#payroll-table').DataTable({
-            "paging": false,
-            "searching": false,
-            "info": false,
-            "responsive": true,
-            dom: 'Bfrtip',
-            buttons: [
-                {
-                    extend: 'pdfHtml5',
-                    text: 'PDF',
-                    title: 'Toto Car Tinting Shop - Payroll Report',
-                    className: 'hidden'
-                },
-                {
-                    extend: 'csvHtml5',
-                    text: 'CSV',
-                    title: 'Toto Car Tinting Shop - Payroll Report',
-                    className: 'hidden'
-                }
-            ]
-        });
-        
-        // Uncomment these lines if you want to use PDF/CSV export buttons
-        /*
-        $('#pdf-button').on('click', function() {
-            payrollTable.button('.buttons-pdf').trigger();
-        });
-        
-        $('#csv-button').on('click', function() {
-            payrollTable.button('.buttons-csv').trigger();
-        });
-        */
     });
 </script>
 {% endblock %}
