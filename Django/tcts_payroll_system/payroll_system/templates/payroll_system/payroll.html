@@ -33,7 +33,7 @@
 
 <!--page content-->
 {% block outsidecontent %}
-<div id="background" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddPayroll(); cancelEditDeductions();">
+<div id="background" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelAddPayroll()">
     
 </div> 
 
@@ -82,10 +82,10 @@
 
 <!--deductions-->
 
-<div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
+<!-- <div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
     <div class="space-y-2">
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Edit Deductions</h1>
-        <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>     -->
+        <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>     
     </div>
     <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:edit_deductions' %}">
         {% csrf_token %}
@@ -110,7 +110,7 @@
             <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM" onclick="">CONFIRM</button>    
         </div>
     </form>   
-</div>
+</div> -->
 {% endblock %}
 
 {% block content %}
@@ -129,9 +129,7 @@
             </div>
 
             <div class="h-[40px] space-x-2 flex items-end">
-                <button id="button_1" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="editDeductions()">EDIT DEDUCTIONS</button> 
                 <button id="button_2" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addPayroll()">ADD PAYROLL</button> 
-    
             </div>
         </div>
 
@@ -260,19 +258,19 @@
     }
 
 
-    function editDeductions(){
-        let bg = document.getElementById("background");
-        const popup = document.getElementById("deductions-popup");
+    // function editDeductions(){
+    //     let bg = document.getElementById("background");
+    //     const popup = document.getElementById("deductions-popup");
         
-        bg.classList.add("show");
-        popup.classList.add("show");
-    }
+    //     bg.classList.add("show");
+    //     popup.classList.add("show");
+    // }
 
-    function cancelEditDeductions(){
-        let bg = document.getElementById("background");
-        const popup = document.getElementById("deductions-popup");
-        bg.classList.remove("show");
-        popup.classList.remove("show");
-    }
+    // function cancelEditDeductions(){
+    //     let bg = document.getElementById("background");
+    //     const popup = document.getElementById("deductions-popup");
+    //     bg.classList.remove("show");
+    //     popup.classList.remove("show");
+    // }
 </script>
 {% endblock %}

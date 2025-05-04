@@ -34,16 +34,6 @@
             text-align: center !important;
         }
         
-        #calendar{
-            background-image: url("{% static 'images/calendar_icon.png' %}") !important;
-        }
-
-        #calendar:hover{
-            background-image: url("{% static 'images/calendar_icon_hover.png' %}") !important;
-            cursor: pointer;
-            transition: 0.5s;
-        }
-        
         #label{
             margin: 0 10px;
             font-family: 'Inter';
@@ -75,12 +65,12 @@
 <!--page content-->
 
 {% block outsidecontent %}
-<div id="background_payroll" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50">
+<div id="background" class="background fixed m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelConfirmPayroll(); cancelEditIncentives(); cancelEditDeductions()">
         
 </div> 
 
 <!-- Confirmation Dialogue -->
-<div id="payroll-popup" class="payroll fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
+<div id="payroll-popup" class="popup fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
     <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
 
     <div class="w-full h-[2px] my-1 border border-2 border-[#1e1e1e40] rounded-full"></div>
@@ -92,13 +82,10 @@
         <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">CONFIRM</button>
     </div>
 </div>
+
 <!-- End of Confirmation Dialogue -->
 
-<div id="background_incentive" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelEditIncentives()">
-    
-</div> 
-
-<div id="incentive-popup" class="edit_incentives_popup absolute w-[80%] sm:w-[60%] md:w-[50%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
+<div id="incentive-popup" class="edit_incentives_popup popup absolute w-[80%] sm:w-[60%] md:w-[50%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
     <h1>Add/Deduct for all Employees</h1>
     <form id="incentives-form" class="flex flex-col" method="post" action="#">
         {% csrf_token %}
@@ -131,38 +118,43 @@
     </form>
 </div>
 
-<!-- <div id="background_payday" class="background absolute m-0 size-full bg-[rgba(30,30,30,0.5)] invisible opacity-0 z-50" onclick="cancelChangePayday()">
-    
-</div> 
-
-<div id="payday-popup" class="payday_popup absolute w-[300px] sm:w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
-    <h1>Change Payday</h1>
-    <form id="payday-form" class="size-full flex flex-col" method="post" action="#">
+<!--deductions-->
+<div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
+    <div class="space-y-2">
+        <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Edit Deductions</h1>
+        <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>     -->
+    </div>
+    <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:edit_deductions' %}">
         {% csrf_token %}
-        <input type="hidden" name="payday" value="true">
-        <div class="w-full h-[50%] my-5 flex justify-center gap-1">
-            <div class="w-[90%] bg-[#EFEDE6] rounded-xl">
-                <div class="w-full h-[25%]">
-                    <label for="payday" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">date</label>
-                </div>
-                <div class="w-full h-[75%]">
-                    <input type="date" name="date" id="payday" class="w-full h-full px-5 outline-none border-none font-[Inter] font-semibold text-3xl" required>
-                </div>
+        <div class="flex flex-col">
+            <label for="deduction_type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Deduction Type</label>
+        
+            <div class="w-full h-[60px]">
+                {{ deduction_form.deduction_type }}
             </div>
         </div>
-        <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
-            <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelChangePayday()">
-            <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
-        </div>           
-    </form>
-</div> -->
+
+        <div class="flex flex-col">
+            <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">amount</label>
+        
+            <div class="w-full h-[60px]">
+                {{ deduction_form.amount }}
+            </div>
+        </div>
+
+        <div class="w-full h-[40px] flex justify-end gap-3">
+            <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditDeductions()">CANCEL</button>
+            <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM" onclick="">CONFIRM</button>    
+        </div>
+    </form>   
+</div>
 
 {% endblock %}
 
 {% block content %}
-<div class="w-full grid grid-cols-4 grid-rows-[30px_75px_50px] md:grid-rows-[55px_75px_65px] lg:grid-cols-6 lg:grid-rows-[70px_70px] gap-4">
-    <div class="bg-[#1E1E1E] px-4 order-1 col-span-4 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
-
+<div class="w-full grid grid-cols-4 grid-rows-[50px_50px_70px] md:grid-rows-[65px_65px_70px] lg:grid-cols-[2fr_2fr_2fr_1fr_1fr_1fr_1fr] lg:grid-rows-[90px_50px] gap-5">
+    
+    <div class="bg-[#1E1E1E] px-4 order-1 col-span-3 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
         <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
             <p class="text-[10px]/3 sm:text-sm/3.5 md:text-base/4 lg:text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">TOTAL PAYROLL</p>
             <div class="flex flex-col justify-end items-end text-right">
@@ -190,41 +182,43 @@
                 {% endif %}
             </div>
         </div>
+    </div>
 
-        <div class="w-[1px] h-[80%] mx-2 border border-2 border-[#f8d14640] rounded-full"></div> <!--horizontal line-->
-        
-        <div class="h-full py-4 flex flex-col justify-between items-center overflow-hidden">
-            <p class="text-white text-[10px] sm:text-xs md:text-lg font-bold font-[League Spartan] text-left">PERIOD</p>
-            <div class="flex flex-col justify-evenly items-center">
-                <div class="bg-[#f8d14640] px-2 py-0.5 rounded-xl">
-                    <p>00-00-00</p>
-                </div>
-                <p class="text-white">to</p>
-                <div class="bg-[#f8d14640] px-2 py-0.5 rounded-xl">
-                    <p>00-00-00</p>
+    <div class="order-4 col-span-4 lg:order-2 lg:col-span-4 lg:row-span-1">
+        <div class="bg-white size-full py-2 px-6 rounded-xl flex flex-row lg:flex-col items-center justify-between overflow-hidden">
+            <div class="flex items-center size-full gap-2">
+                <p class="text-sm font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD:</p>
+
+                <div class=" h-full flex items-center gap-2">
+                    <p class="text-4xl text-nowrap">00-00-00</p>
+                    <p>to</p>
+                    <p class="text-4xl text-nowrap">00-00-00</p>
                 </div>
             </div>
+            <a href="">
+                <div class="flex items-center h-fit w-fit gap-2">
+                    <p class="hidden md:inline-block text-xs text-nowrap">PAYROLL PERIODS</p>
+                    <img src="{% static 'images/next_icon.png' %}" alt="" class="" title="Check Other Payroll Periods">
+                </div>
+            </a>
+            
         </div>
     </div>
 
-    <div class="order-2 col-span-2 rows-span-1">
-        <div class="size-full flex rounded-full overflow-hidden">
-            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-3 cursor-pointer" id="edit_incentives" onclick="editIncentives()">
-                <p class="sm:hidden m-0 p-0 text-[#FFF] font-bold text-base text-sm md:text-base lg:text-lg">ALL INCENTIVES</p>
-                <p class="hidden sm:block xl:hidden m-0 p-0 text-[#FFF] font-bold ">EMPLOYEES' INCENTIVES</p>
-                <p class="hidden xl:block m-0 p-0 text-[#FFF] font-bold text-lg">EDIT ALL EMPLOYEES' INCENTIVES</p>
-                <img src="{% static 'images/edit_icon.png' %}" alt="">
+    <div class="order-2 col-span-1 lg:order-3 lg:col-span-2 row-span-1">
+        <div class="size-full flex rounded-full overflow-hidden ">
+            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-3 cursor-pointer" id="edit_incentives" onclick="editIncentives()" title="Edit All Employee Incentives">
+                <p class="m-0 p-0 text-[#FFF] font-bold text-base text-sm md:text-lg lg:text-base xl:text-lg">INCENTIVES</p>
+                <img src="{% static 'images/incentives_icon.png' %}" alt="">
             </button>
         </div>
     </div>
 
-    <div class="order-3 col-span-2 rows-span-1">
+    <div class="order-3 col-span-1 lg:order-4 lg:col-span-2 row-span-1">
         <div class="size-full flex rounded-full overflow-hidden">
-            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-3 cursor-pointer" id="edit_incentives" onclick="editIncentives()">
-                <p class="sm:hidden m-0 p-0 text-[#FFF] font-bold text-base text-sm md:text-base lg:text-lg">ALL DEDUCTIONS</p>
-                <p class="hidden sm:block xl:hidden m-0 p-0 text-[#FFF] font-bold ">EMPLOYEES' DEDUCTIONS</p>
-                <p class="hidden xl:block m-0 p-0 text-[#FFF] font-bold text-lg">EDIT ALL EMPLOYEES' DEDUCTIONS</p>
-                <img src="{% static 'images/edit_icon.png' %}" alt="">
+            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-3 cursor-pointer" id="edit_incentives" onclick="editDeductions()" title="Edit All Employee Deductions">
+                <p class="m-0 p-0 text-[#FFF] font-bold text-base text-sm md:text-lg lg:text-base xl:text-lg">DEDUCTIONS</p>
+                <img src="{% static 'images/deductions_icon.png' %}" alt="">
             </button>
         </div>
     </div>
@@ -358,14 +352,14 @@
 
     <script>
         function editIncentives(){
-            const bg = document.getElementById("background_incentive");
+            const bg = document.getElementById("background");
             const popup = document.getElementById("incentive-popup");
             bg.classList.add("show");
             popup.classList.add("show");
         }
 
         function cancelEditIncentives(){
-            const bg = document.getElementById("background_incentive");
+            const bg = document.getElementById("background");
             const popup = document.getElementById("incentive-popup");
             bg.classList.remove("show");
             popup.classList.remove("show");
@@ -373,35 +367,36 @@
             // Reset the form
             document.getElementById("incentives-form").reset();
         }
+
         
         function confirmPayroll(){
-            const bg = document.getElementById("background_payroll");
+            const bg = document.getElementById("background");
             const popup = document.getElementById("payroll-popup");
             bg.classList.add("show");
             popup.classList.add("show");
         }
         
         function cancelConfirmPayroll(){
-            const bg = document.getElementById("background_payroll");
+            const bg = document.getElementById("background");
             const popup = document.getElementById("payroll-popup");
             bg.classList.remove("show");
             popup.classList.remove("show");
         }
         
-        function changePayday(){
-            const bg = document.getElementById("background_payday");
-            const popup = document.getElementById("payday-popup");
+
+        function editDeductions(){
+            let bg = document.getElementById("background");
+            const popup = document.getElementById("deductions-popup");
+            
             bg.classList.add("show");
             popup.classList.add("show");
         }
-        
-        function cancelChangePayday(){
-            const bg = document.getElementById("background_payday");
-            const popup = document.getElementById("payday-popup");
+
+        function cancelEditDeductions(){
+            let bg = document.getElementById("background");
+            const popup = document.getElementById("deductions-popup");
             bg.classList.remove("show");
             popup.classList.remove("show");
-
-            document.getElementById("payday-form").reset();
         }
 
         document.addEventListener('DOMContentLoaded', function() {
