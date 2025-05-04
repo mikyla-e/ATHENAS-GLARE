@@ -288,11 +288,15 @@ class PayrollPeriodForm(forms.ModelForm):
 
 class DeductionForm(forms.ModelForm):
     amount = forms.FloatField(widget=forms.NumberInput())
+    payroll_period = forms.ModelChoiceField(
+        queryset=PayrollPeriod.objects.filter(payroll_status=PayrollPeriod.PayrollStatus.PENDING),
+        empty_label="Select Payroll Period"
+    )
 
     class Meta:
         model = Deduction
-        fields = ('amount', 'deduction_type')
-        widget = {
+        fields = ('amount', 'deduction_type', 'payroll_period')
+        widgets = {
             'deduction_type': forms.Select()
         }
         

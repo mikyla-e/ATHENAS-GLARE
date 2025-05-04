@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from django.views.decorators.csrf import csrf_protect
 from .forms import EmployeeForm, PayrollPeriodForm, DeductionForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
-from .models import Employee, PayrollPeriod, PayrollRecord, Attendance, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
+from .models import Employee, Attendance, PayrollPeriod, Deduction, PayrollRecord, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.views.decorators.http import require_POST
@@ -380,7 +380,26 @@ def edit_deductions(request):
     if request.method == 'POST':
         deduction_form = DeductionForm(request.POST)
         if deduction_form.is_valid():
-            deduction_form.save()
+            # Get form data
+            deduction_type = deduction_form.cleaned_data['deduction_type']
+            amount = deduction_form.cleaned_data['amount']
+            payroll_period = deduction_form.cleaned_data['payroll_period']
+            
+            # Get all payroll records for the selected period
+            payroll_records = PayrollRecord.objects.filter(payroll_period=payroll_period)
+            
+            # Create a deduction for each payroll record
+            for record in payroll_records:
+                Deduction.objects.create(
+                    payroll_record=record,
+                    deduction_type=deduction_type,
+                    amount=amount
+                )
+                
+                # Recalculate and save the net pay
+                record.save()
+                
+            messages.success(request, f"{deduction_type} deduction applied to all employees for selected period.")
             return redirect('payroll_system:payroll_record')
         else:
             payroll_records = PayrollRecord.objects.all()

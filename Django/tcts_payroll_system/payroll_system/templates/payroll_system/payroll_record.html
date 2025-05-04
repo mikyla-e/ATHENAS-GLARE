@@ -141,10 +141,17 @@
                 {{ deduction_form.amount }}
             </div>
         </div>
+        <div class="flex flex-col">
+            <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Amount</label>
+        
+            <div class="w-full h-[60px]">
+                {{ deduction_form.payroll_period }}
+            </div>
+        </div>
 
         <div class="w-full h-[40px] flex justify-end gap-3">
             <input id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditDeductions()">
-            <input id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM" onclick="">   
+            <input id="button" type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">   
         </div>
     </form>   
 </div>

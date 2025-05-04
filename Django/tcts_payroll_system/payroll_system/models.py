@@ -210,8 +210,22 @@ class Employee(models.Model):
                 raise ValidationError({'date_of_employment': "Employee must be at least 18 years old at date of employment."})
 
     def save(self, *args, **kwargs):
+        is_new = self.pk is None  # Check if employee is newly created
         self.full_clean()
         super().save(*args, **kwargs)
+
+        # Only run if it's a new employee and active
+        if is_new and self.is_active and self.date_of_employment:
+            
+            overlapping_periods = PayrollPeriod.objects.filter(
+                start_date__lte=self.date_of_employment,
+                end_date__gte=self.date_of_employment
+            )
+
+            for period in overlapping_periods:
+                # Ensure not already added (e.g. duplicate save)
+                if not PayrollRecord.objects.filter(employee=self, payroll_period=period).exists():
+                    PayrollRecord.objects.create(employee=self, payroll_period=period)
 
 class Attendance(models.Model):
     class AttendanceStatus(models.TextChoices):
@@ -296,6 +310,7 @@ class PayrollPeriod(models.Model):
     class PayrollStatus(models.TextChoices):
         PENDING = 'PENDING', _('Pending')
         PROCESSED = 'PROCESSED', _('Processed')
+        INPROGRESS = 'INPROGRESS', _('In-Progress')
 
     class Type(models.TextChoices):
         WEEKLY = 'WEEKLY', _('Weekly')
@@ -306,7 +321,7 @@ class PayrollPeriod(models.Model):
     start_date = models.DateField(null=False)
     end_date = models.DateField(null=False)
     payment_date = models.DateField(null=False)
-    payroll_status = models.CharField(max_length=9, choices=PayrollStatus.choices, default=PayrollStatus.PENDING)
+    payroll_status = models.CharField(max_length=11, choices=PayrollStatus.choices, default=PayrollStatus.PENDING)
     type = models.CharField(max_length=9, choices=Type.choices)
 
     def save(self, *args, **kwargs):
@@ -360,11 +375,21 @@ class PayrollRecord(models.Model):
         total_deductions = self.calculate_total_deductions()
         return self.gross_pay - total_deductions - self.cash_advance
 
+    from django.db.models import Q
+
     def save(self, *args, **kwargs):
+        self.days_worked = Attendance.objects.filter(
+            employee=self.employee,
+            attendance_status=Attendance.AttendanceStatus.PRESENT,
+            date__range=(self.payroll_period.start_date, self.payroll_period.end_date)
+        ).count()
+
         self.gross_pay = self.calculate_gross_pay()
-        super().save(*args, **kwargs)  # Save first so deductions have a related PayrollRecord
+        
+        super().save(*args, **kwargs)
+
         self.net_pay = self.calculate_net_pay()
-        super().save(update_fields=['net_pay'])  # Update net pay only
+        super().save(update_fields=['net_pay'])
 
     def __str__(self):
         return f"{self.employee} | {self.payroll_period.start_date} - {self.net_pay:.2f} net pay"
