@@ -318,12 +318,12 @@ def employee_profile(request, employee_id):
 @login_required
 def payroll(request):
     payroll_periods = PayrollPeriod.objects.all()
-    payroll_period_form = PayrollPeriodForm()  # Empty form for modal
-    deduction_form = DeductionForm()  # Empty form for modal
+    payroll_period_form = PayrollPeriodForm()  
+    deduction_form = DeductionForm()  
 
     context = {
         'payroll_periods': payroll_periods,
-        'payroll_period_form': payroll_period_form,  # Include the form in context for modal use
+        'payroll_period_form': payroll_period_form,  
         'deduction_form': deduction_form,
     }
 
@@ -337,13 +337,11 @@ def create_payroll(request):
             payroll_period_form.save()
             return redirect('payroll_system:payroll')
         else:
-            # Fetch current payroll periods to re-render the same page
             payroll_periods = PayrollPeriod.objects.all()
 
             context = {
                 'payroll_period_form': payroll_period_form,
                 'payroll_periods': payroll_periods,
-                'error': "Please correct the errors below.",
             }
 
             return render(request, 'payroll_system/payroll.html', context)
@@ -358,13 +356,11 @@ def edit_deductions(request):
             deduction_form.save()
             return redirect('payroll_system:payroll')
         else:
-            # Fetch current payroll periods to re-render the same page
             payroll_periods = PayrollPeriod.objects.all()
 
             context = {
                 'deduction_form': deduction_form,
                 'payroll_periods': payroll_periods,
-                'error': "Please correct the errors below.",
             }
 
             return render(request, 'payroll_system/payroll.html', context)
@@ -373,9 +369,7 @@ def edit_deductions(request):
 
 @login_required
 def payrolls(request):
-    employees = Employee.objects.prefetch_related('payrollperiods', 'payrollrecords', 'attendances').all()
-    
-    query = request.GET.get('q', '')
+    employees = Employee.objects.prefetch_related('payroll_records').all()
     
     latest_attendance_subquery = (
         Attendance.objects
@@ -384,81 +378,60 @@ def payrolls(request):
         .values('date')[:1]
     )
     
-    # latest_payroll_subquery = (
-    #     Payroll.objects
-    #     .filter(employee_id_fk=OuterRef('pk'))
-    #     .order_by('-payment_date')
-    #     .values('payroll_status')[:1]
-    # )
-    
-    # employees = Employee.objects.annotate(
-    #     latest_attendance_date=Subquery(latest_attendance_subquery),
-    #     latest_payroll_status=Subquery(latest_payroll_subquery)
-    # )
-    
-    if query:
-        employees = employees.filter(
-            first_name__icontains=query
-        ) | employees.filter(
-            last_name__icontains=query
-        ) | employees.filter(
-            employee_id__icontains=query
-        )
-    
     total_employees = employees.count()
     
-    # Count employees with different payroll statuses
-    # processed_payroll_count = employees.filter(latest_payroll_status='PROCESSED').count()
-    # pending_payroll_count = employees.filter(latest_payroll_status='PENDING').count()
+    # # Count employees with different payroll statuses
+    # # processed_payroll_count = employees.filter(latest_payroll_status='PROCESSED').count()
+    # # pending_payroll_count = employees.filter(latest_payroll_status='PENDING').count()
     
-    # Calculate the next Saturday for the payday
-    today = now().date()
-    days_until_saturday = (5 - today.weekday()) % 7  # 5 is Saturday
-    next_saturday = today + timedelta(days=days_until_saturday)
+    # # Calculate the next Saturday for the payday
+    # today = now().date()
+    # days_until_saturday = (5 - today.weekday()) % 7  # 5 is Saturday
+    # next_saturday = today + timedelta(days=days_until_saturday)
     
-    # Get the start and end of the current week (Monday to Sunday)
-    start_of_week = today - timedelta(days=today.weekday())  # Monday
-    end_of_week = start_of_week + timedelta(days=6)  # Sunday
+    # # Get the start and end of the current week (Monday to Sunday)
+    # start_of_week = today - timedelta(days=today.weekday())  # Monday
+    # end_of_week = start_of_week + timedelta(days=6)  # Sunday
     
-    # Get payroll data for each employee with calculated salary
-    employee_data = []
-    try:
-        for employee in employees:
-            latest_payroll = employee.payrolls.order_by('-payment_date').first()
+    # # Get payroll data for each employee with calculated salary
+    # employee_data = []
+    # try:
+    #     for employee in employees:
+    #         latest_payroll = employee.payrolls.order_by('-payment_date').first()
             
-            if latest_payroll:
-                # Count attendance for the current week
-                weekly_attendance_count = Attendance.objects.filter(
-                    employee_id_fk=employee,
-                    date__range=[start_of_week, end_of_week],
-                    attendance_status='Present'
-                ).count()
+    #         if latest_payroll:
+    #             # Count attendance for the current week
+    #             weekly_attendance_count = Attendance.objects.filter(
+    #                 employee_id_fk=employee,
+    #                 date__range=[start_of_week, end_of_week],
+    #                 attendance_status='Present'
+    #             ).count()
                 
-                # Calculate salary using the model method
-                latest_payroll.calculate_salary(weekly_attendance_count)
-                latest_payroll.save()  # Save the updated salary
+    #             # Calculate salary using the model method
+    #             latest_payroll.calculate_salary(weekly_attendance_count)
+    #             latest_payroll.save()  # Save the updated salary
             
-            employee_data.append({
-                'employee': employee,
-                'latest_payroll': latest_payroll
-            })
-    except Exception as e:
-        print(f"Error processing employee data: {e}")
+    #         employee_data.append({
+    #             'employee': employee,
+    #             'latest_payroll': latest_payroll
+    #         })
+    # except Exception as e:
+    #     print(f"Error processing employee data: {e}")
     
-    # Calculate statistics for the dashboard
-    current_month_start = today.replace(day=1)
-    previous_month_end = current_month_start - timedelta(days=1)
-    previous_month_start = previous_month_end.replace(day=1)
+    # # Calculate statistics for the dashboard
+    # current_month_start = today.replace(day=1)
+    # previous_month_end = current_month_start - timedelta(days=1)
+    # previous_month_start = previous_month_end.replace(day=1)
 
-    active_employees_per_day = (
-        Attendance.objects.filter(date__range=[start_of_week, end_of_week])
-        .values('date')
-        .annotate(active_count=Count('employee', distinct=True))
-    )
+    # active_employees_per_day = (
+    #     Attendance.objects.filter(date__range=[start_of_week, end_of_week])
+    #     .values('date')
+    #     .annotate(active_count=Count('employee', distinct=True))
+    # )
 
-    total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
-    days_counted = len(active_employees_per_day) or 1  # Avoid division by zero
-    avg_active_employees = total_active_counts / days_counted
+    # total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
+    # days_counted = len(active_employees_per_day) or 1  # Avoid division by zero
+    # avg_active_employees = total_active_counts / days_counted
 
     # employees_with_latest_payroll = Employee.objects.annotate(latest_payroll_status=Subquery(latest_payroll_subquery))
 
@@ -531,9 +504,9 @@ def payrolls(request):
     # Pass all data to the template
     try:
         context = {
-            'employee_data': employee_data,
+            'employees': employees,
             'total_employees': total_employees,
-            'avg_active_employees': round(avg_active_employees),
+            # 'avg_active_employees': round(avg_active_employees),
             # 'processed_payroll_count': processed_payroll_count,
             # 'pending_payroll_count': pending_payroll_count,
             # 'total_payroll': total_payroll,  
@@ -545,7 +518,7 @@ def payrolls(request):
             # 'previous_avg_rate': previous_avg_rate,
             # 'rate_percentage': rate_percentage,
             # 'avg_rate': current_avg_rate,
-            'query': query,
+            
         }
     except Exception as e:
         print(f"Error creating context: {e}")
@@ -560,7 +533,7 @@ def payrolls(request):
             # 'previous_avg_rate': previous_avg_rate,
             # 'rate_percentage': rate_percentage,
             # 'avg_rate': current_avg_rate,
-            'query': query,
+        
         }
 
     return render(request, 'payroll_system/payrolls.html', context)
@@ -753,13 +726,13 @@ def update_employee_incentives(request, employee_id):
 
 @login_required
 def payroll_individual(request, employee_id):
-    employee = Employee.objects.prefetch_related('payrolls', 'attendances').get(employee_id=employee_id)
+    employee = Employee.objects.prefetch_related('payroll_records').get(employee_id=employee_id)
     
     # Get current payroll (most recent)
-    current_payroll = employee.payrolls.order_by('-payment_date').first()
+    # current_payroll = employee.payrolls.order_by('-payment_date').first()
     
-    # Get payroll history (excluding current)
-    payroll_history = employee.payrolls.order_by('-payment_date')[1:] if employee.payrolls.count() > 1 else []
+    # # Get payroll history (excluding current)
+    # payroll_history = employee.payrolls.order_by('-payment_date')[1:] if employee.payrolls.count() > 1 else []
     
     # Get the start and end of the current week (Monday to Saturday)
     today = now().date()
@@ -770,46 +743,46 @@ def payroll_individual(request, employee_id):
     
     # Get weekly attendance count for current payroll display
     weekly_attendance = Attendance.objects.filter(
-        employee_id_fk=employee,
+        employee=employee,
         date__range=[start_of_week, end_of_week],
         attendance_status='Present'
     ).values_list('date', flat=True).distinct().count()
     
     # Re-calculate the current payroll using the attendance count
-    if current_payroll:
-        current_payroll.calculate_salary(weekly_attendance)
-        current_payroll.save()
+    # if current_payroll:
+    #     current_payroll.calculate_salary(weekly_attendance)
+    #     current_payroll.save()
     
     # Calculate attendance counts for each historical payroll
-    for payroll in payroll_history:
-        # Determine the payment period for this payroll
-        payment_date = payroll.payment_date
+    # for payroll in payroll_history:
+    #     # Determine the payment period for this payroll
+    #     payment_date = payroll.payment_date
         
-        # Payment date is typically a Saturday, so subtract 5 days to get Monday
-        start_date = payment_date - timedelta(days=5)  # Monday
+    #     # Payment date is typically a Saturday, so subtract 5 days to get Monday
+    #     start_date = payment_date - timedelta(days=5)  # Monday
         
-        # Count attendance records within this payroll period
-        payroll.attendance_count = Attendance.objects.filter(
-            employee_id_fk=employee,
-            date__range=[start_date, payment_date],
-            attendance_status='Present'
-        ).values_list('date', flat=True).distinct().count()
+    #     # Count attendance records within this payroll period
+    #     payroll.attendance_count = Attendance.objects.filter(
+    #         employee_id_fk=employee,
+    #         date__range=[start_date, payment_date],
+    #         attendance_status='Present'
+    #     ).values_list('date', flat=True).distinct().count()
     
     # Check attendance records for today's active status
-    latest_time_log = Attendance.objects.filter(employee_id_fk=employee, date=today).order_by('-time_in').first()
+    latest_time_log = Attendance.objects.filter(employee=employee, date=today).order_by('-time_in').first()
     
     # Determine active status
-    employee.active_status = Employee.ActiveStatus.INACTIVE
-    if latest_time_log and latest_time_log.time_in and not latest_time_log.time_out:
-        employee.active_status = Employee.ActiveStatus.ACTIVE
+    # employee.active_status = Employee.ActiveStatus.INACTIVE
+    # if latest_time_log and latest_time_log.time_in and not latest_time_log.time_out:
+    #     employee.active_status = Employee.ActiveStatus.ACTIVE
     
     # Save updated active_status in database
-    employee.save(update_fields=['active_status'])
+    # employee.save(update_fields=['active_status'])
     
     return render(request, 'payroll_system/payroll_individual.html', {
         'employee': employee,
-        'current_payroll': current_payroll,
-        'payroll_history': payroll_history,
+        # 'current_payroll': current_payroll,
+        # 'payroll_history': payroll_history,
         'attendance_count': weekly_attendance
     })
 

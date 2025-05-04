@@ -261,23 +261,26 @@
                 </tr>
             </thead>
             <tbody>
-                {% for data in employee_data %}
-                {% with employee=data.employee latest_payroll=data.latest_payroll %}
-                    {% if latest_payroll %}
+            {% for employee in employees %}
+                {% if employee.payroll_records.all %}
+                    {% for record in employee.payroll_records.all %}
                     <tr id="payroll-data">
-                        <td class="p-2 text-xs font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td class="p-2 text-xs font-[Inter]"><!--CASH ADVANCE (YES/NO)--></td>
-                        <td class="p-2 text-xs font-[Inter]"><!--RATE--></td>
-                        <td class="p-2 text-xs font-[Inter]" id="payment-amount">₱<!--NET PAY--></td>
-                        <td class="p-2 text-xs font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                        <td class="p-2 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="p-2 text-sm font-[Inter]"><!--CASH ADVANCE (YES/NO)--></td>
+                        <td class="p-2 text-sm font-[Inter]"><!--RATE--></td>
+                        <td class="p-2 text-sm font-[Inter]" id="payment-amount">₱<!--{{ record.net_pay }}--></td>
+                        <td class="p-2 text-sm font-[Inter]" id="more">
+                            <a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a>
+                        </td>
                     </tr>
-                    {% else %}
+                    {% empty %}
                     <tr id="payroll-data">
-                        <td class="p-2 text-xs font-[Inter]" colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td class="p-2 text-xs font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                        <td class="p-2 text-sm font-[Inter]" colspan="5">
+                            No payroll records found for {{ employee.first_name }} {{ employee.last_name }}
+                        </td>
                     </tr>
-                    {% endif %}
-                {% endwith %}
+                    {% endfor %}
+                {% endif %}
             {% endfor %}
             </tbody>
         </table>
@@ -289,30 +292,33 @@
                 <tr class="text-base text-center font-[League Spartan]">
                     <th class="p-2 text-base font-[League Spartan]">EMPLOYEE</th>
                     <th class="p-2 text-base font-[League Spartan]">CASH ADVANCE</th>
-                    <th class="p-2 text-base font-[League Spartan]">RATE</th>
+                    <th class="p-2 text-base font-[League Spartan]">DAILY RATE</th>
                     <th class="p-2 text-base font-[League Spartan]" id="payment-amount">NET PAY</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                {% for data in employee_data %}
-                {% with employee=data.employee latest_payroll=data.latest_payroll %}
-                    {% if latest_payroll %}
+            {% for employee in employees %}
+                {% if employee.payroll_records.all %}
+                    {% for record in employee.payroll_records.all %}
                     <tr id="payroll-data">
                         <td class="p-2 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td class="p-2 text-sm font-[Inter]"><!--CASH ADVANCE (YES/NO)--></td>
-                        <td class="p-2 text-sm font-[Inter]"><!--RATE--></td>
-                        <td class="p-2 text-sm font-[Inter]" id="payment-amount">₱<!--NET PAY--></td>
-                        <td class="p-2 text-sm font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                        <td class="p-2 text-sm font-[Inter]">{% if record.cash_advance %} YES {% else %} NO {% endif %}</td>
+                        <td class="p-2 text-sm font-[Inter]">{{ employee.daily_rate }}</td>
+                        <td class="p-2 text-sm font-[Inter]" id="payment-amount">₱ {{ record.net_pay }}</td>
+                        <td class="p-2 text-sm font-[Inter]" id="more">
+                            <a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a>
+                        </td>
                     </tr>
-                    {% else %}
+                    {% empty %}
                     <tr id="payroll-data">
-                        <td class="p-2 text-sm font-[Inter]" colspan="4">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td class="p-2 text-sm font-[Inter]" id="more"><a href="{% url 'payroll_system:payroll_individual' employee.employee_id %}">MORE</a></td>
+                        <td class="p-2 text-sm font-[Inter]" colspan="5">
+                            No payroll records found for {{ employee.first_name }} {{ employee.last_name }}
+                        </td>
                     </tr>
-                    {% endif %}
-                {% endwith %}
-            {% endfor %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}          
             </tbody>
         </table>
     </div>

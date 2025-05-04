@@ -115,11 +115,7 @@
 <div class="w-full grid gap-4 grid-cols-[100px_1fr_1fr] grid-rows-[100px_80px_auto_auto]  md:gap-5 md:grid-cols-[100px_6fr_6fr] md:grid-rows-[100px_50px_120px]   lg:grid-cols-[100px_6fr_6fr] lg:grid-rows-[100px_auto] z-10">
 
     <div class="order-1 col-span-1 rounded-full w-full flex justify-center items-center min-w-[100px]">
-        {% if employee.active_status %}
-            <img class="rounded-full size-[100px] object-cover" src="{{ employee.employee_image.url }}" alt="">
-        {% else %}
-            <img class="rounded-full size-[100px] object-cover" src="{% static 'images/employee_image' %}" alt="">
-        {% endif %}
+        <img class="rounded-full size-[100px] object-cover" src="{{ employee.employee_image.url }}" alt="">
     </div>
 
     <div id="status" class="order-3 col-span-3 md:order-2 md:col-span-2 lg:col-span-1 size-full flex justify-center items-start md:items-end">
@@ -181,20 +177,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        {% if current_payroll %}
-                            <td class="p-2 text-sm font-[Inter]">{{ current_payroll.rate }}</td>
-                            <td class="p-2 text-sm font-[Inter]">{{ attendance_count }}</td>
-                            <td id="total-incentives" class="p-2 text-sm font-[Inter] incentive-display">{{ current_payroll.incentives|default:"0.00" }}</td>                        
+                    {% if employee.payroll_records.all %}
+                        {% for record in employee.payroll_records.all %}
+                        <tr>
+                            <td class="p-2 text-sm font-[Inter]">{{ employee.daily_rate }}</td>
+                            <td class="p-2 text-sm font-[Inter]">{{ record.days_worked }}</td>
+                            <td id="total-incentives" class="p-2 text-sm font-[Inter] incentive-display">{{ record.incentives }}</td>                        
                             <!-- <td class="p-2 text-sm font-[Inter]">{{ current_payroll.deductions }}</td> -->
-                            <td class="p-2 text-sm font-[Inter] salary-display">{{ current_payroll.salary }}</td>
-                            <td class="p-2 text-sm font-[Inter]">{{ current_payroll.payment_date }}</td>
+                            <td class="p-2 text-sm font-[Inter] salary-display">{{ record.net_pay }}</td>
+                            <td class="p-2 text-sm font-[Inter]">{{ record.payroll_period.payment_date }}</td>
                             <td class="p-3 w-full h-[30%] flex justify-center items-center">
-                                <a class="h-8.5 w-8.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
+                                <a class="h-8.5 w-8.5 flex-shrink-0" href="#">
                                     <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
                                 </a>
                             </td>
-                        {% else %}
+                            {% empty %}
                             <td class="p-2 text-sm font-[Inter]">0.00</td>
                             <td class="p-2 text-sm font-[Inter]">{{ attendance_count|default:"0" }}</td>
                             <td class="p-2 text-sm font-[Inter]">0.00</td>
@@ -202,12 +199,13 @@
                             <td class="p-2 text-sm font-[Inter]">0.00</td>
                             <td class="p-2 text-sm font-[Inter]">N/A</td>
                             <td class="p-3 w-full h-full py-2 flex justify-center items-center">
-                                <a class="h-8.5 w-8.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
+                                <a class="h-8.5 w-8.5 flex-shrink-0" href="#">
                                     <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
                                 </a>
                             </td>
-                        {% endif %}
-                    </tr>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
     
@@ -223,16 +221,28 @@
                     <tbody>
                         <thead class="border-b-[2px] border-b-[rgba(30,30,30,0.2)]">
                             <tr>
-                                <th class="px-2 text-base font-[League Spartan]">PhilHealth</th>
-                                <th class="px-2 text-base font-[League Spartan]">SSS</th>
-                                <th class="px-2 text-base font-[League Spartan]">Others</th>
+                            {% if employee.payroll_records.all %}
+                                {% for record in employee.payroll_records.all %}
+                                    {% for deduction in record.deductions.all %}
+                                    <th class="p-2 text-base font-[League Spartan]">{{ deduction }}</th>
+                                    {% empty %}
+                                    <th class="p-2 text-base font-[League Spartan]">Deduction Type</th>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="p-2 text-sm font-[Inter]">0.00</td>
-                                <td class="p-2 text-sm font-[Inter]">0.00</td>
-                                <td class="p-2 text-sm font-[Inter]">0.00</td>
+                            {% if employee.payroll_records.all %}
+                                {% for record in employee.payroll_records.all %}
+                                    {% for deduction in record.deductions.all %}
+                                    <td class="p-2 text-sm font-[Inter]">{{ deduction.amount }}</td>
+                                    {% empty %}
+                                    <td class="p-2 text-sm font-[Inter]">No deduction added.</td>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
                             </tr>
                         </tbody>
                     </tbody>
@@ -248,11 +258,11 @@
                     </thead>
                     <tbody>
                         <tr>
-                            {% if current_payroll %}
-                            <td class="p-2 text-sm font-[Inter]">{{ current_payroll.cash_advance }}</td>
-                            {% else %}
-                            <td class="p-2 text-sm font-[Inter]">0.00</td>
-                            {% endif %}
+                        {% if employee.payroll_records.all %}
+                            {% for record in employee.payroll_records.all %}
+                            <td class="p-2 text-sm font-[Inter]">{{ record.cash_advance }}</td>
+                            {% endfor %}
+                        {% endif %}
                         </tr>
                     </tbody>
                 </table>
@@ -283,7 +293,7 @@
                             <td class="px-2 text-xs font-[Inter] salary-display">{{ current_payroll.salary }}</td>
                             <td class="px-2 text-xs font-[Inter]">{{ current_payroll.payment_date }}</td>
                             <td class="p-3 flex justify-center items-center">
-                                <a class="h-7.5 w-7.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
+                                <a class="h-7.5 w-7.5 flex-shrink-0" href="#">
                                     <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
                                 </a>
                             </td>
@@ -295,7 +305,7 @@
                             <td class="px-2 text-xs font-[Inter]">0.00</td>
                             <td class="px-2 text-xs font-[Inter]">N/A</td>
                             <td class="p-3 flex justify-center items-center">
-                                <a class="h-7.5 w-7.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
+                                <a class="h-7.5 w-7.5 flex-shrink-0" href="#">
                                     <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
                                 </a>
                             </td>
@@ -375,7 +385,7 @@
                             <td class="px-2 text-[10px] font-[Inter] salary-display">{{ current_payroll.salary }}</td>
                             <td class="px-2 text-[10px] font-[Inter]">{{ current_payroll.payment_date }}</td>
                             <td class="p-3 flex justify-center items-center">
-                                <a class="h-7.5 w-7.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
+                                <a class="h-7.5 w-7.5 flex-shrink-0" href="#">
                                     <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
                                 </a>
                             </td>
@@ -387,7 +397,7 @@
                             <td class="px-2 text-[10px] font-[Inter]">0.00</td>
                             <td class="px-2 text-[10px] font-[Inter]">N/A</td>
                             <td class="p-3 flex justify-center items-center">
-                                <a class="h-7.5 w-7.5 flex-shrink-0" href="{% url 'payroll_system:payroll_edit' employee.employee_id %}">
+                                <a class="h-7.5 w-7.5 flex-shrink-0" href="#">
                                     <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
                                 </a>
                             </td>

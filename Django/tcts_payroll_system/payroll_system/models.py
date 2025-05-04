@@ -338,7 +338,7 @@ class Deduction(models.Model):
     amount = models.FloatField(default=0)
 
     def __str__(self):
-        return f"{self.type}: {self.amount:.2f}"
+        return self.deduction_type
 
 class PayrollRecord(models.Model):
     payroll_record_id = models.AutoField(primary_key=True)
@@ -347,8 +347,8 @@ class PayrollRecord(models.Model):
     incentives = models.FloatField(default=0)
     cash_advance = models.FloatField(default=0)
     net_pay = models.FloatField(default=0)
-    employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='payrollrecords')
-    payroll_period = models.ForeignKey('PayrollPeriod', on_delete=models.CASCADE, related_name='payrollrecords')
+    employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='payroll_records')
+    payroll_period = models.ForeignKey('PayrollPeriod', on_delete=models.CASCADE, related_name='payroll_records')
 
     def calculate_gross_pay(self):
         return self.days_worked * self.employee.daily_rate + self.incentives
