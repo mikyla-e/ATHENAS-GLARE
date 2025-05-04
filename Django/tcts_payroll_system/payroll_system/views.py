@@ -337,11 +337,14 @@ def create_payroll(request):
 @login_required
 def payroll_record(request):
     employees = Employee.objects.prefetch_related('payroll_records').all()
+    
+    deduction_form = DeductionForm() 
        
     total_employees = employees.count()
     
     context = {
         'employees': employees,
+        'deduction_form': deduction_form,
         'total_employees': total_employees,
     }
     return render(request, 'payroll_system/payroll_record.html', context)
@@ -350,12 +353,10 @@ def payroll_record(request):
 def payrolls(request):
     payroll_periods = PayrollPeriod.objects.all()
     payroll_period_form = PayrollPeriodForm()  
-    deduction_form = DeductionForm()  
 
     context = {
         'payroll_periods': payroll_periods,
         'payroll_period_form': payroll_period_form,  
-        'deduction_form': deduction_form,
     }
 
     return render(request, 'payroll_system/payrolls.html', context)
@@ -380,18 +381,18 @@ def edit_deductions(request):
         deduction_form = DeductionForm(request.POST)
         if deduction_form.is_valid():
             deduction_form.save()
-            return redirect('payroll_system:payroll')
+            return redirect('payroll_system:payroll_record')
         else:
-            payroll_periods = PayrollPeriod.objects.all()
+            payroll_records = PayrollRecord.objects.all()
 
             context = {
                 'deduction_form': deduction_form,
-                'payroll_periods': payroll_periods,
+                'payroll_records': payroll_records,
             }
 
-            return render(request, 'payroll_system/payrolls.html', context)
+            return render(request, 'payroll_system/payroll_record.html', context)
 
-    return redirect('payroll_system:payrolls')
+    return redirect('payroll_system:payroll_record')
 
 @login_required
 def update_all_incentives(request):
