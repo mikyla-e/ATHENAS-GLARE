@@ -198,11 +198,17 @@
         <div class="bg-white size-full py-2 px-6 rounded-xl flex flex-row lg:flex-col items-center justify-between overflow-hidden">
             <div class="flex items-center size-full gap-2">
                 <p class="text-sm font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD:</p>
-
-                <div class=" h-full flex items-center gap-2">
-                    <p class="text-4xl text-nowrap">00-00-00</p>
-                    <p>to</p>
-                    <p class="text-4xl text-nowrap">00-00-00</p>
+            
+                <div class="h-full flex items-center gap-2">
+                    {% if selected_payroll %}
+                        <p class="text-4xl text-nowrap">{{ selected_payroll.start_date|date:"m-d-y" }}</p>
+                        <p>to</p>
+                        <p class="text-4xl text-nowrap">{{ selected_payroll.end_date|date:"m-d-y" }}</p>
+                    {% else %}
+                        <p class="text-4xl text-nowrap">00-00-00</p>
+                        <p>to</p>
+                        <p class="text-4xl text-nowrap">00-00-00</p>
+                    {% endif %}
                 </div>
             </div>
             <a href="{% url 'payroll_system:payrolls' %}">

@@ -342,16 +342,39 @@ def payroll_record(request):
 
         # Get all PayrollRecords for the selected period, with employee data
         records = PayrollRecord.objects.filter(payroll_period=payroll).select_related('employee')
-
+        
+        # Calculate total payroll amount for this period
+        total_payroll = records.aggregate(total=Sum('net_pay'))['total'] or 0
+        
+        # Calculate percentage change (if you have previous payroll data)
+        # For example, comparing to the previous payroll period:
+        previous_payroll = PayrollPeriod.objects.filter(
+            payment_date__lt=payroll.payment_date
+        ).order_by('-payment_date').first()
+        
+        payroll_percentage = 0
+        if previous_payroll:
+            previous_total = PayrollRecord.objects.filter(
+                payroll_period=previous_payroll
+            ).aggregate(total=Sum('net_pay'))['total'] or 0
+            
+            if previous_total > 0:
+                payroll_percentage = ((total_payroll - previous_total) / previous_total) * 100
+        
         context = {
             'records': records,
             'selected_payroll': payroll,
+            'total_payroll': total_payroll,
+            'payroll_percentage': payroll_percentage,
+            'payday_date': payroll.payment_date,
         }
     else:
         # If no payroll is selected, show nothing or default view
         records = []
         context = {
             'records': records,
+            'total_payroll': "No total payroll yet",
+            'payroll_percentage': 0,
         }
 
     return render(request, 'payroll_system/payroll_record.html', context)
