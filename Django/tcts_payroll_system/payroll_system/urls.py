@@ -34,4 +34,5 @@ urlpatterns = [
     path('payroll/update-payday/', views.update_payday, name='update_payday'),
     path('api/attendance-stats/', views.get_attendance_stats, name='attendance_stats'),
     path('api/payroll-by-week/', views.payroll_by_week, name='payroll_by_week'),
+    path('payslip/', views.payslip, name='payslip'),
 ]

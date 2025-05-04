@@ -44,7 +44,7 @@
                     <td class="p-2">{{ customer.contact_number }}</td>
                     <td class="p-2">{{ customer.city }}, {{ customer.barangay }}</td>
                     <td class="p-2">
-                        <a class="" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
+                        <a class="" title="Customer Detail" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
                     </td>
                 </tr>
             {% empty %}

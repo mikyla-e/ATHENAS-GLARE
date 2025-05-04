@@ -1517,3 +1517,7 @@ def payroll_by_week(request):
         'labels': labels,
         'amounts': amounts
     })
+
+@login_required
+def payslip(request):
+    return render(request, 'payslip.html')
