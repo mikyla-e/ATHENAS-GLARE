@@ -164,6 +164,15 @@
 {% endif %}
 
 <div class="size-full px-5 flex flex-col gap-4">
+    <div class="w-full flex justify-end h-[30px]">
+        <a href="{% url 'payroll_system:payroll_history' %}">
+            <button id="button" class="size-full mx-3">
+                <p class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center">Go to Payroll History ></p>
+            </button>
+        </a>
+        
+    </div>
+    
     {% if current_payroll %}
     <div class="flex flex-col py-3 px-4 bg-white rounded-xl">
         <div class="px-2 flex justify-between items-end">
