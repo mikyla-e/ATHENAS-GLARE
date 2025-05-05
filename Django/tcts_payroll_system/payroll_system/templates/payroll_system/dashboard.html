@@ -47,6 +47,15 @@
         }
     }
 
+    select#payroll-period-dropdown {
+        color: white;
+    }
+
+    select#payroll-period-dropdown option {
+        color: black;
+        background-color: white;
+    }
+
 </style>
 {% endblock %}
 
@@ -122,28 +131,23 @@
             </div>
             <div class="w-[55%] ml-2 h-full p-3 rounded-xl " id="payroll-info">
                 <div class="h-full flex flex-col justify-between items-end" id="content2">
-                    <!-- This maintains the original div structure and styling -->
-                    <div class="h-fit my-2 mx-4 flex flex-col items-end" id="total_payroll">
-                        <div class="w-full flex justify-between items-center">
-                            <!-- Dropdown on the left side -->
-                            <div class="relative inline-block">
-                                <select id="payroll-period-dropdown" onchange="togglePayrollView(this.value)" 
-                                        class="bg-gray-700 text-gray-300 text-xs rounded-md px-2 py-1 cursor-pointer appearance-none pr-8 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                                    <option value="weekly">Weekly</option>
-                                    <option value="monthly" selected>Monthly</option>
-                                    <option value="yearly">Yearly</option>
-                                </select>
-                                <!-- Custom dropdown arrow -->
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                    <div class="h-fit my-2 mx-1 md:mx-2 flex flex-col items-end" id="total_payroll">
+                        <div class="w-full flex flex-row justify-end items-end md:gap-1">
+                            <div class="relative inline-block" title="Select Time Period">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-2 text-black-400">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </div>
+                                <select id="payroll-period-dropdown" onchange="togglePayrollView(this.value)" class="font-[Roboto] font-semibold text-right text-xs sm:text-sm lg:text-base text-white md:text-nowrap rounded-md cursor-pointer appearance-none pl-7.5 pr-1 focus:outline-none focus:ring-1 focus:ring-white-500">
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly" selected>Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
                             </div>
-                            
-                            <!-- Original TOTAL PAYROLL text on the right -->
-                            <p class="font-[Roboto] font-semibold text-right text-xs sm:text-base text-white md:text-nowrap">
-                                TOTAL PAYROLL
+
+                            <p class="font-[Roboto] font-semibold text-right text-xs sm:text-sm lg:text-base text-white md:text-nowrap">
+                                PAYROLL
                             </p>
                         </div>
                         
@@ -152,29 +156,29 @@
                             ₱{{ monthly_payroll|default:"0.00"|floatformat:2 }}
                         </h1>
                     </div>
-                    <div class="h-fit my-2 mx-4 flex flex-col items-end" id="next_payday">
+                    <div class="h-fit my-2 mx-1 md:mx-2 flex flex-col items-end" id="next_payday">
                         {% if next_payday %}
                             <h1 class="font-[Inter] font-semibold text-sm sm:text-xl xl:text-2xl text-right text-nowrap">{{ next_payday }}</h1>
                         {% else %}
-                            <h1 class="font-[Inter] font-semibold text-sm sm:text-base text-right text-nowrap text-gray-400">No upcoming payday</h1>
+                            <h1 class="font-[Inter] font-semibold text-sm md:text-base text-right text-nowrap text-gray-400">No upcoming payday</h1>
                         {% endif %}
-                        <p class="font-[Roboto] font-semibold text-xs sm:text-base text-right text-white md:text-nowrap">NEXT PAYDAY</p>    
+                        <p class="font-[Roboto] font-semibold text-xs sm:text-sm lg:text-base text-right text-white md:text-nowrap">NEXT PAYDAY</p>    
                     </div>
-                </div>
+                </div>  
             </div>
         </div>
         
         <!-- Donut Chart -->
-        <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 xl:col-span-3 flex flex-col justify-center items-center bg-white rounded-xl shadow-lg" id="attendance">
-            <div class="w-full px-3 pt-3">
+        <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 xl:col-span-3 flex flex-col justify-around items-center bg-white rounded-xl shadow-lg" id="attendance">
+            <div class="w-full px-3 pt-3 ">
                 <h2 class="text-[#1E1E1E] font-bold text-base">ATTENDANCE</h2>
+                <p class="text-[#1E1E1ECC] font-normal text-xs lg:text-sm">Employee attendance based on...</p>
                 <div class="flex justify-center gap-2 mt-2">
                     <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#F8D146] text-[#1E1E1E]" data-period="day">Day</button>
                     <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="week">Week</button>
                     <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="month">Month</button>
                     <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="year">Year</button>
                 </div>
-                <p id="attendance-period" class="text-center text-sm text-gray-500 mt-1">Today's Attendance</p>
             </div>
             <canvas id="donut" class="p-[15px]"></canvas>
         </div>
@@ -200,9 +204,9 @@
                         {% for history in histories %}
                         <tr>
                             <td class="px-3">
-                                <div class="flex flex-col gap-2">
-                                    <p id="history" class="text-[15px]/5 font-[Inter]">{{ history.description }}</p>
-                                    <p id="history_time" class="text-[#1e1e1e81] text-[13px] font-[Roboto] font-bold">{{ history.date_time }}</p>
+                                <div class="flex flex-col gap-1 lg:gap-2">
+                                    <p id="history" class="text-xs lg:text-[15px]/5 font-[Inter]">{{ history.description }}</p>
+                                    <p id="history_time" class="text-[#1e1e1e81] text-[10px] lg:text-[13px] font-[Roboto] font-bold">{{ history.date_time }}</p>
                                 </div>
                             </td>
                         </tr>
@@ -219,16 +223,16 @@
         </div>
 
         <!-- Bar Chart -->
-        <div class="order-2 lg:order-6 col-span-5 lg:col-span-5 xl:col-span-6 bg-white rounded-xl shadow-lg flex flex-col justify-center items-center" id="payroll-per-week">
+        <div class="order-2 lg:order-6 col-span-5 lg:col-span-5 xl:col-span-6 bg-white rounded-xl shadow-lg flex flex-col justify-between items-center" id="payroll-per-week">
             <div class="w-full px-3 pt-3">
                 <h2 class="text-[#1E1E1E] font-bold text-base">PAYROLL PER PERIOD</h2>
-                <p class="text-sm text-gray-500">Total payment amounts by payroll date</p>
+                <p class="text-[#1E1E1ECC] font-normal text-xs lg:text-sm">Total payment amounts by payroll date</p>
             </div>
             <div style="height: 230px; width: 100%; position: relative;">
                 <canvas id="bar" class="p-[15px]"></canvas>
             </div>
             <div class="w-full px-4 pb-2 flex justify-end">
-                <button id="refresh-payroll-chart" class="text-xs text-blue-600 hover:underline">Refresh Data</button>
+                <button id="refresh-payroll-chart" class="text-xs text-[#1E1E1E] hover:text-[#F8D146] duration-150 cursor-pointer">Refresh Data</button>
             </div>
         </div>
 
@@ -236,26 +240,26 @@
             <table id="preview-table" class="absolute bg-white w-full rounded-2xl text-xs-center z-40">
                 <thead class="text-[#1E1E1E] border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                     <tr class="text-base font-[League Spartan]">
-                        <th class="py-1">EMPLOYEE</th>
-                        <th>PAYMENT AMOUNT</th>
-                        <th>STATUS</th>
-                        <th>LAST ATTENDANCE</th>
+                        <th class="p-2 text-base font-[League Spartan]">EMPLOYEE</th>
+                        <th class="p-2 text-base font-[League Spartan]">PAYMENT AMOUNT</th>
+                        <th class="p-2 text-base font-[League Spartan]">STATUS</th>
+                        <th class="p-2 text-base font-[League Spartan]">LAST ATTENDANCE</th>
                     </tr>
                 </thead>
                 
                 <tbody>
                     {% for employee in employees %}
                     <tr class="text-center">
-                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td>{{ employee.total_payment }}</td>
-                        <td>
+                        <td class="px-2 py-4 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="px-2 py-4 text-sm font-[Inter]">{{ employee.total_payment }}</td>
+                        <td class="px-2 py-4 text-sm font-[Inter]">
                             {% if employee.active_status == "Active" %}
                                 Active
                             {% else %}
                                 Inactive
                             {% endif %}
                         </td>
-                        <td>
+                        <td class="px-2 py-4 text-sm font-[Inter]">
                             {% if employee.latest_attendance_date %}
                                     {{ employee.latest_attendance_date }}
                             {% else %}
@@ -266,7 +270,7 @@
                     
                     {% empty %}
                     <tr>
-                        <td colspan="4">No employees found.</td>
+                        <td colspan="4" class="px-2 py-4 text-sm font-[Inter]">No employees found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

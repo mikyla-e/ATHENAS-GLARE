@@ -119,10 +119,10 @@
 </div>
 
 <!--deductions-->
-<div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
+<!-- <div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
     <div class="space-y-2">
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Edit Deductions</h1>
-        <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>     -->
+        <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>
     </div>
     <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:edit_deductions' %}">
         {% csrf_token %}
@@ -157,14 +157,14 @@
             <input id="button" type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">   
         </div>
     </form>   
-</div>
+</div> -->
 
 {% endblock %}
 
 {% block content %}
 <div class="w-full grid grid-cols-4 grid-rows-[50px_50px_70px] md:grid-rows-[60px_60px_70px] lg:grid-cols-[2fr_2fr_2fr_1fr_1fr_1fr_1fr] lg:grid-rows-[90px_50px] gap-5">
     
-    <div class="bg-[#1E1E1E] px-4 order-1 col-span-3 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
+    <div class="bg-[#1E1E1E] px-4 order-1 col-span-4 lg:col-span-3 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
         <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
             <p class="text-[10px]/3 sm:text-sm/3.5 md:text-base/4 lg:text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">TOTAL PAYROLL</p>
             <div class="flex flex-col justify-end items-end text-right">
@@ -194,26 +194,36 @@
         </div>
     </div>
 
-    <div class="order-4 col-span-4 lg:order-2 lg:col-span-4 lg:row-span-1">
+    <div class="order-2 col-span-4 row-span-1 lg:order-2 lg:col-span-4 lg:row-span-2">
         <div class="bg-white size-full py-2 px-6 rounded-xl flex flex-row lg:flex-col items-center justify-between overflow-hidden">
-            <div class="flex items-center size-full gap-2">
-                <p class="text-sm font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD:</p>
+            <div class="flex items-center lg:items-start lg:flex-col size-full gap-2 lg:gap-0">
+                <div class="w-fit lg:w-full flex lg:justify-between">
+                    <p class="text-sm font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD:</p>
+
+                    <a href="{% url 'payroll_system:payrolls' %}" class="hidden lg:block">
+                        <div class="flex items-center h-fit w-fit gap-2">
+                            <p class="text-xs text-nowrap">OTHER PERIODS</p>
+                            <img src="{% static 'images/next_icon.png' %}" alt="" class="" title="Check Other Payroll Periods">
+                        </div>
+                    </a>
+                </div>
             
-                <div class="h-full flex items-center gap-2">
+                <div class="size-full flex flex-row rounded-sm lg:flex-col xl:flex-row lg:justify-center items-center gap-2 lg:gap-0 xl:gap-2">
                     {% if selected_payroll %}
-                        <p class="text-4xl text-nowrap">{{ selected_payroll.start_date|date:"m-d-y" }}</p>
+                        <p class="text-4xl xl:text-5xl text-nowrap">{{ selected_payroll.start_date|date:"m-d-y" }}</p>
                         <p>to</p>
-                        <p class="text-4xl text-nowrap">{{ selected_payroll.end_date|date:"m-d-y" }}</p>
+                        <p class="text-4xl xl:text-5xl text-nowrap">{{ selected_payroll.end_date|date:"m-d-y" }}</p>
                     {% else %}
-                        <p class="text-4xl text-nowrap">00-00-00</p>
+                        <p class="text-4xl xl:text-5xl text-nowrap">00-00-00</p>
                         <p>to</p>
-                        <p class="text-4xl text-nowrap">00-00-00</p>
+                        <p class="text-4xl xl:text-5xl text-nowrap">00-00-00</p>
                     {% endif %}
                 </div>
+                
             </div>
-            <a href="{% url 'payroll_system:payrolls' %}">
+            <a href="{% url 'payroll_system:payrolls' %}" class="lg:hidden">
                 <div class="flex items-center h-fit w-fit gap-2">
-                    <p class="hidden md:inline-block text-xs text-nowrap">PAYROLL PERIODS</p>
+                    <p class="hidden md:inline-block text-xs text-nowrap">OTHER PERIODS</p>
                     <img src="{% static 'images/next_icon.png' %}" alt="" class="" title="Check Other Payroll Periods">
                 </div>
             </a>
@@ -221,28 +231,23 @@
         </div>
     </div>
 
-    <div class="order-2 col-span-1 lg:order-3 lg:col-span-2 row-span-1">
-        <div class="size-full flex rounded-full overflow-hidden ">
-            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-1 cursor-pointer" id="edit_incentives" onclick="editIncentives()" title="Edit All Employee Incentives">
-                <p class="hidden sm:inline-block m-0 p-0 text-[#FFF] font-bold text-base sm:text-xs md:text-sm xl:text-lg">INCENTIVES</p>
-                <img src="{% static 'images/incentives_icon.png' %}" alt="">
-            </button>
-        </div>
+    <!-- <div class="order-2 col-span-1 lg:order-3 lg:col-span-2 row-span-1">
+        
     </div>
 
     <div class="order-3 col-span-1 lg:order-4 lg:col-span-2 row-span-1">
-        <div class="size-full flex rounded-full overflow-hidden">
+        <!-- <div class="size-full flex rounded-full overflow-hidden">
             <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-1 cursor-pointer" id="edit_incentives" onclick="editDeductions()" title="Edit All Employee Deductions">
                 <p class="hidden sm:inline-block m-0 p-0 text-[#FFF] font-bold text-base sm:text-xs md:text-sm xl:text-lg">DEDUCTIONS</p>
                 <img src="{% static 'images/deductions_icon.png' %}" alt="">
             </button>
-        </div>
-    </div>
+        </div> 
+    </div> -->
 </div>
 
 <div class="w-full flex flex-col py-5">
     <div class="w-full h-[40px] flex flex-nowrap justify-between gap-3">
-        <div class="w-[80%] lg:w-[85%] xl:w-[90%] h-full flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden" id="search">
+        <div class="w-[85%] xl:w-[90%] h-full flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden" id="search">
             <form class="w-full flex justify-center items-center gap-3" method="get">
                 {% csrf_token %}
                 <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
@@ -252,9 +257,16 @@
             </form>
         </div>
 
-        <a href="#">
+        <!-- <a href="#">
             <button id="button_2" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-[40px] text-center">PRINT</button>
-        </a>
+        </a> -->
+
+        <div class="w-fit h-full flex rounded-full overflow-hidden ">
+            <button class="size-full px-4 flex justify-center items-center bg-[#F8D146] gap-1 cursor-pointer" id="edit_incentives" onclick="editIncentives()" title="Edit All Employee Incentives">
+                <p class="hidden sm:inline-block m-0 p-0 text-[#FFF] font-bold text-xs/3 lg:text-sm/4">INCENTIVES</p>
+                <img src="{% static 'images/incentives_icon.png' %}" alt="">
+            </button>
+        </div>
 
         <!-- <div class="w-[20%] lg:w-[15%] xl:w-[10%] h-full">
             <form action="#" method="post" id="confirm-payroll-form" class="h-full">
@@ -402,20 +414,20 @@
         // }
         
 
-        function editDeductions(){
-            let bg = document.getElementById("background");
-            const popup = document.getElementById("deductions-popup");
+        // function editDeductions(){
+        //     let bg = document.getElementById("background");
+        //     const popup = document.getElementById("deductions-popup");
             
-            bg.classList.add("show");
-            popup.classList.add("show");
-        }
+        //     bg.classList.add("show");
+        //     popup.classList.add("show");
+        // }
 
-        function cancelEditDeductions(){
-            let bg = document.getElementById("background");
-            const popup = document.getElementById("deductions-popup");
-            bg.classList.remove("show");
-            popup.classList.remove("show");
-        }
+        // function cancelEditDeductions(){
+        //     let bg = document.getElementById("background");
+        //     const popup = document.getElementById("deductions-popup");
+        //     bg.classList.remove("show");
+        //     popup.classList.remove("show");
+        // }
 
         document.addEventListener('DOMContentLoaded', function() {
             // For confirm payroll

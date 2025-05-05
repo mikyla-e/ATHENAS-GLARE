@@ -32,6 +32,23 @@
     
 }
 
+#confirm{
+    padding: 0 20px;
+    width: fit-content;
+
+    border-radius: 50px;
+    border: none;
+
+    background-color: #7AB576;
+    color: white;
+}
+
+#confirm:hover{
+    cursor: pointer;
+    scale: 1.05;
+    transition: 0.5s;
+}
+
 #button:hover{
     cursor: pointer;
     scale: 1.05;
@@ -127,6 +144,7 @@ input[type=date]{
 }
 
 select{
+    height: 50px;
     margin: 8px 0;
     padding: 2px 15px;
     border: none;

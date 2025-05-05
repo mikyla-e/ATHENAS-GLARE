@@ -119,9 +119,6 @@
                     <datalist id="province-list">
                     </datalist>
                 </div>
-            </div>
-        
-            <div class="order-2">
                 <div class="flex flex-col my-1">
                     <div class="">
                         <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
@@ -134,72 +131,79 @@
                     <datalist id="city-list">
                     </datalist>
                 </div>
-                <div class="flex flex-col my-1">
-                    <div class="">
-                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="{{ form.barangay.id_for_label }}">{{ form.barangay.label }}</label>
-                        {% if form.barangay.errors %}
-                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.barangay.errors.0 }}</div>
-                        {% endif %}
+            </div>
+        
+            <div class="order-2 flex flex-col justify-between">
+                <div class="">
+                    <div class="flex flex-col my-1">
+                        <div class="">
+                            <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="{{ form.barangay.id_for_label }}">{{ form.barangay.label }}</label>
+                            {% if form.barangay.errors %}
+                                <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.barangay.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        {{ form.barangay }}
+                        <datalist id="barangay-list">
+                        </datalist>
                     </div>
-                    {{ form.barangay }}
-                    <datalist id="barangay-list">
-                    </datalist>
-                </div>
-                <div class="flex flex-col my-1">
-                    <div class="">
-                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="education">HIGHEST EDUCATION ATTAINMENT</label>
-                        {% if form.highest_education.errors %}
-                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.highest_education.errors.0 }}</div>
-                        {% endif %}
+                    <div class="flex flex-col my-1">
+                        <div class="">
+                            <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="education">HIGHEST EDUCATION ATTAINMENT</label>
+                            {% if form.highest_education.errors %}
+                                <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.highest_education.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+    
+                        {{ form.highest_education }}
                     </div>
-
-                    {{ form.highest_education }}
-                </div>
-                <div class="flex flex-col my-1">
-                    <div class="">
-                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="work-experience">WORK EXPERIENCE</label>
-                        {% if form.work_experience.errors %}
-                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.work_experience.errors.0 }}</div>
-                        {% endif %}
+                    <div class="flex flex-col my-1">
+                        <div class="">
+                            <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="work-experience">WORK EXPERIENCE</label>
+                            {% if form.work_experience.errors %}
+                                <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.work_experience.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        {{ form.work_experience }}
                     </div>
-                    {{ form.work_experience }}
-                </div>
-                <div class="flex flex-col my-1">
-                    <div class="">
-                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="date-of-employment">DAILY RATE</label>
-                        {% if form.daily_rate.errors %}
-                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.daily_rate.errors.0 }}</div>
-                        {% endif %}
+                    <div class="flex flex-col my-1">
+                        <div class="">
+                            <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="date-of-employment">DAILY RATE</label>
+                            {% if form.daily_rate.errors %}
+                                <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.daily_rate.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        {{ form.daily_rate }}
                     </div>
-                    {{ form.daily_rate }}
-                </div>
-                <div class="flex flex-col my-1">
-                    <div class="">
-                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="date-of-employment">DATE OF EMPLOYEMENT</label>
-                        {% if form.date_of_employment.errors %}
-                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.date_of_employment.errors.0 }}</div>
-                        {% endif %}
+                    <div class="flex flex-col my-1">
+                        <div class="">
+                            <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="date-of-employment">DATE OF EMPLOYEMENT</label>
+                            {% if form.date_of_employment.errors %}
+                                <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.date_of_employment.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        {{ form.date_of_employment }}
                     </div>
-                    {{ form.date_of_employment }}
-                </div>
-                <div class="flex flex-col my-1">
-                    <div class="">
-                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="employee-status">EMPLOYEE STATUS</label>
-                        {% if form.employee_status.errors %}
-                            <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.employee_status.errors.0 }}</div>
-                        {% endif %}
+                    <div class="flex flex-col my-1">
+                        <div class="">
+                            <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="employee-status">EMPLOYEE STATUS</label>
+                            {% if form.employee_status.errors %}
+                                <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.employee_status.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        {{ form.employee_status }}
                     </div>
-                    {{ form.employee_status }}
-                </div>
-                <div class="flex flex-col my-1">
-                    <div class="">
-                        <label class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="employee-status">ACTIVE STATUS</label>
+                    <div class="flex flex-col my-2">
                         {% if form.is_active.errors %}
                             <div class="text-[#e74c3c] text-[9px] md:text-xs font-bold inline-block">{{ form.is_active.errors.0 }}</div>
                         {% endif %}
+                        <div class="flex justify-between mx-[20px]">
+                            <label class="font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]" for="employee-status">ACTIVE STATUS</label>
+                            
+                            {{ form.is_active }}
+                        </div>
                     </div>
-                    {{ form.is_active }}
                 </div>
+                
                 
                 <div class="w-full h-[50px] flex justify-end items-center gap-5">
                     {% if form.non_field_errors %}
@@ -209,7 +213,8 @@
                             {% endfor %}
                         </div>
                     {% endif %}
-                    <input class="size-full text-xs/3 lg:text-base/4 font-bold text-[League Spartan] text-center" type="submit" value="PROCEED TO PHOTO" />
+                    <input class="size-full text-xs/3 lg:text-base/4 font-bold text-[League Spartan] text-center" type="button" id="cancel" onclick="history.back();" value="CANCEL" />
+                    <input class="size-full text-xs/3 lg:text-base/4 font-bold text-[League Spartan] text-center" type="submit" id="confirm" value="PROCEED TO PHOTO" />
                 </div>    
             </div>
         </form>

@@ -29,7 +29,7 @@
     </div>
     <div class="flex-1 overflow-y-auto" id="menu">
         <ul class="h-auto w-[80px] md:w-[190px]">
-            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if request.path == '/payroll_system/dashboard/' %}focused{% endif %}">
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if request.path == '/payroll_system/dashboard/' %}focused{% endif %}" title="Dashboard">
                 <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:dashboard' %}">
                     <img class="w-auto h-auto"
                     src="{% if 'dashboard' in request.path %}
@@ -41,7 +41,7 @@
                     <div class="hidden md:block text-base font-[League Spartan] font-semibold">DASHBOARD</div>
                 </a>
             </li>
-            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'payrolls' in request.path %}focused{% endif %}">
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'payrolls' in request.path %}focused{% endif %}" title="Payroll">
                 <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:payrolls' %}">
                     <img class="w-auto h-auto" 
                     src="{% if 'payrolls' in request.path %}
@@ -53,7 +53,7 @@
                     <div class="hidden md:block text-base font-[League Spartan] font-semibold">PAYROLL</div>
                 </a>
             </li>
-            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'employees' in request.path %}focused{% endif %}">
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'employees' in request.path %}focused{% endif %}" title="Employees">
                 <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:employees' %}">
                     <img class="w-auto h-auto"
                     src="{% if 'employees' in request.path %}
@@ -65,7 +65,7 @@
                     <div class="hidden md:block text-base font-[League Spartan] font-semibold">EMPLOYEES</div>
                 </a>
             </li>
-            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'services' in request.path %}focused{% endif %}">
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'services' in request.path %}focused{% endif %}" title="Services">
                 <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:services' %}">
                     <img class="w-auto h-auto"
                     src="{% if 'services' in request.path %}
@@ -77,7 +77,7 @@
                     <div class="hidden md:block text-base font-[League Spartan] font-semibold">SERVICES</div>
                 </a>
             </li>
-            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'status' in request.path %}focused{% endif %}">
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'status' in request.path %}focused{% endif %}" title="Status">
                 <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:status' %}">
                     <img class="w-auto h-auto"
                     src="{% if 'status' in request.path %}
@@ -89,7 +89,7 @@
                     <div class="hidden md:block text-base font-[League Spartan] font-semibold">STATUS</div>
                 </a>
             </li>
-            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'customers' in request.path %}focused{% endif %}">
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'customers' in request.path %}focused{% endif %}" title="Customers">
                 <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'payroll_system:customers' %}">
                     <img class="w-auto h-auto"
                     src="{% if 'customers' in request.path %}
@@ -101,7 +101,7 @@
                     <div class="hidden md:block text-base font-[League Spartan] font-semibold">CUSTOMERS</div>
                 </a>
             </li>
-            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'settings' in request.path %}focused{% elif 'about' in request.path %}focused{% endif %}">
+            <li id="menu-item" class="px-5 py-2.5 flex justify-center md:justify-start {% if 'settings' in request.path %}focused{% elif 'about' in request.path %}focused{% endif %}" title="Settings">
                 <a class="size-fit flex flex-nowrap items-center gap-2" href="{% url 'settings:settings' %}">
                     <img class="w-auto h-auto"
                     src="{% if 'settings' in request.path %}
