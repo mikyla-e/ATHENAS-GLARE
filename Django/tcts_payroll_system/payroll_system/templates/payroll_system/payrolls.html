@@ -41,20 +41,22 @@
     
 </div> 
 
-<!--confirm payroll-->
-<div id="confirm-payroll-popup" class="popup fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
-    <div class="flex flex-col gap-2">
-        <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
-        <div class="w-full h-[2px] my-1 border border-2 border-[#1e1e1e40] rounded-full"></div>
-        <h1 class="text-base sm:text-base my-2 font-[League Spartan] font-normal text-center">Are you sure you want to confirm this payroll period? Once confirmed, no further changes can be made to this cycle.</h1>
-
-    </div>    
-    <div class="w-full h-[40px] my-1 flex justify-around items-center gap-3">
-        <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelConfirmPayroll()">CANCEL</button>
-        <button id="confirm" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">CONFIRM</button>
-    </div>
+<div id="confirm-payroll-popup" class="popup fixed w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible gap-4 opacity-0 rounded-lg z-60 overflow-hidden">
+    <form method="POST" id="confirm-payroll-form" class="flex flex-col gap-4">
+        {% csrf_token %}
+        <div class="flex flex-col gap-2">
+            <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
+            <div class="w-full h-[2px] my-1 border border-2 border-[#1e1e1e40] rounded-full"></div>
+            <h1 class="text-base sm:text-base my-2 font-[League Spartan] font-normal text-center">
+                Are you sure you want to confirm this payroll period? Once confirmed, no further changes can be made to this cycle.
+            </h1>
+        </div>
+        <div class="flex flex-row gap-2 justify-end">
+            <button type="button" onclick="cancelConfirmPayroll();" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center">Cancel</button>
+            <button type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center">Confirm</button>
+        </div>
+    </form>
 </div>
-
 
 <!--add payroll-->
 <div id="add-payroll-popup" class="popup fixed w-[500px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
@@ -182,7 +184,7 @@
                     <p class="text-[League Spartan] text-lg font-semibold text-[#1E1E1E80]">{{ current_payroll.get_payroll_status_display }}</p>
                 </div>
                 <div class="h-[30px]">
-                    <button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Confirm Payroll Period" onclick="confirmPayroll()">CONFIRM PAYROLL</button>
+                    <button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Confirm Payroll Period" onclick="confirmPayroll({{ current_payroll.payroll_period_id }})">CONFIRM PAYROLL</button>
                 </div>
             </div>
         </div>
@@ -305,20 +307,26 @@
 <!--(optional)script-->
 {% block script %}
 <script>
-    function confirmPayroll(){
-        const bg = document.getElementById("background");
+    function confirmPayroll(payrollId) {
+        const form = document.getElementById("confirm-payroll-form");
         const popup = document.getElementById("confirm-payroll-popup");
-        bg.classList.add("show");
-        popup.classList.add("show");
-    }
-    
-    function cancelConfirmPayroll(){
-        const bg = document.getElementById("background");
-        const popup = document.getElementById("confirm-payroll-popup");
-        bg.classList.remove("show");
-        popup.classList.remove("show");
+        const background = document.getElementById("background");
+
+        // Set the form action dynamically
+        form.action = `/payroll_system/payroll/confirm/${payrollId}/`;
+
+        // Show popup and background
+        popup.classList.remove("invisible", "opacity-0");
+        background.classList.remove("invisible", "opacity-0");
     }
 
+    function cancelConfirmPayroll() {
+        const popup = document.getElementById("confirm-payroll-popup");
+        const background = document.getElementById("background");
+
+        popup.classList.add("invisible", "opacity-0");
+        background.classList.add("invisible", "opacity-0");
+    }
 
     function addPayroll(){
         let bg = document.getElementById("background");

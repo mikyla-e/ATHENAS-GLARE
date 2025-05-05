@@ -430,6 +430,28 @@ class PayrollPeriod(models.Model):
         for record in self.payroll_records.all():
             record.recalculate_and_save()
         return True
+    
+    def confirm(self):
+        """
+        Confirm and finalize this payroll period.
+        Raises ValidationError if end date hasn't been reached or status isn't INPROGRESS.
+        Returns True if successful.
+        """
+        today = timezone.now().date()
+        
+        # Validate end date
+        if self.end_date > today:
+            raise ValidationError("Cannot confirm payroll before the period's end date.")
+        
+        # Validate status
+        if self.payroll_status != self.PayrollStatus.INPROGRESS:
+            raise ValidationError("Only payroll periods with IN-PROGRESS status can be confirmed.")
+        
+        # Set status to PROCESSED
+        self.payroll_status = self.PayrollStatus.PROCESSED
+        self.save()
+        
+        return True
 
     def __str__(self):
         return f"{self.start_date} to {self.end_date} ({self.get_payroll_status_display()})"

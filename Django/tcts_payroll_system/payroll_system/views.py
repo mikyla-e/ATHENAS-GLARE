@@ -1,4 +1,5 @@
 import base64
+import calendar
 from datetime import datetime, date as date_class
 from django.core.files.base import ContentFile
 from django.contrib import messages
@@ -13,7 +14,6 @@ from django.utils.timezone import now, timedelta
 from django.views.decorators.csrf import csrf_protect
 from .forms import EmployeeForm, PayrollPeriodForm, DeductionForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
 from .models import Employee, Attendance, PayrollPeriod, Deduction, PayrollRecord, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
-import calendar
 
 @csrf_protect  # Ensure CSRF protection
 
@@ -489,7 +489,21 @@ def payroll_individual(request, employee_id):
 
 @login_required
 def payroll_history(request):
-    return render(request, 'payroll_system/payroll_history.html')
+    # Get all processed payroll periods
+    processed_periods = PayrollPeriod.objects.filter(
+        payroll_status=PayrollPeriod.PayrollStatus.PROCESSED
+    ).order_by('-end_date')  # Most recent first
+    
+    for period in processed_periods:
+        period.total_net_pay = period.payroll_records.aggregate(
+            total=Sum('net_pay')
+        )['total'] or 0
+    
+    context = {
+        'payroll_periods': processed_periods,
+    }
+    
+    return render(request, 'payroll_system/payroll_history.html', context)
 
 @login_required
 def edit_deductions(request):
@@ -719,64 +733,31 @@ def update_employee_incentives(request, employee_id):
     # If not POST, redirect back to the payroll page
     return redirect('payroll_system:payroll_individual', employee_id=employee_id)
 
-# @login_required
-# def confirm_payroll(request):
-#     if request.method == 'POST':
-#         try:
-#             # Find all pending payrolls
-#             # pending_payrolls = Payroll.objects.filter(payroll_status='PENDING')
+@login_required
+def confirm_payroll(request, payroll_period_id):
+    if request.method == 'POST':
+        try:
+            # Get the payroll period to confirm
+            payroll_period = get_object_or_404(PayrollPeriod, payroll_period_id=payroll_period_id)
             
-#             # # Calculate the next payment date for the new payroll
-#             # today = now().date()
-#             # temp_payroll = Payroll()  # Temporary instance to use the method
+            # Use the model method to confirm payroll
+            payroll_period.confirm()
             
-#             # Default to Saturday (5), but this could be configurable via settings or form
-#             payment_weekday = 5  # 0=Monday, 5=Saturday, 6=Sunday
-#             next_payment_date = temp_payroll.get_next_payment_date(today, payment_weekday)
+            # Add success message
+            messages.success(request, f"Payroll period from {payroll_period.start_date} to {payroll_period.end_date} has been successfully processed.")
             
-#             # Process all the pending payrolls first
-#             processed_payrolls = []
-#             for payroll in pending_payrolls:
-#                 # Store the cash advance amount for later use
-#                 cash_advance_amount = payroll.cash_advance
-#                 employee = payroll.employee_id_fk
-                
-#                 # Update the payroll status to PROCESSED but keep the cash_advance value
-#                 payroll.payroll_status = 'PROCESSED'
-#                 payroll.save()
-                
-#                 # Store information needed for creating new payrolls
-#                 processed_payrolls.append({
-#                     'employee': employee,
-#                     'rate': payroll.rate,
-#                     'cash_advance': cash_advance_amount
-#                 })
+            # Redirect to payroll history page
+            return redirect('payroll_system:payroll_history')
             
-#             # Now create new payrolls with cash advance transferred to deductions
-#             for payroll_info in processed_payrolls:
-#                 # Create a new payroll with the cash advance as deductions
-#                 new_payroll = Payroll(
-#                     rate=payroll_info['rate'],  # Keep the same rate
-#                     incentives=0,  # Reset incentives
-#                     payroll_status='PENDING',  # Set status to PENDING
-#                     deductions=payroll_info['cash_advance'],  # Transfer cash advance to deductions
-#                     salary=0,  # Reset salary
-#                     cash_advance=0,  # Start with zero cash advance
-#                     payment_date=next_payment_date,  # Set payment date to next payment day
-#                     employee_id_fk=payroll_info['employee']  # Keep the same employee
-#                 )
-#                 new_payroll.save()
-            
-#             # Log history
-#             History.objects.create(description=f"Payroll confirmed. Cash advances transferred to next payroll's deductions.")
-            
-#             return redirect('payroll_system:payrolls')
-#         except Exception as e:
-#             messages.error(request, f'Error confirming payroll: {e}')
-#             # Return to payroll page with error message
-#             return redirect('payroll_system:payrolls')
+        except ValidationError as e:
+            messages.error(request, e.message)
+            return redirect('payroll_system:payrolls')
+        except Exception as e:
+            messages.error(request, f'Error confirming payroll: {e}')
+            return redirect('payroll_system:payrolls')
     
-#     return redirect('payroll_system:payrolls')
+    # If not POST, redirect to payrolls page
+    return redirect('payroll_system:payrolls')
 
 # @login_required
 # def payroll_edit(request, employee_id):
@@ -1683,5 +1664,3 @@ def get_previous_avg_rate():
             return previous_employees.aggregate(Avg('daily_rate'))['daily_rate__avg']
     
     return None
-
-

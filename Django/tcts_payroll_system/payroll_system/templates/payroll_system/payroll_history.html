@@ -39,6 +39,18 @@
 {% endblock %}
 
 {% block content %}
+
+{% if messages %}
+
+<div class="messages my-3">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} p-2 rounded-lg mb-2 {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 <div class="size-full flex flex-col">
     <div class="w-full flex justify-between">
         <p class="mx-3 text-[League Spartan] text-3xl font-bold">HISTORY</p>
@@ -68,19 +80,20 @@
         <tbody>
             {% for payroll_period in payroll_periods %}
             <tr id="payroll-data">
-                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.type }}</td>
-                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.start_date }}</td>
-                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.end_date }}</td>
-                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.payroll_status }}</td>
-                <td class="p-2 text-sm font-[Inter]"><!--TOTAL NET PAY--></td>
-                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.payment_date }}</td> 
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.get_type_display }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.start_date|date:"M d, Y" }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.end_date|date:"M d, Y" }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.get_payroll_status_display }}</td>
+                <td class="p-2 text-sm font-[Inter]">₱{{ payroll_period.total_net_pay|floatformat:2 }}</td>
+                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.payment_date|date:"M d, Y" }}</td> 
                 <td>
-                    <a href="">view</a>
+                    <a href="{% url 'payroll_system:payroll_record' %}?payroll_id={{ payroll_period.payroll_period_id }}" 
+                       class="text-blue-600 hover:text-blue-800 hover:underline">View</a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td class="p-2 text-center text-sm font-[Inter]" colspan="7">No Payroll Period Existing</td>
+                <td class="p-2 text-center text-sm font-[Inter]" colspan="7">No processed payroll periods available</td>
             </tr>
             {% endfor %}
         </tbody>
