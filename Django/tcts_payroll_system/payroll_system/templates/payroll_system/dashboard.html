@@ -241,7 +241,7 @@
                 <thead class="text-[#1E1E1E] border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                     <tr class="text-base font-[League Spartan]">
                         <th class="p-2 text-base font-[League Spartan]">EMPLOYEE</th>
-                        <th class="p-2 text-base font-[League Spartan]">PAYMENT AMOUNT</th>
+                        <th class="p-2 text-base font-[League Spartan]">NET PAY</th>
                         <th class="p-2 text-base font-[League Spartan]">STATUS</th>
                         <th class="p-2 text-base font-[League Spartan]">LAST ATTENDANCE</th>
                     </tr>
@@ -251,26 +251,31 @@
                     {% for employee in employees %}
                     <tr class="text-center">
                         <td class="px-2 py-4 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td class="px-2 py-4 text-sm font-[Inter]">{{ employee.total_payment }}</td>
                         <td class="px-2 py-4 text-sm font-[Inter]">
-                            {% if employee.active_status == "Active" %}
-                                Active
+                            {% if employee.payroll_record %}
+                                ₱{{ employee.payroll_record.net_pay|floatformat:2 }}
                             {% else %}
-                                Inactive
+                                ₱0.00
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-4 text-sm font-[Inter]">
+                            {% if employee.is_active %}
+                                <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Active</span>
+                            {% else %}
+                                <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Inactive</span>
                             {% endif %}
                         </td>
                         <td class="px-2 py-4 text-sm font-[Inter]">
                             {% if employee.latest_attendance_date %}
-                                    {{ employee.latest_attendance_date }}
+                                {{ employee.latest_attendance_date }}
                             {% else %}
-                                No Attendance Data
+                                <span class="text-gray-500">No Attendance Data</span>
                             {% endif %}
                         </td>
                     </tr>
-                    
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="px-2 py-4 text-sm font-[Inter]">No employees found.</td>
+                        <td colspan="4" class="px-2 py-4 text-sm font-[Inter] text-center">No employees found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

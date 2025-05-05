@@ -27,20 +27,29 @@ def dashboard(request):
         .values('date')[:1]
     )
 
-    # latest_payroll_status_subquery = (
-    #     Payroll.objects
-    #     .filter(employee_id_fk=OuterRef('pk'))
-    #     .order_by('-payment_date')
-    #     .values('payroll_status')[:1]
-    # )
+    # Get employees with their latest attendance date
+    employees = Employee.objects.annotate(
+        latest_attendance_date=Subquery(latest_attendance_subquery)
+    ).order_by('-latest_attendance_date', 'last_name')  # Order by most recent attendance date
     
-    # latest_payroll_rate_subquery = (
-    #     Payroll.objects
-    #     .filter(employee_id_fk=OuterRef('pk'))
-    #     .order_by('-payment_date')
-    #     .values('salary')[:1]
-    # )
-
+    # Get the current active payroll period
+    current_payroll_period = PayrollPeriod.objects.filter(
+        payroll_status=PayrollPeriod.PayrollStatus.INPROGRESS
+    ).first()
+    
+    # If there's a current payroll period, get the payroll records for each employee
+    if current_payroll_period:
+        for employee in employees:
+            try:
+                payroll_record = PayrollRecord.objects.get(
+                    employee=employee,
+                    payroll_period=current_payroll_period
+                )
+                employee.payroll_record = payroll_record
+            except PayrollRecord.DoesNotExist:
+                # Set default values if no payroll record exists
+                employee.payroll_record = None
+    
     total_employees = Employee.objects.count()
 
     # Get current week range (Monday to Sunday)
@@ -55,35 +64,6 @@ def dashboard(request):
         employee__is_active=True
     ).values('employee').distinct().count()
 
-
-    # active_employees_per_day = (
-    #     Attendance.objects.filter(date__range=[start_of_week, end_of_week])
-    #     .values('date')
-    #     .annotate(active_count=Count('employee', distinct=True))
-    # )
-
-    # # Calculate the average number of active employees within the week
-    # total_active_counts = sum(day['active_count'] for day in active_employees_per_day)
-    # days_counted = len(active_employees_per_day) or 1  # Avoid division by zero
-
-    # avg_active_employees = total_active_counts / days_counted
-    
-    # employees_with_latest_payroll = Employee.objects.annotate(
-    #     latest_payroll_status=Subquery(latest_payroll_status_subquery)
-    # )
-    
-    # processed_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PROCESSED').count()
-    
-    # pending_payroll_count = employees_with_latest_payroll.filter(latest_payroll_status='PENDING').count()
-    
-    # Calculate Total Payroll (Sum of all processed salaries)
-    #total_payroll = Payroll.objects.filter(payroll_status='PROCESSED').aggregate(Sum('salary'))['salary__sum']
-    
-    # if total_payroll is None:
-    #     total_payroll = "No total payroll yet"
-    
-    # Add next payday calculation too
-    today = now().date()
     # Count payroll periods grouped by status
     processed_payroll_count = PayrollPeriod.objects.filter(
         payroll_status=PayrollPeriod.PayrollStatus.PROCESSED
@@ -92,41 +72,23 @@ def dashboard(request):
     pending_payroll_count = PayrollPeriod.objects.filter(
         payroll_status=PayrollPeriod.PayrollStatus.PENDING
     ).count()
+    
     next_payday = PayrollPeriod.objects.filter(payment_date__gt=today).aggregate(Min('payment_date'))['payment_date__min']
 
-    # Modified: Get employees ordered by most recent time-in (attendance date)
-    # recent_employees = (
-    #     Employee.objects
-    #     .annotate(
-    #         latest_attendance_date=Subquery(latest_attendance_subquery),
-    #         latest_payroll_status=Subquery(latest_payroll_status_subquery),
-    #         latest_payroll_rate=Subquery(latest_payroll_rate_subquery)
-    #     )
-    #     .order_by('-latest_attendance_date', 'last_name')[:5] # Order by most recent attendance date
-    # )
-
     histories = History.objects.order_by('-date_time')
-
-    # Calculate the total payment correctly using the rate/salary
-    # for employee in recent_employees:
-    #     if employee.latest_payroll_rate:
-    #         employee.total_payment = f"₱{employee.latest_payroll_rate:.2f}"
-    #     else:
-    #         employee.total_payment = "₱0.00"
     
-    #new
+    # Calculate payroll totals
     payroll_totals = calculate_payroll_totals(request)
      
     context = { 
         'histories': histories,
-        # 'employees': recent_employees,
+        'employees': employees,
         'total_employees': total_employees,
         'avg_active_employees': round(avg_active_employees),
         'processed_payroll_count': processed_payroll_count,
         'pending_payroll_count': pending_payroll_count,
-        # 'total_payroll': total_payroll,
         'next_payday': next_payday,
-        'total_payroll': payroll_totals.get('monthly_payroll', 0),  # Keep existing behavior for compatibility
+        'total_payroll': payroll_totals.get('monthly_payroll', 0),
         'weekly_payroll': payroll_totals.get('weekly_payroll', 0),
         'monthly_payroll': payroll_totals.get('monthly_payroll', 0),
         'yearly_payroll': payroll_totals.get('yearly_payroll', 0),
