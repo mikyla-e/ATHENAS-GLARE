@@ -1,9 +1,8 @@
 import os
 import cv2
-import pytz
 import face_recognition
 from django.core.exceptions import ValidationError
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date, datetime, time, timedelta
 from functools import lru_cache
 from payroll_system.models import Employee, Attendance
 from django.utils import timezone
@@ -199,78 +198,61 @@ def mark_attendance(employee, action):
     
     # For time_in action
     if action == 'time_in':
-        # Check if employee already has an attendance record for today
+        # Check if employee already has an active session
+        today_attendance = Attendance.objects.filter(
+            employee_id_fk=employee, 
+            date=today,
+            time_in__isnull=False,
+            time_out__isnull=True
+        ).first()
+        
+        if today_attendance:
+            # Already has an open session
+            return {
+                'status': 'success',
+                'message': f'Already timed in at {today_attendance.time_in.strftime("%I:%M %p")}.',
+                'has_open_session': True
+            }
+        
         try:
-            today_attendance = Attendance.objects.get(employee_id_fk=employee, date=today)
-            
-            # If already timed in
-            if today_attendance.time_in:
-                return {
-                    'status': 'info',
-                    'message': f'You have already timed in at {today_attendance.time_in.strftime("%I:%M %p")}.'
-                }
-        except Attendance.DoesNotExist:
             # Create new attendance record
-            try:
-                # Validate against work hours
-                if current_time < WORK_START_TIME:
-                    return {
-                        'status': 'warning',
-                        'message': 'Cannot time in before 8:00 AM. Work hours start at 8:00 AM.'
-                    }
-                
-                # Create new attendance record
-                attendance = Attendance(
-                    employee_id_fk=employee,
-                    date=today,
-                    time_in=current_time,
-                    attendance_status=Attendance.AttendanceStatus.PRESENT
-                )
-                attendance.save()
-                
-                return {
-                    'status': 'success',
-                    'message': f'Time in recorded at {current_time.strftime("%I:%M %p")}.',
-                    'employee_name': f'{employee.first_name} {employee.last_name}',
-                    'employee_id': employee.employee_id,
-                    'time': current_time.strftime("%I:%M %p")
-                }
-            except ValidationError as e:
-                return {
-                    'status': 'error',
-                    'message': str(e)
-                }
-            except Exception as e:
-                return {
-                    'status': 'error',
-                    'message': f'Error recording time in: {str(e)}'
-                }
+            attendance = Attendance(
+                employee_id_fk=employee,
+                date=today,
+                time_in=current_time,
+                attendance_status=Attendance.AttendanceStatus.PRESENT
+            )
+            attendance.save()
+            
+            return {
+                'status': 'success',
+                'message': f'Time in recorded at {current_time.strftime("%I:%M %p")}.',
+                'employee_name': f'{employee.first_name} {employee.last_name}',
+                'employee_id': employee.employee_id,
+                'time': current_time.strftime("%I:%M %p"),
+                'has_open_session': True
+            }
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f'Error recording time in: {str(e)}'
+            }
     
     # For time_out action
     elif action == 'time_out':
         try:
-            # Find today's attendance record
-            today_attendance = Attendance.objects.get(employee_id_fk=employee, date=today)
+            # Find today's attendance record with an open session
+            today_attendance = Attendance.objects.filter(
+                employee_id_fk=employee, 
+                date=today,
+                time_in__isnull=False,
+                time_out__isnull=True
+            ).first()
             
-            # If already timed out
-            if today_attendance.time_out:
-                return {
-                    'status': 'info',
-                    'message': f'You have already timed out at {today_attendance.time_out.strftime("%I:%M %p")}.'
-                }
-            
-            # If not timed in yet
-            if not today_attendance.time_in:
+            if not today_attendance:
                 return {
                     'status': 'warning', 
-                    'message': 'You must time in before timing out.'
-                }
-            
-            # Validate against work hours
-            if current_time > WORK_END_TIME:
-                return {
-                    'status': 'warning',
-                    'message': 'Cannot time out after 5:00 PM. Work hours end at 5:00 PM.'
+                    'message': 'No active session found to time out from.'
                 }
             
             # Record time out
@@ -289,19 +271,10 @@ def mark_attendance(employee, action):
                 'employee_name': f'{employee.first_name} {employee.last_name}',
                 'employee_id': employee.employee_id,
                 'time': current_time.strftime("%I:%M %p"),
-                'hours_worked': formatted_hours
+                'hours_worked': formatted_hours,
+                'has_open_session': False
             }
         
-        except Attendance.DoesNotExist:
-            return {
-                'status': 'warning',
-                'message': 'No time in record found for today. Please time in first.'
-            }
-        except ValidationError as e:
-            return {
-                'status': 'error',
-                'message': str(e)
-            }
         except Exception as e:
             return {
                 'status': 'error',

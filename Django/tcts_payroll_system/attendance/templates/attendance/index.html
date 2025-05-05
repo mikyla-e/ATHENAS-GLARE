@@ -277,12 +277,12 @@
                                 })
                                 .catch(function(fallbackError) {
                                     console.error('Could not access any camera:', fallbackError);
-                                    showNotification('Camera access denied. Please check browser permissions.', 'error');
+                                    showConfirmationMessage('Camera access denied. Please check browser permissions.', 'error');
                                     statusMessage.textContent = "No camera access. Check permissions.";
                                 });
                         });
                 } else {
-                    showNotification('Your browser does not support camera access.', 'error');
+                    showConfirmationMessage('Your browser does not support camera access.', 'error');
                     statusMessage.textContent = "Camera not supported by browser.";
                 }
             }
@@ -313,12 +313,12 @@
                 const endDate = endDateInput.value;
                 
                 if (!startDate || !endDate) {
-                    showNotification('Please select both start and end dates', 'warning');
+                    showConfirmationMessage('Please select both start and end dates', 'warning');
                     return;
                 }
                 
                 if (new Date(startDate) > new Date(endDate)) {
-                    showNotification('Start date cannot be after end date', 'warning');
+                    showConfirmationMessage('Start date cannot be after end date', 'warning');
                     return;
                 }
                 
@@ -330,7 +330,7 @@
                 if (recognizedEmployeeId) {
                     fetchFilteredHistory(recognizedEmployeeId);
                 } else {
-                    showNotification('Please get recognized first to view filtered history', 'info');
+                    showConfirmationMessage('Please get recognized first to view filtered history', 'info');
                 }
             }
             
@@ -367,13 +367,13 @@
                     success: function(response) {
                         if (response.status === 'success') {
                             updateAttendanceHistory(response.today_logs, response.history_logs);
-                            showNotification('Attendance history filtered successfully', 'success');
+                            showConfirmationMessage('Attendance history filtered successfully', 'success');
                         } else {
-                            showNotification(response.message, 'error');
+                            showConfirmationMessage(response.message, 'error');
                         }
                     },
                     error: function(error) {
-                        showNotification('Error filtering attendance history', 'error');
+                        showConfirmationMessage('Error filtering attendance history', 'error');
                     }
                 });
             }
@@ -458,7 +458,7 @@
                             
                             setTimeout(function() {
                                 recognitionOverlay.classList.add('hidden');
-                                checkAttendanceStatus(recognizedEmployeeId);
+                                handleEmployeeRecognition(recognizedEmployeeId);
                             }, 2000);
                         }
                         break;
@@ -470,9 +470,26 @@
                         break;
                         
                     case 'error':
-                        showNotification(response.message, 'error');
+                        showConfirmationMessage(response.message, 'error');
                         break;
                 }
+            }
+            
+            // Handle employee recognition - new function that handles time-in automatically
+            function handleEmployeeRecognition(employeeId) {
+                checkAttendanceStatus(employeeId, function(hasOpenSession) {
+                    if (hasOpenSession) {
+                        // Already timed in, ask for time out confirmation
+                        showConfirmationDialog(
+                            "Time Out?",
+                            "Do you want to time out now?",
+                            "time_out"
+                        );
+                    } else {
+                        // No open session, automatically time in
+                        recordAttendance("time_in", employeeId);
+                    }
+                });
             }
             
             // Show confirmation dialog
@@ -483,6 +500,19 @@
                 confirmationDialog.classList.remove('hidden');
             }
             
+            // Show confirmation message (replaces toast notifications)
+            function showConfirmationMessage(message, type) {
+                const title = type.charAt(0).toUpperCase() + type.slice(1);
+                showConfirmationDialog(title, message, null);
+                
+                // Auto-hide after 3 seconds for messages
+                setTimeout(function() {
+                    if (!attendanceAction) {
+                        hideConfirmationDialog();
+                    }
+                }, 3000);
+            }
+            
             // Hide confirmation dialog
             function hideConfirmationDialog() {
                 confirmationDialog.classList.add('hidden');
@@ -491,7 +521,11 @@
             
             // Confirm button click handler
             confirmYesBtn.addEventListener('click', function() {
-                if (!recognizedEmployeeId || !attendanceAction) return;
+                if (!recognizedEmployeeId || !attendanceAction) {
+                    hideConfirmationDialog();
+                    resetRecognition();
+                    return;
+                }
                 
                 recordAttendance(attendanceAction, recognizedEmployeeId);
                 hideConfirmationDialog();
@@ -513,17 +547,17 @@
                         'employee_id': employeeId
                     },
                     success: function(response) {
-                        if (response.status === 'success' || response.status === 'warning') {
-                            showNotification(response.message, response.status);
-                            checkAttendanceStatus(employeeId, true);
+                        if (response.status === 'success') {
+                            showConfirmationMessage(response.message, 'success');
+                            checkAttendanceStatus(employeeId);
                             setTimeout(resetRecognition, 2000);
                         } else {
-                            showNotification(response.message, 'error');
+                            showConfirmationMessage(response.message, response.status || 'error');
                             resetRecognition();
                         }
                     },
                     error: function(error) {
-                        showNotification('Error recording attendance', 'error');
+                        showConfirmationMessage('Error recording attendance', 'error');
                         resetRecognition();
                     }
                 });
@@ -538,7 +572,7 @@
             }
             
             // Check attendance status and update UI accordingly
-            function checkAttendanceStatus(employeeId, skipConfirmation = false) {
+            function checkAttendanceStatus(employeeId, callback) {
                 const requestData = {
                     'action': 'check_status',
                     'employee_id': employeeId
@@ -557,28 +591,16 @@
                         if (response.status === 'success') {
                             updateAttendanceHistory(response.today_logs, response.history_logs);
                             
-                            if (!skipConfirmation) {
-                                if (response.has_open_session) {
-                                    showConfirmationDialog(
-                                        "Time Out?",
-                                        `Do you want to time out now?`,
-                                        "time_out"
-                                    );
-                                } else {
-                                    showConfirmationDialog(
-                                        "Time In?",
-                                        `Do you want to time in now?`,
-                                        "time_in"
-                                    );
-                                }
+                            if (typeof callback === 'function') {
+                                callback(response.has_open_session);
                             }
                         } else {
-                            showNotification(response.message, 'error');
+                            showConfirmationMessage(response.message, 'error');
                             resetRecognition();
                         }
                     },
                     error: function(error) {
-                        showNotification('Error checking attendance status', 'error');
+                        showConfirmationMessage('Error checking attendance status', 'error');
                         resetRecognition();
                     }
                 });
@@ -679,40 +701,6 @@
                     
                     previousHistory.innerHTML = previousHTML;
                 }
-            }
-            
-            // Show notification
-            function showNotification(message, type, duration = 5000) {
-                const notification = document.getElementById('notification');
-                const notificationMessage = document.getElementById('notification-message');
-                
-                notificationMessage.innerHTML = message;
-                
-                // Remove all styling classes first
-                notification.classList.remove('border-red-500', 'border-green-500', 'border-yellow-500', 'bg-yellow-100', 'border-blue-500', 'bg-blue-100');
-                
-                // Apply appropriate styling based on message type
-                switch(type) {
-                    case 'error':
-                        notification.classList.add('border-red-500');
-                        break;
-                    case 'warning':
-                        notification.classList.add('border-yellow-500', 'bg-yellow-100');
-                        break;
-                    case 'info':
-                        notification.classList.add('border-blue-500', 'bg-blue-100');
-                        break;
-                    default: // success
-                        notification.classList.add('border-green-500');
-                }
-                
-                // Show notification
-                notification.classList.remove('hidden');
-                
-                // Hide after specified duration
-                setTimeout(function() {
-                    notification.classList.add('hidden');
-                }, duration);
             }
         });
     </script>

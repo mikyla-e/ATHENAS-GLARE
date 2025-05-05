@@ -324,6 +324,11 @@ def employee_edit(request, employee_id):
         if form.is_valid():
             # Save the updated employee data
             form.save()
+
+            History.objects.create(
+                description=f"Employee {employee.first_name} {employee.last_name} ({employee.employee_id}) was updated."
+            )
+
             messages.success(request, f'Employee "{employee.first_name} {employee.last_name}" updated successfully.')
             return redirect('payroll_system:employee_profile', employee_id=employee_id)  # Redirect to employee list after successful edit
         else:
@@ -376,6 +381,7 @@ def create_payroll(request):
         payroll_period_form = PayrollPeriodForm(request.POST)
         if payroll_period_form.is_valid():
             payroll_period_form.save()
+            
             return redirect('payroll_system:payrolls')
         else:
             payroll_periods = PayrollPeriod.objects.all()
@@ -1176,21 +1182,46 @@ def status(request):
     if request.method == 'POST':
         task_id = request.POST.get('task_id')
         
-        # if task_id and task_id != 'undefined':
-        #     task = get_object_or_404(Task, task_id=task_id)
+        if task_id and task_id != 'undefined':
+            task = get_object_or_404(Task, task_id=task_id)
             
-        #     if 'incentives' in request.POST:
-        #         amount = request.POST.get('number')
-        #         if amount and float(amount) > 0:
-        #             payroll = Payroll.objects.filter(employee_id_fk=task.employee).latest('payment_date')
+            if 'incentives' in request.POST:
+                amount = request.POST.get('number')
+                if amount and float(amount) > 0:
+                    # Find the most recent active payroll period
+                    current_date = timezone.now().date()
+                    active_period = PayrollPeriod.objects.filter(
+                        start_date__lte=current_date,
+                        end_date__gte=current_date,
+                        payroll_status=PayrollPeriod.PayrollStatus.INPROGRESS
+                    ).order_by('-end_date').first()
                     
-        #             payroll.incentives = payroll.incentives + float(amount)
-        #             payroll.save()
+                    if active_period:
+                        # Get or create payroll record for this employee in the active period
+                        payroll_record, created = PayrollRecord.objects.get_or_create(
+                            employee=task.employee,
+                            payroll_period=active_period
+                        )
+                        
+                        # Add incentive
+                        payroll_record.incentives += float(amount)
+                        payroll_record.save()
+                        
+                        # Recalculate gross pay and net pay
+                        payroll_record.gross_pay = payroll_record.calculate_gross_pay()
+                        payroll_record.net_pay = payroll_record.calculate_net_pay()
+                        payroll_record.save(update_fields=['gross_pay', 'net_pay'])
+                        
+                        # Create history record
+                        History.objects.create(
+                            description=f"Added incentive of {float(amount)} to {task.employee.first_name} {task.employee.last_name} for completing task: {task.task_name}"
+                        )
                     
-        #         task.task_status = 'Completed'
-        #         task.save()
+                # Update task status regardless of payroll status
+                task.task_status = Task.TaskStatus.COMPLETED
+                task.save()
                 
-        #         return redirect('payroll_system:status')
+                return redirect('payroll_system:status')
     
     tasks = Task.objects.all().order_by('-created_at')
     context = {
