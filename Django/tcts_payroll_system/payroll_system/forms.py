@@ -273,6 +273,285 @@ class EmployeeForm(forms.ModelForm):
             employee.save()
         
         return employee
+    
+class EmployeeEditForm(forms.ModelForm):
+    first_name = forms.CharField(widget=forms.TextInput())
+    middle_name = forms.CharField(widget=forms.TextInput(), required=False)
+    last_name = forms.CharField(widget=forms.TextInput())
+    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    contact_number = forms.CharField(widget=forms.TextInput(attrs={'type': 'tel'}))
+    emergency_contact = forms.CharField(widget=forms.TextInput(attrs={'type': 'tel'}))
+    region = forms.CharField(label='Region', widget=forms.TextInput(attrs={'id': 'region-dropdown', 'list': 'region-list', 
+                             'autocomplete': 'off'}))
+    province = forms.CharField(label='Province', widget=forms.TextInput(attrs={'id': 'province-dropdown', 'list': 'province-list',
+                               'autocomplete': 'off'}))
+    city = forms.CharField(label='City', widget=forms.TextInput(attrs={'id': 'city-dropdown', 'list': 'city-list', 
+                           'autocomplete': 'off'}))
+    barangay = forms.CharField(label='Barangay', widget=forms.TextInput(attrs={'id': 'barangay-dropdown', 'list': 'barangay-list', 
+                               'autocomplete': 'off'}))
+    work_experience = forms.CharField(widget=forms.Textarea(), required=False)
+    daily_rate = forms.FloatField(widget=forms.NumberInput())
+    date_of_employment = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), initial=timezone.now)
+    is_active = forms.BooleanField(widget=forms.CheckboxInput())
+    
+    class Meta:
+        model = Employee
+        fields = ('first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
+                  'highest_education', 'work_experience', 'daily_rate', 'date_of_employment', 'employee_status', 'is_active')
+        widgets = {
+            'gender': forms.Select(),
+            'highest_education': forms.Select(),
+            'employee_status': forms.Select(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['date_of_birth'].widget = forms.DateInput(
+            attrs={
+                'type': 'date',
+                'max': timezone.now().date().isoformat(),  # Set max date to today
+                'value': '',  # No default value when form loads
+            }
+        )
+
+        # Set initial values for location fields using descriptive names
+        instance = kwargs.get('instance')
+        if instance:
+            if instance.region:
+                self.initial['region'] = instance.region.regDesc
+            if instance.province:
+                self.initial['province'] = instance.province.provDesc
+            if instance.city:
+                self.initial['city'] = instance.city.citymunDesc
+            if instance.barangay:
+                self.initial['barangay'] = instance.barangay.brgyDesc
+
+    #Helper function to validate 11-digit numbers.
+    def validate_contact_number(self, contact_number):
+        
+        if not contact_number.isdigit() or len(contact_number) != 11:
+            raise forms.ValidationError("Contact number must be exactly 11 digits.")
+        return contact_number
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name', '')
+        if len(first_name) < 2:
+            raise forms.ValidationError("First name must be at least 2 characters.")
+        if not all(char.isalpha() or char.isspace() or char == '-' for char in first_name):
+            raise forms.ValidationError("First name should contain only letters, spaces, or hyphens.")
+        return first_name.strip()
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name', '')
+        if len(last_name) < 2:
+            raise forms.ValidationError("Last name must be at least 2 characters.")
+        if not all(char.isalpha() or char.isspace() or char == '-' for char in last_name):
+            raise forms.ValidationError("Last name should contain only letters, spaces, or hyphens.")
+        return last_name.strip()
+
+    def clean_middle_name(self):
+        middle_name = self.cleaned_data.get('middle_name', '')
+        if middle_name and not all(char.isalpha() or char.isspace() or char == '-' for char in middle_name):
+            raise forms.ValidationError("Middle name should contain only letters, spaces, or hyphens.")
+        return middle_name.strip() if middle_name else middle_name
+
+    def clean_date_of_birth(self):
+        date_of_birth = self.cleaned_data.get('date_of_birth')
+        if date_of_birth:
+            # Validate that employee is at least 18 years old
+            today = timezone.now().date()
+            age = today.year - date_of_birth.year
+            
+            # Adjust age if birthday hasn't occurred yet this year
+            if (today.month, today.day) < (date_of_birth.month, date_of_birth.day):
+                age -= 1
+            
+            if age < 18:
+                raise forms.ValidationError("Employee must be at least 18 years old.")
+            
+            # Additional validation: date can't be in the future
+            if date_of_birth > today:
+                raise forms.ValidationError("Date of birth cannot be in the future.")
+        
+        return date_of_birth
+
+    def clean_date_of_employment(self):
+        date_of_employment = self.cleaned_data.get('date_of_employment')
+        date_of_birth = self.cleaned_data.get('date_of_birth')
+        
+        # Date of employment shouldn't be in the future
+        if date_of_employment and date_of_employment > timezone.now().date():
+            raise forms.ValidationError("Date of employment cannot be in the future.")
+            
+        # Date of employment shouldn't be before date of birth
+        if date_of_employment and date_of_birth and date_of_employment < date_of_birth:
+            raise forms.ValidationError("Date of employment cannot be before date of birth.")
+            
+        # Employee should be at least 18 years old at date of employment
+        if date_of_employment and date_of_birth:
+            age_at_employment = date_of_employment.year - date_of_birth.year
+            if (date_of_employment.month, date_of_employment.day) < (date_of_birth.month, date_of_birth.day):
+                age_at_employment -= 1
+                
+            if age_at_employment < 18:
+                raise forms.ValidationError("Employee must be at least 18 years old at date of employment.")
+                
+        return date_of_employment
+
+    def clean_contact_number(self):
+        return self.validate_contact_number(self.cleaned_data.get('contact_number', ''))
+
+    def clean_emergency_contact(self):
+        emergency_contact = self.cleaned_data.get('emergency_contact', '')
+        contact_number = self.cleaned_data.get('contact_number', '')
+        
+        # Validate format
+        emergency_contact = self.validate_contact_number(emergency_contact)
+        
+        # Emergency contact shouldn't be the same as contact number
+        if emergency_contact == contact_number:
+            raise forms.ValidationError("Emergency contact cannot be the same as personal contact number.")
+            
+        return emergency_contact
+    
+    def clean_region(self):
+        region_name = self.cleaned_data.get('region')
+        if not region_name:
+            raise forms.ValidationError("Region is required.")
+            
+        region = Region.objects.filter(regDesc=region_name).first()
+        if not region:
+            raise forms.ValidationError("Please select a valid region.")
+            
+        return region_name
+    
+    def clean_province(self):
+        province_name = self.cleaned_data.get('province')
+        region_name = self.cleaned_data.get('region')
+        
+        if not province_name:
+            raise forms.ValidationError("Province is required.")
+            
+        if region_name:
+            region = Region.objects.filter(regDesc=region_name).first()
+            if region:
+                province = Province.objects.filter(
+                    provDesc=province_name,
+                    regCode=region.regCode
+                ).first()
+                
+                if not province:
+                    raise forms.ValidationError("Province must belong to the selected region.")
+        
+        return province_name
+    
+    def clean_city(self):
+        city_name = self.cleaned_data.get('city')
+        province_name = self.cleaned_data.get('province')
+        
+        if not city_name:
+            raise forms.ValidationError("City is required.")
+            
+        if province_name:
+            province = Province.objects.filter(provDesc=province_name).first()
+            if province:
+                city = City.objects.filter(
+                    citymunDesc=city_name,
+                    provCode=province.provCode
+                ).first()
+                
+                if not city:
+                    raise forms.ValidationError("City must belong to the selected province.")
+        
+        return city_name
+    
+    def clean_barangay(self):
+        barangay_name = self.cleaned_data.get('barangay')
+        city_name = self.cleaned_data.get('city')
+        
+        if not barangay_name:
+            raise forms.ValidationError("Barangay is required.")
+            
+        if city_name:
+            city = City.objects.filter(citymunDesc=city_name).first()
+            if city:
+                barangay = Barangay.objects.filter(
+                    brgyDesc=barangay_name,
+                    citymunCode=city.citymunCode
+                ).first()
+                
+                if not barangay:
+                    raise forms.ValidationError("Barangay must belong to the selected city.")
+        
+        return barangay_name
+    
+    def clean_work_experience(self):
+        work_experience = self.cleaned_data.get('work_experience', '')
+        if work_experience and len(work_experience) > 1000:
+            raise forms.ValidationError("Work experience description is too long (max 1000 characters).")
+        return work_experience
+    
+    def clean(self):
+        cleaned_data = super().clean()
+
+        required_fields = [
+            'first_name', 'last_name', 'gender', 'date_of_birth', 'contact_number', 'emergency_contact',
+            'highest_education', 'date_of_employment', 'employee_status', 'region', 'province', 'city', 'barangay'
+        ]
+        
+        # Check for duplicate employees based on name and birth date
+        first_name = cleaned_data.get('first_name')
+        last_name = cleaned_data.get('last_name')
+        date_of_birth = cleaned_data.get('date_of_birth')
+
+        if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
+            raise forms.ValidationError("All fields must be filled.")
+        
+        if first_name and last_name and date_of_birth:
+            # Define the query to find potential duplicates
+            existing_query = Employee.objects.filter(
+                first_name=first_name,
+                last_name=last_name,
+                date_of_birth=date_of_birth
+            )
+            
+            # Exclude the current instance when updating
+            if self.instance.pk:
+                existing_query = existing_query.exclude(employee_id=self.instance.pk)
+            
+            # Check if any potential duplicates exist
+            if existing_query.exists():
+                raise forms.ValidationError(
+                    "An employee with this name and birth date already exists. "
+                    "If this is a different person, please add a middle name or "
+                    "contact HR to resolve this conflict."
+                )
+        
+        return cleaned_data
+    
+    def save(self, commit=True):
+        employee = super().save(commit=False)
+        
+        # Set location fields based on validated data
+        region_name = self.cleaned_data.get('region')
+        province_name = self.cleaned_data.get('province')
+        city_name = self.cleaned_data.get('city')
+        barangay_name = self.cleaned_data.get('barangay')
+        
+        region = Region.objects.filter(regDesc=region_name).first()
+        province = Province.objects.filter(provDesc=province_name, regCode=region.regCode).first()
+        city = City.objects.filter(citymunDesc=city_name, provCode=province.provCode).first()
+        barangay = Barangay.objects.filter(brgyDesc=barangay_name, citymunCode=city.citymunCode).first()
+        
+        employee.region = region
+        employee.province = province
+        employee.city = city
+        employee.barangay = barangay
+        
+        if commit:
+            employee.save()
+        
+        return employee
 
 class PayrollPeriodForm(forms.ModelForm):
     start_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'w-full h-full px-5 outline-none border-none font-[Inter] font-normal text-3xl', 'type': 'date'}))

@@ -191,7 +191,7 @@ onclick="cancelEditAttendance()">
                 <div class="w-full flex justify-between">
                     <h1 class="text-4xl font-[League Spartan] font-semibold">{{ employee.first_name }} {{ employee.last_name }} <span class="text-3xl text-[#1e1e1e80] font-semibold">{{ employee.employee_id }}</span></h1>
 
-                    <a href="{% url 'payroll_system:employee_edit' %}">
+                    <a href="{% url 'payroll_system:employee_edit' employee.employee_id %}">
                         <p>Edit</p>
                     </a>
                 </div>

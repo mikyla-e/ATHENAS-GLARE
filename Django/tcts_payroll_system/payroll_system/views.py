@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from django.views.decorators.csrf import csrf_protect
-from .forms import EmployeeForm, PayrollPeriodForm, DeductionForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
+from .forms import EmployeeForm, EmployeeEditForm, PayrollPeriodForm, DeductionForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
 from .models import Employee, Attendance, PayrollPeriod, Deduction, PayrollRecord, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 
 @csrf_protect  # Ensure CSRF protection
@@ -313,8 +313,62 @@ def employee_profile(request, employee_id):
     return render(request, 'payroll_system/employee_profile.html', context)
 
 @login_required
-def employee_edit(request):
-    return render(request, 'payroll_system/employee_edit.html')
+def employee_edit(request, employee_id):
+    # Get the employee object or return 404 if not found
+    employee = get_object_or_404(Employee, employee_id=employee_id)
+    
+    if request.method == 'POST':
+        # Process the form data if form is submitted
+        form = EmployeeEditForm(request.POST, request.FILES, instance=employee)
+        
+        if form.is_valid():
+            # Save the updated employee data
+            form.save()
+            messages.success(request, f'Employee "{employee.first_name} {employee.last_name}" updated successfully.')
+            return redirect('payroll_system:employee_profile', employee_id=employee_id)  # Redirect to employee list after successful edit
+        else:
+            # If form has errors, display them
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        # For GET requests, initialize the form with the employee instance
+        # The form's __init__ method will handle setting the initial values for location fields
+        form = EmployeeEditForm(instance=employee)
+    
+    # Get all regions for the dropdown
+    regions = Region.objects.all().order_by('regDesc').values('regDesc', 'regCode')
+    
+    # Initialize lists for dependent dropdowns
+    provinces = []
+    cities = []
+    barangays = []
+    
+    # Populate dependent dropdowns based on the employee's current location
+    if employee.region:
+        provinces = Province.objects.filter(
+            regCode=employee.region.regCode
+        ).order_by('provDesc').values('provDesc', 'provCode', 'regCode')
+        
+        if employee.province:
+            cities = City.objects.filter(
+                provCode=employee.province.provCode
+            ).order_by('citymunDesc').values('citymunDesc', 'citymunCode', 'provCode')
+            
+            if employee.city:
+                barangays = Barangay.objects.filter(
+                    citymunCode=employee.city.citymunCode
+                ).order_by('brgyDesc').values('brgyDesc', 'brgyCode', 'citymunCode')
+    
+    # Add JavaScript data to help maintain selected values
+    context = {
+        'form': form,
+        'employee': employee,
+        'regions': regions,
+        'provinces': provinces,
+        'cities': cities,
+        'barangays': barangays,
+    }
+    
+    return render(request, 'payroll_system/employee_edit.html', context)
 
 @login_required
 def create_payroll(request):
