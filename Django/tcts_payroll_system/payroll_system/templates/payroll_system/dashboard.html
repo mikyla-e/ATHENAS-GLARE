@@ -47,6 +47,15 @@
         }
     }
 
+    select#payroll-period-dropdown {
+        color: white;
+    }
+
+    select#payroll-period-dropdown option {
+        color: black;
+        background-color: white;
+    }
+
 </style>
 {% endblock %}
 
@@ -122,33 +131,54 @@
             </div>
             <div class="w-[55%] ml-2 h-full p-3 rounded-xl " id="payroll-info">
                 <div class="h-full flex flex-col justify-between items-end" id="content2">
-                    <div class="h-fit my-2 mx-4 flex flex-col items-end" id="total_payroll">
-                        <p class="font-[Roboto] font-semibold text-right text-xs sm:text-base text-white md:text-nowrap">TOTAL PAYROLL</p>
-                        {% if total_payroll == "No total payroll yet" %}
-                            <h1 class="font-[Inter] font-semibold text-lg sm:text-2xl xl:text-3xl text-right">₱0.00</h1>    
+                    <div class="h-fit my-2 mx-1 md:mx-2 flex flex-col items-end" id="total_payroll">
+                        <div class="w-full flex flex-row justify-end items-end md:gap-1">
+                            <div class="relative inline-block" title="Select Time Period">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-2 text-black-400">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                                <select id="payroll-period-dropdown" onchange="togglePayrollView(this.value)" class="font-[Roboto] font-semibold text-right text-xs sm:text-sm lg:text-base text-white md:text-nowrap rounded-md cursor-pointer appearance-none pl-7.5 pr-1 focus:outline-none focus:ring-1 focus:ring-white-500">
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly" selected>Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+
+                            <p class="font-[Roboto] font-semibold text-right text-xs sm:text-sm lg:text-base text-white md:text-nowrap">
+                                PAYROLL
+                            </p>
+                        </div>
+                        
+                        <!-- The amount display uses original styling -->
+                        <h1 id="payroll-amount" class="font-[Inter] font-semibold text-lg sm:text-2xl xl:text-3xl text-right">
+                            ₱{{ monthly_payroll|default:"0.00"|floatformat:2 }}
+                        </h1>
+                    </div>
+                    <div class="h-fit my-2 mx-1 md:mx-2 flex flex-col items-end" id="next_payday">
+                        {% if next_payday %}
+                            <h1 class="font-[Inter] font-semibold text-sm sm:text-xl xl:text-2xl text-right text-nowrap">{{ next_payday }}</h1>
                         {% else %}
-                            <h1 class="font-[Inter] font-semibold text-lg sm:text-2xl xl:text-3xl text-right">₱{{ total_payroll|floatformat:2 }}</h1>
+                            <h1 class="font-[Inter] font-semibold text-sm md:text-base text-right text-nowrap text-gray-400">No upcoming payday</h1>
                         {% endif %}
+                        <p class="font-[Roboto] font-semibold text-xs sm:text-sm lg:text-base text-right text-white md:text-nowrap">NEXT PAYDAY</p>    
                     </div>
-                    <div class="h-fit my-2 mx-4 flex flex-col items-end" id="next_payday">
-                        <h1 class="font-[Inter] font-semibold text-sm sm:text-xl xl:text-2xl text-right text-nowrap">{{ next_payday|default:"N/A" }}</h1>
-                        <p class="font-[Roboto] font-semibold text-xs sm:text-base text-right text-white md:text-nowrap">NEXT PAYDAY</p>    
-                    </div>
-                </div>
+                </div>  
             </div>
         </div>
         
         <!-- Donut Chart -->
-        <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 xl:col-span-3 flex flex-col justify-center items-center bg-white rounded-xl shadow-lg" id="attendance">
-            <div class="w-full px-3 pt-3">
+        <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 xl:col-span-3 flex flex-col justify-around items-center bg-white rounded-xl shadow-lg" id="attendance">
+            <div class="w-full px-3 pt-3 ">
                 <h2 class="text-[#1E1E1E] font-bold text-base">ATTENDANCE</h2>
+                <p class="text-[#1E1E1ECC] font-normal text-xs lg:text-sm">Employee attendance based on...</p>
                 <div class="flex justify-center gap-2 mt-2">
                     <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#F8D146] text-[#1E1E1E]" data-period="day">Day</button>
                     <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="week">Week</button>
                     <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="month">Month</button>
                     <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="year">Year</button>
                 </div>
-                <p id="attendance-period" class="text-center text-sm text-gray-500 mt-1">Today's Attendance</p>
             </div>
             <canvas id="donut" class="p-[15px]"></canvas>
         </div>
@@ -174,9 +204,9 @@
                         {% for history in histories %}
                         <tr>
                             <td class="px-3">
-                                <div class="flex flex-col gap-2">
-                                    <p id="history" class="text-[15px]/5 font-[Inter]">{{ history.description }}</p>
-                                    <p id="history_time" class="text-[#1e1e1e81] text-[13px] font-[Roboto] font-bold">{{ history.date_time }}</p>
+                                <div class="flex flex-col gap-1 lg:gap-2">
+                                    <p id="history" class="text-xs lg:text-[15px]/5 font-[Inter]">{{ history.description }}</p>
+                                    <p id="history_time" class="text-[#1e1e1e81] text-[10px] lg:text-[13px] font-[Roboto] font-bold">{{ history.date_time }}</p>
                                 </div>
                             </td>
                         </tr>
@@ -193,9 +223,16 @@
         </div>
 
         <!-- Bar Chart -->
-        <div class="order-2 lg:order-6 col-span-5 lg:col-span-5 xl:col-span-6 bg-white rounded-xl shadow-lg flex justify-center items-center" id="payroll-per-week">
-            <div style="height: 250px; width: 100%; position: relative;">
+        <div class="order-2 lg:order-6 col-span-5 lg:col-span-5 xl:col-span-6 bg-white rounded-xl shadow-lg flex flex-col justify-between items-center" id="payroll-per-week">
+            <div class="w-full px-3 pt-3">
+                <h2 class="text-[#1E1E1E] font-bold text-base">PAYROLL PER PERIOD</h2>
+                <p class="text-[#1E1E1ECC] font-normal text-xs lg:text-sm">Total payment amounts by payroll date</p>
+            </div>
+            <div style="height: 230px; width: 100%; position: relative;">
                 <canvas id="bar" class="p-[15px]"></canvas>
+            </div>
+            <div class="w-full px-4 pb-2 flex justify-end">
+                <button id="refresh-payroll-chart" class="text-xs text-[#1E1E1E] hover:text-[#F8D146] duration-150 cursor-pointer">Refresh Data</button>
             </div>
         </div>
 
@@ -203,26 +240,26 @@
             <table id="preview-table" class="absolute bg-white w-full rounded-2xl text-xs-center z-40">
                 <thead class="text-[#1E1E1E] border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                     <tr class="text-base font-[League Spartan]">
-                        <th class="py-1">EMPLOYEE</th>
-                        <th>PAYMENT AMOUNT</th>
-                        <th>STATUS</th>
-                        <th>LAST ATTENDANCE</th>
+                        <th class="p-2 text-base font-[League Spartan]">EMPLOYEE</th>
+                        <th class="p-2 text-base font-[League Spartan]">PAYMENT AMOUNT</th>
+                        <th class="p-2 text-base font-[League Spartan]">STATUS</th>
+                        <th class="p-2 text-base font-[League Spartan]">LAST ATTENDANCE</th>
                     </tr>
                 </thead>
                 
                 <tbody>
                     {% for employee in employees %}
                     <tr class="text-center">
-                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td>{{ employee.total_payment }}</td>
-                        <td>
+                        <td class="px-2 py-4 text-sm font-[Inter]">{{ employee.first_name }} {{ employee.last_name }}</td>
+                        <td class="px-2 py-4 text-sm font-[Inter]">{{ employee.total_payment }}</td>
+                        <td class="px-2 py-4 text-sm font-[Inter]">
                             {% if employee.active_status == "Active" %}
                                 Active
                             {% else %}
                                 Inactive
                             {% endif %}
                         </td>
-                        <td>
+                        <td class="px-2 py-4 text-sm font-[Inter]">
                             {% if employee.latest_attendance_date %}
                                     {{ employee.latest_attendance_date }}
                             {% else %}
@@ -233,7 +270,7 @@
                     
                     {% empty %}
                     <tr>
-                        <td colspan="4">No employees found.</td>
+                        <td colspan="4" class="px-2 py-4 text-sm font-[Inter]">No employees found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -438,285 +475,178 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const barChart = document.getElementById('bar');
-        let payrollChart;
         
         // Function to fetch payroll data from API
         function fetchPayrollData() {
-            fetch('/api/payroll-by-week/')
+            // Replace with your actual API endpoint
+            fetch('/api/payroll-stats/')
                 .then(response => response.json())
                 .then(data => {
-                    // If chart exists, destroy it before creating a new one
-                    if (payrollChart) {
-                        payrollChart.destroy();
-                    }
-                    
-                    // Create new chart with the data
-                    payrollChart = new Chart(barChart, {
-                        type: "bar",
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: "Total Payroll",
-                                backgroundColor: "#F8D14680",
-                                borderColor: "#F8D146",
-                                data: data.amounts,
-                                borderWidth: 2
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            onResize: function(chart, size) {
-                                // This ensures height stays fixed at container height
-                                chart.height = size.height;
-                            },
-                            layout: {
-                                padding: 10
-                            },
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: "PAYROLL PER WEEK",
-                                    color: "#1E1E1E",
-                                    align: 'start',
-                                    padding: {
-                                        top: 0,
-                                        bottom: 10
-                                    },
-                                    font: {
-                                        size: 16
-                                    }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            let value = context.raw || 0;
-                                            return `₱${value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                                        }
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        callback: function(value) {
-                                            if (value === 0) return '₱0';
-                                            return '₱' + value.toLocaleString('en-US', {
-                                                notation: 'compact',
-                                                compactDisplay: 'short'
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
+                    createBarChart(data.dates, data.amounts);
                 })
                 .catch(error => {
                     console.error('Error fetching payroll data:', error);
+                    // Create an empty chart when no data is available
+                    createBarChart([], []);
                     
-                    // Create fallback chart with default data if fetch fails
-                    if (payrollChart) {
-                        payrollChart.destroy();
-                    }
-                    
-                    payrollChart = new Chart(barChart, {
-                        type: "bar",
-                        data: {
-                            labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
-                            datasets: [{
-                                label: "Total Payroll",
-                                backgroundColor: "#F8D14680",
-                                borderColor: "#F8D146",
-                                data: [0, 0, 0, 0, 0],
-                                borderWidth: 2
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            layout: {
-                                padding: 10
-                            },
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: "PAYROLL PER WEEK",
-                                    color: "#1E1E1E",
-                                    align: 'start',
-                                    padding: {
-                                        top: 0,
-                                        bottom: 10
-                                    },
-                                    font: {
-                                        size: 16
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        callback: function(value) {
-                                            return '₱' + value;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
+                    // Display "No data available" message
+                    const chartContainer = document.getElementById('bar').parentElement;
+                    const noDataMessage = document.createElement('div');
+                    noDataMessage.className = 'absolute inset-0 flex items-center justify-center bg-white bg-opacity-80';
+                    noDataMessage.innerHTML = '<p class="text-gray-500 font-medium">No payroll data available</p>';
+                    chartContainer.appendChild(noDataMessage);
                 });
         }
         
-        // Load payroll data when page loads
-        fetchPayrollData();
+        // Function to create and configure the bar chart
+        function createBarChart(labels, data) {
+            // Clear any existing "no data" message
+            const chartContainer = document.getElementById('bar').parentElement;
+            const existingMessage = chartContainer.querySelector('div.absolute');
+            if (existingMessage) {
+                chartContainer.removeChild(existingMessage);
+            }
+            
+            // Show "no data" message if the chart has no data
+            if (data.length === 0) {
+                const noDataMessage = document.createElement('div');
+                noDataMessage.className = 'absolute inset-0 flex items-center justify-center bg-white bg-opacity-80';
+                noDataMessage.innerHTML = '<p class="text-gray-500 font-medium">No payroll data available</p>';
+                chartContainer.appendChild(noDataMessage);
+            }
+            
+            // Format amounts as currency
+            const formattedAmounts = data.map(amount => {
+                return new Intl.NumberFormat('en-PH', {
+                    style: 'currency',
+                    currency: 'PHP',
+                    minimumFractionDigits: 2
+                }).format(amount);
+            });
+            
+            const payroll_chart = new Chart(barChart, {
+                type: "bar",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Total Payroll",
+                        backgroundColor: "#F8D14680",
+                        borderColor: "#F8D146",
+                        data: data,
+                        borderWidth: 2
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onResize: function(chart, size) {
+                        chart.height = size.height;
+                    },
+                    layout: {
+                        padding: 10
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "PAYROLL PER PERIOD",
+                            color: "#1E1E1E",
+                            align: 'start',
+                            padding: {
+                                top: 0,
+                                bottom: 10
+                            },
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    // Display formatted currency on tooltip
+                                    return formattedAmounts[context.dataIndex];
+                                }
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    // Abbreviate large numbers
+                                    if (value >= 1000) {
+                                        return '₱' + value / 1000 + 'k';
+                                    }
+                                    return '₱' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Handle responsive behavior
+            window.addEventListener('resize', function() {
+                payroll_chart.resize();
+            });
+        }
         
-        // Optional: Set up an interval to refresh data every few minutes
-        // setInterval(fetchPayrollData, 300000); // Refresh every 5 minutes
+        // Initialize the chart
+        fetchPayrollData();
+    });
+
+    // Add this to your script section
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the refresh button
+        const refreshButton = document.getElementById('refresh-payroll-chart');
+        
+        if (refreshButton) {
+            refreshButton.addEventListener('click', function() {
+                // Show loading indicator
+                this.textContent = 'Loading...';
+                this.disabled = true;
+                
+                // Force fetch new data
+                fetch('/api/payroll-stats/?nocache=' + new Date().getTime())
+                    .then(response => response.json())
+                    .then(data => {
+                        createBarChart(data.dates, data.amounts);
+                    })
+                    .catch(error => {
+                        console.error('Error refreshing payroll data:', error);
+                        createBarChart([], []);
+                    })
+                    .finally(() => {
+                        // Reset button text and enable it
+                        refreshButton.textContent = 'Refresh Data';
+                        refreshButton.disabled = false;
+                    });
+            });
+        }
     });
 </script>
 
 <script>
-    // Payroll Chart Script
+    // Store payroll values from Django context with safe defaults
+    const payrollData = {
+        weekly: '{{ weekly_payroll|default:"0.00"|floatformat:2 }}',
+        monthly: '{{ monthly_payroll|default:"0.00"|floatformat:2 }}',
+        yearly: '{{ yearly_payroll|default:"0.00"|floatformat:2 }}'
+    };
+    
+    function togglePayrollView(period) {
+        // Update the displayed amount
+        const payrollAmount = document.getElementById('payroll-amount');
+        payrollAmount.textContent = `₱${payrollData[period]}`;
+    }
+    
+    // Set the dropdown to monthly by default
     document.addEventListener('DOMContentLoaded', function() {
-        const barChart = document.getElementById('bar');
-        let payrollChart;
-        
-        // Function to fetch payroll data from API
-        function fetchPayrollData() {
-            fetch('/api/payroll-by-week/')
-                .then(response => response.json())
-                .then(data => {
-                    // If chart exists, destroy it before creating a new one
-                    if (payrollChart) {
-                        payrollChart.destroy();
-                    }
-                    
-                    // Create new chart with the data
-                    payrollChart = new Chart(barChart, {
-                        type: "bar",
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: "Total Payroll",
-                                backgroundColor: "#F8D14680",
-                                borderColor: "#F8D146",
-                                data: data.amounts,
-                                borderWidth: 2
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            onResize: function(chart, size) {
-                                // This ensures height stays fixed at container height
-                                chart.height = size.height;
-                            },
-                            layout: {
-                                padding: 10
-                            },
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: "TOTAL PAYROLL PER PAYMENT DATE",
-                                    color: "#1E1E1E",
-                                    align: 'start',
-                                    padding: {
-                                        top: 0,
-                                        bottom: 10
-                                    },
-                                    font: {
-                                        size: 16
-                                    }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            let value = context.raw || 0;
-                                            return `₱${value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                                        }
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        callback: function(value) {
-                                            if (value === 0) return '₱0';
-                                            return '₱' + value.toLocaleString('en-US', {
-                                                notation: 'compact',
-                                                compactDisplay: 'short'
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching payroll data:', error);
-                    
-                    // Create fallback chart with default data if fetch fails
-                    if (payrollChart) {
-                        payrollChart.destroy();
-                    }
-                    
-                    payrollChart = new Chart(barChart, {
-                        type: "bar",
-                        data: {
-                            labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
-                            datasets: [{
-                                label: "Total Payroll",
-                                backgroundColor: "#F8D14680",
-                                borderColor: "#F8D146",
-                                data: [0, 0, 0, 0, 0],
-                                borderWidth: 2
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            layout: {
-                                padding: 10
-                            },
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: "PAYROLL PER WEEK",
-                                    color: "#1E1E1E",
-                                    align: 'start',
-                                    padding: {
-                                        top: 0,
-                                        bottom: 10
-                                    },
-                                    font: {
-                                        size: 16
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        callback: function(value) {
-                                            return '₱' + value;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                });
-        }
-        
-        // Load payroll data when page loads
-        fetchPayrollData();
-        
-        // Optional: Set up an interval to refresh data every few minutes
-        // setInterval(fetchPayrollData, 300000); // Refresh every 5 minutes
+        document.getElementById('payroll-period-dropdown').value = 'monthly';
     });
 </script>
 {% endblock %}

@@ -99,10 +99,6 @@ class Employee(models.Model):
         FULLTIME = 'Full Time', _('Full Time')
         PARTTIME = 'Part Time', _('Part Time')
 
-    class ActiveStatus(models.TextChoices):
-        ACTIVE = 'Active', _('Active')
-        INACTIVE = 'Inactive', _('Inactive')
-
     employee_id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=100, null=False)
     middle_name = models.CharField(max_length=100, null=True, blank=True)
@@ -117,10 +113,10 @@ class Employee(models.Model):
     barangay = models.ForeignKey(Barangay, on_delete=models.SET_NULL, null=True, to_field='id')
     highest_education = models.CharField(max_length=20, choices=HighestEducation.choices, null=True)
     work_experience = models.CharField(max_length=2083, null=True, blank=True)
+    daily_rate = models.FloatField(default=0, null=False)
     date_of_employment = models.DateField(default=timezone.now)
-    days_worked = models.IntegerField(default=0, null=False)
     employee_status = models.CharField(max_length=9, choices=EmployeeStatus.choices, null=True)
-    active_status = models.CharField(max_length=8, choices=ActiveStatus.choices, default=ActiveStatus.ACTIVE)
+    is_active = models.BooleanField(default=True)
     absences = models.IntegerField(default=0, null=False)
     employee_image = models.ImageField(null=False, upload_to='images/', validators=[validate_image_size])
 
@@ -214,41 +210,22 @@ class Employee(models.Model):
                 raise ValidationError({'date_of_employment': "Employee must be at least 18 years old at date of employment."})
 
     def save(self, *args, **kwargs):
-        # Run full validation before saving (ensures model-level validation runs)
+        is_new = self.pk is None  # Check if employee is newly created
         self.full_clean()
         super().save(*args, **kwargs)
 
-    def update_attendance_stats(self):
-        today = timezone.now().date()
-        start_date = self.date_of_employment
+        # Only run if it's a new employee and active
+        if is_new and self.is_active and self.date_of_employment:
+            
+            overlapping_periods = PayrollPeriod.objects.filter(
+                start_date__lte=self.date_of_employment,
+                end_date__gte=self.date_of_employment
+            )
 
-        if start_date > today:
-            return
-
-        # Count working days (exclude Sundays)
-        total_working_days = 0
-        day = start_date
-        while day <= today:
-            if day.weekday() != 6:  # 6 = Sunday
-                total_working_days += 1
-            day += timedelta(days=1)
-
-        # Count present days based on actual time_in
-        present_days = self.attendances.filter(
-            date__lte=today,
-            time_in__isnull=False
-        ).values('date').distinct().count()
-
-        # Calculate absences
-        absences = max(total_working_days - present_days, 0)
-
-        # Update DB and instance
-        Employee.objects.filter(employee_id=self.employee_id).update(
-            days_worked=present_days,
-            absences=absences
-        )
-        self.days_worked = present_days
-        self.absences = absences
+            for period in overlapping_periods:
+                # Ensure not already added (e.g. duplicate save)
+                if not PayrollRecord.objects.filter(employee=self, payroll_period=period).exists():
+                    PayrollRecord.objects.create(employee=self, payroll_period=period)
 
 class Attendance(models.Model):
     class AttendanceStatus(models.TextChoices):
@@ -261,10 +238,9 @@ class Attendance(models.Model):
     date = models.DateField(default=timezone.now, null=False)
     hours_worked = models.FloatField(default=0, null=False)  
     attendance_status = models.CharField(max_length=8, choices=AttendanceStatus.choices, default=AttendanceStatus.PRESENT)
-    remarks = models.CharField(max_length=255, null=True, blank=True)  
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    employee_id_fk = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='attendances')
+    employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='attendances')
     
     # Define work hour boundaries
     WORK_START_TIME = time(8, 0)  # 8:00 AM
@@ -275,7 +251,7 @@ class Attendance(models.Model):
     
     def __str__(self):
         status = f"[{self.attendance_status}]"
-        employee = self.employee_id_fk.first_name if hasattr(self.employee_id_fk, 'first_name') else f"Employee #{self.employee_id_fk_id}"
+        employee = self.employee.first_name if hasattr(self.employee, 'first_name') else f"Employee #{self.employee_id_fk_id}"
         date_str = self.date.strftime('%Y-%m-%d')
         hours = f"{self.hours_worked}hrs" if self.hours_worked else "No hours recorded"
         
@@ -307,9 +283,21 @@ class Attendance(models.Model):
             self.hours_worked = round(worked_seconds / 3600, 2)
 
     def save(self, *args, **kwargs):
-        self.full_clean()  # Run validation before saving
+        self.full_clean()  
         
-        # Calculate hours before saving if needed
+        # Check if this is an update to an existing record
+        is_update = self.pk is not None
+        
+        # Store old status for comparison if this is an update
+        old_status = None
+        if is_update:
+            try:
+                old_attendance = Attendance.objects.get(pk=self.pk)
+                old_status = old_attendance.attendance_status
+            except Attendance.DoesNotExist:
+                pass
+        
+        # Calculate hours worked
         if self.time_in and self.time_out:
             if not kwargs.pop('skip_hours_calculation', False):
                 time_in_dt = datetime.combine(self.date, self.time_in)
@@ -318,6 +306,11 @@ class Attendance(models.Model):
                 self.hours_worked = round(worked_seconds / 3600, 2)
         
         super().save(*args, **kwargs)
+        
+        # If this is an update AND status changed OR this is a new entry
+        # then update related payroll records
+        if (is_update and old_status != self.attendance_status) or not is_update:
+            self.update_payroll_records()
             
     def get_formatted_hours_worked(self):
         # Returns time worked as hh:mm:ss if time_out exists
@@ -330,148 +323,186 @@ class Attendance(models.Model):
             minutes, seconds = divmod(remainder, 60)
             return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
         return None
-
-class Payroll(models.Model):
+    
+    def update_payroll_records(self):
+        """Update payroll records affected by this attendance record"""
+        # Find all IN-PROGRESS payroll periods that include this attendance date
+        related_periods = PayrollPeriod.objects.filter(
+            start_date__lte=self.date,
+            end_date__gte=self.date,
+            payroll_status=PayrollPeriod.PayrollStatus.INPROGRESS
+        )
+        
+        # Update each payroll record for this employee in the affected periods
+        for period in related_periods:
+            try:
+                # Get the payroll record for this employee and period
+                payroll_record = PayrollRecord.objects.get(
+                    employee=self.employee,
+                    payroll_period=period
+                )
+                
+                # Recalculate days worked for this specific record
+                previous_days = payroll_record.days_worked
+                new_days = payroll_record.calculate_days_worked()
+                
+                # Only update if the number of days has changed
+                if previous_days != new_days:
+                    payroll_record.days_worked = new_days
+                    payroll_record.gross_pay = payroll_record.calculate_gross_pay()
+                    payroll_record.net_pay = payroll_record.calculate_net_pay()
+                    payroll_record.save(update_fields=['days_worked', 'gross_pay', 'net_pay'])
+                    
+            except PayrollRecord.DoesNotExist:
+                # Create a new record if one doesn't exist
+                PayrollRecord.objects.create(
+                    employee=self.employee,
+                    payroll_period=period
+                )
+    
+class PayrollPeriod(models.Model):
     class PayrollStatus(models.TextChoices):
         PENDING = 'PENDING', _('Pending')
         PROCESSED = 'PROCESSED', _('Processed')
-    
-    payroll_id = models.AutoField(primary_key=True)
-    rate = models.FloatField(default=0, null=False)
-    incentives = models.FloatField(default=0, null=False)
-    payroll_status = models.CharField(max_length=9, choices=PayrollStatus.choices, default=PayrollStatus.PENDING, null=True, blank=True)
-    deductions = models.FloatField(default=0, null=False)
-    salary = models.FloatField(default=0, null=False)  
-    cash_advance = models.FloatField(default=0, null=False)  
+        INPROGRESS = 'INPROGRESS', _('In-Progress')
+
+    class Type(models.TextChoices):
+        WEEKLY = 'WEEKLY', _('Weekly')
+        BIWEEKLY = 'BY-WEEKLY', _('By-weekly')
+        MONTHLY = 'MONTHLY', _('Monthly')
+
+    payroll_period_id = models.AutoField(primary_key=True)
+    start_date = models.DateField(null=False)
+    end_date = models.DateField(null=False)
     payment_date = models.DateField(null=False)
-    employee_id_fk = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='payrolls')
-    attendance_id_fk = models.ForeignKey(Attendance, null=True, blank=True, on_delete=models.CASCADE)
-    
-    def __str__(self):
-        employee = self.employee_id_fk.first_name if hasattr(self.employee_id_fk, 'first_name') else f"Employee #{self.employee_id_fk_id}"
-        date_str = self.payment_date.strftime('%Y-%m-%d')
-        amount = f"₱{self.salary:,.2f}" if self.salary else "₱0.00"
-        status = f"[{self.payroll_status}]"
-        
-        return f"Payroll #{self.payroll_id} - {employee} - {date_str} - {amount} {status}"
-    
-    def calculate_salary(self, attendance_count=None):
-        """
-        Calculate the salary based on rate, incentives, and deductions.
-        If attendance_count is provided, it will be used for the calculation,
-        otherwise the method will fetch the attendance count from the database.
-        """
-        if attendance_count is None:
-            if self.payment_date:
-                # Get current week's Monday and Sunday
-                # This ensures we only count attendance in the current week
-                # regardless of payment date
-                payment_date = self.payment_date
-                current_weekday = payment_date.weekday()  # 0=Monday, 6=Sunday
-                
-                # Calculate the Monday of the current week
-                start_date = payment_date - timedelta(days=current_weekday)
-                
-                # End date is either the payment date or Sunday of current week, whichever is earlier
-                sunday_of_week = start_date + timedelta(days=6)
-                end_date = min(payment_date, sunday_of_week)
-                
-                unique_days = Attendance.objects.filter(
-                    employee_id_fk=self.employee_id_fk,
-                    date__range=[start_date, end_date],
-                    attendance_status='Present'
-                ).values_list('date', flat=True).distinct().count()
-                
-                attendance_count = unique_days
-            else:
-                attendance_count = 0
-        
-        base_salary = self.rate * attendance_count
-        
-        # Calculate salary without including cash_advance in calculations
-        # Cash advance is only considered when creating a new payroll
-        self.salary = base_salary + self.incentives - self.deductions
-        
-        if self.salary < 0:
-            self.salary = 0
-            
-        return self.salary
-    
-    def process_payroll(self):
-        """
-        Process the payroll - just return the cash advance amount for the next payroll
-        Without resetting the cash advance on the current payroll
-        """
-        # Just return the cash advance amount so it can be transferred to next payroll
-        cash_advance_amount = self.cash_advance
-        
-        # Set status to PROCESSED
-        self.payroll_status = self.PayrollStatus.PROCESSED
-        
-        # Recalculate salary
-        self.calculate_salary()
-        
-        return cash_advance_amount
-    
-    def get_next_payment_date(self, from_date=None, target_weekday=5):
-        """
-        Calculate the next payment date.
-        
-        Args:
-            from_date: The reference date (defaults to today)
-            target_weekday: The target day of week (0=Monday, 5=Saturday [default], 6=Sunday)
-        
-        Returns:
-            The next date corresponding to the target weekday
-        """
-        if from_date is None:
-            from_date = timezone.now().date()
-        
-        # Calculate days until target weekday (e.g., Saturday=5)
-        days_until_target = (target_weekday - from_date.weekday()) % 7
-        
-        # If today is the target day, return next week's target day
-        if days_until_target == 0:
-            days_until_target = 7
-            
-        return from_date + timedelta(days=days_until_target)
-        
-    def get_next_saturday(self, from_date=None):
-        """
-        Maintained for backward compatibility.
-        Returns the next Saturday from the given date.
-        """
-        return self.get_next_payment_date(from_date, target_weekday=5)
-            
+    payroll_status = models.CharField(max_length=11, choices=PayrollStatus.choices, default=PayrollStatus.PENDING)
+    type = models.CharField(max_length=9, choices=Type.choices)
+
     def save(self, *args, **kwargs):
-        # If this is a new payroll record (no ID yet)
-        if not self.payroll_id:
-            # If payment_date is not set, set it to the next Saturday by default
-            if not self.payment_date:
-                self.payment_date = self.get_next_saturday()
-        
-        # Check if payroll is being processed (status changing from PENDING to PROCESSED)
-        is_processing = False
-        
-        if self.payroll_id:
-            try:
-                old_payroll = Payroll.objects.get(payroll_id=self.payroll_id)
-                if (old_payroll.payroll_status == self.PayrollStatus.PENDING and 
-                    self.payroll_status == self.PayrollStatus.PROCESSED):
-                    is_processing = True
-            except Payroll.DoesNotExist:
-                pass
-        
-        # Calculate salary before saving
-        self.calculate_salary()
-        
-        # Process payroll if needed (but don't reset cash advance)
-        if is_processing:
-            self.process_payroll()
-        
-        self.full_clean()
+        today = timezone.now().date()
+
+        # Block INPROGRESS if start_date is in the future
+        if self.payroll_status == self.PayrollStatus.INPROGRESS and self.start_date > today:
+            raise ValidationError("Cannot generate payroll period before the start date.")
+
+        is_new = self.pk is None
+
+        # Auto-set payment date to end_date
+        if self.end_date:
+            self.payment_date = self.end_date
+
         super().save(*args, **kwargs)
 
+        if is_new:
+            active_employees = Employee.objects.filter(is_active=True)
+            for employee in active_employees:
+                PayrollRecord.objects.create(
+                    employee=employee,
+                    payroll_period=self
+                )
+
+    def generate(self):
+        """Generate or update payroll calculations for this period"""
+        today = timezone.now().date()
+
+        if self.start_date > today:
+            raise ValidationError("Cannot generate payroll period before the start date.")
+
+        self.payroll_status = self.PayrollStatus.INPROGRESS
+        self.save()
+
+        # Calculate all records in this period
+        for record in self.payroll_records.all():
+            # Calculate days worked
+            record.days_worked = record.calculate_days_worked()
+            record.gross_pay = record.calculate_gross_pay()
+            record.save()
+            
+            # Calculate net pay after saving (so deductions are properly accounted for)
+            record.net_pay = record.calculate_net_pay()
+            record.save(update_fields=['net_pay'])
+    
+    def recalculate_all_records(self):
+        """Force recalculation of all payroll records in this period"""
+        if self.payroll_status == self.PayrollStatus.PROCESSED:
+            return False
+            
+        for record in self.payroll_records.all():
+            record.recalculate_and_save()
+        return True
+
+    def __str__(self):
+        return f"{self.start_date} to {self.end_date} ({self.get_payroll_status_display()})"
+
+class Deduction(models.Model):
+    class DeductionType(models.TextChoices):
+        SSS = 'SSS', _('SSS')
+        PHILHEALTH = 'PHILHEALTH', _('PhilHealth')
+        PAGIBIG = 'PAGIBIG', _('Pag-Ibig')
+
+    deduction_id = models.AutoField(primary_key=True)
+    payroll_record = models.ForeignKey('PayrollRecord', on_delete=models.CASCADE, related_name='deductions')
+    deduction_type = models.CharField(max_length=20, choices=DeductionType.choices)
+    amount = models.FloatField(default=0)
+
+    def __str__(self):
+        return self.deduction_type
+
+class PayrollRecord(models.Model):
+    payroll_record_id = models.AutoField(primary_key=True)
+    days_worked = models.IntegerField(default=0)
+    gross_pay = models.FloatField(default=0)
+    incentives = models.FloatField(default=0)
+    cash_advance = models.FloatField(default=0)
+    net_pay = models.FloatField(default=0)
+    employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='payroll_records')
+    payroll_period = models.ForeignKey('PayrollPeriod', on_delete=models.CASCADE, related_name='payroll_records')
+
+    def calculate_days_worked(self):
+        """Calculate the number of days worked in this payroll period"""
+        return Attendance.objects.filter(
+            employee=self.employee,
+            attendance_status=Attendance.AttendanceStatus.PRESENT,
+            date__range=(self.payroll_period.start_date, self.payroll_period.end_date)
+        ).values('date').distinct().count()
+
+    def calculate_gross_pay(self):
+        """Calculate gross pay based on days worked and employee rate"""
+        return self.days_worked * self.employee.daily_rate + self.incentives
+
+    def calculate_total_deductions(self):
+        """Calculate the sum of all deductions"""
+        return sum(d.amount for d in self.deductions.all())
+
+    def calculate_net_pay(self):
+        """Calculate net pay after deductions and cash advances"""
+        total_deductions = self.calculate_total_deductions()
+        return self.gross_pay - total_deductions - self.cash_advance
+
+    def save(self, *args, **kwargs):
+        # Skip calculations if update_fields is specified (to avoid recursion)
+        if kwargs.get('update_fields'):
+            super().save(*args, **kwargs)
+            return
+            
+        # For any other save, recalculate if period is in progress
+        if self.payroll_period.payroll_status == PayrollPeriod.PayrollStatus.INPROGRESS:
+            # Always recalculate days worked
+            self.days_worked = self.calculate_days_worked()
+            self.gross_pay = self.calculate_gross_pay()
+            
+            # First save to make sure we have an ID
+            super().save(*args, **kwargs)
+            
+            # Then update net pay
+            self.net_pay = self.calculate_net_pay()
+            super().save(update_fields=['net_pay'])
+        else:
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.employee} | {self.payroll_period.start_date} - {self.net_pay:.2f} net pay"
+    
 class History(models.Model):
     history_id = models.AutoField(primary_key=True)
     description = models.CharField(max_length=255, null=False)
@@ -498,7 +529,7 @@ class Customer(models.Model):
     first_name = models.CharField(max_length=100, null=False)
     middle_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=False)
-    contact_number = models.CharField(max_length=15, null=True)
+    contact_number = models.CharField(max_length=15, null=False)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, to_field='id')
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, to_field='id')
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, to_field='id')
@@ -594,13 +625,13 @@ class Task(models.Model):
     
     task_id = models.AutoField(primary_key=True)
     task_name = models.CharField(max_length=100, null=False)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='tasks')
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='tasks')
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='tasks')
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='tasks', null=True)
     task_status = models.CharField(max_length=11, choices=TaskStatus.choices, default=TaskStatus.IN_PROGRESS)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='tasks')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='tasks')
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='tasks')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='tasks')
 
     def __str__(self):
         return f"{self.task_name} - {self.customer} - {self.task_status}" 
@@ -616,6 +647,3 @@ class Task(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
-        
-class PayrollSettings(models.Model):
-    global_payday = models.DateField()

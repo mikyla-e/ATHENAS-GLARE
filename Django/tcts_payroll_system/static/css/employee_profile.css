@@ -5,8 +5,8 @@
     border-radius: 30px;
     border: none;
 
-    background-image: linear-gradient(to right, #1e1e1e , #1e1e1e); 
-    color: #F8D146;
+    background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
+    color: #1e1e1e;
     
 }
 
@@ -14,6 +14,9 @@
     cursor: pointer;
     scale: 1.05;
     transition: 0.5s;
+
+    background-image: linear-gradient(to right, #1e1e1e , #1e1e1e); 
+    color: #F8D146;
 }
 
 .dt-layout-row{
@@ -36,6 +39,27 @@ tbody tr td{
     border-bottom: 2px solid rgba(30, 30, 30, 0.20) !important;
 }
 
+#cancel{
+    padding: 0 20px;
+    width: fit-content;
+
+    border-radius: 30px;
+    border: none;
+
+    background-image: linear-gradient(to right, #DC4646 , #DC4646); 
+    color: white;
+    
+}
+
+#cancel:hover{
+    cursor: pointer;
+    scale: 1.05;
+    transition: 0.2s;
+    background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
+    color: white;
+}
+
+/* 
 input[type=button]{
     padding: 0 20px;
     width: fit-content;
@@ -73,7 +97,7 @@ input[type=submit]:hover{
     transition: 0.5s;
     background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
     color: #F8D146;
-}
+} */
 
 /* Cursor pointer for edit links */
 .edit-link {
@@ -90,4 +114,21 @@ input[type=submit]:hover{
     background: -webkit-linear-gradient(#F8D146, #F5B93F);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+#confirm{
+    padding: 0 20px;
+    width: fit-content;
+
+    border-radius: 50px;
+    border: none;
+
+    background-color: #7AB576;
+    color: white;
+}
+
+#confirm:hover{
+    cursor: pointer;
+    scale: 1.05;
+    transition: 0.5s;
 }

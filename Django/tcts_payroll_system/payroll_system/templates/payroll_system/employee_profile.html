@@ -80,8 +80,8 @@ onclick="cancelAddAttendance()">
        </div>
    </div>
    <div class="w-full h-[40px] mt-2 md:mt-1 flex justify-center sm:justify-end gap-3">
-       <input type="button" class="w-full sm:w-auto px-4 text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddAttendance()">
-       <input type="submit" class="w-full sm:w-auto px-4 text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+       <input type="button" id="cancel" class="w-full sm:w-auto px-4 text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelAddAttendance()">
+       <input type="submit" id="confirm" class="w-full sm:w-auto px-4 text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
    </div>           
 </form>
 </div>
@@ -172,8 +172,8 @@ onclick="cancelEditAttendance()">
                 </div>
             </div>
             <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
-                <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditAttendance()">
-                <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+                <input type="button" id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditAttendance()">
+                <input type="submit" id="confirm" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
             </div>           
         </form>
     </div>
@@ -188,7 +188,13 @@ onclick="cancelEditAttendance()">
                 <img src="{{ employee.employee_image.url }}" alt="Employee Image" class="size-full object-cover rounded-xl">
             </div>
             <div class="w-full flex flex-col justify-end gap-2">
-                <h1 class="text-4xl font-[League Spartan] font-semibold">{{ employee.first_name }} {{ employee.last_name }} <span class="text-3xl text-[#1e1e1e80] font-semibold">{{ employee.employee_id }}</span></h1>
+                <div class="w-full flex justify-between">
+                    <h1 class="text-4xl font-[League Spartan] font-semibold">{{ employee.first_name }} {{ employee.last_name }} <span class="text-3xl text-[#1e1e1e80] font-semibold">{{ employee.employee_id }}</span></h1>
+
+                    <a href="{% url 'payroll_system:employee_edit' %}">
+                        <p>Edit</p>
+                    </a>
+                </div>
                 
                 <div class="flex items-center gap-3">
                     <div class="font-[League Spartan] text-sm font-extrabold text-[#1e1e1e80]">DETAILS</div>
@@ -269,27 +275,27 @@ onclick="cancelEditAttendance()">
     <div class="w-full h-fit flex flex-col lg:flex-row justify-between gap-5">
         <div class="lg:hidden w-full h-[60px] flex flex-row flex-nowrap justify-end gap-5">
             <div class="w-fit h-full flex gap-2">
-                <button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addAttendance()">ADD ATTENDANCE</button>
-
-                <select name="duration" id="duration" class="w-fit h-full px-2 rounded-full border-none bg-gradient-to-r from-[#F8D146] to-[#F5B93F] text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center">
+                <select name="duration" id="duration" class="w-fit h-full px-2 rounded-full border-none bg-white text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center cursor-pointer">
                     <option value="Current Week">Current Week</option>
                     <option value="Last Week">Last Week</option>
                     <option value="Two Weeks Ago">Two Weeks Ago</option>
                     <option value="Last Month">Last Month</option>
                     <option value="Custom">Custom</option>
                 </select>
+
+                <button id="button" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addAttendance()" title="Add Attendance">ADD ATTENDANCE</button>
             </div>
         </div>
 
-        <div class="w-full h-[60px] md:h-[100px] lg:w-[300px] lg:h-full flex justify-between flex-row lg:flex-col gap-[15px]">
-            <div class="w-fit md:w-full h-full overflow-hidden bg-white border-l-[10px] border-[#F8D146] rounded-r-xl">
+        <div class="w-full h-[60px] md:h-[100px] lg:w-[300px] lg:h-[350px] flex justify-between flex-row lg:flex-col gap-[15px]">
+            <div class="w-fit sm:w-[20%] lg:w-full h-full overflow-hidden bg-white border-l-[10px] border-[#F8D146] rounded-r-xl">
                 <div class="w-full h-full hidden lg:flex items-center px-4 gap-2">
-                    <div class="size-[60px]">
-                        <img src="{% static 'images/payroll_status_icon.png' %}" alt="">
+                    <div class="size-[45px]">
+                        <img src="{% static 'images/active_status_icon.png' %}" alt="">
                     </div>
                     <div class="flex flex-col justify-between">
-                        <h2 id="title" class="font-bold text-base">PAYROLL STATUS</h2>
-                        <p class="font-extrabold text-xl text-[#1e1e1e80]">{{ payroll_status }}</p>
+                        <h2 id="title" class="font-bold text-base">ACTIVE STATUS</h2>
+                        <p class="font-extrabold text-xl text-[#1e1e1e80] text-nowrap">{% if employee.is_active %} Active {% else%} Inactive {% endif %}</p>
                     </div>
                 </div>
 
@@ -297,18 +303,18 @@ onclick="cancelEditAttendance()">
                     <div class="w-full flex justify-start items-center gap-1">
                         <h2 id="title" class="font-bold text-sm md:text-base">STATUS</h2>
                     </div>
-                    <p class="font-extrabold text-base md:text-lg text-[#1e1e1e80]">{{ payroll_status }}</p>
+                    <p class="font-extrabold text-base md:text-lg text-[#1e1e1e80] text-nowrap">{% if employee.is_active %} Active {% else%} Inactive {% endif %}</p>
                 </div>
             </div>
 
-            <div class="w-fit md:w-full lg:w-full h-full overflow-hidden bg-white border-l-[10px] border-[#F8D146] rounded-r-xl">
+            <div class="w-fit sm:w-[35%] lg:w-full h-full overflow-hidden bg-white border-l-[10px] border-[#F8D146] rounded-r-xl">
                 <div class="w-full h-full hidden lg:flex items-center px-4 gap-2">
-                    <div class="size-[60px]">
+                    <div class="size-[50px]">
                         <img src="{% static 'images/attendance_icon.png' %}" alt="">
                     </div>
                     <div class="flex flex-col justify-between">
                         <h2 id="title" class="font-bold text-base text-nowrap">LAST ATTENDANCE</h2>
-                        <p class="font-extrabold text-xl text-[#1e1e1e80]">{{ latest_attendance.date }}</p>
+                        <p class="font-extrabold text-xl text-[#1e1e1e80] text-nowrap">{% if latest_attendance.date %} {{ latest_attendance.date }} {% else %} No Attendance {% endif %}</p>
                     </div>
                 </div>
 
@@ -316,19 +322,19 @@ onclick="cancelEditAttendance()">
                     <div class="w-full flex justify-start items-center gap-1">
                         <h2 id="title" class="font-bold text-sm md:text-base">ATTENDANCE</h2>
                     </div>
-                    <p class="font-extrabold text-base text-[#1e1e1e80] text-nowrap">{{ latest_attendance.date }}</p>
+                    <p class="font-extrabold text-base text-[#1e1e1e80] text-nowrap">{% if latest_attendance.date %} {{ latest_attendance.date }} {% else %} No Attendance {% endif %}</p>
                 </div>
                 
             </div>
 
-            <div class="w-fit md:w-full h-full overflow-hidden bg-white border-l-[10px] border-[#F8D146] rounded-r-xl">
+            <div class="w-fit sm:w-[25%] lg:w-full h-full overflow-hidden bg-white border-l-[10px] border-[#F8D146] rounded-r-xl">
                 <div class="w-full h-full hidden lg:flex items-center px-4 gap-2">
-                    <div class="size-[60px]">
+                    <div class="size-[50px]">
                         <img src="{% static 'images/absences_icon.png' %}" alt="">
                     </div>
                     <div class="flex flex-col justify-between">
                         <h2 id="title" class="font-bold text-base">ABSENCES</h2>
-                        <p class="font-extrabold text-xl text-[#1e1e1e80]">{{ employee.absences }} Absences</p>
+                        <p class="font-extrabold text-xl text-[#1e1e1e80] text-nowrap">{{ employee.absences }} Absences</p>
                     </div>
                 </div>
 
@@ -336,18 +342,18 @@ onclick="cancelEditAttendance()">
                     <div class="w-full flex justify-start items-center gap-1">
                         <h2 id="title" class="font-bold text-sm md:text-base">ABSENCES</h2>
                     </div>
-                    <p class="font-extrabold text-base md:text-lg text-[#1e1e1e80]">{{ employee.absences }}</p>
+                    <p class="font-extrabold text-base md:text-lg text-[#1e1e1e80] text-nowrap">{{ employee.absences }} Absences</p>
                 </div>
             </div>
 
-            <div class="w-fit md:w-full h-full overflow-hidden bg-white border-l-[10px] border-[#F8D146] rounded-r-xl">
+            <div class="w-fit sm:w-[20%] lg:w-full h-full overflow-hidden bg-white border-l-[10px] border-[#F8D146] rounded-r-xl">
                 <div class="w-full h-full hidden lg:flex items-center px-4 gap-2">
-                    <div class="size-[60px]">
-                        <img src="{% static 'images/day_worked_icon.png' %}" alt="">
+                    <div class="size-[45px]">
+                        <img src="{% static 'images/days_worked_icon.png' %}" alt="">
                     </div>
                     <div class="flex flex-col justify-between">
                         <h2 id="title" class="font-bold text-base">DAYS WORKED</h2>
-                        <p class="font-extrabold text-xl text-[#1e1e1e80]">{{ employee.days_worked }} Days</p>
+                        <p class="font-extrabold text-xl text-[#1e1e1e80] text-nowrap">{{ employee.days_worked }} Days</p>
                     </div>
                 </div>
                 
@@ -355,7 +361,7 @@ onclick="cancelEditAttendance()">
                     <div class="w-full flex justify-start items-center gap-1">
                         <h2 id="title" class="font-bold text-sm md:text-base">WORKED</h2>
                     </div>
-                    <p class="font-extrabold text-base md:text-lg text-[#1e1e1e80]">{{ employee.days_worked }} Days</p>
+                    <p class="font-extrabold text-base md:text-lg text-[#1e1e1e80] text-nowrap">{{ employee.days_worked }} Days</p>
                 </div>
             </div>
         </div>

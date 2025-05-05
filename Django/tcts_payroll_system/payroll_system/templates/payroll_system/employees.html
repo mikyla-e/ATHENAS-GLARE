@@ -46,7 +46,7 @@
                     <th class="p-2 text-base font-[League Spartan]">ID</th>
                     <th class="p-2 text-base font-[League Spartan]">CONTACT NUMBER</th>
                     <th class="p-2 text-base font-[League Spartan]">EMPLOYMENT STATUS</th>
-                    <th class="p-2 text-base font-[League Spartan]">PAYROLL STATUS</th>
+                    <th class="p-2 text-base font-[League Spartan]">ACTIVE STATUS</th>
                     <th class="p-2 text-base font-[League Spartan]">LAST ATTENDANCE</th>
                     <th></th>
                 </tr>
@@ -59,10 +59,10 @@
                     <td class="p-2 text-sm font-[Inter]">{{ employee.contact_number}}</td>
                     <td class="p-2 text-sm font-[Inter]">{{ employee.employee_status }}</td>
                     <td class="p-2 text-sm font-[Inter]">
-                        {% if employee.latest_payroll_status %}
-                            {{ employee.latest_payroll_status }}
+                        {% if employee.is_active %}
+                            Active
                         {% else %}
-                            No Payroll Data
+                            Inactive
                         {% endif %}
                     </td>
                     <td class="p-2 text-sm font-[Inter]">
@@ -90,7 +90,7 @@
                     <th class="p-2 text-sm font-[League Spartan]">EMPLOYEE NAME</th>
                     <th class="p-2 text-sm font-[League Spartan]">CONTACT NUMBER</th>
                     <th class="p-2 text-sm font-[League Spartan]">EMPLOYMENT STATUS</th>
-                    <th class="p-2 text-sm font-[League Spartan]">PAYROLL STATUS</th>
+                    <th class="p-2 text-sm font-[League Spartan]">ACTIVE STATUS</th>
                     <th class="p-2 text-sm font-[League Spartan]">LAST ATTENDANCE</th>
                     <th></th>
                 </tr>

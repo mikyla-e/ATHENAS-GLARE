@@ -1,5 +1,4 @@
-#button,
-input[type=submit]{
+#button{
     padding: 0 20px;
 
     border-radius: 30px;
@@ -16,7 +15,7 @@ input[type=submit]{
     border: none;
 
     background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
-    color: white;
+    color: #1E1E1E;
 }
 
 #button_2{
@@ -30,8 +29,24 @@ input[type=submit]{
     
 }
 
-#button:hover,
-input[type=submit]:hover{
+#confirm{
+    padding: 0 20px;
+    width: fit-content;
+
+    border-radius: 50px;
+    border: none;
+
+    background-color: #7AB576;
+    color: white;
+}
+
+#confirm:hover{
+    cursor: pointer;
+    scale: 1.05;
+    transition: 0.5s;
+}
+
+#button:hover{
     cursor: pointer;
     scale: 1.05;
     transition: 0.5s;
@@ -67,14 +82,12 @@ input[type=button]:hover{
     color: white;
 }
 
-#field{
+#field,
+.field{
     height: 40px;
     margin: 2px;
     padding: 0 15px;
     border: none;
-
-    font-family: 'Inter';
-    font-size: 1rem;
 
     background-color: rgba(111, 81, 21, 0.10);
     border-radius: 10px;
@@ -85,7 +98,7 @@ input[type=button]:hover{
     box-shadow: 0 0 0 2px #F8D146; /* Tailwind's yellow-400 */
 }
 
-input[type=text], input[type=email], input[type=password], input[type=tel], select{
+input[type=text], input[type=email], input[type=password], input[type=tel], input[type=number]{
     height: 50px;
     margin: 8px 0;
     padding: 2px 15px;
@@ -126,3 +139,12 @@ input[type=date]{
     resize: none
 }
 
+select{
+    height: 50px;
+    margin: 8px 0;
+    padding: 2px 15px;
+    border: none;
+
+    background-color: #fff;
+    border-radius: 20px;
+}
