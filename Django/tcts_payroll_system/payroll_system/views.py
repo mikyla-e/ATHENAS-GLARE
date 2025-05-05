@@ -1,21 +1,18 @@
-import re
 import base64
 from datetime import datetime, date as date_class
 from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import OuterRef, Subquery, Sum, Min, Prefetch
+from django.db.models import OuterRef, Subquery, Sum, Min, Avg
 from django.forms import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from django.views.decorators.csrf import csrf_protect
 from .forms import EmployeeForm, PayrollPeriodForm, DeductionForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
 from .models import Employee, Attendance, PayrollPeriod, Deduction, PayrollRecord, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
-from django.views.decorators.csrf import csrf_exempt
-import json
-from django.views.decorators.http import require_POST
 import calendar
 
 @csrf_protect  # Ensure CSRF protection
@@ -334,53 +331,6 @@ def create_payroll(request):
     return redirect('payroll_system:payrolls')
 
 @login_required
-def payroll_record(request):
-    payroll_id = request.GET.get('payroll_id')
-
-    if payroll_id:
-        payroll = get_object_or_404(PayrollPeriod, payroll_period_id=payroll_id)
-
-        # Get all PayrollRecords for the selected period, with employee data
-        records = PayrollRecord.objects.filter(payroll_period=payroll).select_related('employee')
-        
-        # Calculate total payroll amount for this period
-        total_payroll = records.aggregate(total=Sum('net_pay'))['total'] or 0
-        
-        # Calculate percentage change (if you have previous payroll data)
-        # For example, comparing to the previous payroll period:
-        previous_payroll = PayrollPeriod.objects.filter(
-            payment_date__lt=payroll.payment_date
-        ).order_by('-payment_date').first()
-        
-        payroll_percentage = 0
-        if previous_payroll:
-            previous_total = PayrollRecord.objects.filter(
-                payroll_period=previous_payroll
-            ).aggregate(total=Sum('net_pay'))['total'] or 0
-            
-            if previous_total > 0:
-                payroll_percentage = ((total_payroll - previous_total) / previous_total) * 100
-        
-        context = {
-            'records': records,
-            'selected_payroll': payroll,
-            'total_payroll': total_payroll,
-            'payroll_percentage': payroll_percentage,
-            'payday_date': payroll.payment_date,
-        }
-    else:
-        # If no payroll is selected, show nothing or default view
-        records = []
-        context = {
-            'records': records,
-            'total_payroll': "No total payroll yet",
-            'payroll_percentage': 0,
-        }
-
-    return render(request, 'payroll_system/payroll_record.html', context)
-
-
-@login_required
 def payrolls(request):
     # Get the current in-progress payroll period (if any)
     current_payroll = PayrollPeriod.objects.filter(
@@ -405,11 +355,129 @@ def payrolls(request):
     return render(request, 'payroll_system/payrolls.html', context)
 
 @login_required
+def payroll_record(request):
+    payroll_id = request.GET.get('payroll_id')
+    
+    if payroll_id:
+        payroll = get_object_or_404(PayrollPeriod, payroll_period_id=payroll_id)
+        
+        # Get all PayrollRecords for the selected period, with employee data
+        records = PayrollRecord.objects.filter(payroll_period=payroll).select_related('employee')
+        
+        # If payroll is in progress, dynamically update all records
+        if payroll.payroll_status == PayrollPeriod.PayrollStatus.INPROGRESS:
+            for record in records:
+                # Check if attendance data has changed
+                current_days = record.days_worked
+                actual_days = record.calculate_days_worked()
+                
+                if current_days != actual_days:
+                    # Update the record
+                    record.days_worked = actual_days
+                    record.gross_pay = record.calculate_gross_pay()
+                    record.net_pay = record.calculate_net_pay()
+                    record.save(update_fields=['days_worked', 'gross_pay', 'net_pay'])
+        
+        # Refresh the queryset to get updated data
+        records = PayrollRecord.objects.filter(payroll_period=payroll).select_related('employee')
+        
+        # Calculate total payroll amount for this period
+        total_payroll = records.aggregate(total=Sum('net_pay'))['total'] or 0
+        
+        # Calculate percentage change compared to previous period
+        previous_payroll = PayrollPeriod.objects.filter(
+            payment_date__lt=payroll.payment_date
+        ).order_by('-payment_date').first()
+        
+        payroll_percentage = 0
+        if previous_payroll:
+            previous_total = PayrollRecord.objects.filter(
+                payroll_period=previous_payroll
+            ).aggregate(total=Sum('net_pay'))['total'] or 0
+            
+            if previous_total > 0:
+                payroll_percentage = ((total_payroll - previous_total) / previous_total) * 100
+        
+        context = {
+            'records': records,
+            'selected_payroll': payroll,
+            'total_payroll': total_payroll,
+            'payroll_percentage': payroll_percentage,
+            'payday_date': payroll.payment_date,
+        }
+    else:
+        # If no payroll is selected, show nothing or default view
+        payroll_periods = PayrollPeriod.objects.all().order_by('-start_date')
+        context = {
+            'payroll_periods': payroll_periods,
+            'records': [],
+            'total_payroll': 0,
+            'payroll_percentage': 0,
+        }
+    
+    return render(request, 'payroll_system/payroll_record.html', context)
+
+@login_required
 def payroll_individual(request, employee_id):
-    employee = Employee.objects.prefetch_related('payroll_records').get(employee_id=employee_id)
+    employee = get_object_or_404(Employee.objects.prefetch_related('payroll_records'), employee_id=employee_id)
+    
+    # Get the specific payroll record if a period is selected
+    payroll_id = request.GET.get('payroll_id')
+    selected_record = None
+    payroll_records = []
+    
+    if payroll_id:
+        payroll = get_object_or_404(PayrollPeriod, payroll_period_id=payroll_id)
+                
+        selected_record = PayrollRecord.objects.filter(
+            employee=employee,
+            payroll_period__payroll_period_id=payroll_id
+        ).select_related('payroll_period').first()
+        
+        # If payroll is in progress, always check and update the record
+        if selected_record and payroll.payroll_status == PayrollPeriod.PayrollStatus.INPROGRESS:
+            # Check if attendance data has changed
+            current_days = selected_record.days_worked
+            actual_days = selected_record.calculate_days_worked()
+            
+            if current_days != actual_days:
+                # Update the record with fresh calculations
+                selected_record.days_worked = actual_days
+                selected_record.gross_pay = selected_record.calculate_gross_pay()
+                selected_record.net_pay = selected_record.calculate_net_pay()
+                selected_record.save(update_fields=['days_worked', 'gross_pay', 'net_pay'])
+                
+                # Refresh the record after update
+                selected_record = PayrollRecord.objects.filter(
+                    employee=employee,
+                    payroll_period__payroll_period_id=payroll_id
+                ).select_related('payroll_period').first()
+        
+        # Only get the current payroll record instead of all records
+        if selected_record:
+            payroll_records = [selected_record]
+    else:
+        # If no payroll is selected, get all records (fallback behavior)
+        payroll_records = PayrollRecord.objects.filter(
+            employee=employee
+        ).select_related('payroll_period').order_by('-payroll_period__end_date')
+    
+    # Get attendance records for selected period
+    attendance_records = []
+    if selected_record:
+        attendance_records = Attendance.objects.filter(
+            employee=employee,
+            date__range=(
+                selected_record.payroll_period.start_date,
+                selected_record.payroll_period.end_date
+            )
+        ).order_by('date')
     
     context = {
         'employee': employee,
+        'payroll_records': payroll_records,
+        'selected_record': selected_record,
+        'attendance_records': attendance_records,
     }
     
     return render(request, 'payroll_system/payroll_individual.html', context)
@@ -476,98 +544,147 @@ def update_all_incentives(request):
     if request.method == 'POST':
         action = request.POST.get('action')
         amount = request.POST.get('amount')
+        payroll_id = request.POST.get('payroll_id')
         
         try:
             amount = float(amount)
             
-            # Get all employees
-            employees = Employee.objects.all()
-            
-            # For each employee, get their most recent payroll
-            for employee in employees:
-                latest_payroll = employee.payrolls.order_by('-payment_date').first()
+            # Get the current payroll period
+            if payroll_id:
+                payroll_period = get_object_or_404(PayrollPeriod, payroll_period_id=payroll_id)
+            else:
+                # Default to the most recent in-progress payroll period
+                payroll_period = PayrollPeriod.objects.filter(
+                    payroll_status=PayrollPeriod.PayrollStatus.INPROGRESS
+                ).order_by('-start_date').first()
                 
-                if latest_payroll:
-                    current_incentives = latest_payroll.incentives or 0  # Handle None values
-                    
-                    if action == 'add':
-                        # Add to incentives
-                        latest_payroll.incentives = current_incentives + amount
-                    elif action == 'subtract':
-                        # Subtract from incentives (ensure it doesn't go below zero)
-                        latest_payroll.incentives = max(0, current_incentives - amount)
-                    
-                    latest_payroll.save()
+                if not payroll_period:
+                    messages.error(request, 'No active payroll period found.')
+                    return redirect('payroll_system:payrolls')
+            
+            # Only allow updates for in-progress periods
+            if payroll_period.payroll_status != PayrollPeriod.PayrollStatus.INPROGRESS:
+                messages.error(request, 'Can only update incentives for in-progress payroll periods.')
+                return redirect('payroll_system:payrolls')
+            
+            # Get all payroll records for this period
+            records = PayrollRecord.objects.filter(payroll_period=payroll_period)
+            
+            # Update incentives for each record
+            for record in records:
+                current_incentives = record.incentives or 0  # Handle None values
+                
+                if action == 'add':
+                    record.incentives = current_incentives + amount
+                elif action == 'subtract':
+                    record.incentives = max(0, current_incentives - amount)
+                
+                # Recalculate gross pay and net pay
+                record.gross_pay = record.calculate_gross_pay()
+                record.net_pay = record.calculate_net_pay()
+                
+                # Save the record with updated values
+                record.save(update_fields=['incentives', 'gross_pay', 'net_pay'])
             
             messages.success(request, f'Successfully updated incentives for all employees!')
+            
         except ValueError:
             messages.error(request, 'Please enter a valid number for amount')
         except Exception as e:
             messages.error(request, f'An error occurred: {str(e)}')
     
-    return redirect('payroll_system:payrolls')
+    # Redirect based on where the request came from
+    redirect_url = request.POST.get('redirect_url', 'payroll_system:payroll_record')
+
+    if payroll_id and 'payroll_record' in redirect_url:
+        base_url = reverse('payroll_system:payroll_record')
+        return redirect(f'{base_url}?payroll_id={payroll_id}')
+    else:
+        return redirect(redirect_url)
 
 @login_required
 def update_employee_incentives(request, employee_id):
-    """Update incentives for a specific employee."""
+    """Update incentives for a specific employee in the current payroll period."""
     if request.method == 'POST':
         action = request.POST.get('action')
         amount_str = request.POST.get('amount')
+        payroll_id = request.POST.get('payroll_id')
         
         try:
             # Get the employee
-            employee = Employee.objects.get(employee_id=employee_id)
+            employee = get_object_or_404(Employee, employee_id=employee_id)
             
-            # Get the most recent payroll for this employee
-            current_payroll = employee.payrolls.order_by('-payment_date').first()
+            # Get the specified payroll period
+            if payroll_id:
+                payroll_period = get_object_or_404(PayrollPeriod, payroll_period_id=payroll_id)
+            else:
+                # Default to the most recent in-progress payroll period
+                payroll_period = PayrollPeriod.objects.filter(
+                    payroll_status=PayrollPeriod.PayrollStatus.INPROGRESS
+                ).order_by('-start_date').first()
+                
+                if not payroll_period:
+                    error_msg = 'No active payroll period found.'
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({'success': False, 'error': error_msg})
+                    else:
+                        messages.error(request, error_msg)
+                        return redirect('payroll_system:payroll_individual', employee_id=employee_id)
             
-            if not current_payroll:
+            # Only allow updates for in-progress periods
+            if payroll_period.payroll_status != PayrollPeriod.PayrollStatus.INPROGRESS:
+                error_msg = 'Can only update incentives for in-progress payroll periods.'
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'success': False,
-                        'error': 'No payroll record exists for this employee.'
-                    })
+                    return JsonResponse({'success': False, 'error': error_msg})
                 else:
-                    messages.error(request, 'No payroll record exists for this employee.')
+                    messages.error(request, error_msg)
+                    return redirect('payroll_system:payroll_individual', employee_id=employee_id)
+            
+            # Get the payroll record for this employee and period
+            payroll_record = PayrollRecord.objects.filter(
+                employee=employee,
+                payroll_period=payroll_period
+            ).first()
+            
+            if not payroll_record:
+                error_msg = 'No payroll record exists for this employee in the selected period.'
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'error': error_msg})
+                else:
+                    messages.error(request, error_msg)
                     return redirect('payroll_system:payroll_individual', employee_id=employee_id)
             
             # Convert amount to float
             amount = float(amount_str)
             
             # Update incentives based on action
-            current_incentives = current_payroll.incentives or 0  # Handle None values
+            current_incentives = payroll_record.incentives or 0
             
             if action == 'add':
-                current_payroll.incentives = current_incentives + amount
+                payroll_record.incentives = current_incentives + amount
             elif action == 'subtract':
                 # Ensure we don't go below zero
-                current_payroll.incentives = max(0, current_incentives - amount)
+                payroll_record.incentives = max(0, current_incentives - amount)
             
-            # Recalculate salary with updated incentives
-            # Get the attendance count
-            today = now().date()
-            start_of_week = today - timedelta(days=today.weekday())  # Monday
-            end_of_week = start_of_week + timedelta(days=6)  # Sunday
+            # Recalculate gross pay and net pay
+            payroll_record.gross_pay = payroll_record.calculate_gross_pay()
+            payroll_record.net_pay = payroll_record.calculate_net_pay()
             
-            weekly_attendance_count = Attendance.objects.filter(
-                employee=employee,
-                date__range=[start_of_week, end_of_week],
-                attendance_status='Present'
-            ).count()
-            
-            current_payroll.calculate_salary(weekly_attendance_count)
-            current_payroll.save()
+            # Save the updated record
+            payroll_record.save(update_fields=['incentives', 'gross_pay', 'net_pay'])
             
             # Format the values for display
-            formatted_incentives = "{:.2f}".format(current_payroll.incentives)
-            formatted_salary = "{:.2f}".format(current_payroll.salary)
+            formatted_incentives = "{:.2f}".format(payroll_record.incentives)
+            formatted_gross_pay = "{:.2f}".format(payroll_record.gross_pay)
+            formatted_net_pay = "{:.2f}".format(payroll_record.net_pay)
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 # Return JSON response for AJAX request
                 return JsonResponse({
                     'success': True,
                     'new_incentives': formatted_incentives,
-                    'new_salary': formatted_salary
+                    'new_gross_pay': formatted_gross_pay,
+                    'new_net_pay': formatted_net_pay
                 })
             else:
                 # Regular form submission
@@ -575,7 +692,10 @@ def update_employee_incentives(request, employee_id):
                     request, 
                     f'Successfully {"added to" if action == "add" else "subtracted from"} incentives for {employee.first_name} {employee.last_name}.'
                 )
-                return redirect('payroll_system:payroll_individual', employee_id=employee_id)
+                redirect_url = f'payroll_system:payroll_individual'
+                if payroll_id:
+                    return redirect(f'{redirect_url}?payroll_id={payroll_id}', employee_id=employee_id)
+                return redirect(redirect_url, employee_id=employee_id)
                 
         except Employee.DoesNotExist:
             error_msg = 'Employee not found.'

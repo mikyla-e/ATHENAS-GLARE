@@ -285,6 +285,19 @@ class Attendance(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()  
         
+        # Check if this is an update to an existing record
+        is_update = self.pk is not None
+        
+        # Store old status for comparison if this is an update
+        old_status = None
+        if is_update:
+            try:
+                old_attendance = Attendance.objects.get(pk=self.pk)
+                old_status = old_attendance.attendance_status
+            except Attendance.DoesNotExist:
+                pass
+        
+        # Calculate hours worked
         if self.time_in and self.time_out:
             if not kwargs.pop('skip_hours_calculation', False):
                 time_in_dt = datetime.combine(self.date, self.time_in)
@@ -293,6 +306,11 @@ class Attendance(models.Model):
                 self.hours_worked = round(worked_seconds / 3600, 2)
         
         super().save(*args, **kwargs)
+        
+        # If this is an update AND status changed OR this is a new entry
+        # then update related payroll records
+        if (is_update and old_status != self.attendance_status) or not is_update:
+            self.update_payroll_records()
             
     def get_formatted_hours_worked(self):
         # Returns time worked as hh:mm:ss if time_out exists
@@ -305,6 +323,42 @@ class Attendance(models.Model):
             minutes, seconds = divmod(remainder, 60)
             return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
         return None
+    
+    def update_payroll_records(self):
+        """Update payroll records affected by this attendance record"""
+        # Find all IN-PROGRESS payroll periods that include this attendance date
+        related_periods = PayrollPeriod.objects.filter(
+            start_date__lte=self.date,
+            end_date__gte=self.date,
+            payroll_status=PayrollPeriod.PayrollStatus.INPROGRESS
+        )
+        
+        # Update each payroll record for this employee in the affected periods
+        for period in related_periods:
+            try:
+                # Get the payroll record for this employee and period
+                payroll_record = PayrollRecord.objects.get(
+                    employee=self.employee,
+                    payroll_period=period
+                )
+                
+                # Recalculate days worked for this specific record
+                previous_days = payroll_record.days_worked
+                new_days = payroll_record.calculate_days_worked()
+                
+                # Only update if the number of days has changed
+                if previous_days != new_days:
+                    payroll_record.days_worked = new_days
+                    payroll_record.gross_pay = payroll_record.calculate_gross_pay()
+                    payroll_record.net_pay = payroll_record.calculate_net_pay()
+                    payroll_record.save(update_fields=['days_worked', 'gross_pay', 'net_pay'])
+                    
+            except PayrollRecord.DoesNotExist:
+                # Create a new record if one doesn't exist
+                PayrollRecord.objects.create(
+                    employee=self.employee,
+                    payroll_period=period
+                )
     
 class PayrollPeriod(models.Model):
     class PayrollStatus(models.TextChoices):
@@ -348,6 +402,7 @@ class PayrollPeriod(models.Model):
                 )
 
     def generate(self):
+        """Generate or update payroll calculations for this period"""
         today = timezone.now().date()
 
         if self.start_date > today:
@@ -356,8 +411,25 @@ class PayrollPeriod(models.Model):
         self.payroll_status = self.PayrollStatus.INPROGRESS
         self.save()
 
+        # Calculate all records in this period
         for record in self.payroll_records.all():
-            record.save()  # Triggers computation if period is INPROGRESS
+            # Calculate days worked
+            record.days_worked = record.calculate_days_worked()
+            record.gross_pay = record.calculate_gross_pay()
+            record.save()
+            
+            # Calculate net pay after saving (so deductions are properly accounted for)
+            record.net_pay = record.calculate_net_pay()
+            record.save(update_fields=['net_pay'])
+    
+    def recalculate_all_records(self):
+        """Force recalculation of all payroll records in this period"""
+        if self.payroll_status == self.PayrollStatus.PROCESSED:
+            return False
+            
+        for record in self.payroll_records.all():
+            record.recalculate_and_save()
+        return True
 
     def __str__(self):
         return f"{self.start_date} to {self.end_date} ({self.get_payroll_status_display()})"
@@ -386,28 +458,43 @@ class PayrollRecord(models.Model):
     employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='payroll_records')
     payroll_period = models.ForeignKey('PayrollPeriod', on_delete=models.CASCADE, related_name='payroll_records')
 
+    def calculate_days_worked(self):
+        """Calculate the number of days worked in this payroll period"""
+        return Attendance.objects.filter(
+            employee=self.employee,
+            attendance_status=Attendance.AttendanceStatus.PRESENT,
+            date__range=(self.payroll_period.start_date, self.payroll_period.end_date)
+        ).values('date').distinct().count()
+
     def calculate_gross_pay(self):
+        """Calculate gross pay based on days worked and employee rate"""
         return self.days_worked * self.employee.daily_rate + self.incentives
 
     def calculate_total_deductions(self):
+        """Calculate the sum of all deductions"""
         return sum(d.amount for d in self.deductions.all())
 
     def calculate_net_pay(self):
+        """Calculate net pay after deductions and cash advances"""
         total_deductions = self.calculate_total_deductions()
         return self.gross_pay - total_deductions - self.cash_advance
 
     def save(self, *args, **kwargs):
-        # Only compute pay if payroll period is INPROGRESS
-        if self.payroll_period.payroll_status == PayrollPeriod.PayrollStatus.INPROGRESS:
-            self.days_worked = Attendance.objects.filter(
-                employee=self.employee,
-                attendance_status=Attendance.AttendanceStatus.PRESENT,
-                date__range=(self.payroll_period.start_date, self.payroll_period.end_date)
-            ).count()
-
-            self.gross_pay = self.calculate_gross_pay()
+        # Skip calculations if update_fields is specified (to avoid recursion)
+        if kwargs.get('update_fields'):
             super().save(*args, **kwargs)
-
+            return
+            
+        # For any other save, recalculate if period is in progress
+        if self.payroll_period.payroll_status == PayrollPeriod.PayrollStatus.INPROGRESS:
+            # Always recalculate days worked
+            self.days_worked = self.calculate_days_worked()
+            self.gross_pay = self.calculate_gross_pay()
+            
+            # First save to make sure we have an ID
+            super().save(*args, **kwargs)
+            
+            # Then update net pay
             self.net_pay = self.calculate_net_pay()
             super().save(update_fields=['net_pay'])
         else:
