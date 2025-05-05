@@ -222,6 +222,7 @@ def employee_picture(request):
             messages.error(request, "No image was captured. Please take a picture.")
     
     return render(request, 'payroll_system/employee_picture.html')
+    
 
 @login_required
 def employees(request):
@@ -310,6 +311,10 @@ def employee_profile(request, employee_id):
     }
     
     return render(request, 'payroll_system/employee_profile.html', context)
+
+@login_required
+def employee_edit(request):
+    return render(request, 'payroll_system/employee_edit.html')
 
 @login_required
 def create_payroll(request):
