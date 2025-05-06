@@ -797,6 +797,19 @@ class CustomerForm(forms.ModelForm):
             raise forms.ValidationError("All fields must be filled.")
         
         return cleaned_data
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # If we have initial data for city, make sure it's preserved
+        if 'initial' in kwargs and 'city' in kwargs['initial']:
+            # Store the initial city value
+            self._initial_city = kwargs['initial']['city']
+            
+            # If this is being rendered as an unbound form (GET request)
+            if not self.is_bound and hasattr(self, '_initial_city'):
+                # Set the initial value for city
+                self.initial['city'] = self._initial_city
 
     def save(self, commit=True):
         customer = super().save(commit=False)
@@ -950,20 +963,20 @@ class CustomerEditForm(forms.ModelForm):
         
         return barangay_name
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
         
-        # Set initial values for location fields using descriptive names
-        instance = kwargs.get('instance')
-        if instance:
-            if instance.region:
-                self.initial['region'] = instance.region.regDesc
-            if instance.province:
-                self.initial['province'] = instance.province.provDesc
-            if instance.city:
-                self.initial['city'] = instance.city.citymunDesc
-            if instance.barangay:
-                self.initial['barangay'] = instance.barangay.brgyDesc
+    #     # Set initial values for location fields using descriptive names
+    #     instance = kwargs.get('instance')
+    #     if instance:
+    #         if instance.region:
+    #             self.initial['region'] = instance.region.regDesc
+    #         if instance.province:
+    #             self.initial['province'] = instance.province.provDesc
+    #         if instance.city:
+    #             self.initial['city'] = instance.city.citymunDesc
+    #         if instance.barangay:
+    #             self.initial['barangay'] = instance.barangay.brgyDesc
     
     def save(self, commit=True):
         customer = super().save(commit=False)

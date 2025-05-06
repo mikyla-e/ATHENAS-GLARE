@@ -269,6 +269,7 @@ def employee_profile(request, employee_id):
     if latest_attendance:
         latest_attendance.calculate_hours_worked()
     
+    #new
     # Filter attendance records based on selected duration
     duration = request.GET.get('duration', 'Current Week')
     today = timezone.now().date()
@@ -325,15 +326,18 @@ def employee_profile(request, employee_id):
         'days_absent': filtered_attendance.filter(attendance_status=Attendance.AttendanceStatus.ABSENT).count(),
         'total_hours': sum(a.hours_worked for a in filtered_attendance if a.hours_worked)
     }
+    #new
     
     context = {
         'employee': employee,
         'latest_attendance': latest_attendance,
+        #bago
         'filtered_attendance': filtered_attendance,
         'attendance_stats': attendance_stats,
         'selected_duration': duration,
         'start_date': start_date,
         'end_date': end_date,
+        #bago
     }
     
     return render(request, 'payroll_system/employee_profile.html', context)
@@ -1041,23 +1045,31 @@ def services_client(request):
     if service_id:
         request.session['selected_service_id'] = service_id
     
-    customer_form = CustomerForm()
-    vehicle_form = VehicleForm()
-
-    regions = list(Region.objects.all().values('regDesc', 'regCode'))
-    customers = Customer.objects.all()
     
     initial_data = {
         'region': 'REGION IX (ZAMBOANGA PENINSULA)',
-        'province': 'ZAMBOANGA DEL SUR', 
+        'province': 'ZAMBOANGA DEL SUR',
+        'city': 'ZAMBOANGA CITY'
     }
 
     customer_form = CustomerForm(initial=initial_data)
+    vehicle_form = VehicleForm()
+
+    regions = list(Region.objects.all().values('regDesc', 'regCode'))
+    
+    province = Province.objects.filter(provDesc='ZAMBOANGA DEL SUR').first()
+    
+    cities = []
+    if province:
+        cities = City.objects.filter(provCode=province.provCode).values('citymunDesc', 'citymunCode')
+    
+    customers = Customer.objects.all()
 
     context = {
         'customer_form': customer_form,
         'vehicle_form': vehicle_form,
         'regions': regions,
+        'cities': cities,
         'customers': customers,
         'should_clear_storage': True,
     }

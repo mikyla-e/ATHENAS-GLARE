@@ -86,10 +86,10 @@
                 <td class="text-center px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll_period.payment_date|date:"M d, Y" }}</td> 
                 <td class="text-center px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter] space-x-2">
                     <a href="{% url 'payroll_system:payroll_record' %}?payroll_id={{ payroll_period.payroll_period_id }}" class="font-bold hover:text-[#F8D146] duration-100">
-                        View
+                        VIEW
                     </a>
                     <a href="{% url 'payroll_system:payslip' payroll_period_id=payroll_period.payroll_period_id %}" class="font-bold hover:text-[#F8D146] duration-100">
-                        Print
+                        PRINT
                     </a>
                 </td>
             </tr>

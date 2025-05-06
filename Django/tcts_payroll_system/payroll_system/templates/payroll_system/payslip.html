@@ -6,6 +6,7 @@
 
 <!--head content-->
 {% block headcontent %}
+<link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 <style>
   /* Main styling */
   .payslip-container {
@@ -157,14 +158,15 @@
 <!--content-->
 {% block content %}
 <div class="flex flex-col ">
-  <h1 class="text-2xl font-bold mb-4 flex justify-end">Payslips for Period: {{ payroll_period.start_date|date:"M d, Y" }} to {{ payroll_period.end_date|date:"M d, Y" }}</h1>
+  <div class="flex justify-between">
+    <h1 class="text-2xl font-bold mb-4 flex justify-end">Payslips for Period: {{ payroll_period.start_date|date:"M d, Y" }} to {{ payroll_period.end_date|date:"M d, Y" }}</h1>
 
-  <div class=" flex justify-end print-button mb-4">
-    <button onclick="printPayslips()" 
-    class="bg-black text-[#f8d146] hover:bg-[#f8d146] hover:text-black hover:scale-105 font-bold cursor-pointer rounded-full px-6 py-3 w-[25%] transition-all duration-200"
-    id="button_2">
-    Print All Payslips
-    </button>
+    <div class=" flex justify-end print-button mb-4">
+      <button onclick="printPayslips()" 
+      id="button_2">
+      Print All Payslips
+      </button>
+    </div>
   </div>
 
   {% for record in payroll_records %}
@@ -172,7 +174,7 @@
   <div class="payslip-container shadow-lg/50 rounded-lg mb-10">
     <div class="mb-[20px] flex justify-between">
       <div>
-        <h1 class="text-4xl font-bold">Payslip</h1>
+        <h1 class="text-4xl font-bold mb-2">PAYSLIP</h1>
         <p>Tumaga Putik Rd. Zamboanga City</p>
         <p>09XX-XXX-XXXX</p>
         <p>Pay period: {{ payroll_period.start_date|date:"F j" }}-{{ payroll_period.end_date|date:"j, Y" }}</p>

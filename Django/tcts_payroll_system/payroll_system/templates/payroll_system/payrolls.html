@@ -2,7 +2,7 @@
 {% load static %}
 
 <!--title-->
-{% block title %}Payroll{% endblock %}
+{% block title %}Payroll Periods{% endblock %}
 
 <!--(optional)head content-->
 {% block headcontent %}
@@ -162,7 +162,7 @@
         <div class="w-full h-[2px] my-3 border border-2 border-[#1e1e1e40] rounded-full"></div>
     </div>
     
-    <div class="messages">
+    <div class="msg">
         {% for message in messages %}
         <p class="{% if message.tags %}{{ message.tags }}{% endif %} text-base sm:text-base my-2 font-[League Spartan] font-normal text-center">
             {{ message }}
@@ -200,7 +200,8 @@
                     <p class="text-[League Spartan] text-2xl font-bold text-nowrap">CURRENT PAYROLL</p>
                     <p class="hidden md:block text-[League Spartan] text-lg font-semibold text-[#1E1E1E80]">{{ current_payroll.get_payroll_status_display }}</p>
                 </div>
-                <div class="h-[30px]">
+                <div class="h-[30px] flex flex-row gap-2">
+                    <button id="button_1" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Print Payroll Report">PRINT</button>
                     <button id="confirm" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Confirm Payroll Period" onclick="confirmPayroll({{ current_payroll.payroll_period_id }})">CONFIRM PAYROLL</button>
                 </div>
             </div>
@@ -324,6 +325,7 @@
 <!--(optional)script-->
 {% block script %}
 <script>
+    console.log({{ messages|length }} + " messages found.")
     function confirmPayroll(payrollId) {
         const form = document.getElementById("confirm-payroll-form");
         const popup = document.getElementById("confirm-payroll-popup");
