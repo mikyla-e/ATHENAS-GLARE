@@ -220,6 +220,19 @@ def mark_attendance(employee, action):
     
     # For time_in action
     if action == 'time_in':
+        # Check if outside of work hours
+        if current_time < WORK_START_TIME:
+            return {
+                'status': 'warning',
+                'message': f'Cannot time in before {WORK_START_TIME.strftime("%I:%M %p")}. Work hours start at {WORK_START_TIME.strftime("%I:%M %p")}.'
+            }
+            
+        if current_time > WORK_END_TIME:
+            return {
+                'status': 'warning',
+                'message': f'Cannot time in after {WORK_END_TIME.strftime("%I:%M %p")}. Work hours end at {WORK_END_TIME.strftime("%I:%M %p")}.'
+            }
+            
         # Check if employee already has an active session
         today_attendance = Attendance.objects.filter(
             employee=employee, 
@@ -254,6 +267,11 @@ def mark_attendance(employee, action):
                 'time': current_time.strftime("%I:%M %p"),
                 'has_open_session': True
             }
+        except ValidationError as e:
+            return {
+                'status': 'warning',
+                'message': f'Validation error: {str(e)}'
+            }
         except Exception as e:
             return {
                 'status': 'error',
@@ -262,6 +280,13 @@ def mark_attendance(employee, action):
     
     # For time_out action
     elif action == 'time_out':
+        # Check if outside of work hours
+        if current_time > WORK_END_TIME:
+            return {
+                'status': 'warning',
+                'message': f'Cannot time out after {WORK_END_TIME.strftime("%I:%M %p")}. Work hours end at {WORK_END_TIME.strftime("%I:%M %p")}.'
+            }
+            
         try:
             # Find today's attendance record with an open session
             today_attendance = Attendance.objects.filter(
@@ -297,6 +322,11 @@ def mark_attendance(employee, action):
                 'has_open_session': False
             }
         
+        except ValidationError as e:
+            return {
+                'status': 'warning',
+                'message': f'Validation error: {str(e)}'
+            }
         except Exception as e:
             return {
                 'status': 'error',

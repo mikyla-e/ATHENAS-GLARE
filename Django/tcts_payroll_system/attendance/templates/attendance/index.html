@@ -640,6 +640,17 @@
                 confirmationTitle.textContent = title;
                 confirmationMessage.textContent = message;
                 attendanceAction = action;
+                
+                // Show "Yes/No" for action confirmations, "OK" for messages
+                if (action) {
+                    confirmYesBtn.textContent = "Yes";
+                    confirmNoBtn.textContent = "No";
+                    confirmNoBtn.style.display = "block";
+                } else {
+                    confirmYesBtn.textContent = "OK";
+                    confirmNoBtn.style.display = "none";
+                }
+                
                 confirmationDialog.classList.remove('hidden');
             }
             
@@ -664,12 +675,14 @@
             
             // Confirm button click handler
             confirmYesBtn.addEventListener('click', function() {
-                if (!recognizedEmployeeId || !attendanceAction) {
+                if (!attendanceAction) {
+                    // It's just a message dialog with OK button
                     hideConfirmationDialog();
                     resetRecognition();
                     return;
                 }
                 
+                // It's an action confirmation (like time_out)
                 recordAttendance(attendanceAction, recognizedEmployeeId);
                 hideConfirmationDialog();
             });
