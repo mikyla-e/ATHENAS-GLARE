@@ -517,18 +517,59 @@ def payroll_individual(request, employee_id):
 
 @login_required
 def payroll_history(request):
-    # Get all processed payroll periods
+    """View for displaying payroll history with date filtering"""
+    
+    # Get the filter period from request query parameters
+    filter_period = request.GET.get('filter_period', '')
+    
+    # Start with all processed payroll periods, ordered by most recent end date first
     processed_periods = PayrollPeriod.objects.filter(
         payroll_status=PayrollPeriod.PayrollStatus.PROCESSED
     ).order_by('-end_date')  # Most recent first
     
+    # Apply date filtering based on the selected period
+    today = timezone.now().date()
+    
+    if filter_period == 'this_week':
+        # Start of current week (Sunday)
+        start_of_week = today - timedelta(days=today.weekday())
+        processed_periods = processed_periods.filter(end_date__gte=start_of_week)
+        
+    elif filter_period == 'this_month':
+        start_of_month = today.replace(day=1)
+        processed_periods = processed_periods.filter(end_date__gte=start_of_month)
+        
+    elif filter_period == 'last_6_months':
+        six_months_ago = today - timedelta(days=180)
+        processed_periods = processed_periods.filter(end_date__gte=six_months_ago)
+        
+    elif filter_period == 'this_year':
+        start_of_year = today.replace(month=1, day=1)
+        processed_periods = processed_periods.filter(end_date__gte=start_of_year)
+        
+    elif filter_period == 'last_year':
+        last_year_start = today.replace(year=today.year-1, month=1, day=1)
+        last_year_end = today.replace(year=today.year-1, month=12, day=31)
+        processed_periods = processed_periods.filter(
+            end_date__gte=last_year_start,
+            start_date__lte=last_year_end
+        )
+    
+    # Calculate total net pay for each payroll period using your existing aggregate method
     for period in processed_periods:
         period.total_net_pay = period.payroll_records.aggregate(
             total=Sum('net_pay')
         )['total'] or 0
     
+    # Pagination (10 records per page)
+    from django.core.paginator import Paginator
+    paginator = Paginator(processed_periods, 10)
+    page = request.GET.get('page')
+    processed_periods = paginator.get_page(page)
+    
     context = {
         'payroll_periods': processed_periods,
+        'filter_period': filter_period,
     }
     
     return render(request, 'payroll_system/payroll_history.html', context)
