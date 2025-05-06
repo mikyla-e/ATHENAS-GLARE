@@ -2,6 +2,7 @@ import base64
 import cv2
 import io
 import numpy as np
+import logging
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -10,8 +11,10 @@ from payroll_system.models import Employee
 from .face_recognition_attendance import process_frame_recognition, mark_attendance, check_attendance_status, get_filtered_attendance
 from PIL import Image
 
-# Create your views here.
+# Set up logging
+logger = logging.getLogger(__name__)
 
+# Create your views here.
 @csrf_exempt
 def attendance(request):
     if request.method == "GET":
@@ -26,21 +29,33 @@ def attendance(request):
                 image_data = request.POST.get('image_data')
                 
                 # Remove the data:image/jpeg;base64, part
-                image_data = image_data.split(',')[1]
+                if ',' in image_data:
+                    image_data = image_data.split(',')[1]
                 
-                # Convert base64 to image
-                image_bytes = base64.b64decode(image_data)
-                image = Image.open(io.BytesIO(image_bytes))
-                
-                # Convert to OpenCV format
-                opencv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-                
-                # Process face recognition on this frame
-                result = process_frame_recognition(opencv_image)
-                
-                return JsonResponse(result)
+                try:
+                    # Convert base64 to image
+                    image_bytes = base64.b64decode(image_data)
+                    image = Image.open(io.BytesIO(image_bytes))
+                    
+                    # Convert to OpenCV format - support both RGB and RGBA
+                    np_image = np.array(image)
+                    if len(np_image.shape) == 3 and np_image.shape[2] == 4:
+                        # RGBA image, convert to RGB
+                        opencv_image = cv2.cvtColor(np_image, cv2.COLOR_RGBA2BGR)
+                    else:
+                        # RGB image
+                        opencv_image = cv2.cvtColor(np_image, cv2.COLOR_RGB2BGR)
+                    
+                    # Process face recognition on this frame
+                    result = process_frame_recognition(opencv_image)
+                    
+                    return JsonResponse(result)
+                except Exception as e:
+                    logger.error(f"Error processing image: {str(e)}")
+                    return JsonResponse({'status': 'error', 'message': f"Error processing image: {str(e)}"})
             
             except Exception as e:
+                logger.error(f"Error in image data handling: {str(e)}")
                 return JsonResponse({'status': 'error', 'message': str(e)})
         
         # For checking attendance status with optional date filtering

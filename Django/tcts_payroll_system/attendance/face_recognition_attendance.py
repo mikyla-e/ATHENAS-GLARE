@@ -4,9 +4,7 @@ import face_recognition
 from django.core.exceptions import ValidationError
 from datetime import date, datetime, time, timedelta
 from functools import lru_cache
-from payroll_system.models import Employee, Attendance
-from django.utils import timezone
-from django.core.exceptions import ValidationError    
+from payroll_system.models import Employee, Attendance 
 
 # Cache the face encodings to avoid reloading them for every frame
 @lru_cache(maxsize=1)
@@ -15,48 +13,72 @@ def load_registered_faces():
     employee_names = {}
     employees = Employee.objects.all()
     
+    print("Loading registered faces...")
+    
     for employee in employees:
         if employee.employee_image:
             try:
                 image_path = employee.employee_image.path
                 
                 if os.path.exists(image_path):
-                    # Reduce image size for faster processing before encoding
+                    # Load the image directly without resizing at first
                     image = cv2.imread(image_path)
                     if image is None:
+                        print(f"Failed to load image for employee {employee.employee_id}")
                         continue
                     
-                    # Resize image to 1/4 size for faster processing
-                    small_image = cv2.resize(image, (0, 0), fx=0.25, fy=0.25)
-                    rgb_small_image = cv2.cvtColor(small_image, cv2.COLOR_BGR2RGB)
+                    # Convert to RGB (face_recognition uses RGB)
+                    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                     
-                    # Try to detect faces first - use HOG model for speed
-                    face_locations = face_recognition.face_locations(rgb_small_image, model="hog")
+                    # Try to detect faces using HOG model
+                    face_locations = face_recognition.face_locations(rgb_image, model="hog")
                     
-                    if face_locations:
-                        # Only encode if we actually found a face
-                        encodings = face_recognition.face_encodings(rgb_small_image, face_locations)
+                    if not face_locations:
+                        print(f"No face detected in image for employee {employee.employee_id}")
+                        # Try using CNN model as a fallback (more accurate but slower)
+                        face_locations = face_recognition.face_locations(rgb_image, model="cnn")
+                        
+                        if not face_locations:
+                            print(f"Still no face detected using CNN model for employee {employee.employee_id}")
+                            continue
+                    
+                    # Get the largest face by area
+                    largest_face = max(face_locations, key=lambda rect: (rect[2]-rect[0])*(rect[3]-rect[1]))
+                    
+                    # Create encoding
+                    encodings = face_recognition.face_encodings(rgb_image, [largest_face])
 
-                        if len(encodings) > 0:
-                            employee_id = str(employee.employee_id)
-                            registered_faces[employee_id] = encodings[0]
-                            employee_names[employee_id] = f"{employee.first_name} {employee.last_name}"
-                            
-            except Exception:
-                pass
-
+                    if encodings:
+                        employee_id = str(employee.employee_id)
+                        registered_faces[employee_id] = encodings[0]
+                        employee_names[employee_id] = f"{employee.first_name} {employee.last_name}"
+                        print(f"Successfully loaded face for {employee_names[employee_id]}")
+                    else:
+                        print(f"Failed to encode face for employee {employee.employee_id}")
+                else:
+                    print(f"Image path does not exist: {image_path}")
+            except Exception as e:
+                print(f"Error processing image for employee {employee.employee_id}: {str(e)}")
+    
+    print(f"Loaded {len(registered_faces)} face encodings")
     return registered_faces, employee_names
 
 def compare_faces(known_encoding, captured_encoding):
-    # Returns True if the face matches, False otherwise.
-    # The tolerance value controls strictness: lower = stricter (0.6 is lenient)
-    match = face_recognition.compare_faces([known_encoding], captured_encoding, tolerance=0.55)[0]
-    
-    # For additional security, also check the distance
+    """
+    Compare face encodings with improved matching logic
+    """
+    # Calculate distance between face encodings
     distance = face_recognition.face_distance([known_encoding], captured_encoding)[0]
     
-    # Return True only if the built-in comparison says it's a match AND the distance is small enough
-    return match and distance < 0.6  # Slightly more lenient for web camera
+    # Use a more lenient tolerance for better matching
+    # 0.6 is more lenient than the default 0.5
+    tolerance = 0.6
+    
+    # Use built-in compare_faces function
+    match = face_recognition.compare_faces([known_encoding], captured_encoding, tolerance=tolerance)[0]
+    
+    # Return match status and distance (for debugging)
+    return match, distance
 
 def check_attendance_status(employee, start_date=None, end_date=None):
     """
@@ -288,21 +310,60 @@ def mark_attendance(employee, action):
 
 # Process a single frame from the web interface
 def process_frame_recognition(frame):
-    # Resize frame for faster processing
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    """
+    Process a video frame to recognize faces with improved detection
+    """
+    # Debug flag
+    debug = True
     
-    # Convert to RGB for face_recognition library
-    rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+    # Make sure we have a valid frame
+    if frame is None or frame.size == 0:
+        return {'status': 'error', 'message': 'Invalid frame received'}
     
-    # Find faces in the frame - use HOG model for speed
-    face_locations = face_recognition.face_locations(rgb_small_frame, model="hog")
+    # Increase detection reliability by trying multiple sizes
+    # First try normal size
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    face_locations = face_recognition.face_locations(rgb_frame, model="hog")
     
+    # If no face detected, try with smaller resize
     if not face_locations:
-        return {'status': 'waiting', 'message': 'No face detected'}
+        if debug:
+            print("No face detected at normal size, trying smaller size")
+        small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+        rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+        face_locations = face_recognition.face_locations(rgb_small_frame, model="hog")
+        
+        # If still no face detected, try with different size
+        if not face_locations:
+            if debug:
+                print("No face detected at half size, trying quarter size")
+            smaller_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+            rgb_smaller_frame = cv2.cvtColor(smaller_frame, cv2.COLOR_BGR2RGB)
+            face_locations = face_recognition.face_locations(rgb_smaller_frame, model="hog")
+            
+            if face_locations:
+                if debug:
+                    print(f"Face detected at quarter size: {face_locations}")
+                # Use the quarter size frame for encoding
+                frame_to_use = rgb_smaller_frame
+            else:
+                return {'status': 'waiting', 'message': 'No face detected'}
+        else:
+            if debug:
+                print(f"Face detected at half size: {face_locations}")
+            # Use the half size frame for encoding
+            frame_to_use = rgb_small_frame
+    else:
+        if debug:
+            print(f"Face detected at normal size: {face_locations}")
+        # Use the normal size frame for encoding
+        frame_to_use = rgb_frame
     
-    # Process the first (largest) face
-    face_location = face_locations[0]
-    face_encodings = face_recognition.face_encodings(rgb_small_frame, [face_location])
+    # Get the largest face by area
+    largest_face = max(face_locations, key=lambda rect: (rect[2]-rect[0])*(rect[3]-rect[1]))
+    
+    # Try to encode the face
+    face_encodings = face_recognition.face_encodings(frame_to_use, [largest_face])
     
     if not face_encodings:
         return {'status': 'waiting', 'message': 'Cannot encode face'}
@@ -312,14 +373,29 @@ def process_frame_recognition(frame):
     # Load face database (uses cached version after first call)
     registered_faces, employee_names = load_registered_faces()
     
+    if not registered_faces:
+        return {'status': 'error', 'message': 'No registered faces available'}
+    
     # Check against all registered faces
+    best_match = None
+    best_distance = 1.0  # Lower is better, 0 is perfect match
+    
     for employee_id, known_encoding in registered_faces.items():
-        if compare_faces(known_encoding, face_encoding):
-            # Match found
-            return {
-                'status': 'recognized',
-                'employee_id': employee_id,
-                'name': employee_names[employee_id],
-            }
+        match, distance = compare_faces(known_encoding, face_encoding)
+        
+        if debug:
+            print(f"Employee {employee_id}: Match={match}, Distance={distance}")
+        
+        if match and distance < best_distance:
+            best_match = employee_id
+            best_distance = distance
+    
+    if best_match:
+        return {
+            'status': 'recognized',
+            'employee_id': best_match,
+            'name': employee_names[best_match],
+            'confidence': 1 - best_distance  # Convert distance to confidence (0-1)
+        }
     
     return {'status': 'unknown', 'message': 'Face not recognized'}

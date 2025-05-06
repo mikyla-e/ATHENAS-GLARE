@@ -56,6 +56,29 @@
             scale: 1.05;
             transition: 0.5s;
         }
+        
+        /* Debug panel styles */
+        #debug-panel {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        /* Face frame indicator */
+        .face-indicator {
+            position: absolute;
+            border: 2px solid green;
+            z-index: 20;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -73,6 +96,8 @@
 
                     <div class="absolute z-10 w-[45%] h-[75%] bg-white mix-blend-overlay" style="border-radius: 100%/90%;"></div>
                     
+                    <!-- Face indicator -->
+                    <div id="face-box" class="face-indicator"></div>
                 </div>
 
                 <!-- Status overlay -->
@@ -87,6 +112,7 @@
                     <div class="bg-gradient-to-r from-[#5c4b10C4] to-[#4f380bC4] text-white p-6 rounded-lg text-center text-[League Spartan]">
                         <div id="recognized-name" class="text-3xl font-bold mb-4"></div>
                         <div id="recognition-message" class="text-xl"></div>
+                        <div id="recognition-confidence" class="text-lg mt-2 font-light"></div>
                     </div>
                 </div>
                 
@@ -98,6 +124,13 @@
                         <button id="confirm-yes" class="bg-[#F8D146] text-white px-5 py-2.5 rounded font-bold transition-all duration-300">Yes</button>
                         <button id="confirm-no" class="bg-red-500 text-white px-5 py-2.5 rounded font-bold transition-all duration-300">No</button>
                     </div>
+                </div>
+                
+                <!-- Debug panel -->
+                <div id="debug-panel">
+                    <div>Debug Information:</div>
+                    <div id="debug-info">No data</div>
+                    <button id="toggle-debug" class="mt-2 px-2 py-1 bg-gray-600 text-xs rounded">Hide Debug</button>
                 </div>
             </div>
         </div>
@@ -205,6 +238,7 @@
             const recognitionOverlay = document.getElementById('recognition-overlay');
             const recognizedName = document.getElementById('recognized-name');
             const recognitionMessage = document.getElementById('recognition-message');
+            const recognitionConfidence = document.getElementById('recognition-confidence');
             const todayHistory = document.getElementById('today-history');
             const previousHistory = document.getElementById('previous-history');
             const confirmationDialog = document.getElementById('confirmation-dialog');
@@ -212,6 +246,10 @@
             const confirmationMessage = document.getElementById('confirmation-message');
             const confirmYesBtn = document.getElementById('confirm-yes');
             const confirmNoBtn = document.getElementById('confirm-no');
+            const faceBox = document.getElementById('face-box');
+            const debugPanel = document.getElementById('debug-panel');
+            const debugInfo = document.getElementById('debug-info');
+            const toggleDebugBtn = document.getElementById('toggle-debug');
             
             // Date filter elements
             const startDateInput = document.getElementById('start-date');
@@ -226,10 +264,29 @@
             let consecutiveMatches = 0;
             let attendanceAction = null;
             let currentFilterDates = { startDate: null, endDate: null };
+            let lastFaceLocation = null;
+            let debugMode = false; // Debug mode flag
             
             // Constants
             const REQUIRED_MATCHES = 3;
             const PROCESS_INTERVAL = 300;
+            
+            // Show or hide debug panel
+            toggleDebugBtn.addEventListener('click', function() {
+                debugMode = !debugMode;
+                debugPanel.style.display = debugMode ? 'block' : 'none';
+                this.textContent = debugMode ? 'Hide Debug' : 'Show Debug';
+            });
+            
+            // Add keyboard shortcut for debug mode (Ctrl+D)
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'd') {
+                    e.preventDefault();
+                    debugMode = !debugMode;
+                    debugPanel.style.display = debugMode ? 'block' : 'none';
+                    toggleDebugBtn.textContent = debugMode ? 'Hide Debug' : 'Show Debug';
+                }
+            });
             
             // Initialize webcam with cross-device support
             function initializeCamera() {
@@ -409,14 +466,46 @@
                     // Get image data for processing
                     const imageData = canvas.toDataURL('image/jpeg', 0.7);
                     
+                    // Debug info
+                    if (debugMode) {
+                        debugInfo.innerHTML = `
+                            <div>Video dimensions: ${video.videoWidth}x${video.videoHeight}</div>
+                            <div>Canvas dimensions: ${canvas.width}x${canvas.height}</div>
+                            <div>Processing: ${isProcessing}</div>
+                            <div>Matches: ${consecutiveMatches}/${REQUIRED_MATCHES}</div>
+                        `;
+                    }
+                    
                     // Send to server for face recognition
                     $.ajax({
                         url: window.location.href,
                         type: 'POST',
                         data: {
-                            'image_data': imageData
+                            'image_data': imageData,
+                            'debug': debugMode
                         },
                         success: function(response) {
+                            // Update debug info with response data
+                            if (debugMode && response.debug_info) {
+                                debugInfo.innerHTML += `
+                                    <div class="mt-2 border-t border-gray-600 pt-2">
+                                        <div>Status: ${response.status}</div>
+                                        <div>Message: ${response.message || 'N/A'}</div>
+                                        <div>Face detected: ${response.face_detected ? 'Yes' : 'No'}</div>
+                                        ${response.confidence ? '<div>Confidence: ' + (response.confidence * 100).toFixed(2) + '%</div>' : ''}
+                                    </div>
+                                `;
+                                
+                                // Update face box if face location provided
+                                if (response.face_location) {
+                                    lastFaceLocation = response.face_location;
+                                    updateFaceBox(response.face_location);
+                                } else if (response.status === 'waiting') {
+                                    // Hide face box if no face detected
+                                    faceBox.style.display = 'none';
+                                }
+                            }
+                            
                             handleRecognitionResponse(response);
                             isProcessing = false;
                             
@@ -440,6 +529,45 @@
                 }
             }
             
+            // Update face box position
+            function updateFaceBox(location) {
+                // location format: [top, right, bottom, left]
+                if (!location || location.length !== 4) return;
+                
+                // Scale face location to video display size
+                const videoElement = video;
+                const videoWidth = videoElement.videoWidth;
+                const videoHeight = videoElement.videoHeight;
+                
+                const displayWidth = videoElement.offsetWidth;
+                const displayHeight = videoElement.offsetHeight;
+                
+                const scaleX = displayWidth / videoWidth;
+                const scaleY = displayHeight / videoHeight;
+                
+                // Calculate position
+                const top = location[0] * scaleY;
+                const right = location[1] * scaleX;
+                const bottom = location[2] * scaleY;
+                const left = location[3] * scaleX;
+                
+                // Apply styles
+                faceBox.style.top = top + 'px';
+                faceBox.style.right = (displayWidth - right) + 'px';
+                faceBox.style.bottom = (displayHeight - bottom) + 'px';
+                faceBox.style.left = left + 'px';
+                faceBox.style.display = 'block';
+                
+                // Color based on match status
+                if (consecutiveMatches > 0) {
+                    const matchRatio = consecutiveMatches / REQUIRED_MATCHES;
+                    const color = `rgba(0, ${Math.floor(255 * matchRatio)}, 0, 0.7)`;
+                    faceBox.style.borderColor = color;
+                } else {
+                    faceBox.style.borderColor = 'rgba(255, 165, 0, 0.7)'; // Orange
+                }
+            }
+            
             // Handle recognition response
             function handleRecognitionResponse(response) {
                 switch(response.status) {
@@ -459,6 +587,16 @@
                             isPaused = true;
                             recognizedName.textContent = response.name;
                             recognitionMessage.textContent = "Face matched";
+                            
+                            // Show confidence level if available
+                            if (response.confidence) {
+                                const confidencePct = (response.confidence * 100).toFixed(1);
+                                recognitionConfidence.textContent = `Match confidence: ${confidencePct}%`;
+                                recognitionConfidence.style.display = 'block';
+                            } else {
+                                recognitionConfidence.style.display = 'none';
+                            }
+                            
                             recognitionOverlay.classList.remove('hidden');
                             
                             setTimeout(function() {
@@ -573,6 +711,7 @@
                 recognizedEmployeeId = null;
                 consecutiveMatches = 0;
                 isPaused = false;
+                faceBox.style.display = 'none';
                 processFrame();
             }
             
@@ -710,3 +849,4 @@
         });
     </script>
 </body>
+</html>
