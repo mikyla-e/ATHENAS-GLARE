@@ -7,25 +7,23 @@
 <!--(optional)head content-->
 {% block headcontent %}
 <style>
-    .background {
-        transition: opacity 0.3s ease;
-        z-index: 50;
+    td{
+        border-bottom: 1px solid #cac5c5;
     }
 
-    .edit_incentives_popup {
-        transition: opacity 0.3s ease;
-        z-index: 60;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    th:first-child, td:first-child{
+        border-left: none;
     }
 
-    .background.show, 
-    .edit_incentives_popup.show {
-        visibility: visible !important;
-        opacity: 1 !important;
+    tr:first-child th {
+        border-top: none;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
     }
 </style>
 
-<link rel="stylesheet" href="{% static 'css/payroll_individual.css'%}">
 <link rel="stylesheet" href="{% static 'css/table.css'%}">
 <link rel="stylesheet" href="{% static 'css/default_design.css' %}">
 {% endblock %}
@@ -51,11 +49,11 @@
 </div>
 {% endif %}
 
-<div class="size-full flex flex-col">
-    <div class="w-full flex justify-between">
+<div class="size-full flex flex-col my-3 gap-3">
+    <div class="w-full h-[40px] flex justify-between items-center">
         <p class="mx-3 text-[League Spartan] text-3xl font-bold">HISTORY</p>
 
-        <select>
+        <select class="h-full">
             <option value="">This Week</option>
             <option value="">This Month</option>
             <option value="">Last 6 Months Ago</option>
@@ -65,30 +63,34 @@
         </select> 
     </div>
 
-    <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-md/10">
+    <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
         <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
             <tr class="">
-                <th class="p-2 text-lg font-[League Spartan]">TYPE</th>
-                <th class="p-2 text-lg font-[League Spartan]">START</th>
-                <th class="p-2 text-lg font-[League Spartan]">END</th>
-                <th class="p-2 text-lg font-[League Spartan]">STATUS</th>
-                <th class="p-2 text-lg font-[League Spartan]">TOTAL NET PAY</th>
-                <th class="p-2 text-lg font-[League Spartan]">PAYMENT DATE</th>
+                <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">TYPE</th>
+                <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">START</th>
+                <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">END</th>
+                <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">STATUS</th>
+                <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">TOTAL NET PAY</th>
+                <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">PAYMENT DATE</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             {% for payroll_period in payroll_periods %}
             <tr id="payroll-data">
-                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.get_type_display }}</td>
-                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.start_date|date:"M d, Y" }}</td>
-                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.end_date|date:"M d, Y" }}</td>
-                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.get_payroll_status_display }}</td>
-                <td class="p-2 text-sm font-[Inter]">₱{{ payroll_period.total_net_pay|floatformat:2 }}</td>
-                <td class="p-2 text-sm font-[Inter]">{{ payroll_period.payment_date|date:"M d, Y" }}</td> 
-                <td>
-                    <a href="{% url 'payroll_system:payroll_record' %}?payroll_id={{ payroll_period.payroll_period_id }}" 
-                       class="text-blue-600 hover:text-blue-800 hover:underline">View</a>
+                <td class="text-center px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll_period.get_type_display }}</td>
+                <td class="text-center px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll_period.start_date|date:"M d, Y" }}</td>
+                <td class="text-center px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll_period.end_date|date:"M d, Y" }}</td>
+                <td class="text-center px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll_period.get_payroll_status_display }}</td>
+                <td class="text-center px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">₱{{ payroll_period.total_net_pay|floatformat:2 }}</td>
+                <td class="text-center px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll_period.payment_date|date:"M d, Y" }}</td> 
+                <td class="text-center px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter] space-x-2">
+                    <a href="{% url 'payroll_system:payroll_record' %}?payroll_id={{ payroll_period.payroll_period_id }}" class="font-bold hover:text-[#F8D146] duration-100">
+                        View
+                    </a>
+                    <a href="" class="font-bold hover:text-[#F8D146] duration-100">
+                        Print
+                    </a>
                 </td>
             </tr>
             {% empty %}
