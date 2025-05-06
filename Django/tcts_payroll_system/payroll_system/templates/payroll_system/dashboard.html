@@ -357,124 +357,205 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/attendance_chart.js' %}"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const donutChart = document.getElementById('donut');
-        let attendanceChart;
+        // Get the canvas element
+        const donutCanvas = document.getElementById('donut');
+        const periodToggles = document.querySelectorAll('.period-toggle');
+        const attendancePeriodDisplay = document.getElementById('attendance-period');
         
-        // Function to load attendance data and update chart
-        function loadAttendanceData(period) {
-            fetch(`/api/attendance-stats/?period=${period}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Update period display
-                    document.getElementById('attendance-period').innerText = data.period_display;
-                    
-                    // If chart exists, destroy it before creating a new one
-                    if (attendanceChart) {
-                        attendanceChart.destroy();
-                    }
-                    
-                    // Create new chart with the data
-                    attendanceChart = new Chart(donutChart, {
-                        type: "doughnut",
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                backgroundColor: ["#F8D146","#DC4646"],
-                                data: data.data,
-                                borderWidth: 0
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            cutout: "40%",
-                            layout: {
-                                padding: 0
-                            },
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        boxWidth: 15,
-                                        padding: 5,
-                                        font: {
-                                            size: 14
-                                        }
-                                    }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            const label = context.label || '';
-                                            const value = context.raw || 0;
-                                            const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                            return `${label}: ${value} (${percentage}%)`;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching attendance data:', error);
-                    
-                    // Create fallback chart with default data if fetch fails
-                    if (attendanceChart) {
-                        attendanceChart.destroy();
-                    }
-                    
-                    attendanceChart = new Chart(donutChart, {
-                        type: "doughnut",
-                        data: {
-                            labels: ["Present", "Absent"],
-                            datasets: [{
-                                backgroundColor: ["#F8D146","#DC4646"],
-                                data: [2, 1],  // Default fallback data
-                                borderWidth: 0
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            cutout: "40%",
-                            layout: {
-                                padding: 0
-                            },
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        boxWidth: 15,
-                                        padding: 5,
-                                        font: {
-                                            size: 14
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                });
+        // Set up Chart.js donut chart
+        let attendanceChart = null;
+        
+        // Global state 
+        let activePeriod = 'day'; // Default is daily view
+        
+        // Colors for chart
+        const chartColors = {
+            present: '#F8D146', // Yellow for present
+            absent: '#DC4646'   // Red for absent
+        };
+        
+        // Function to fetch attendance data from API
+        async function fetchAttendanceData(period) {
+            try {
+                // Updated endpoint for attendance data
+                const endpoint = `/api/attendance-stats/?period=${period}`;
+                const response = await fetch(endpoint);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Received attendance data:', data); // Debug line
+                return data;
+            } catch (error) {
+                console.error('Error fetching attendance data:', error);
+                // Return default data in case of error
+                return {
+                    period_display: capitalizeFirstLetter(period),
+                    labels: ['Present', 'Absent'],
+                    data: [0, 0] // Default to zeros instead of arbitrary values
+                };
+            }
         }
         
-        // Add click event listeners to period toggle buttons
-        document.querySelectorAll('.period-toggle').forEach(button => {
-            button.addEventListener('click', function() {
-                // Update button styles
-                document.querySelectorAll('.period-toggle').forEach(btn => {
-                    btn.classList.remove('bg-[#F8D146]');
-                    btn.classList.add('bg-[#E1E1E1]');
-                });
-                this.classList.remove('bg-[#E1E1E1]');
-                this.classList.add('bg-[#F8D146]');
+        // Helper function to capitalize first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        // Function to update chart with new data
+        function updateChart(data) {
+            // Validate data structure
+            if (!data || !Array.isArray(data.data) || !Array.isArray(data.labels)) {
+                console.error('Invalid data format received:', data);
+                data = {
+                    period_display: capitalizeFirstLetter(activePeriod),
+                    labels: ['Present', 'Absent'],
+                    data: [0, 0]
+                };
+            }
+            
+            // Destroy existing chart if it exists
+            if (attendanceChart) {
+                attendanceChart.destroy();
+            }
+            
+            // Update period display if the element exists
+            if (attendancePeriodDisplay) {
+                attendancePeriodDisplay.innerText = data.period_display || capitalizeFirstLetter(activePeriod);
+            }
+            
+            // Create new chart
+            attendanceChart = new Chart(donutCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data,
+                        backgroundColor: [chartColors.present, chartColors.absent],
+                        borderWidth: 0,
+                        hoverOffset: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 15,
+                                font: {
+                                    family: 'Roboto',
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((acc, current) => acc + current, 0);
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    beforeDraw: function(chart) {
+                        const width = chart.width;
+                        const height = chart.height;
+                        const ctx = chart.ctx;
+                        
+                        ctx.restore();
+                        
+                        // Total count
+                        const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+                        
+                        // Font settings for total
+                        ctx.font = 'bold 20px Roboto';
+                        ctx.textBaseline = 'middle';
+                        ctx.textAlign = 'center';
+                        ctx.fillStyle = '#1E1E1E';
+                        
+                        // Draw total number
+                        ctx.fillText(total, width / 2, height / 2 - 10);
+                        
+                        // Font settings for "Total" label
+                        ctx.font = '12px Roboto';
+                        ctx.fillStyle = '#1E1E1ECC';
+                        
+                        // Draw "Total" label
+                        ctx.fillText('Total', width / 2, height / 2 + 10);
+                        
+                        ctx.save();
+                    }
+                }]
+            });
+        }
+        
+        // Function to initialize dashboard with data
+        async function initializeAttendanceChart(period) {
+            // Update active toggle button
+            periodToggles.forEach(toggle => {
+                if (toggle.dataset.period === period) {
+                    toggle.classList.remove('bg-[#E1E1E1]');
+                    toggle.classList.add('bg-[#F8D146]');
+                } else {
+                    toggle.classList.remove('bg-[#F8D146]');
+                    toggle.classList.add('bg-[#E1E1E1]');
+                }
+            });
+            
+            // Show loading state (optional)
+            if (attendancePeriodDisplay) {
+                attendancePeriodDisplay.innerText = 'Loading...';
+            }
+            
+            try {
+                // Fetch data for the selected period
+                const data = await fetchAttendanceData(period);
                 
-                // Load data for selected period
-                loadAttendanceData(this.dataset.period);
+                // Update chart with new data
+                updateChart(data);
+            } catch (error) {
+                console.error('Failed to initialize attendance chart:', error);
+                // Update chart with default data
+                updateChart({
+                    period_display: capitalizeFirstLetter(period),
+                    labels: ['Present', 'Absent'],
+                    data: [0, 0]
+                });
+            }
+        }
+        
+        // Add event listeners to period toggle buttons
+        periodToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const period = this.dataset.period;
+                activePeriod = period;
+                initializeAttendanceChart(period);
             });
         });
         
-        // Load initial data for day period
-        loadAttendanceData('day');
+        // Initialize with default period (day)
+        initializeAttendanceChart(activePeriod);
+        
+        // Refresh data periodically (every 5 minutes)
+        setInterval(function() {
+            initializeAttendanceChart(activePeriod);
+        }, 300000); // 5 minutes
     });
 </script>
 <script>
