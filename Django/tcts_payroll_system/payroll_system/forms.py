@@ -671,14 +671,37 @@ class CustomerForm(forms.ModelForm):
     middle_name = forms.CharField(widget=forms.TextInput(attrs={'class': ''}), required=False)
     last_name = forms.CharField(widget=forms.TextInput(attrs={'class': ''}))
     contact_number = forms.CharField(widget=forms.TextInput(attrs={'class': '', 'type': 'tel'}))
-    region = forms.CharField(label='Region', widget=forms.TextInput(attrs={'class': '', 'id': 'region-dropdown', 'list': 'region-list', 
-                             'autocomplete': 'off'}))
-    province = forms.CharField(label='Province', widget=forms.TextInput(attrs={'class': '', 'id': 'province-dropdown', 'list': 'province-list',
-                               'autocomplete': 'off'}))
-    city = forms.CharField(label='City', widget=forms.TextInput(attrs={'class': '', 'id': 'city-dropdown', 'list': 'city-list', 
-                           'autocomplete': 'off'}))
-    barangay = forms.CharField(label='Barangay', widget=forms.TextInput(attrs={'class': '', 'id': 'barangay-dropdown', 'list': 'barangay-list', 
-                               'autocomplete': 'off'}))
+    
+    # Keep visible fields but with initial values
+    region = forms.CharField(label='Region', widget=forms.TextInput(attrs={
+        'class': '', 
+        'id': 'region-dropdown', 
+        'list': 'region-list',
+        'autocomplete': 'off',
+        'readonly': 'readonly'  # Make it read-only
+    }))
+    province = forms.CharField(label='Province', widget=forms.TextInput(attrs={
+        'class': '', 
+        'id': 'province-dropdown', 
+        'list': 'province-list',
+        'autocomplete': 'off',
+        'readonly': 'readonly'  # Make it read-only
+    }))
+    city = forms.CharField(label='City', widget=forms.TextInput(attrs={
+        'class': '', 
+        'id': 'city-dropdown', 
+        'list': 'city-list',
+        'autocomplete': 'off',
+        'readonly': 'readonly'  # Make it read-only
+    }))
+    
+    # Barangay is user-editable
+    barangay = forms.CharField(label='Barangay', widget=forms.TextInput(attrs={
+        'class': '', 
+        'id': 'barangay-dropdown', 
+        'list': 'barangay-list', 
+        'autocomplete': 'off'
+    }))
     
     class Meta:
         model = Customer
@@ -715,116 +738,63 @@ class CustomerForm(forms.ModelForm):
     def clean_contact_number(self):
         return self.validate_contact_number(self.cleaned_data.get('contact_number', ''))
     
-    def clean_region(self):
-        region_name = self.cleaned_data.get('region')
-        if not region_name:
-            raise forms.ValidationError("Region is required.")
-            
-        region = Region.objects.filter(regDesc=region_name).first()
-        if not region:
-            raise forms.ValidationError("Please select a valid region.")
-            
-        return region_name
-    
-    def clean_province(self):
-        province_name = self.cleaned_data.get('province')
-        region_name = self.cleaned_data.get('region')
-        
-        if not province_name:
-            raise forms.ValidationError("Province is required.")
-            
-        if region_name:
-            region = Region.objects.filter(regDesc=region_name).first()
-            if region:
-                province = Province.objects.filter(
-                    provDesc=province_name,
-                    regCode=region.regCode
-                ).first()
-                
-                if not province:
-                    raise forms.ValidationError("Province must belong to the selected region.")
-        
-        return province_name
-    
-    def clean_city(self):
-        city_name = self.cleaned_data.get('city')
-        province_name = self.cleaned_data.get('province')
-        
-        if not city_name:
-            raise forms.ValidationError("City is required.")
-            
-        if province_name:
-            province = Province.objects.filter(provDesc=province_name).first()
-            if province:
-                city = City.objects.filter(
-                    citymunDesc=city_name,
-                    provCode=province.provCode
-                ).first()
-                
-                if not city:
-                    raise forms.ValidationError("City must belong to the selected province.")
-        
-        return city_name
-    
     def clean_barangay(self):
         barangay_name = self.cleaned_data.get('barangay')
-        city_name = self.cleaned_data.get('city')
         
         if not barangay_name:
             raise forms.ValidationError("Barangay is required.")
             
-        if city_name:
-            city = City.objects.filter(citymunDesc=city_name).first()
-            if city:
-                barangay = Barangay.objects.filter(
-                    brgyDesc=barangay_name,
-                    citymunCode=city.citymunCode
-                ).first()
-                
-                if not barangay:
-                    raise forms.ValidationError("Barangay must belong to the selected city.")
+        # Get the predefined city
+        city = City.objects.filter(citymunDesc='ZAMBOANGA CITY').first()
+        
+        if city:
+            barangay = Barangay.objects.filter(
+                brgyDesc=barangay_name,
+                citymunCode=city.citymunCode
+            ).first()
+            
+            if not barangay:
+                raise forms.ValidationError("Please select a valid barangay in ZAMBOANGA CITY.")
         
         return barangay_name
     
     def clean(self):
         cleaned_data = super().clean()
-
-        required_fields = [
-            'first_name', 'last_name', 'contact_number', 'region', 'province', 'city', 'barangay'
-        ]
+        
+        # Only validate specific required fields since region, province, and city are pre-filled
+        required_fields = ['first_name', 'last_name', 'contact_number', 'barangay']
         
         if any(cleaned_data.get(field) in [None, ''] for field in required_fields):
-            raise forms.ValidationError("All fields must be filled.")
+            raise forms.ValidationError("All required fields must be filled.")
         
         return cleaned_data
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # If we have initial data for city, make sure it's preserved
-        if 'initial' in kwargs and 'city' in kwargs['initial']:
-            # Store the initial city value
-            self._initial_city = kwargs['initial']['city']
-            
-            # If this is being rendered as an unbound form (GET request)
-            if not self.is_bound and hasattr(self, '_initial_city'):
-                # Set the initial value for city
-                self.initial['city'] = self._initial_city
+        # Set default values
+        self.fields['region'].initial = 'REGION IX (ZAMBOANGA PENINSULA)'
+        self.fields['province'].initial = 'ZAMBOANGA DEL SUR'
+        self.fields['city'].initial = 'ZAMBOANGA CITY'
+        
+        # Generate readonly attribute for admin UI
+        self.fields['region'].widget.attrs['readonly'] = True 
+        self.fields['province'].widget.attrs['readonly'] = True
+        self.fields['city'].widget.attrs['readonly'] = True
 
     def save(self, commit=True):
         customer = super().save(commit=False)
         
-        # Set location fields based on validated data
-        region_name = self.cleaned_data.get('region')
-        province_name = self.cleaned_data.get('province')
-        city_name = self.cleaned_data.get('city')
-        barangay_name = self.cleaned_data.get('barangay')
+        # Get the pre-defined location objects
+        region = Region.objects.filter(regDesc='REGION IX (ZAMBOANGA PENINSULA)').first()
+        province = Province.objects.filter(provDesc='ZAMBOANGA DEL SUR', regCode=region.regCode).first()
+        city = City.objects.filter(citymunDesc='ZAMBOANGA CITY', provCode=province.provCode).first()
         
-        region = Region.objects.filter(regDesc=region_name).first()
-        province = Province.objects.filter(provDesc=province_name, regCode=region.regCode).first()
-        city = City.objects.filter(citymunDesc=city_name, provCode=province.provCode).first()
+        # Get the barangay object
+        barangay_name = self.cleaned_data.get('barangay')
         barangay = Barangay.objects.filter(brgyDesc=barangay_name, citymunCode=city.citymunCode).first()
         
+        # Set the location fields
         customer.region = region
         customer.province = province
         customer.city = city

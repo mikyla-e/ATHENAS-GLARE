@@ -1045,23 +1045,32 @@ def services_client(request):
     if service_id:
         request.session['selected_service_id'] = service_id
     
-    
-    initial_data = {
-        'region': 'REGION IX (ZAMBOANGA PENINSULA)',
-        'province': 'ZAMBOANGA DEL SUR',
-        'city': 'ZAMBOANGA CITY'
-    }
-
-    customer_form = CustomerForm(initial=initial_data)
+    # Create form with defaults handled in the form's __init__
+    customer_form = CustomerForm()
     vehicle_form = VehicleForm()
-
+    
+    # Get all location data for the form
     regions = list(Region.objects.all().values('regDesc', 'regCode'))
     
-    province = Province.objects.filter(provDesc='ZAMBOANGA DEL SUR').first()
+    # Get the pre-defined region, province and city objects
+    region = Region.objects.filter(regDesc='REGION IX (ZAMBOANGA PENINSULA)').first()
+    province = Province.objects.filter(provDesc='ZAMBOANGA DEL SUR', regCode=region.regCode).first()
+    city = City.objects.filter(citymunDesc='ZAMBOANGA CITY', provCode=province.provCode).first()
     
+    # Get provinces for the selected region
+    provinces = []
+    if region:
+        provinces = Province.objects.filter(regCode=region.regCode).values('provDesc', 'provCode')
+    
+    # Get cities for the selected province
     cities = []
     if province:
         cities = City.objects.filter(provCode=province.provCode).values('citymunDesc', 'citymunCode')
+    
+    # Get barangays for the selected city
+    barangays = []
+    if city:
+        barangays = Barangay.objects.filter(citymunCode=city.citymunCode).values('brgyDesc', 'brgyCode')
     
     customers = Customer.objects.all()
 
@@ -1069,7 +1078,9 @@ def services_client(request):
         'customer_form': customer_form,
         'vehicle_form': vehicle_form,
         'regions': regions,
+        'provinces': provinces,
         'cities': cities,
+        'barangays': barangays,
         'customers': customers,
         'should_clear_storage': True,
     }
