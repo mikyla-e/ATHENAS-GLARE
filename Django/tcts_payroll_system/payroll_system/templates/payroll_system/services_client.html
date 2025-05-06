@@ -108,7 +108,7 @@
                         {% endif %}
                         <datalist id="province-list">
                             {% for province in provinces %}
-                                <option value="{{ province.regDesc }}" data-code="{{ province.regCode }}">
+                                <option value="{{ province.provDesc }}" data-code="{{ province.provCode }}">
                             {% endfor %}
                         </datalist>
                     </div>
@@ -120,7 +120,7 @@
                         {% endif %}
                         <datalist id="city-list">
                             {% for city in cities %}
-                                <option value="{{ city.regDesc }}" data-code="{{ city.regCode }}">
+                                <option value="{{ city.citymunDesc }}" data-code="{{ city.citymunCode }}">
                             {% endfor %}
                         </datalist>
                     </div>
@@ -132,7 +132,7 @@
                         {% endif %}
                         <datalist id="barangay-list">
                             {% for barangay in barangays %}
-                                <option value="{{ barangay.regDesc }}" data-code="{{ barangay.regCode }}">
+                                <option value="{{ barangay.brgyDesc }}" data-code="{{ barangay.brgyCode }}">
                             {% endfor %}
                         </datalist>
                     </div>
