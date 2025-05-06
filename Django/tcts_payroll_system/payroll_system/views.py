@@ -16,6 +16,7 @@ from .forms import EmployeeForm, EmployeeEditForm, PayrollPeriodForm, DeductionF
 from .models import Employee, Attendance, PayrollPeriod, Deduction, PayrollRecord, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 from urllib.parse import urlencode
 from django.views.decorators.http import require_GET
+from django.http import HttpResponseRedirect
 
 @csrf_protect  # Ensure CSRF protection
 
@@ -1332,19 +1333,24 @@ def status(request):
                         # Recalculate gross pay and net pay
                         payroll_record.gross_pay = payroll_record.calculate_gross_pay()
                         payroll_record.net_pay = payroll_record.calculate_net_pay()
-                        payroll_record.save(update_fields=['gross_pay', 'net_pay'])
+                        payroll_record.save()  # Save all fields instead of update_fields
                         
                         # Create history record
                         History.objects.create(
                             description=f"Added incentive of {float(amount)} to {task.employee.first_name} {task.employee.last_name} for completing task: {task.task_name}"
                         )
-                    
-                # Update task status regardless of payroll status
+                        
+                        # Log success for debugging
+                        print(f"Added incentive of {amount} to payroll record {payroll_record.id}")
+                
+                # Update task status
                 task.task_status = Task.TaskStatus.COMPLETED
                 task.save()
                 
-                return redirect('payroll_system:status')
-    
+                # Use HttpResponseRedirect for POST-redirect-GET pattern
+                return HttpResponseRedirect(reverse('payroll_system:status'))
+            
+    # GET request or POST without incentives  
     tasks = Task.objects.all().order_by('-created_at')
     context = {
         'tasks': tasks
