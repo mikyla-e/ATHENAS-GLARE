@@ -1593,5 +1593,53 @@ def attendance_summary(request):
 
 @login_required
 def print(request):
+    # Get all active employees
+    employees = Employee.objects.filter(is_active=True)
     
-    return render(request, 'print.html')
+    # Get the most recent payroll period
+    latest_payroll_period = PayrollPeriod.objects.order_by('-payment_date').first()
+    
+    # Prepare data for the template
+    employee_data = []
+    total_salary = 0
+    
+    for employee in employees:
+        # Try to get the payroll record for this employee
+        if latest_payroll_period:
+            try:
+                payroll_record = PayrollRecord.objects.get(
+                    employee=employee, 
+                    payroll_period=latest_payroll_period
+                )
+                
+                # Calculate total deductions
+                total_deductions = payroll_record.calculate_total_deductions()
+                
+                # Create the payroll data dictionary
+                latest_payroll = {
+                    'rate': employee.daily_rate,
+                    'incentives': payroll_record.incentives,
+                    'deductions': total_deductions,
+                    'salary': payroll_record.net_pay,
+                    'cash_advance': payroll_record.cash_advance
+                }
+                
+                # Add to total salary
+                total_salary += payroll_record.net_pay
+            except PayrollRecord.DoesNotExist:
+                latest_payroll = None
+        else:
+            latest_payroll = None
+        
+        # Add to employee data list
+        employee_data.append({
+            'employee': employee,
+            'latest_payroll': latest_payroll
+        })
+    
+    context = {
+        'employee_data': employee_data,
+        'total_salary': total_salary
+    }
+    
+    return render(request, 'print.html', context)
