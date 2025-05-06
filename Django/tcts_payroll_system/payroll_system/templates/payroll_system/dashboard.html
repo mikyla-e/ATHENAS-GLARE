@@ -558,162 +558,124 @@
         }, 300000); // 5 minutes
     });
 </script>
+
 <script>
+    // Setup the chart when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
-        const barChart = document.getElementById('bar');
+        // Initialize the payroll chart
+        initializePayrollChart();
         
-        // Function to fetch payroll data from API
-        function fetchPayrollData() {
-            // Replace with your actual API endpoint
-            fetch('/api/payroll-stats/')
-                .then(response => response.json())
-                .then(data => {
-                    createBarChart(data.dates, data.amounts);
-                })
-                .catch(error => {
-                    console.error('Error fetching payroll data:', error);
-                    // Create an empty chart when no data is available
-                    createBarChart([], []);
-                    
-                    // Display "No data available" message
-                    const chartContainer = document.getElementById('bar').parentElement;
-                    const noDataMessage = document.createElement('div');
-                    noDataMessage.className = 'absolute inset-0 flex items-center justify-center bg-white bg-opacity-80';
-                    noDataMessage.innerHTML = '<p class="text-gray-500 font-medium">No payroll data available</p>';
-                    chartContainer.appendChild(noDataMessage);
-                });
-        }
-        
-        // Function to create and configure the bar chart
-        function createBarChart(labels, data) {
-            // Clear any existing "no data" message
-            const chartContainer = document.getElementById('bar').parentElement;
-            const existingMessage = chartContainer.querySelector('div.absolute');
-            if (existingMessage) {
-                chartContainer.removeChild(existingMessage);
-            }
-            
-            // Show "no data" message if the chart has no data
-            if (data.length === 0) {
-                const noDataMessage = document.createElement('div');
-                noDataMessage.className = 'absolute inset-0 flex items-center justify-center bg-white bg-opacity-80';
-                noDataMessage.innerHTML = '<p class="text-gray-500 font-medium">No payroll data available</p>';
-                chartContainer.appendChild(noDataMessage);
-            }
-            
-            // Format amounts as currency
-            const formattedAmounts = data.map(amount => {
-                return new Intl.NumberFormat('en-PH', {
-                    style: 'currency',
-                    currency: 'PHP',
-                    minimumFractionDigits: 2
-                }).format(amount);
+        // Add event listener for the refresh button
+        document.getElementById('refresh-payroll-chart').addEventListener('click', function() {
+            fetchPayrollData().then(data => {
+                updatePayrollChart(payrollChart, data);
+            }).catch(error => {
+                console.error('Error refreshing payroll chart:', error);
             });
-            
-            const payroll_chart = new Chart(barChart, {
-                type: "bar",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: "Total Payroll",
-                        backgroundColor: "#F8D14680",
-                        borderColor: "#F8D146",
-                        data: data,
-                        borderWidth: 2
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    onResize: function(chart, size) {
-                        chart.height = size.height;
-                    },
-                    layout: {
-                        padding: 10
-                    },
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: "PAYROLL PER PERIOD",
-                            color: "#1E1E1E",
-                            align: 'start',
-                            padding: {
-                                top: 0,
-                                bottom: 10
-                            },
-                            font: {
-                                size: 16,
-                                weight: 'bold'
+        });
+    });
+
+    // Global variable to hold the chart instance
+    let payrollChart = null;
+
+    // Initialize the payroll chart
+    function initializePayrollChart() {
+        const ctx = document.getElementById('bar').getContext('2d');
+        
+        // Create the initial chart with loading state
+        payrollChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Loading...'],
+                datasets: [{
+                    label: 'Payroll Amount',
+                    data: [0],
+                    backgroundColor: '#F8D146',
+                    borderColor: '#F8D146',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₱' + value.toLocaleString();
                             }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    // Display formatted currency on tooltip
-                                    return formattedAmounts[context.dataIndex];
-                                }
-                            }
-                        },
-                        legend: {
-                            display: false
                         }
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    // Abbreviate large numbers
-                                    if (value >= 1000) {
-                                        return '₱' + value / 1000 + 'k';
-                                    }
-                                    return '₱' + value;
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
                                 }
+                                if (context.parsed.y !== null) {
+                                    label += '₱' + context.parsed.y.toLocaleString();
+                                }
+                                return label;
                             }
                         }
                     }
                 }
-            });
-            
-            // Handle responsive behavior
-            window.addEventListener('resize', function() {
-                payroll_chart.resize();
-            });
-        }
+            }
+        });
         
-        // Initialize the chart
-        fetchPayrollData();
-    });
+        // Fetch initial data
+        fetchPayrollData().then(data => {
+            updatePayrollChart(payrollChart, data);
+        }).catch(error => {
+            console.error('Error loading payroll chart:', error);
+            // Show error state
+            updatePayrollChart(payrollChart, {
+                labels: ['No data available'],
+                values: [0]
+            });
+        });
+    }
 
-    // Add this to your script section
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get the refresh button
-        const refreshButton = document.getElementById('refresh-payroll-chart');
-        
-        if (refreshButton) {
-            refreshButton.addEventListener('click', function() {
-                // Show loading indicator
-                this.textContent = 'Loading...';
-                this.disabled = true;
-                
-                // Force fetch new data
-                fetch('/api/payroll-stats/?nocache=' + new Date().getTime())
-                    .then(response => response.json())
-                    .then(data => {
-                        createBarChart(data.dates, data.amounts);
-                    })
-                    .catch(error => {
-                        console.error('Error refreshing payroll data:', error);
-                        createBarChart([], []);
-                    })
-                    .finally(() => {
-                        // Reset button text and enable it
-                        refreshButton.textContent = 'Refresh Data';
-                        refreshButton.disabled = false;
-                    });
-            });
+    // Fetch payroll data from the server
+    async function fetchPayrollData() {
+        try {
+            const response = await fetch('/api/payroll/chart-data/');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching payroll data:', error);
+            throw error;
         }
-    });
+    }
+
+    // Update the chart with new data
+    function updatePayrollChart(chart, data) {
+        if (!chart) return;
+        
+        chart.data.labels = data.labels;
+        chart.data.datasets[0].data = data.values;
+        
+        // Update chart colors based on values (optional visual enhancement)
+        const colors = data.values.map(() => '#F8D146');
+        chart.data.datasets[0].backgroundColor = colors;
+        chart.data.datasets[0].borderColor = colors;
+        
+        chart.update();
+    }
 </script>
 
 <script>

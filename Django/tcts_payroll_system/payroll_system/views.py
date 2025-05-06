@@ -15,6 +15,7 @@ from django.views.decorators.csrf import csrf_protect
 from .forms import EmployeeForm, EmployeeEditForm, PayrollPeriodForm, DeductionForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
 from .models import Employee, Attendance, PayrollPeriod, Deduction, PayrollRecord, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
 from urllib.parse import urlencode
+from django.views.decorators.http import require_GET
 
 @csrf_protect  # Ensure CSRF protection
 
@@ -1335,41 +1336,36 @@ def get_next_payday(employee):
     return None
 
 @login_required
-def payroll_stats_api(request):
-    """API endpoint to return payroll data for the chart"""
+@require_GET
+def payroll_chart_data(request):
+    """
+    Endpoint to retrieve payroll data for the chart
+    Returns payment dates and total net pay amounts for the last 6 payroll periods
+    """
+    # Get the 6 most recent payroll periods
+    recent_periods = PayrollPeriod.objects.order_by('-payment_date')[:6]
     
-    # Get the 5 most recent completed payroll periods that have records
-    recent_periods = PayrollPeriod.objects.order_by('-end_date')
+    # Prepare data structure
+    chart_data = {
+        'labels': [],
+        'values': []
+    }
     
-    dates = []
-    amounts = []
-    
-    # Filter out periods with no payroll records and limit to 5
-    valid_periods = []
-    for period in recent_periods:
-        total = PayrollRecord.objects.filter(payroll_period=period).aggregate(
-            total=Sum('net_pay')
-        )['total'] or 0
+    # Process the periods in reverse order (oldest to newest)
+    for period in reversed(list(recent_periods)):
+        # Format date as DD/MM/YYYY
+        formatted_date = period.payment_date.strftime('%d/%m/%Y')
         
-        # Only include periods that have payroll records with non-zero totals
-        if total > 0:
-            valid_periods.append((period, total))
-            
-        # Stop once we have 5 valid periods
-        if len(valid_periods) >= 5:
-            break
+        # Get total net pay for this period
+        total_net_pay = PayrollRecord.objects.filter(
+            payroll_period=period
+        ).aggregate(total=Sum('net_pay'))['total'] or 0
+        
+        # Add to chart data
+        chart_data['labels'].append(formatted_date)
+        chart_data['values'].append(round(total_net_pay, 2))
     
-    # If we have valid periods, process them (oldest to newest for the chart)
-    for period, total in reversed(valid_periods):
-        # Format date as "MMM DD" (e.g., "Apr 15")
-        formatted_date = period.end_date.strftime('%b %d')
-        dates.append(formatted_date)
-        amounts.append(float(total))
-    
-    return JsonResponse({
-        'dates': dates,
-        'amounts': amounts
-    })
+    return JsonResponse(chart_data)
 
 @login_required
 def payslip(request):
