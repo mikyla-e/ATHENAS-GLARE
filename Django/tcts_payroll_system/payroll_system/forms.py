@@ -538,15 +538,34 @@ class EmployeeEditForm(forms.ModelForm):
         city_name = self.cleaned_data.get('city')
         barangay_name = self.cleaned_data.get('barangay')
         
+        # Get region object
         region = Region.objects.filter(regDesc=region_name).first()
-        province = Province.objects.filter(provDesc=province_name, regCode=region.regCode).first()
-        city = City.objects.filter(citymunDesc=city_name, provCode=province.provCode).first()
-        barangay = Barangay.objects.filter(brgyDesc=barangay_name, citymunCode=city.citymunCode).first()
-        
-        employee.region = region
-        employee.province = province
-        employee.city = city
-        employee.barangay = barangay
+        if region:
+            employee.region = region
+            
+            # Get province object
+            province = Province.objects.filter(
+                provDesc=province_name,
+                regCode=region.regCode
+            ).first()
+            if province:
+                employee.province = province
+                
+                # Get city object
+                city = City.objects.filter(
+                    citymunDesc=city_name,
+                    provCode=province.provCode
+                ).first()
+                if city:
+                    employee.city = city
+                    
+                    # Get barangay object
+                    barangay = Barangay.objects.filter(
+                        brgyDesc=barangay_name,
+                        citymunCode=city.citymunCode
+                    ).first()
+                    if barangay:
+                        employee.barangay = barangay
         
         if commit:
             employee.save()

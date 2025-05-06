@@ -135,11 +135,16 @@
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
+    
+    /* Add page break between payslips */
+    .payslip-container {
+      page-break-after: always;
+    }
   }
 </style>
 
 <script>
-  function printPayslip() {
+  function printPayslips() {
     window.print();
     return false;
   }
@@ -147,28 +152,30 @@
 {% endblock %}
 
 <!--header-->
-{% block header %}PAYSLIP{% endblock %}
+{% block header %}PAYSLIPS{% endblock %}
 
 <!--content-->
 {% block content %}
 <div class="flex flex-col">
-  <h1 class="text-2xl font-bold mb-4">Payslip Print Preview</h1>
+  <h1 class="text-2xl font-bold mb-4">Payslips for Period: {{ payroll_period.start_date|date:"M d, Y" }} to {{ payroll_period.end_date|date:"M d, Y" }}</h1>
 
   <div class="print-button mb-4">
-    <button onclick="printPayslip()" 
+    <button onclick="printPayslips()" 
     class="bg-black text-[#f8d146] hover:bg-[#f8d146] hover:text-black hover:scale-105 font-bold cursor-pointer rounded-full px-6 py-3 w-[25%] transition-all duration-200"
     id="button_2">
-    Print Payslip
-  </button>
+    Print All Payslips
+    </button>
   </div>
 
-  <div class="payslip-container shadow-lg/50 rounded-lg">
+  {% for record in payroll_records %}
+  <!-- start of template -->
+  <div class="payslip-container shadow-lg/50 rounded-lg mb-10">
     <div class="mb-[20px] flex justify-between">
       <div>
         <h1 class="text-4xl font-bold">Payslip</h1>
         <p>Tumaga Putik Rd. Zamboanga City</p>
         <p>09XX-XXX-XXXX</p>
-        <p>Pay period: January 1-15, 2025</p>
+        <p>Pay period: {{ payroll_period.start_date|date:"F j" }}-{{ payroll_period.end_date|date:"j, Y" }}</p>
       </div>
       <div class="flex justify-center items-center bg-black rounded-full w-[15%]">
         <img class="drop-shadow-xs" src="{% static 'images/clients_logo.png' %}" alt="">
@@ -180,8 +187,8 @@
         <th width="50%">
           <div class="employee-info">
             <div class="employee-details">
-              <p><strong>Employee:</strong> Viktor Greg Lim</p>
-              <p><strong>Employee Status:</strong> Full-Time</p>
+              <p><strong>Employee:</strong> {{ record.employee.first_name }} {% if record.employee.middle_name %}{{ record.employee.middle_name }} {% endif %}{{ record.employee.last_name }}</p>
+              <p><strong>Employee Status:</strong> {{ record.employee.get_employee_status_display }}</p>
             </div>
           </div>
         </th>
@@ -196,7 +203,7 @@
 
       <tr>
         <th colspan="2" class="payment-date">
-          Payslip for January 1-15, 2025
+          Payslip for {{ payroll_period.start_date|date:"F j" }}-{{ payroll_period.end_date|date:"j, Y" }}
         </th>
       </tr>
 
@@ -210,43 +217,45 @@
           <div class="amounts-section">
             <div class="amounts-row">
               <span>Daily Rate:</span>
-              <span>₱500.00</span>
+              <span>₱{{ record.employee.daily_rate|floatformat:2 }}</span>
+            </div>
+            <div class="amounts-row">
+              <span>Days Worked:</span>
+              <span>{{ record.days_worked }}</span>
             </div>
             <div class="amounts-row">
               <span>Gross Pay:</span>
-              <span>₱6,000.00</span>
+              <span>₱{{ record.gross_pay|floatformat:2 }}</span>
             </div>
+            {% if record.incentives > 0 %}
             <div class="amounts-row">
               <span>Incentives:</span>
-              <span>₱500.00</span>
+              <span>₱{{ record.incentives|floatformat:2 }}</span>
             </div>
+            {% endif %}
             <div class="amounts-row total-row">
               <span>Total Earnings:</span>
-              <span>₱6,800.00</span>
+              <span>₱{{ record.gross_pay|floatformat:2 }}</span>
             </div>
           </div>
         </th>
         <th>
           <div class="amounts-section">
+            {% for deduction in record.deductions.all %}
             <div class="amounts-row">
-              <span>SSS:</span>
-              <span>₱300.00</span>
+              <span>{{ deduction.get_deduction_type_display }}:</span>
+              <span>₱{{ deduction.amount|floatformat:2 }}</span>
             </div>
-            <div class="amounts-row">
-              <span>Pag-IBIG:</span>
-              <span>₱100.00</span>
-            </div>
-            <div class="amounts-row">
-              <span>PhilHealth:</span>
-              <span>₱150.00</span>
-            </div>
+            {% endfor %}
+            {% if record.cash_advance > 0 %}
             <div class="amounts-row">
               <span>Cash Advance:</span>
-              <span>₱500.00</span>
+              <span>₱{{ record.cash_advance|floatformat:2 }}</span>
             </div>
+            {% endif %}
             <div class="amounts-row total-row">
               <span>Total Deductions:</span>
-              <span>₱1,250.00</span>
+              <span>₱{{ record.calculate_total_deductions|floatformat:2 }}</span>
             </div>
           </div>
         </th>
@@ -254,7 +263,7 @@
 
       <tr>
         <th colspan="2" class="grand-total">
-          Net Pay: ₱5,550.00
+          Net Pay: ₱{{ record.net_pay|floatformat:2 }}
         </th>
       </tr>
     </table>
@@ -275,5 +284,11 @@
       </div>
     </div>
   </div>
+  <!-- end of the template -->
+  {% empty %}
+  <div class="p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg">
+    No payroll records found for this period.
+  </div>
+  {% endfor %}
 </div>
 {% endblock %}

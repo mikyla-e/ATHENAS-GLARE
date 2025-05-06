@@ -123,6 +123,9 @@
 
                     {{ form.province }}
                     <datalist id="province-list">
+                        {% for province in provinces %}
+                            <option value="{{ province.provDesc }}" data-code="{{ province.provCode }}">
+                        {% endfor %}
                     </datalist>
                 </div>
                 <div class="flex flex-col my-1">
@@ -135,6 +138,9 @@
 
                     {{ form.city }}
                     <datalist id="city-list">
+                        {% for city in cities %}
+                            <option value="{{ city.citymunDesc }}" data-code="{{ city.citymunCode }}">
+                        {% endfor %}
                     </datalist>
                 </div>
             </div>
@@ -152,6 +158,9 @@
 
                         {{ form.barangay }}
                         <datalist id="barangay-list">
+                            {% for barangay in barangays %}
+                                <option value="{{ barangay.brgyDesc }}" data-code="{{ barangay.brgyCode }}">
+                            {% endfor %}
                         </datalist>
                     </div>
                     <div class="flex flex-col my-1">

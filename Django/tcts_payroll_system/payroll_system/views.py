@@ -846,8 +846,8 @@ def confirm_payroll(request, payroll_period_id):
             # Add success message
             messages.success(request, f"Payroll period from {payroll_period.start_date} to {payroll_period.end_date} has been successfully processed.")
             
-            # Redirect to payroll history page
-            return redirect('payroll_system:payroll_history')
+            # Redirect to payslip page instead of payroll history
+            return redirect('payroll_system:payslip', payroll_period_id=payroll_period.payroll_period_id)
             
         except ValidationError as e:
             messages.error(request, e.message)
@@ -1368,8 +1368,26 @@ def payroll_chart_data(request):
     return JsonResponse(chart_data)
 
 @login_required
-def payslip(request):
-    return render(request, 'payslip.html')
+def payslip(request, payroll_period_id):
+    # Get the payroll period
+    payroll_period = get_object_or_404(PayrollPeriod, payroll_period_id=payroll_period_id)
+    
+    # Check if payroll period is confirmed (processed)
+    if payroll_period.payroll_status != PayrollPeriod.PayrollStatus.PROCESSED:
+        messages.error(request, "Payslips are only available for processed payroll periods.")
+        return redirect('payroll_system:payroll_history')
+    
+    # Get all payroll records for this period
+    payroll_records = PayrollRecord.objects.filter(
+        payroll_period=payroll_period
+    ).select_related('employee')
+    
+    context = {
+        'payroll_period': payroll_period,
+        'payroll_records': payroll_records,
+    }
+    
+    return render(request, 'payslip.html', context)
     
 @login_required
 def payroll_view(request):

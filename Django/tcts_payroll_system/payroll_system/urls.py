@@ -39,7 +39,7 @@ urlpatterns = [
     path('ajax/customer/<int:customer_id>/', views.get_customer_details, name='get_customer_details'),
     # path('payroll/update-payday/', views.update_payday, name='update_payday'),
     path('api/payroll-by-week/', views.payroll_by_week, name='payroll_by_week'),
-    path('payslip/', views.payslip, name='payslip'),
+    path('payslip/<int:payroll_period_id>/', views.payslip, name='payslip'),
     #new - flores
     path('attendance/summary/', views.attendance_summary, name='attendance-summary'),
     path('api/payroll/chart-data/', views.payroll_chart_data, name='payroll_chart_data'),

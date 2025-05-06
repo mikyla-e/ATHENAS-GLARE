@@ -55,9 +55,9 @@ function initializeAddressFields(config) {
                         provinceList.appendChild(option);
                     });
                     
-                    // If province has a value, trigger its input handler
+                    // If province has a value, trigger its change handler
                     if (provinceInput && provinceInput.value) {
-                        const event = new Event('input');
+                        const event = new Event('input', { bubbles: true });
                         provinceInput.dispatchEvent(event);
                     }
                 }
@@ -81,9 +81,9 @@ function initializeAddressFields(config) {
                         cityList.appendChild(option);
                     });
                     
-                    // If city has a value, trigger its input handler
+                    // If city has a value, trigger its change handler
                     if (cityInput && cityInput.value) {
-                        const event = new Event('input');
+                        const event = new Event('input', { bubbles: true });
                         cityInput.dispatchEvent(event);
                     }
                 }
@@ -110,6 +110,30 @@ function initializeAddressFields(config) {
             })
             .catch(error => console.error("Error fetching barangays:", error));
     }
+    
+    // Function to find region code from name
+    function findRegionCode(regionName) {
+        if (!regionName || !regionList) return null;
+        const option = Array.from(regionList.querySelectorAll('option'))
+            .find(opt => opt.value === regionName);
+        return option ? option.getAttribute('data-code') : null;
+    }
+
+    // Function to find province code from name and region code
+    function findProvinceCode(provinceName) {
+        if (!provinceName || !provinceList) return null;
+        const option = Array.from(provinceList.querySelectorAll('option'))
+            .find(opt => opt.value === provinceName);
+        return option ? option.getAttribute('data-code') : null;
+    }
+    
+    // Function to find city code from name
+    function findCityCode(cityName) {
+        if (!cityName || !cityList) return null;
+        const option = Array.from(cityList.querySelectorAll('option'))
+            .find(opt => opt.value === cityName);
+        return option ? option.getAttribute('data-code') : null;
+    }
 
     // Setup event listeners if elements exist
     if (regionInput) {
@@ -123,7 +147,9 @@ function initializeAddressFields(config) {
         });
         
         regionInput.addEventListener("input", function() {
-            const selectedOption = document.querySelector(`#${config.regionListId} option[value="${regionInput.value}"]`);
+            const selectedOption = Array.from(regionList.querySelectorAll('option'))
+                .find(opt => opt.value === regionInput.value);
+                
             if (selectedOption) {
                 currentRegionCode = selectedOption.dataset.code;
                 if (provinceInput) provinceInput.value = "";
@@ -133,15 +159,6 @@ function initializeAddressFields(config) {
                 fetchProvinces(currentRegionCode);
             }
         });
-        
-        // If region already has a value on page load, fetch provinces
-        if (regionInput.value) {
-            const selectedOption = document.querySelector(`#${config.regionListId} option[value="${regionInput.value}"]`);
-            if (selectedOption) {
-                currentRegionCode = selectedOption.dataset.code;
-                fetchProvinces(currentRegionCode);
-            }
-        }
     }
     
     if (provinceInput) {
@@ -154,7 +171,9 @@ function initializeAddressFields(config) {
         });
         
         provinceInput.addEventListener("input", function() {
-            const selectedOption = document.querySelector(`#${config.provinceListId} option[value="${provinceInput.value}"]`);
+            const selectedOption = Array.from(provinceList.querySelectorAll('option'))
+                .find(opt => opt.value === provinceInput.value);
+                
             if (selectedOption) {
                 currentProvinceCode = selectedOption.dataset.code;
                 if (cityInput) cityInput.value = "";
@@ -163,15 +182,6 @@ function initializeAddressFields(config) {
                 fetchCities(currentProvinceCode);
             }
         });
-        
-        // If province already has a value on page load, fetch cities
-        if (provinceInput.value) {
-            const selectedOption = document.querySelector(`#${config.provinceListId} option[value="${provinceInput.value}"]`);
-            if (selectedOption) {
-                currentProvinceCode = selectedOption.dataset.code;
-                fetchCities(currentProvinceCode);
-            }
-        }
     }
     
     if (cityInput) {
@@ -183,7 +193,9 @@ function initializeAddressFields(config) {
         });
         
         cityInput.addEventListener("input", function() {
-            const selectedOption = document.querySelector(`#${config.cityListId} option[value="${cityInput.value}"]`);
+            const selectedOption = Array.from(cityList.querySelectorAll('option'))
+                .find(opt => opt.value === cityInput.value);
+                
             if (selectedOption) {
                 currentCityCode = selectedOption.dataset.code;
                 if (barangayInput) barangayInput.value = "";
@@ -191,17 +203,26 @@ function initializeAddressFields(config) {
                 fetchBarangays(currentCityCode);
             }
         });
-        
-        // If city already has a value on page load, fetch barangays
-        if (cityInput.value) {
-            const selectedOption = document.querySelector(`#${config.cityListId} option[value="${cityInput.value}"]`);
-            if (selectedOption) {
-                currentCityCode = selectedOption.dataset.code;
-                fetchBarangays(currentCityCode);
+    }
+    
+    // Initialize the cascade with existing values
+    function initializeLocation() {
+        // If region already has a value, find its code and fetch provinces
+        if (regionInput && regionInput.value) {
+            // Look for the region code in the datalist
+            const regionOption = Array.from(regionList.querySelectorAll('option'))
+                .find(opt => opt.value === regionInput.value);
+                
+            if (regionOption) {
+                currentRegionCode = regionOption.getAttribute('data-code');
+                fetchProvinces(currentRegionCode);
             }
         }
     }
     
     // Initialize field states based on current values
     updateFieldStates();
+    
+    // Initialize the location fields after a small delay to make sure the DOM is fully loaded
+    setTimeout(initializeLocation, 100);
 }
