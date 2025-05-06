@@ -156,10 +156,10 @@
 
 <!--content-->
 {% block content %}
-<div class="flex flex-col">
-  <h1 class="text-2xl font-bold mb-4">Payslips for Period: {{ payroll_period.start_date|date:"M d, Y" }} to {{ payroll_period.end_date|date:"M d, Y" }}</h1>
+<div class="flex flex-col ">
+  <h1 class="text-2xl font-bold mb-4 flex justify-end">Payslips for Period: {{ payroll_period.start_date|date:"M d, Y" }} to {{ payroll_period.end_date|date:"M d, Y" }}</h1>
 
-  <div class="print-button mb-4">
+  <div class=" flex justify-end print-button mb-4">
     <button onclick="printPayslips()" 
     class="bg-black text-[#f8d146] hover:bg-[#f8d146] hover:text-black hover:scale-105 font-bold cursor-pointer rounded-full px-6 py-3 w-[25%] transition-all duration-200"
     id="button_2">
@@ -284,11 +284,7 @@
       </div>
     </div>
   </div>
-  <!-- end of the template -->
-  {% empty %}
-  <div class="p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg">
-    No payroll records found for this period.
-  </div>
+  <span class="m-5"></span>
   {% endfor %}
 </div>
 {% endblock %}

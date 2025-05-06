@@ -1494,3 +1494,8 @@ def attendance_summary(request):
     }
     
     return JsonResponse(data)
+
+@login_required
+def print(request):
+    
+    return render(request, 'print.html')
