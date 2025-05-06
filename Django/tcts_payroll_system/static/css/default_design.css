@@ -61,8 +61,7 @@
 }
 
 
-#cancel,
-input[type=button]{
+#cancel{
     padding: 0 20px;
 
     border-radius: 30px;
@@ -73,8 +72,7 @@ input[type=button]{
     
 }
 
-#cancel:hover,
-input[type=button]:hover{
+#cancel:hover{
     cursor: pointer;
     scale: 1.05;
     transition: 0.2s;

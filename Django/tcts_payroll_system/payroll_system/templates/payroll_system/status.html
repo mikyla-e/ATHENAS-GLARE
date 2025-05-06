@@ -45,6 +45,18 @@
     .status-link.active {
         color: #F8D146;
     }
+
+    input[type=number]{
+        height: 50px;
+        margin: 8px 0;
+        padding: 2px 15px;
+        border: none;
+
+        background-color: #EFEDE6;
+        height: 50px;
+        border-radius: 10px;
+        resize: none
+    }
 </style>
 {% endblock %}
 
@@ -57,15 +69,15 @@
         
 </div> 
 
-<div id="task-popup" class="task fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around items-center invisible opacity-0 rounded-lg z-60 overflow-hidden shadow-lg/20">
+<div id="task-popup" class="task fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col gap-5 justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden shadow-lg/20">
     
-    <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left">Complete Task?</h1>
-
+    <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">COMPLETE</h1>
+    <div class="w-full h-[2px] my-1 border border-2 border-[#1e1e1e40] rounded-full"></div>
     <h1 class="text-sm sm:text-base my-2 py-4 font-[Inter] font-normal text-center">Are you sure you want to mark this task as <i>completed</i>? Confirm to proceed.</h1>
     
     <div class="w-full h-[40px] my-1 flex justify-evenly items-center gap-3">
-        <button id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelTask()">CANCEL</button>
-        <button id="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM" onclick="addIncentives()">CONFIRM</button>
+        <button id="cancel" class="w-fit h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CANCEL" onclick="cancelTask()">CANCEL</button>
+        <button id="confirm" class="w-fit h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CONFIRM" onclick="addIncentives()">CONFIRM</button>
     </div>
     <input type="hidden" id="selected-task-id" value="">
 </div>
@@ -78,13 +90,12 @@
         <input type="hidden" name="task_id" id="incentives-task-id" value="">
         <div class="w-full h-[50%] my-5 flex flex-col justify-center items-start gap-1">
             <label for="incentives" class="mx-[20px] font-[Inter] text-xs md:text-[14px] font-semibold text-[#1E1E1E]">AMOUNT</label>
-            <div class="w-full h-[60%] bg-[#EFEDE6] rounded-xl">
-                <input type="number" name="number" id="cash_advance" class="size-full px-5 outline-none border-none font-[Inter] font-normal text-base" required>
-            </div>
+            <input type="number" name="number" id="cash_advance" class="size-full px-5 outline-none border-none font-[Inter] font-normal text-base" required>
+            
         </div>
         <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
-            <input type="button" class="w-[30%] h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelIncentives()">
-            <input type="submit" class="w-[30%] h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
+            <input type="button" id="cancel" class="w-[30%] h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelIncentives()">
+            <input type="submit" id="confirm" class="w-[30%] h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">
         </div>           
     </form>
 </div>

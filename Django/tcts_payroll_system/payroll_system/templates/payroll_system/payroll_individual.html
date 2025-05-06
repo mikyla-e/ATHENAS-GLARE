@@ -6,8 +6,6 @@
 
 <!--(optional)head content-->
 {% block headcontent %}
-
-
 <style>
     .background {
         transition: opacity 0.3s ease;
@@ -61,7 +59,7 @@
         background-color: #e9c13b;
     } */
 
-    #cash_advance, input[type=date], input[type=text], input[type=number], select{
+    #cash_advance, #id_deduction_type, #id_amount, input[type=date], input[type=text], input[type=number], select{
         height: 60px;
         width: 100%;
         margin: 2px;
@@ -73,12 +71,12 @@
     }
 
     /* Input field styling */
-    input[type="text"].field {
+    /* input[type="text"].field {
         padding: 8px;
         border: 1px solid #ddd;
         border-radius: 4px;
         width: 100%;
-    }
+    } */
 </style>
 <link rel="stylesheet" href="{% static 'css/payroll_individual.css'%}">
 <link rel="stylesheet" href="{% static 'css/table.css'%}">
@@ -238,7 +236,7 @@
     <div id="buttons" class="order-2 col-span-2 md:order-3 md:col-span-3 lg:col-span-1 flex justify-end items-end md:items-start lg:items-end gap-2">
         {% if selected_record and selected_record.payroll_period.payroll_status == 'INPROGRESS' %}
         <button id="button_2" class="h-[45px] flex justify-center items-center gap-2 overflow-hidden" onclick="addCashAdvance()">
-            <p class="text-[#FFF] font-bold text-xs/4 xl:text-sm/4 text-[League Spartan]">CASH ADVANCE</p>
+            <p class="text-[#F8D146] font-bold text-xs/4 xl:text-sm/4 text-[League Spartan]">CASH ADVANCE</p>
         </button>
         {% endif %}
         <button id="button_1" class="h-[45px] flex justify-center items-center gap-2 overflow-hidden" onclick="editDeductions()">
@@ -254,31 +252,31 @@
     <div id="current_payroll" class="order-4 col-span-3 w-full">
         
         <!--large devices-->
-        <div class="hidden xl:flex flex-col w-full gap-4">
+        <div class="flex flex-col w-full gap-4">
             <table id="current_payroll_table" class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
                 <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                     <tr>
-                        <th class="p-2 text-base font-[League Spartan]">RATE PER DAY</th>
-                        <th class="p-2 text-base font-[League Spartan]">TOTAL ATTENDANCE</th>
-                        <th class="p-2 text-base font-[League Spartan]">TOTAL INCENTIVES</th>
-                        <th class="p-2 text-base font-[League Spartan]">TOTAL PAYMENT AMOUNT</th>
-                        <th class="p-2 text-base font-[League Spartan]">DATE OF PAY</th>
+                        <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">RATE PER DAY</th>
+                        <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">TOTAL ATTENDANCE</th>
+                        <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">TOTAL INCENTIVES</th>
+                        <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">TOTAL PAYMENT AMOUNT</th>
+                        <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">DATE OF PAY</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for record in payroll_records %}
                     <tr>
-                        <td class="px-2 py-4 text-sm font-[Inter]">{{ employee.daily_rate }}</td>
-                        <td class="px-2 py-4 text-sm font-[Inter]">{{ record.days_worked }}</td>
-                        <td id="total-incentives" class="px-2 py-4 text-sm font-[Inter] incentive-display">{{ record.incentives }}</td>                        
-                        <td class="px-2 py-4 text-sm font-[Inter] salary-display">{{ record.net_pay }}</td>
-                        <td class="px-2 py-4 text-sm font-[Inter]">{{ record.payroll_period.payment_date }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ employee.daily_rate }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ record.days_worked }}</td>
+                        <td id="total-incentives" class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter] incentive-display">{{ record.incentives }}</td>                        
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter] salary-display">{{ record.net_pay }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ record.payroll_period.payment_date }}</td>
                         {% empty %}
-                        <td class="px-2 py-4 text-sm font-[Inter]">0.00</td>
-                        <td class="px-2 py-4 text-sm font-[Inter]">0</td>
-                        <td class="px-2 py-4 text-sm font-[Inter]">0.00</td>
-                        <td class="px-2 py-4 text-sm font-[Inter]">0.00</td>
-                        <td class="px-2 py-4 text-sm font-[Inter]">N/A</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">0.00</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">0</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">0.00</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">0.00</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">N/A</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -288,7 +286,7 @@
                 <table id="current_payroll_table" class="bg-white w-[85%] border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
                     <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                         <tr>
-                            <th class="p-2 text center text-base font-[League Spartan]" colspan="3">
+                            <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]" colspan="4">
                                 DEDUCTIONS
                             </th>
                         </tr>
@@ -298,9 +296,9 @@
                             <tr>
                                 {% for record in payroll_records %}
                                     {% for deduction in record.deductions.all %}
-                                    <th class="text-base font-[League Spartan]">{{ deduction }}</th>
+                                    <th class="text-xs md:text-sm xl:text-base font-[League Spartan]">{{ deduction }}</th>
                                     {% empty %}
-                                    <th class="text-base font-[League Spartan]">Deduction Type</th>
+                                    <th class="text-xs md:text-sm xl:text-base font-[League Spartan]">Deduction Type</th>
                                     {% endfor %}
                                 {% endfor %}
                             </tr>
@@ -309,9 +307,9 @@
                             <tr>
                             {% for record in payroll_records %}
                                 {% for deduction in record.deductions.all %}
-                                <td class="p-2 text-sm font-[Inter]">{{ deduction.amount }}</td>
+                                <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ deduction.amount }}</td>
                                 {% empty %}
-                                <td class="p-2 text-sm font-[Inter]">No deduction added.</td>
+                                <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">No deduction added.</td>
                                 {% endfor %}
                             {% endfor %}
                             </tr>
@@ -321,8 +319,8 @@
         
                 <table id="current_payroll_table" class="bg-white w-[15%] border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
                     <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                        <tr class="text-base font-[League Spartan]">
-                            <th class="p-2 text-base font-[League Spartan]">
+                        <tr class="">
+                            <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">
                                 CASH ADVANCE
                             </th>
                         </tr>
@@ -330,197 +328,8 @@
                     <tbody>
                         <tr>
                         {% for record in payroll_records %}
-                        <td class="p-2 text-sm font-[Inter]">{{ record.cash_advance }}</td>
+                        <td class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">{{ record.cash_advance }}</td>
                         {% endfor %}
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-
-        <!--medium devices-->
-        <div class="hidden md:flex flex-col xl:hidden w-full gap-3">
-            <table id="current_payroll_table" class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
-                <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                    <tr class="">
-                        <th class="p-2 text-sm font-[League Spartan]">RATE</th>
-                        <th class="p-2 text-sm font-[League Spartan]">ATTENDANCE</th>
-                        <th class="p-2 text-sm font-[League Spartan]">INCENTIVES</th>
-                        <th class="p-2 text-sm font-[League Spartan]">DEDUCTIONS</th>
-                        <th class="p-2 text-sm font-[League Spartan]">PAYMENT AMOUNT</th>
-                        <th class="p-2 text-sm font-[League Spartan]">PAY DATE</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        {% if current_payroll %}
-                            <td class="p-2 text-xs font-[Inter]">{{ current_payroll.rate }}</td>
-                            <td class="px-2 text-xs font-[Inter]">{{ attendance_count }}</td>
-                            <td class="px-2 text-xs font-[Inter] incentive-display">{{ current_payroll.incentives|default:"0.00" }}</td>
-                            <td class="px-2 text-xs font-[Inter]">{{ current_payroll.deductions }}</td>
-                            <td class="px-2 text-xs font-[Inter] salary-display">{{ current_payroll.salary }}</td>
-                            <td class="px-2 text-xs font-[Inter]">{{ current_payroll.payment_date }}</td>
-                            <td class="p-3 flex justify-center items-center">
-                                <a class="h-7.5 w-7.5 flex-shrink-0" href="#">
-                                    <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
-                                </a>
-                            </td>
-                        {% else %}
-                            <td class="px-2 text-xs font-[Inter]">0.00</td>
-                            <td class="px-2 text-xs font-[Inter]">{{ attendance_count|default:"0" }}</td>
-                            <td class="px-2 text-xs font-[Inter]">0.00</td>
-                            <td class="px-2 text-xs font-[Inter]">0.00</td>
-                            <td class="px-2 text-xs font-[Inter]">0.00</td>
-                            <td class="px-2 text-xs font-[Inter]">N/A</td>
-                            <td class="p-3 flex justify-center items-center">
-                                <a class="h-7.5 w-7.5 flex-shrink-0" href="#">
-                                    <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
-                                </a>
-                            </td>
-                        {% endif %}
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="flex w-full gap-3">
-                <table id="current_payroll_table" class="bg-white w-[85%] border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
-                    <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                        <tr>
-                            <th class="p-2 text-sm font-[League Spartan]">
-                                DEDUCTIONS
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <thead class="border-b-[2px] border-b-[rgba(30,30,30,0.2)]">
-                            <tr>
-                                <th class="px-2 text-sm font-[League Spartan]">PhilHealth</th>
-                                <th class="px-2 text-sm font-[League Spartan]">Pag-Ibig</th>
-                                <th class="px-2 text-sm font-[League Spartan]">SSS</th>
-                                <th class="px-2 text-sm font-[League Spartan]">Others</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="p-2 text-xs font-[Inter]">0.00</td>
-                                <td class="p-2 text-xs font-[Inter]">0.00</td>
-                                <td class="p-2 text-xs font-[Inter]">0.00</td>
-                                <td class="p-2 text-xs font-[Inter]">0.00</td>
-                            </tr>
-                        </tbody>
-                    </tbody>
-                </table>
-        
-                <table id="current_payroll_table" class="bg-white w-[15%] border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
-                    <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                        <tr>
-                            <th class="p-2 text-sm font-[League Spartan]">
-                                CASH ADVANCE
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            {% if current_payroll %}
-                            <td class="p-2 text-xs font-[Inter]">{{ current_payroll.cash_advance }}</td>
-                            {% else %}
-                            <td class="p-2 text-xs font-[Inter]">0.00</td>
-                            {% endif %}
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!--small devices-->
-        <div class="md:hidden flex flex-col w-full gap-2">
-            <table id="current_payroll_table" class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
-                <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                    <tr class="text-base font-[League Spartan]">
-                        <th class="p-2 text-xs font-[League Spartan]">RATE</th>
-                        <th class="p-2 text-xs font-[League Spartan]">ATTENDANCE</th>
-                        <th class="p-2 text-xs font-[League Spartan]">INCENTIVES</th>
-                        <th class="p-2 text-xs font-[League Spartan]">DEDUCTIONS</th>
-                        <th class="p-2 text-xs font-[League Spartan]">PAYMENT AMOUNT</th>
-                        <th class="p-2 text-xs font-[League Spartan]">PAY DATE</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        {% if current_payroll %}
-                            <td class="p-2 text-[10px] font-[Inter]">{{ current_payroll.rate }}</td>
-                            <td class="px-2 text-[10px] font-[Inter]">{{ attendance_count }}</td>
-                            <td class="px-2 text-[10px] font-[Inter] incentive-display">{{ current_payroll.incentives|default:"0.00" }}</td>
-                            <td class="px-2 text-[10px] font-[Inter] salary-display">{{ current_payroll.deductions }}</td>
-                            <td class="px-2 text-[10px] font-[Inter] salary-display">{{ current_payroll.salary }}</td>
-                            <td class="px-2 text-[10px] font-[Inter]">{{ current_payroll.payment_date }}</td>
-                            <td class="p-3 flex justify-center items-center">
-                                <a class="h-7.5 w-7.5 flex-shrink-0" href="#">
-                                    <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
-                                </a>
-                            </td>
-                        {% else %}
-                            <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                            <td class="px-2 text-[10px] font-[Inter]">{{ attendance_count|default:"0" }}</td>
-                            <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                            <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                            <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                            <td class="px-2 text-[10px] font-[Inter]">N/A</td>
-                            <td class="p-3 flex justify-center items-center">
-                                <a class="h-7.5 w-7.5 flex-shrink-0" href="#">
-                                    <img class="cursor-pointer" src="{% static 'images/payroll_edit_icon.png' %}" alt="">
-                                </a>
-                            </td>
-                        {% endif %}
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="flex w-full gap-2">
-                <table id="current_payroll_table" class="bg-white w-[15%] border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
-                    <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                        <tr>
-                            <th class="p-2 text-xs font-[League Spartan]">
-                                DEDUCTIONS
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <thead class="border-b-[2px] border-b-[rgba(30,30,30,0.2)]">
-                            <tr>
-                                <th class="px-2 text-xs font-[League Spartan]">PhilHealth</th>
-                                <th class="px-2 text-xs font-[League Spartan]">Pag-Ibig</th>
-                                <th class="px-2 text-xs font-[League Spartan]">SSS</th>
-                                <th class="px-2 text-xs font-[League Spartan]">Others</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                                <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                                <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                                <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                            </tr>
-                        </tbody>
-                    </tbody>
-                </table>
-        
-                <table id="current_payroll_table" class="bg-white w-[15%] border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
-                    <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
-                        <tr class="text-base font-[League Spartan]">
-                            <th class="p-2 text-xs font-[League Spartan]">
-                                CASH ADVANCE
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            {% if current_payroll %}
-                            <td class="px-2 text-[10px] font-[Inter]">{{ current_payroll.cash_advance }}</td>
-                            {% else %}
-                            <td class="px-2 text-[10px] font-[Inter]">0.00</td>
-                            {% endif %}
                         </tr>
                     </tbody>
                 </table>

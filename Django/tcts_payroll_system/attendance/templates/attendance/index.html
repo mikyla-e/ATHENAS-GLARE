@@ -50,8 +50,19 @@
             color: #F8D146;
         }
 
+        .cancel{
+            padding: 0 20px;
+
+            border-radius: 30px;
+            border: none;
+
+            background-image: linear-gradient(to right, #DC4646 , #DC4646); 
+            color: white;
+            
+        }
+
         
-        #button_1:hover, #button_2:hover{
+        #button_1:hover, #button_2:hover, .cancel:hover{
             cursor: pointer;
             scale: 1.05;
             transition: 0.5s;
@@ -86,7 +97,7 @@
         <img src="{% static 'images/clients_logo.png' %}" alt="Logo">
     </div>
 
-    <div class="h-screen grid grid-rows-[5fr_1fr] lg:grid-cols-[3fr_1fr] lg:grid-rows-1">
+    <div class="h-screen grid grid-col-1 grid-rows-[5fr_1fr] lg:grid-cols-[3fr_1fr] lg:grid-rows-1">
         <!-- Main camera area -->
         <div class="bg-[#1E1E1E] order-1 relative">
             <div class="h-full overflow-hidden">
@@ -109,7 +120,7 @@
                 
                 <!-- Recognition overlay -->
                 <div id="recognition-overlay" class="absolute inset-0 flex items-center justify-center hidden">
-                    <div class="bg-gradient-to-r from-[#5c4b10C4] to-[#4f380bC4] text-white p-6 rounded-lg text-center text-[League Spartan]">
+                    <div class="bg-gradient-to-t from-[#171104C4] to-[#000000C4] text-white p-6 rounded-lg text-center text-[League Spartan]">
                         <div id="recognized-name" class="text-3xl font-bold mb-4"></div>
                         <div id="recognition-message" class="text-xl"></div>
                         <div id="recognition-confidence" class="text-lg mt-2 font-light"></div>
@@ -117,12 +128,12 @@
                 </div>
                 
                 <!-- Confirmation dialog -->
-                <div id="confirmation-dialog" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-[#FFFFFFC4] to-[#1E1E1EC4] p-5 rounded-lg z-50 text-center text-white min-w-[300px]">
+                <div id="confirmation-dialog" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-t from-[#171104C4] to-[#000000C4] p-5 rounded-lg z-50 text-center text-white min-w-[300px]">
                     <h2 id="confirmation-title" class="text-2xl font-bold mb-4"></h2>
                     <p id="confirmation-message" class="text-lg mb-6"></p>
-                    <div class="flex justify-center gap-4">
-                        <button id="confirm-yes" class="bg-[#F8D146] text-white px-5 py-2.5 rounded font-bold transition-all duration-300">Yes</button>
-                        <button id="confirm-no" class="bg-red-500 text-white px-5 py-2.5 rounded font-bold transition-all duration-300">No</button>
+                    <div class="h-[40px] flex justify-center gap-4">
+                        <button id="confirm-yes" class="button_1 text-white rounded font-bold">YES</button>
+                        <button id="confirm-no" class="cancel text-white rounded font-bold">NO</button>
                     </div>
                 </div>
                 
@@ -136,13 +147,13 @@
         </div>
         
         <!-- Sidebar area -->
-        <div class="bg-white p-4 flex lg:flex-col justify-between order-2">
+        <div class="w-full bg-white p-4 flex lg:flex-col justify-between order-2">
             <div id="logo" class="hidden lg:flex items-center gap-3">
                 <img src="{% static 'images/logo_icon.png' %}" alt="">
                 <p class="text-2xl font-extrabold">ATTENDANCE</p>
             </div>
 
-            <div class="flex flex-col h-[90%] gap-4">
+            <div class="flex flex-col w-full h-[90%] gap-4">
                 <div id="content" class="h-fit lg:h-fit w-full flex justify-between lg:flex-col lg:justify-start">
                     <p id="philippines-time" class="text-4xl lg:text-[75px] font-[Roboto] font-bold text-left flex flex-wrap">00:00AM</p>
                     <div id="date" class="flex flex-row flex-nowrap font-[League Spartan] gap-2">
@@ -153,32 +164,35 @@
                 </div>
                 
                 <!-- Attendance History Section -->
-                <div id="attendance-history" class="w-full h-full border border-[#89734d80] rounded-lg p-4 bg-gray-50 flex flex-col">
+                <div id="attendance-history" class="w-full max-h-[600px] border border-[#89734d80] rounded-lg p-4 bg-gray-50 flex flex-col">
                     <h3 class="text-[League Spartan] text-xl font-bold text-left z-20 mb-2">Attendance History</h3>
                     
-                    <div class="overflow-y-auto flex-grow pr-1">
+                    <div class="w-full overflow-y-auto flex flex-row lg:flex-col gap-5 lg:gap-2">
                         <!-- Today's attendance -->
-                        <div class="mb-2.5">
+                        <div class="w-[50%] lg:w-full">
                             <div class="bg-[#F8D14640] text-[#5c4b10] px-2 py-1 rounded font-semibold z-10">Today's Attendance</div>
                             <div id="today-history" class="text-sm"></div>
                         </div>
                         
-                        <!-- Date Filter Section -->
-                        <div class="mb-3 p-2 bg-[#89734d15] rounded-md">
-                            <div class="flex items-center gap-1.5 mb-1.5">
-                                <input type="date" id="start-date" class="py-1.5 border border-gray-300 rounded text-sm flex-grow" placeholder="Start Date">
-                                <input type="date" id="end-date" class="py-1.5 border border-gray-300 rounded text-sm flex-grow" placeholder="End Date">                            
+                        <div class="w-[50%] lg:w-full">
+                            <!-- Previous days attendance -->
+                            <div>
+                                <div class="bg-[#89734d15] text-[#1E1E1ECC] px-2 py-1 rounded-t-md font-semibold sticky top-0 z-10">Previous Attendance</div>
+                                
+                                <!-- Date Filter Section -->
+                                <div class="mb-3 p-2 bg-[#89734d15] rounded-b-md">
+                                    <div class="flex items-center gap-1.5 mb-1.5">
+                                        <input type="date" id="start-date" class="py-1.5 border border-gray-300 rounded text-sm flex-grow" placeholder="Start Date">
+                                        <input type="date" id="end-date" class="py-1.5 border border-gray-300 rounded text-sm flex-grow" placeholder="End Date">                            
+                                    </div>
+                                    <div class="h-[30px] flex justify-end gap-2">
+                                        <button id="apply-filter" class="button_1 h-full text-xs/3 font-bold text-[League Spartan] text-center">FILTER</button>
+                                        <button id="reset-filter" class="button_2 h-full text-xs/3 font-bold text-[League Spartan] text-center">RESET</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="previous-history" class="text-sm"></div>
                             </div>
-                            <div class="h-[30px] flex justify-end gap-2">
-                                <button id="apply-filter" class="button_1 h-full text-xs/3 font-bold text-[League Spartan] text-center">FILTER</button>
-                                <button id="reset-filter" class="button_2 h-full text-xs/3 font-bold text-[League Spartan] text-center">RESET</button>
-                            </div>
-                        </div>
-
-                        <!-- Previous days attendance -->
-                        <div>
-                            <div class="bg-[#89734d15] text-[#1E1E1ECC] px-2 py-1 rounded font-semibold sticky top-0 z-10">Previous Attendance</div>
-                            <div id="previous-history" class="text-sm overflow-y-auto"></div>
                         </div>
                     </div>
                 </div>

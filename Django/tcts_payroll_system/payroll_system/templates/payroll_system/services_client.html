@@ -186,20 +186,20 @@
 
             <div class="w-full h-[50px] flex justify-end gap-4">
                 <a class="h-full mx-5" href="javascript:history.back()">
-                    <input id="cancel" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
+                    <input id="cancel" class="w-fit h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CANCEL">
                 </a>
-                <input id="button" class="w-full h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CONFIRM CUSTOMER" onclick="confirmCustomer()">
+                <input id="button_1" class="w-fit h-[40px] px-4 font-bold text-[League Spartan] text-center" type="button" value="CONFIRM CUSTOMER" onclick="confirmCustomer()">
             </div>
 
             <div id="popup" class="popup fixed h-fit w-[60%] md:w-[50%] lg:w-[40%] gap-5 py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-start invisible opacity-0 rounded-lg z-60 overflow-hidden">
                 <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">CONFIRM</h1>
-
-                <span class="w-full h-[2px] my-1 bg-[#1e1e1e40] rounded-full"></span>
-                
-                <h1 class="w-full text-lg my-3 sm:text-xl font-[League Spartan] font-semibold text-center">Are you sure about this Customer's details?</h1>
+                <div class="w-full h-[2px] my-1 border border-2 border-[#1e1e1e40] rounded-full"></div>
+                <h1 class="text-base sm:text-base my-2 font-[League Spartan] font-normal text-center">
+                    Are you sure about this customer's details? Once confirmed, no further changes can be made to this customer.
+                </h1>
                 <div class="w-full h-[40px] my-1 flex justify-end gap-3">
-                    <input type="button" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CANCEL" onclick="cancelConfirmCustomer()">
-                    <input type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CONFIRM">
+                    <input type="button" id="cancel" class="w-fit h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CANCEL" onclick="cancelConfirmCustomer()">
+                    <input type="submit" id="confirm" class="w-fit h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CONFIRM">
                 </div>
             </div>
         </form>
