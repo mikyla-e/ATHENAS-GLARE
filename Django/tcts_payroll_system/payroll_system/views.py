@@ -1631,7 +1631,7 @@ def print(request):
         else:
             latest_payroll = None
         
-        # Add to employee data list
+        # Add to employee data list - always add the employee even if they have no payroll
         employee_data.append({
             'employee': employee,
             'latest_payroll': latest_payroll

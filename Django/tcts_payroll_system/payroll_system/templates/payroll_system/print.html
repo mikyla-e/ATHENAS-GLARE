@@ -253,38 +253,28 @@
             </thead>
             <tbody>
                 {% for data in employee_data %}
-                {% with employee=data.employee latest_payroll=data.latest_payroll %}
-                    {% if latest_payroll %}
-                    <tr class="border-b border-gray-200">
-                        <td class="p-3" data-label="EMPLOYEE">{{ employee.first_name }} {{ employee.last_name }}</td>
-                        <td class="p-3" data-label="RATE PER DAY">{{ latest_payroll.rate }}</td>
-                        <td class="p-3" data-label="INCENTIVES">{{ latest_payroll.incentives }}</td>
-                        <td class="p-3" data-label="DEDUCTIONS">{{ latest_payroll.deductions }}</td>
-                        <td class="p-3 payment-amount" data-label="PAYMENT AMOUNT">₱{{ latest_payroll.salary }}</td>
-                        <td class="p-3" data-label="CASH ADVANCED">{{ latest_payroll.cash_advance }}</td>
-                    </tr>
+                <tr class="border-b border-gray-200">
+                    <td class="p-3" data-label="EMPLOYEE">{{ data.employee.first_name }} {{ data.employee.last_name }}</td>
+                    {% if data.latest_payroll %}
+                        <td class="p-3" data-label="RATE PER DAY">{{ data.latest_payroll.rate }}</td>
+                        <td class="p-3" data-label="INCENTIVES">{{ data.latest_payroll.incentives }}</td>
+                        <td class="p-3" data-label="DEDUCTIONS">{{ data.latest_payroll.deductions }}</td>
+                        <td class="p-3 payment-amount" data-label="PAYMENT AMOUNT">₱{{ data.latest_payroll.salary }}</td>
+                        <td class="p-3" data-label="CASH ADVANCED">{{ data.latest_payroll.cash_advance }}</td>
                     {% else %}
-                    <tr class="border-b border-gray-200">
-                        <td class="p-3" colspan="6">No payroll records found for {{ employee.first_name }} {{ employee.last_name }}</td>
-                    </tr>
+                        <td class="p-3" data-label="RATE PER DAY">{{ data.employee.daily_rate }}</td>
+                        <td class="p-3" data-label="INCENTIVES">-</td>
+                        <td class="p-3" data-label="DEDUCTIONS">-</td>
+                        <td class="p-3 payment-amount" data-label="PAYMENT AMOUNT">-</td>
+                        <td class="p-3" data-label="CASH ADVANCED">-</td>
                     {% endif %}
-                {% endwith %}
+                </tr>
                 {% endfor %}
             </tbody>
             <tfoot>
                 <tr class="bg-gray-50">
                     <td colspan="4" class="p-3 text-right font-bold" data-label="SUMMARY">Total:</td>
-                    <td class="p-3 font-bold payment-amount" data-label="TOTAL AMOUNT">
-                        {% with total_salary=0 %}
-                            {% for data in employee_data %}
-                                {% if data.latest_payroll %}
-                                    {% with total_salary=total_salary|add:data.latest_payroll.salary %}
-                                    {% endwith %}
-                                {% endif %}
-                            {% endfor %}
-                            ₱{{ total_salary }}
-                        {% endwith %}
-                    </td>
+                    <td class="p-3 font-bold payment-amount" data-label="TOTAL AMOUNT">₱{{ total_salary }}</td>
                     <td class="p-3" data-label=""></td>
                 </tr>
             </tfoot>
