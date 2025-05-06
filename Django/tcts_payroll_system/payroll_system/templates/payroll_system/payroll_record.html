@@ -85,7 +85,7 @@
 
 <!-- End of Confirmation Dialogue -->
 
-<div id="incentive-popup" class="edit_incentives_popup popup absolute w-[80%] sm:w-[60%] md:w-[50%] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
+<div id="incentive-popup" class="edit_incentives_popup popup absolute w-[500px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden">
     <h1>Add/Deduct for all Employees</h1>
     <form id="incentives-form" class="flex flex-col" method="post" action="{% url 'payroll_system:update_all_incentives' %}">
         {% csrf_token %}
@@ -115,49 +115,11 @@
         </div>
 
         <div class="w-full h-[40px] my-1 flex justify-center sm:justify-end gap-3">
-            <input type="button" class="size-full" value="CANCEL" onclick="cancelEditIncentives()">
-            <input type="submit" class="size-full" value="CONFIRM">
+            <input type="button" id="cancel" class="w-fit text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CANCEL" onclick="cancelEditIncentives()">
+            <input type="submit" id="confirm" class="w-fit text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CONFIRM">
         </div>                      
     </form>
 </div>
-
-<!--deductions-->
-<!-- <div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
-    <div class="space-y-2">
-        <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Edit Deductions</h1>
-        <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p>
-    </div>
-    <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:edit_deductions' %}">
-        {% csrf_token %}
-        <div class="flex flex-col">
-            <label for="deduction_type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Deduction Type</label>
-        
-            <div class="w-full h-[60px]">
-                {{ deduction_form.deduction_type }}
-            </div>
-        </div>
-
-        <div class="flex flex-col">
-            <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Amount</label>
-        
-            <div class="w-full h-[60px]">
-                {{ deduction_form.amount }}
-            </div>
-        </div>
-        <div class="flex flex-col">
-            <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Amount</label>
-        
-            <div class="w-full h-[60px]">
-                {{ deduction_form.payroll_period }}
-            </div>
-        </div>
-
-        <div class="w-full h-[40px] flex justify-end gap-3">
-            <input id="cancel" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditDeductions()">
-            <input id="button" type="submit" class="size-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">   
-        </div>
-    </form>   
-</div> -->
 
 {% endblock %}
 
@@ -409,22 +371,6 @@
         // function cancelConfirmPayroll(){
         //     const bg = document.getElementById("background");
         //     const popup = document.getElementById("payroll-popup");
-        //     bg.classList.remove("show");
-        //     popup.classList.remove("show");
-        // }
-        
-
-        // function editDeductions(){
-        //     let bg = document.getElementById("background");
-        //     const popup = document.getElementById("deductions-popup");
-            
-        //     bg.classList.add("show");
-        //     popup.classList.add("show");
-        // }
-
-        // function cancelEditDeductions(){
-        //     let bg = document.getElementById("background");
-        //     const popup = document.getElementById("deductions-popup");
         //     bg.classList.remove("show");
         //     popup.classList.remove("show");
         // }
