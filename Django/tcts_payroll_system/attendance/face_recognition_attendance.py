@@ -97,7 +97,7 @@ def check_attendance_status(employee, start_date=None, end_date=None):
     
     # Get today's attendance logs
     today_logs = Attendance.objects.filter(
-        employee_id_fk=employee,
+        employee=employee,
         date=today_str
     ).order_by('time_in')
     
@@ -114,7 +114,7 @@ def check_attendance_status(employee, start_date=None, end_date=None):
         })
     
     # Get historical logs with date filtering if provided
-    history_query = Attendance.objects.filter(employee_id_fk=employee)
+    history_query = Attendance.objects.filter(employee=employee)
     
     if start_date and end_date:
         # Filter by date range
@@ -170,13 +170,13 @@ def get_filtered_attendance(employee, start_date, end_date):
     
     # Get today's logs
     today_logs = Attendance.objects.filter(
-        employee_id_fk=employee,
+        employee=employee,
         date=today
     ).order_by('time_in')
     
     # Get history logs within the date range
     history_logs = Attendance.objects.filter(
-        employee_id_fk=employee,
+        employee=employee,
         date__gte=start_date_obj,
         date__lte=end_date_obj,
         date__lt=today  # Exclude today's logs from history
@@ -222,7 +222,7 @@ def mark_attendance(employee, action):
     if action == 'time_in':
         # Check if employee already has an active session
         today_attendance = Attendance.objects.filter(
-            employee_id_fk=employee, 
+            employee=employee, 
             date=today,
             time_in__isnull=False,
             time_out__isnull=True
@@ -239,7 +239,7 @@ def mark_attendance(employee, action):
         try:
             # Create new attendance record
             attendance = Attendance(
-                employee_id_fk=employee,
+                employee=employee,
                 date=today,
                 time_in=current_time,
                 attendance_status=Attendance.AttendanceStatus.PRESENT
@@ -265,7 +265,7 @@ def mark_attendance(employee, action):
         try:
             # Find today's attendance record with an open session
             today_attendance = Attendance.objects.filter(
-                employee_id_fk=employee, 
+                employee=employee, 
                 date=today,
                 time_in__isnull=False,
                 time_out__isnull=True
