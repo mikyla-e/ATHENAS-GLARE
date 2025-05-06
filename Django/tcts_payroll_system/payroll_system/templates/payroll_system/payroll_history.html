@@ -88,7 +88,7 @@
                     <a href="{% url 'payroll_system:payroll_record' %}?payroll_id={{ payroll_period.payroll_period_id }}" class="font-bold hover:text-[#F8D146] duration-100">
                         View
                     </a>
-                    <a href="" class="font-bold hover:text-[#F8D146] duration-100">
+                    <a href="{% url 'payroll_system:payslip' payroll_period_id=payroll_period.payroll_period_id %}" class="font-bold hover:text-[#F8D146] duration-100">
                         Print
                     </a>
                 </td>
