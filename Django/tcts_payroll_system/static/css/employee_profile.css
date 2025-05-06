@@ -32,8 +32,7 @@
 
 /*pop up*/
 
-.background_add.show,
-.background_edit.show,
+.background.show,
 .add_attendance.show,
 .edit_attendance.show {
     visibility: visible;

@@ -304,8 +304,8 @@
                     <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll.payment_date }}</td>
                     <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter] ">
                     <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter] space-x-2">
-                        <a href="{% url 'payroll_system:generate_payroll' payroll.payroll_period_id %}" class="font-bold hover:text-[#F8D146] duration-100">GENERATE</a>
-                        <a href="{% url 'payroll_system:payroll_record' %}?payroll_id={{ payroll.payroll_period_id }}" class="font-bold hover:text-[#F8D146] duration-100">MORE</a>
+                        <a href="{% url 'payroll_system:generate_payroll' payroll.payroll_period_id %}" class="font-bold hover:text-[#F8D146] duration-100" title="Generate Payroll">GENERATE</a>
+                        <a href="{% url 'payroll_system:payroll_record' %}?payroll_id={{ payroll.payroll_period_id }}" class="font-bold hover:text-[#F8D146] duration-100" title="View More">MORE</a>
                     </td>
                 </tr>
                 {% empty %}

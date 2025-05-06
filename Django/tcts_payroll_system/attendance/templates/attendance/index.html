@@ -593,7 +593,7 @@
                         
                     case 'recognized':
                         consecutiveMatches++;
-                        statusMessage.textContent = `Matching... (${consecutiveMatches}/${REQUIRED_MATCHES})`;
+                        statusMessage.textContent = `Please wait. Detecting face... (${consecutiveMatches}/${REQUIRED_MATCHES})`;
                         
                         if (consecutiveMatches >= REQUIRED_MATCHES) {
                             recognizedEmployeeId = response.employee_id;
