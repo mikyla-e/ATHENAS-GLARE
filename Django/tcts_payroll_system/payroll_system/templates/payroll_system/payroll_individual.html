@@ -134,21 +134,22 @@
 </div>
 
 <!--cash advance-->
+{% if selected_record %}
 <div id="cash-popup" class="popup fixed h-fit w-[400px] sm:w-[450px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden">
     <div class="flex flex-col gap-1">
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Add Cash Advance</h1>
         <p class="text-sm font-[League Spartan] font-normal text-left m-0 text-justify">Requesting for Cash Advance will add deductions of the same amount in the next payroll period. Proceed?</p>    
     </div>
-    <form id="cash-form" class="size-full flex flex-col" method="post" action="">
+    <form id="cash-form" class="size-full flex flex-col" method="post" action="{% url 'payroll_system:add_cash_advance' selected_record.payroll_record_id %}">
         {% csrf_token %}
         <input type="hidden" name="cash_advance" value="true">
         <div class="w-full h-[50%] my-5 flex justify-center gap-1">
             <div class="w-full rounded-xl">
                 <div class="w-full h-[25%]">
-                    <label for="cash_advance" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">amount</label>
+                    <label for="amount" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">amount</label>
                 </div>
                 <div class="w-full h-[75%]">
-                    <input type="number" name="number" id="cash_advance" class="w-full h-full px-5 outline-none border-none font-[Inter] font-semibold text-3xl">
+                    <input type="number" name="amount" id="cash_advance" step="0.01" min="0.01" class="w-full h-full px-5 outline-none border-none font-[Inter] font-semibold text-3xl">
                 </div>
             </div>
         </div>
@@ -158,6 +159,7 @@
         </div>           
     </form>
 </div>
+{% endif %}
 
 <!--deductions-->
 <div id="deductions-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-4">
@@ -165,7 +167,8 @@
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">Edit Deductions</h1>
         <!-- <p class="text-sm font-[League Spartan] font-normal text-left m-0">Editing Deductions will apply to all employees.</p> -->
     </div>
-    <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:edit_deductions' %}">
+    {% if selected_record and selected_record.payroll_period.payroll_status != 'PROCESSED' %}
+    <form class="flex flex-col gap-5" method="post" action="{% url 'payroll_system:add_individual_deduction' selected_record.payroll_record_id %}">
         {% csrf_token %}
         <div class="flex flex-col">
             <label for="deduction_type" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Deduction Type</label>
@@ -182,19 +185,13 @@
                 {{ deduction_form.amount }}
             </div>
         </div>
-        <div class="flex flex-col">
-            <label for="deduction" class="mx-3 font-[Inter] text-sm md:text-[14px] font-semibold text-[#1E1E1E]">Amount</label>
         
-            <div class="w-full h-[60px]">
-                {{ deduction_form.payroll_period }}
-            </div>
-        </div>
-
         <div class="w-full h-[40px] flex justify-end gap-3">
             <input id="cancel" type="button" class="w-fit text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CANCEL" onclick="cancelEditDeductions()">
             <input id="confirm" type="submit" class="w-fit text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" value="CONFIRM">   
         </div>
     </form>   
+    {% endif %}
 </div>
 {% endblock %}
 
@@ -239,9 +236,11 @@
     </div>
 
     <div id="buttons" class="order-2 col-span-2 md:order-3 md:col-span-3 lg:col-span-1 flex justify-end items-end md:items-start lg:items-end gap-2">
+        {% if selected_record and selected_record.payroll_period.payroll_status == 'INPROGRESS' %}
         <button id="button_2" class="h-[45px] flex justify-center items-center gap-2 overflow-hidden" onclick="addCashAdvance()">
             <p class="text-[#FFF] font-bold text-xs/4 xl:text-sm/4 text-[League Spartan]">CASH ADVANCE</p>
         </button>
+        {% endif %}
         <button id="button_1" class="h-[45px] flex justify-center items-center gap-2 overflow-hidden" onclick="editDeductions()">
             <p class="text-[#FFF] font-bold text-xs/4 xl:text-sm/4 text-[League Spartan]">DEDUCTIONS</p>
             <img src="{% static 'images/deductions_icon.png' %}" alt="">

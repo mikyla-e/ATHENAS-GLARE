@@ -368,7 +368,7 @@ class PayrollPeriod(models.Model):
 
     class Type(models.TextChoices):
         WEEKLY = 'WEEKLY', _('Weekly')
-        BIWEEKLY = 'BY-WEEKLY', _('By-weekly')
+        BIWEEKLY = 'BY-WEEKLY', _('Bi-weekly')
         MONTHLY = 'MONTHLY', _('Monthly')
 
     payroll_period_id = models.AutoField(primary_key=True)
@@ -434,8 +434,7 @@ class PayrollPeriod(models.Model):
     def confirm(self):
         """
         Confirm and finalize this payroll period.
-        Raises ValidationError if end date hasn't been reached or status isn't INPROGRESS.
-        Returns True if successful.
+        Transfers any cash advances to the next available payroll period.
         """
         today = timezone.now().date()
         
@@ -447,11 +446,52 @@ class PayrollPeriod(models.Model):
         if self.payroll_status != self.PayrollStatus.INPROGRESS:
             raise ValidationError("Only payroll periods with IN-PROGRESS status can be confirmed.")
         
+        # Check all payroll records for cash advances
+        # and transfer them to the next available payroll period
+        self._transfer_cash_advances()
+        
         # Set status to PROCESSED
         self.payroll_status = self.PayrollStatus.PROCESSED
         self.save()
         
         return True
+
+    def _transfer_cash_advances(self):
+        """
+        Transfer cash advances from this payroll period to the next available one
+        as deductions of type OTHERS.
+        """
+        # Get all payroll records in this period with cash advances
+        records_with_advances = self.payroll_records.filter(cash_advance__gt=0)
+        
+        for record in records_with_advances:
+            # Find the next payroll period for this employee
+            next_period = PayrollPeriod.objects.filter(
+                start_date__gt=self.end_date,
+                payroll_status__in=[
+                    PayrollPeriod.PayrollStatus.PENDING,
+                    PayrollPeriod.PayrollStatus.INPROGRESS
+                ]
+            ).order_by('start_date').first()
+            
+            if next_period:
+                # Get or create a payroll record for the employee in the next period
+                next_record, created = PayrollRecord.objects.get_or_create(
+                    employee=record.employee,
+                    payroll_period=next_period
+                )
+                
+                # Create a deduction of type OTHERS with the cash advance amount
+                Deduction.objects.create(
+                    payroll_record=next_record,
+                    deduction_type=Deduction.DeductionType.OTHERS,
+                    amount=record.cash_advance
+                )
+                
+                # Update the next record's net pay to reflect the new deduction
+                if not created:  # Only recalculate if it's an existing record
+                    next_record.net_pay = next_record.calculate_net_pay()
+                    next_record.save(update_fields=['net_pay'])
 
     def __str__(self):
         return f"{self.start_date} to {self.end_date} ({self.get_payroll_status_display()})"
@@ -461,6 +501,7 @@ class Deduction(models.Model):
         SSS = 'SSS', _('SSS')
         PHILHEALTH = 'PHILHEALTH', _('PhilHealth')
         PAGIBIG = 'PAGIBIG', _('Pag-Ibig')
+        OTHERS = 'OTHERS', _('Others')
 
     deduction_id = models.AutoField(primary_key=True)
     payroll_record = models.ForeignKey('PayrollRecord', on_delete=models.CASCADE, related_name='deductions')
@@ -497,9 +538,9 @@ class PayrollRecord(models.Model):
         return sum(d.amount for d in self.deductions.all())
 
     def calculate_net_pay(self):
-        """Calculate net pay after deductions and cash advances"""
+        """Calculate net pay after deductions (cash advance is NOT deducted)"""
         total_deductions = self.calculate_total_deductions()
-        return self.gross_pay - total_deductions - self.cash_advance
+        return self.gross_pay - total_deductions  
 
     def save(self, *args, **kwargs):
         # Skip calculations if update_fields is specified (to avoid recursion)

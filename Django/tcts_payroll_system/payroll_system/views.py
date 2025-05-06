@@ -14,6 +14,7 @@ from django.utils.timezone import now, timedelta
 from django.views.decorators.csrf import csrf_protect
 from .forms import EmployeeForm, EmployeeEditForm, PayrollPeriodForm, DeductionForm, ServiceForm, CustomerForm, CustomerEditForm, VehicleForm
 from .models import Employee, Attendance, PayrollPeriod, Deduction, PayrollRecord, History, Region, Province, City, Barangay, Service, Customer, Vehicle, Task 
+from urllib.parse import urlencode
 
 @csrf_protect  # Ensure CSRF protection
 
@@ -500,11 +501,15 @@ def payroll_individual(request, employee_id):
             )
         ).order_by('date')
     
+    # Initialize the deduction form with the selected record
+    deduction_form = DeductionForm(payroll_record=selected_record) if selected_record else DeductionForm()
+    
     context = {
         'employee': employee,
         'payroll_records': payroll_records,
         'selected_record': selected_record,
         'attendance_records': attendance_records,
+        'deduction_form': deduction_form,
     }
     
     return render(request, 'payroll_system/payroll_individual.html', context)
@@ -526,6 +531,78 @@ def payroll_history(request):
     }
     
     return render(request, 'payroll_system/payroll_history.html', context)
+
+@login_required
+def add_cash_advance(request, record_id):
+    """Handle cash advance requests for a payroll record"""
+    record = get_object_or_404(PayrollRecord, payroll_record_id=record_id)
+    
+    # Only allow cash advance for IN-PROGRESS payroll periods
+    if record.payroll_period.payroll_status != PayrollPeriod.PayrollStatus.INPROGRESS:
+        messages.error(request, "Cash advance can only be added to active payroll periods.")
+        return redirect('payroll_system:payroll_individual', employee_id=record.employee.employee_id)
+    
+    if request.method == 'POST' and 'cash_advance' in request.POST:
+        try:
+            amount = float(request.POST.get('amount', 0))
+            if amount <= 0:
+                raise ValueError("Amount must be greater than zero")
+                
+            # Add the new cash advance amount to the existing value instead of replacing it
+            record.cash_advance += amount
+            record.save(update_fields=['cash_advance'])
+            
+            messages.success(request, f"Cash advance of ₱{amount:.2f} recorded successfully.")
+            
+        except ValueError as e:
+            messages.error(request, f"Invalid amount: {str(e)}")
+    
+    # Redirect back with the payroll_id parameter to show only the current record
+    redirect_url = reverse('payroll_system:payroll_individual', kwargs={'employee_id': record.employee.employee_id})
+    redirect_url += f'?payroll_id={record.payroll_period.payroll_period_id}'
+    return redirect(redirect_url)
+
+@login_required
+def add_individual_deduction(request, payroll_record_id):
+    payroll_record = get_object_or_404(PayrollRecord, payroll_record_id=payroll_record_id)
+    employee = payroll_record.employee
+    
+    # Check if payroll period is in a state where deductions can be added
+    if payroll_record.payroll_period.payroll_status == PayrollPeriod.PayrollStatus.PROCESSED:
+        messages.error(request, "Cannot add deductions to a processed payroll.")
+        return redirect('payroll_system:payroll_individual', employee_id=employee.employee_id)
+    
+    if request.method == 'POST':
+        form = DeductionForm(request.POST, payroll_record=payroll_record)
+        if form.is_valid():
+            deduction = form.save(commit=False)
+            deduction.payroll_record = payroll_record
+            deduction.save()
+            
+            # Recalculate the net pay
+            payroll_record.net_pay = payroll_record.calculate_net_pay()
+            payroll_record.save(update_fields=['net_pay'])
+            
+            messages.success(request, "Deduction added successfully.")
+            
+            # Build the base URL
+            base_url = reverse('payroll_system:payroll_individual', kwargs={'employee_id': employee.employee_id})
+            
+            # Add query parameters if we have a payroll record
+            if payroll_record:
+                query_params = urlencode({'payroll_id': payroll_record.payroll_period.payroll_period_id})
+                url = f"{base_url}?{query_params}"
+                return redirect(url)
+    else:
+        form = DeductionForm(payroll_record=payroll_record)
+    
+    context = {
+        'form': form,
+        'employee': employee,
+        'payroll_record': payroll_record
+    }
+    
+    return render(request, 'payroll_system/add_deduction.html', context)
 
 @login_required
 def edit_deductions(request):

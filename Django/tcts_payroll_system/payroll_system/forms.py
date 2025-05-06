@@ -579,6 +579,19 @@ class DeductionForm(forms.ModelForm):
             'deduction_type': forms.Select()
         }
         
+    def __init__(self, *args, **kwargs):
+        # Extract the payroll_record parameter if it exists
+        payroll_record = kwargs.pop('payroll_record', None)
+        # Call the parent constructor
+        super().__init__(*args, **kwargs)
+        
+        # If we have a payroll record, hide the payroll_period field
+        if payroll_record:
+            self.fields['payroll_period'].widget = forms.HiddenInput()
+            self.fields['payroll_period'].required = False
+            # Can also pre-select the payroll period if needed
+            # self.initial['payroll_period'] = payroll_record.payroll_period
+            
 class ServiceForm(forms.ModelForm):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'w-full outline-none text-lg', 'placeholder': 'Enter Title'}))
     service_image = forms.ImageField(widget=forms.ClearableFileInput(attrs={'class': 'hidden', 'accept': 'image/*', 'onchange': 'loadImage(event)'}))
