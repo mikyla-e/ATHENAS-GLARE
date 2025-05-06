@@ -944,6 +944,13 @@ def services_client(request):
     regions = list(Region.objects.all().values('regDesc', 'regCode'))
     customers = Customer.objects.all()
     
+    initial_data = {
+        'region': 'REGION IX (ZAMBOANGA PENINSULA)',
+        'province': 'ZAMBOANGA DEL SUR', 
+    }
+
+    customer_form = CustomerForm(initial=initial_data)
+
     context = {
         'customer_form': customer_form,
         'vehicle_form': vehicle_form,

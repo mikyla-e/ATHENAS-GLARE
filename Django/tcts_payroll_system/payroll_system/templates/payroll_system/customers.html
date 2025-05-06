@@ -38,18 +38,20 @@
                 </tr>
             </thead>
             <tbody>
-                <tr id="customer-data">
             {% for customer in customers %}
+                <tr id="customer-data">
                     <td class="p-2">{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
                     <td class="p-2">{{ customer.contact_number }}</td>
                     <td class="p-2">{{ customer.city }}, {{ customer.barangay }}</td>
                     <td class="p-2">
                         <a class="" title="Customer Detail" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
                     </td>
-            {% empty %}
-                    <td class="p-2">No customer records found</td>
-            {% endfor %}
                 </tr>
+            {% empty %}
+                <tr id="customer-data">
+                    <td class="p-2">No customer records found</td>
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>
