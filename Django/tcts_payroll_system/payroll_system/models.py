@@ -596,7 +596,8 @@ class PayrollRecord(models.Model):
 
     def calculate_gross_pay(self):
         """Calculate gross pay based on days worked and employee rate"""
-        return self.days_worked * self.employee.daily_rate + self.incentives
+        gross = self.days_worked * self.employee.daily_rate + self.incentives
+        return max(0, gross)  # Ensure gross pay is never negative
 
     def calculate_total_deductions(self):
         """Calculate the sum of all deductions"""
@@ -605,7 +606,8 @@ class PayrollRecord(models.Model):
     def calculate_net_pay(self):
         """Calculate net pay after deductions (cash advance is NOT deducted)"""
         total_deductions = self.calculate_total_deductions()
-        return self.gross_pay - total_deductions  
+        net = self.gross_pay - total_deductions
+        return max(0, net)  # Ensure net pay is never negative
 
     def save(self, *args, **kwargs):
         # Skip calculations if update_fields is specified (to avoid recursion)
@@ -616,14 +618,14 @@ class PayrollRecord(models.Model):
         # For any other save, recalculate if period is in progress
         if self.payroll_period.payroll_status == PayrollPeriod.PayrollStatus.INPROGRESS:
             # Always recalculate days worked
-            self.days_worked = self.calculate_days_worked()
-            self.gross_pay = self.calculate_gross_pay()
+            self.days_worked = max(0, self.calculate_days_worked())  # Ensure days_worked is never negative
+            self.gross_pay = max(0, self.calculate_gross_pay())  # Ensure gross_pay is never negative
             
             # First save to make sure we have an ID
             super().save(*args, **kwargs)
             
             # Then update net pay
-            self.net_pay = self.calculate_net_pay()
+            self.net_pay = max(0, self.calculate_net_pay())  # Ensure net_pay is never negative
             super().save(update_fields=['net_pay'])
         else:
             super().save(*args, **kwargs)

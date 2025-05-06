@@ -77,6 +77,22 @@
         border-radius: 4px;
         width: 100%;
     } */
+
+    #close-error{
+        padding: 0 20px;
+
+        border-radius: 30px;
+        border: none;
+
+        background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
+        color: #1E1E1E;
+    }
+
+    #close-error:hover{
+        cursor: pointer;
+        scale: 1.05;
+        transition: 0.5s;
+    }
 </style>
 <link rel="stylesheet" href="{% static 'css/payroll_individual.css'%}">
 <link rel="stylesheet" href="{% static 'css/table.css'%}">
@@ -191,20 +207,30 @@
     </form>   
     {% endif %}
 </div>
-{% endblock %}
-
-{% block content %}
 
 {% if messages %}
-<div class="messages my-3">
-    {% for message in messages %}
-    <div class="alert {{ message.tags }} p-2 rounded-lg mb-2 {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% endif %}">
-        {{ message }}
+<div id="error-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-3">
+    <div class="space-y-2">
+        <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">NOTICE</h1>
+        <div class="w-full h-[2px] my-3 border border-2 border-[#1e1e1e40] rounded-full"></div>
     </div>
-    {% endfor %}
+    
+    <div class="messages">
+        {% for message in messages %}
+        <p class="{% if message.tags %}{{ message.tags }}{% endif %} text-base sm:text-base my-2 font-[League Spartan] font-normal text-center">
+            {{ message }}
+        </p>
+        {% endfor %}
+    </div>
+    <div class="w-full h-[40px] flex justify-center gap-3 my-2">
+        <button id="close-error" class="w-[100px] text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" onclick="closeErrorPopup()">OK</button>
+    </div>
 </div>
 {% endif %}
 
+{% endblock %}
+
+{% block content %}
 <div class="w-full grid gap-4 grid-cols-[100px_1fr_1fr] grid-rows-[100px_80px_auto_auto]  md:gap-5 md:grid-cols-[100px_6fr_6fr] md:grid-rows-[100px_50px_120px]   lg:grid-cols-[100px_6fr_6fr] lg:grid-rows-[100px_auto] z-10">
 
     <div class="order-1 col-span-1 rounded-full w-full flex justify-center items-center min-w-[100px]">
@@ -450,5 +476,34 @@
             });
         }
     });
+
+    // When the document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if there are any error messages
+        const errorPopup = document.getElementById('error-popup');
+        const bg = document.getElementById("background");
+        if (errorPopup) {
+            // Show the popup
+            errorPopup.classList.remove('invisible', 'opacity-0');
+            errorPopup.classList.add('visible', 'opacity-100');
+            bg.classList.add("show");
+        }
+    });
+
+    // Function to close the error popup
+    function closeErrorPopup() {
+        const errorPopup = document.getElementById('error-popup');
+        const bg = document.getElementById("background");
+        if (errorPopup) {
+            errorPopup.classList.add('invisible', 'opacity-0');
+            errorPopup.classList.remove('visible', 'opacity-100');
+            bg.classList.remove("show");
+            
+            // Optional: remove the popup from DOM after animation
+            setTimeout(() => {
+                errorPopup.remove();
+            }, 300);
+        }
+    }
 </script>
 {% endblock %}
