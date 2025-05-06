@@ -267,11 +267,73 @@ def employee_profile(request, employee_id):
     # Get latest attendance and calculate hours worked
     latest_attendance = employee.attendances.order_by('-date').first()
     if latest_attendance:
-        latest_attendance.calculate_hours_worked()  
+        latest_attendance.calculate_hours_worked()
+    
+    # Filter attendance records based on selected duration
+    duration = request.GET.get('duration', 'Current Week')
+    today = timezone.now().date()
+    
+    # Determine filter date range based on selected duration
+    if duration == 'Current Week':
+        # Start of the current week (Monday)
+        start_date = today - timezone.timedelta(days=today.weekday())
+        end_date = today
+    elif duration == 'Last Week':
+        # Last week's Monday to Sunday
+        start_date = today - timezone.timedelta(days=today.weekday() + 7)
+        end_date = start_date + timezone.timedelta(days=6)
+    elif duration == 'Two Weeks Ago':
+        # Two weeks ago Monday to Sunday
+        start_date = today - timezone.timedelta(days=today.weekday() + 14)
+        end_date = start_date + timezone.timedelta(days=6)
+    elif duration == 'Last Month':
+        # Last month
+        last_month = today.replace(day=1) - timezone.timedelta(days=1)
+        start_date = last_month.replace(day=1)
+        end_date = last_month
+    elif duration == 'Custom':
+        # Custom date range from request parameters
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        
+        if start_date:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        else:
+            # Default to current month start if no start date provided
+            start_date = today.replace(day=1)
+            
+        if end_date:
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        else:
+            # Default to today if no end date provided
+            end_date = today
+    else:
+        # Default to current week
+        start_date = today - timezone.timedelta(days=today.weekday())
+        end_date = today
+    
+    # Filter attendance records by date range
+    filtered_attendance = employee.attendances.filter(
+        date__gte=start_date,
+        date__lte=end_date
+    ).order_by('-date')
+    
+    # Calculate attendance statistics for the filtered period
+    attendance_stats = {
+        'total_days': (end_date - start_date).days + 1,
+        'days_present': filtered_attendance.filter(attendance_status=Attendance.AttendanceStatus.PRESENT).count(),
+        'days_absent': filtered_attendance.filter(attendance_status=Attendance.AttendanceStatus.ABSENT).count(),
+        'total_hours': sum(a.hours_worked for a in filtered_attendance if a.hours_worked)
+    }
     
     context = {
         'employee': employee,
         'latest_attendance': latest_attendance,
+        'filtered_attendance': filtered_attendance,
+        'attendance_stats': attendance_stats,
+        'selected_duration': duration,
+        'start_date': start_date,
+        'end_date': end_date,
     }
     
     return render(request, 'payroll_system/employee_profile.html', context)

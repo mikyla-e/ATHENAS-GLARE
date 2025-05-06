@@ -269,12 +269,12 @@ onclick="cancelAddAttendance(); cancelEditAttendance();">
     <!--med-->
         <div class="lg:hidden w-full h-[60px] flex flex-row flex-nowrap justify-end gap-5">
             <div class="w-fit h-full flex gap-2">
-                <select name="duration" id="duration" class="w-fit h-full px-2 rounded-full border-none bg-white text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center cursor-pointer">
-                    <option value="Current Week">Current Week</option>
-                    <option value="Last Week">Last Week</option>
-                    <option value="Two Weeks Ago">Two Weeks Ago</option>
-                    <option value="Last Month">Last Month</option>
-                    <option value="Custom">Custom</option>
+                <select name="duration" id="duration" class="w-fit h-full px-2 rounded-full border-none bg-white text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onchange="handleDurationChange()">
+                    <option value="Current Week" {% if selected_duration == 'Current Week' %}selected{% endif %}>Current Week</option>
+                    <option value="Last Week" {% if selected_duration == 'Last Week' %}selected{% endif %}>Last Week</option>
+                    <option value="Two Weeks Ago" {% if selected_duration == 'Two Weeks Ago' %}selected{% endif %}>Two Weeks Ago</option>
+                    <option value="Last Month" {% if selected_duration == 'Last Month' %}selected{% endif %}>Last Month</option>
+                    <option value="Custom" {% if selected_duration == 'Custom' %}selected{% endif %}>Custom</option>
                 </select>
 
                 <button id="button_1" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addAttendance()" title="Add Attendance">ADD ATTENDANCE</button>
@@ -365,12 +365,12 @@ onclick="cancelAddAttendance(); cancelEditAttendance();">
         <div class="w-full h-full lg:w-[75%] flex flex-col gap-5">
             <div class="hidden w-full h-[40px] lg:flex flex-row flex-nowrap justify-end gap-5">
                 <div class="w-fit h-full flex gap-2">
-                    <select name="duration" id="duration" class="w-fit h-full px-2 rounded-full border-none bg-white text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center">
-                        <option value="Current Week">Current Week</option>
-                        <option value="Last Week">Last Week</option>
-                        <option value="Two Weeks Ago">Two Weeks Ago</option>
-                        <option value="Last Month">Last Month</option>
-                        <option value="Custom">Custom</option>
+                    <select name="duration" id="duration" class="w-fit h-full px-2 rounded-full border-none bg-white text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onchange="handleDurationChange()">
+                        <option value="Current Week" {% if selected_duration == 'Current Week' %}selected{% endif %}>Current Week</option>
+                        <option value="Last Week" {% if selected_duration == 'Last Week' %}selected{% endif %}>Last Week</option>
+                        <option value="Two Weeks Ago" {% if selected_duration == 'Two Weeks Ago' %}selected{% endif %}>Two Weeks Ago</option>
+                        <option value="Last Month" {% if selected_duration == 'Last Month' %}selected{% endif %}>Last Month</option>
+                        <option value="Custom" {% if selected_duration == 'Custom' %}selected{% endif %}>Custom</option>
                     </select>
 
                     <button id="button_1" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addAttendance()">ADD ATTENDANCE</button>
@@ -563,6 +563,185 @@ onclick="cancelAddAttendance(); cancelEditAttendance();">
                 errorPopup.remove();
             }, 300);
         }
+    }
+</script>
+
+<script>
+    // Add event listener for duration dropdown
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the duration dropdown element
+        const durationSelects = document.querySelectorAll('select[name="duration"]');
+        
+        // Add event listener to both instances of the dropdown (mobile and desktop)
+        durationSelects.forEach(select => {
+            select.addEventListener('change', function() {
+                // Get the selected value
+                const selectedDuration = this.value;
+                
+                // Sync the other dropdown if it exists
+                durationSelects.forEach(otherSelect => {
+                    if (otherSelect !== this) {
+                        otherSelect.value = selectedDuration;
+                    }
+                });
+                
+                // Get the employee ID from the URL
+                const pathParts = window.location.pathname.split('/');
+                const employeeId = pathParts[pathParts.indexOf('employees') + 1];
+                
+                // If custom duration is selected, show date picker
+                if (selectedDuration === 'Custom') {
+                    showCustomDatePicker();
+                } else {
+                    // Otherwise, make an AJAX request to filter attendance
+                    fetchFilteredAttendance(employeeId, selectedDuration);
+                }
+            });
+        });
+        
+        // Handle custom date form submission
+        if (document.getElementById('custom-date-form')) {
+            document.getElementById('custom-date-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const startDate = document.getElementById('custom_start_date').value;
+                const endDate = document.getElementById('custom_end_date').value;
+                
+                // Get the employee ID from the URL
+                const pathParts = window.location.pathname.split('/');
+                const employeeId = pathParts[pathParts.indexOf('employees') + 1];
+                
+                // Fetch attendance with custom date range
+                fetchFilteredAttendance(employeeId, 'Custom', startDate, endDate);
+                
+                // Hide the custom date picker
+                hideCustomDatePicker();
+            });
+        }
+    });
+
+    function showCustomDatePicker() {
+        const bg = document.getElementById("background_custom_date");
+        const popup = document.getElementById("custom-date-popup");
+        
+        if (bg && popup) {
+            bg.classList.add("show");
+            popup.classList.add("show");
+        }
+    }
+
+    function hideCustomDatePicker() {
+        const bg = document.getElementById("background_custom_date");
+        const popup = document.getElementById("custom-date-popup");
+        
+        if (bg && popup) {
+            bg.classList.remove("show");
+            popup.classList.remove("show");
+        }
+    }
+
+    function fetchFilteredAttendance(employeeId, duration, startDate = null, endDate = null) {
+        // Show loading indicator
+        const tableBody = document.querySelector('table tbody');
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Loading...</td></tr>';
+        
+        // Prepare the URL with query parameters
+        let url = `/payroll_system/filter_attendance/${employeeId}/?duration=${duration}`;
+        
+        if (startDate && endDate) {
+            url += `&start_date=${startDate}&end_date=${endDate}`;
+        }
+        
+        // Fetch the filtered attendance data
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Clear the table
+                tableBody.innerHTML = '';
+                
+                // Check if there are attendance records
+                if (data.attendances.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No attendance records found for this period</td></tr>';
+                    return;
+                }
+                
+                // Populate the table with the filtered data
+                data.attendances.forEach(attendance => {
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-attendance-id', attendance.id);
+                    
+                    // Format date
+                    row.innerHTML = `
+                        <td>${attendance.date}</td>
+                        <td>${attendance.time_in || '-'}</td>
+                        <td>${attendance.time_out || '-'}</td>
+                        <td>${attendance.hours_worked || '-'}</td>
+                        <td>
+                            <span class="edit-link no-underline" 
+                                data-id="${attendance.id}"
+                                data-date="${attendance.date}"
+                                data-time-in="${attendance.time_in || ''}"
+                                data-time-out="${attendance.time_out || ''}"
+                                onclick="editAttendance(this)">
+                                EDIT
+                            </span>
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+                
+                // Reinitialize live hours calculation if needed
+                if (typeof calculateLiveHours === 'function') {
+                    calculateLiveHours();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching attendance data:', error);
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Error loading attendance data</td></tr>';
+            });
+    }
+</script>
+
+<script>
+    function handleDurationChange() {
+        const durationSelect = document.getElementById('duration');
+        const customDateRange = document.getElementById('customDateRange');
+        const applyFilterBtn = document.getElementById('applyFilterBtn');
+        
+        if (durationSelect.value === 'Custom') {
+            customDateRange.classList.remove('hidden');
+            applyFilterBtn.classList.add('hidden');
+        } else {
+            customDateRange.classList.add('hidden');
+            applyFilterBtn.classList.remove('hidden');
+        }
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        handleDurationChange();
+    });
+</script>
+
+<script>
+    function openEditAttendanceModal(attendanceId, date, timeIn, timeOut) {
+        // Find your modal elements
+        const modal = document.getElementById('editAttendanceModal');
+        
+        // Set form values
+        document.getElementById('edit_attendance_id').value = attendanceId;
+        document.getElementById('edit_date').value = date;
+        document.getElementById('edit_time_in').value = timeIn || '';
+        document.getElementById('edit_time_out').value = timeOut || '';
+        
+        // Show modal
+        modal.classList.remove('hidden');
     }
 </script>
 {% endblock %}
