@@ -418,12 +418,12 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update the displayed incentives and salary values
+                // Update the displayed incentives and net pay values
                 document.querySelectorAll('.incentive-display').forEach(el => {
                     el.textContent = data.new_incentives;
                 });
                 document.querySelectorAll('.salary-display').forEach(el => {
-                    el.textContent = data.new_salary;
+                    el.textContent = data.new_net_pay;  // Fixed to use new_net_pay instead of new_salary
                 });
                 
                 // Close the popup

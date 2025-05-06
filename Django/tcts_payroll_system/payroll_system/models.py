@@ -211,12 +211,23 @@ class Employee(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None  # Check if employee is newly created
+        
+        # If employee exists, check for status change
+        if not is_new:
+            try:
+                # Get the original employee instance before changes
+                original_employee = Employee.objects.get(pk=self.pk)
+                status_changed = not original_employee.is_active and self.is_active
+            except Employee.DoesNotExist:
+                status_changed = False
+        else:
+            status_changed = False
+        
         self.full_clean()
         super().save(*args, **kwargs)
 
-        # Only run if it's a new employee and active
+        # Logic for new employee who is active
         if is_new and self.is_active and self.date_of_employment:
-            
             overlapping_periods = PayrollPeriod.objects.filter(
                 start_date__lte=self.date_of_employment,
                 end_date__gte=self.date_of_employment
@@ -224,6 +235,25 @@ class Employee(models.Model):
 
             for period in overlapping_periods:
                 # Ensure not already added (e.g. duplicate save)
+                if not PayrollRecord.objects.filter(employee=self, payroll_period=period).exists():
+                    PayrollRecord.objects.create(employee=self, payroll_period=period)
+        
+        # Logic for employee status change from inactive to active
+        elif status_changed:
+            today = timezone.now().date()
+            
+            # Find active payroll periods (PENDING or INPROGRESS)
+            active_payroll_periods = PayrollPeriod.objects.filter(
+                payroll_status__in=[
+                    PayrollPeriod.PayrollStatus.PENDING,
+                    PayrollPeriod.PayrollStatus.INPROGRESS
+                ],
+                # Ensure the payroll period includes today or is in the future
+                end_date__gte=today
+            )
+            
+            for period in active_payroll_periods:
+                # Ensure not already added
                 if not PayrollRecord.objects.filter(employee=self, payroll_period=period).exists():
                     PayrollRecord.objects.create(employee=self, payroll_period=period)
 
@@ -407,6 +437,17 @@ class PayrollPeriod(models.Model):
 
         if self.start_date > today:
             raise ValidationError("Cannot generate payroll period before the start date.")
+            
+        # Check if there's already an in-progress payroll period
+        existing_in_progress = PayrollPeriod.objects.filter(
+            payroll_status=self.PayrollStatus.INPROGRESS
+        ).exclude(payroll_period_id=self.payroll_period_id).first()
+        
+        if existing_in_progress:
+            raise ValidationError(
+                f"Another payroll period ({existing_in_progress.start_date} to {existing_in_progress.end_date}) "
+                f"is already in progress. Please complete it before generating a new one."
+            )
 
         self.payroll_status = self.PayrollStatus.INPROGRESS
         self.save()
@@ -507,6 +548,30 @@ class Deduction(models.Model):
     payroll_record = models.ForeignKey('PayrollRecord', on_delete=models.CASCADE, related_name='deductions')
     deduction_type = models.CharField(max_length=20, choices=DeductionType.choices)
     amount = models.FloatField(default=0)
+
+    def clean(self):
+        super().clean()
+        
+        # Check if a deduction of this type already exists for this payroll record
+        if self.payroll_record_id and self.deduction_type:
+            existing_deduction = Deduction.objects.filter(
+                payroll_record=self.payroll_record,
+                deduction_type=self.deduction_type
+            )
+            
+            # If this is an existing deduction being updated, exclude itself from the check
+            if self.deduction_id:
+                existing_deduction = existing_deduction.exclude(deduction_id=self.deduction_id)
+            
+            if existing_deduction.exists():
+                raise ValidationError({
+                    'deduction_type': f"A {self.get_deduction_type_display()} deduction already exists for this payroll record. "
+                    f"Please edit the existing deduction instead of creating a new one."
+                })
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.deduction_type

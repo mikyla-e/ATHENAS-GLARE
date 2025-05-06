@@ -576,24 +576,45 @@ def add_individual_deduction(request, payroll_record_id):
     if request.method == 'POST':
         form = DeductionForm(request.POST, payroll_record=payroll_record)
         if form.is_valid():
-            deduction = form.save(commit=False)
-            deduction.payroll_record = payroll_record
-            deduction.save()
-            
-            # Recalculate the net pay
-            payroll_record.net_pay = payroll_record.calculate_net_pay()
-            payroll_record.save(update_fields=['net_pay'])
-            
-            messages.success(request, "Deduction added successfully.")
-            
-            # Build the base URL
-            base_url = reverse('payroll_system:payroll_individual', kwargs={'employee_id': employee.employee_id})
-            
-            # Add query parameters if we have a payroll record
-            if payroll_record:
-                query_params = urlencode({'payroll_id': payroll_record.payroll_period.payroll_period_id})
-                url = f"{base_url}?{query_params}"
-                return redirect(url)
+            try:
+                deduction = form.save(commit=False)
+                deduction.payroll_record = payroll_record
+                
+                # Check for duplicate deduction type manually
+                deduction_type = form.cleaned_data['deduction_type']
+                existing_deduction = Deduction.objects.filter(
+                    payroll_record=payroll_record,
+                    deduction_type=deduction_type
+                ).first()
+                
+                if existing_deduction:
+                    messages.error(
+                        request, 
+                        f"A {deduction.get_deduction_type_display()} deduction already exists for this payroll record. "
+                        f"Please edit the existing deduction instead."
+                    )
+                else:
+                    deduction.save()
+                    
+                    # Recalculate the net pay
+                    payroll_record.net_pay = payroll_record.calculate_net_pay()
+                    payroll_record.save(update_fields=['net_pay'])
+                    
+                    messages.success(request, "Deduction added successfully.")
+                    
+                    # Build the base URL
+                    base_url = reverse('payroll_system:payroll_individual', kwargs={'employee_id': employee.employee_id})
+                    
+                    # Add query parameters if we have a payroll record
+                    if payroll_record:
+                        query_params = urlencode({'payroll_id': payroll_record.payroll_period.payroll_period_id})
+                        url = f"{base_url}?{query_params}"
+                        return redirect(url)
+            except ValidationError as e:
+                # Add any validation errors from the model to the form
+                for field, errors in e.message_dict.items():
+                    for error in errors:
+                        form.add_error(field if field in form.fields else None, error)
     else:
         form = DeductionForm(payroll_record=payroll_record)
     
@@ -618,18 +639,45 @@ def edit_deductions(request):
             # Get all payroll records for the selected period
             payroll_records = PayrollRecord.objects.filter(payroll_period=payroll_period)
             
-            # Create a deduction for each payroll record
+            # Track statistics for user feedback
+            total_records = payroll_records.count()
+            added_count = 0
+            skipped_count = 0
+            
+            # Create a deduction for each payroll record if it doesn't already exist
             for record in payroll_records:
-                Deduction.objects.create(
+                # Check if this type of deduction already exists for this record
+                if not Deduction.objects.filter(
                     payroll_record=record,
-                    deduction_type=deduction_type,
-                    amount=amount
+                    deduction_type=deduction_type
+                ).exists():
+                    # Only create if it doesn't exist
+                    Deduction.objects.create(
+                        payroll_record=record,
+                        deduction_type=deduction_type,
+                        amount=amount
+                    )
+                    
+                    # Recalculate and save the net pay
+                    record.save()
+                    added_count += 1
+                else:
+                    skipped_count += 1
+            
+            # Provide detailed feedback message
+            if added_count > 0:
+                messages.success(
+                    request, 
+                    f"{deduction_type} deduction applied to {added_count} employees for selected period. "
+                    f"{skipped_count} employees already had this deduction type and were skipped."
+                )
+            else:
+                messages.warning(
+                    request, 
+                    f"No new deductions were added. All {total_records} employees already had "
+                    f"a {deduction_type} deduction for this period."
                 )
                 
-                # Recalculate and save the net pay
-                record.save()
-                
-            messages.success(request, f"{deduction_type} deduction applied to all employees for selected period.")
             return redirect('payroll_system:payroll_record')
         else:
             payroll_records = PayrollRecord.objects.all()
@@ -798,7 +846,7 @@ def update_employee_incentives(request, employee_id):
             formatted_net_pay = "{:.2f}".format(payroll_record.net_pay)
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                # Return JSON response for AJAX request
+                # Return JSON response for AJAX request with correct key 'new_net_pay'
                 return JsonResponse({
                     'success': True,
                     'new_incentives': formatted_incentives,
