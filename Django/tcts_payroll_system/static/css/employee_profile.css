@@ -1,22 +1,29 @@
-#button{
+
+#button_1{
     padding: 0 20px;
-    width: fit-content;
 
     border-radius: 30px;
     border: none;
 
     background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
-    color: #1e1e1e;
-    
+    color: #1E1E1E;
 }
 
-#button:hover{
-    cursor: pointer;
-    scale: 1.05;
-    transition: 0.5s;
+#button_2{
+    padding: 0 20px;
+
+    border-radius: 30px;
+    border: none;
 
     background-image: linear-gradient(to right, #1e1e1e , #1e1e1e); 
     color: #F8D146;
+    
+}
+
+#button_1:hover, #button_2:hover{
+    cursor: pointer;
+    scale: 1.05;
+    transition: 0.5s;
 }
 
 .dt-layout-row{
@@ -55,51 +62,9 @@ tbody tr td{
     cursor: pointer;
     scale: 1.05;
     transition: 0.2s;
-    background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
-    color: white;
 }
 
-/* 
-input[type=button]{
-    padding: 0 20px;
-    width: fit-content;
 
-    border-radius: 30px;
-    border: none;
-
-    background-image: linear-gradient(to right, #DC4646 , #DC4646); 
-    color: white;
-    
-}
-
-input[type=button]:hover{
-    cursor: pointer;
-    scale: 1.05;
-    transition: 0.2s;
-    background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
-    color: white;
-}
-
-input[type=submit]{
-    padding: 0 20px;
-    width: fit-content;
-
-    border-radius: 30px;
-    border: none;
-
-    background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
-    
-}
-
-input[type=submit]:hover{
-    cursor: pointer;
-    scale: 1.05;
-    transition: 0.5s;
-    background-image: linear-gradient(to right, #1e1e1e , #1e1e1e);
-    color: #F8D146;
-} */
-
-/* Cursor pointer for edit links */
 .edit-link {
     cursor: pointer;
     color: #1e1e1e;

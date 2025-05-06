@@ -182,7 +182,7 @@
   <div class="alert alert-danger">{{ error }}</div>
 {% endif %}
 
-<div class="size-full px-5 flex flex-col gap-4">
+<div class="size-full flex flex-col gap-4">
     <div class="w-full px-4 flex justify-end h-[30px]">
         <a href="{% url 'payroll_system:payroll_history' %}">
             <button id="button" class="size-full mx-3">
@@ -197,8 +197,8 @@
         <div class="px-2 flex justify-between items-end">
             <div class="w-full flex justify-between items-end gap-2">
                 <div class="flex gap-2 items-end">
-                    <p class="text-[League Spartan] text-2xl font-bold">CURRENT PAYROLL</p>
-                    <p class="text-[League Spartan] text-lg font-semibold text-[#1E1E1E80]">{{ current_payroll.get_payroll_status_display }}</p>
+                    <p class="text-[League Spartan] text-2xl font-bold text-nowrap">CURRENT PAYROLL</p>
+                    <p class="hidden md:block text-[League Spartan] text-lg font-semibold text-[#1E1E1E80]">{{ current_payroll.get_payroll_status_display }}</p>
                 </div>
                 <div class="h-[30px]">
                     <button id="confirm" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Confirm Payroll Period" onclick="confirmPayroll({{ current_payroll.payroll_period_id }})">CONFIRM PAYROLL</button>
@@ -210,10 +210,10 @@
         
         <div class="flex justify-between">
             <div class="flex flex-col px-4 py-3 gap-2">
-                <p class="text-base font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD: <span class="text-[#1E1E1E] text-[Inter] font-semibold">{{ current_payroll.start_date }} - {{ current_payroll.end_date }} | {{ current_payroll.get_type_display }}</span></p>
-                <div class="flex flex-col gap-1">
-                    <p class="text-base font-[Roboto] font-bold text-[#1E1E1E66]">PAYMENT DATE:</p>
-                    <p class="text-2xl text-[Inter] font-semibold">{{ current_payroll.payment_date }}</p>
+                <p class="text-sm md:text-base font-[Roboto] font-bold text-[#1E1E1E66]">PERIOD: <span class="text-[#1E1E1E] text-[Inter] font-semibold">{{ current_payroll.start_date }} - {{ current_payroll.end_date }} | {{ current_payroll.get_type_display }}</span></p>
+                <div class="flex flex-row items-center md:flex-col md:items-start gap-1">
+                    <p class="text-sm md:text-base font-[Roboto] font-bold text-[#1E1E1E66]">PAYMENT DATE:</p>
+                    <p class="text-lg md:text-2xl text-[Inter] font-semibold">{{ current_payroll.payment_date }}</p>
                 </div>            
             </div>
             
@@ -270,11 +270,11 @@
 
     <div class="py-2 px-4 space-y-4 text-center">
         <div class="w-full flex justify-between items-end">
-            <p class="mx-3 text-[League Spartan] text-3xl font-bold">Pending Payrolls</p>
+            <p class="mx-3 text-[League Spartan] text-2xl font-bold text-left text-nowrap">Pending Payrolls</p>
             <div class="h-[40px] space-x-2 flex justify-end items-end">
-                <button id="button_2" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="editDeductions()" title="Edit Deductions">EDIT DEDUCTIONS</button> 
+                <button id="button_2" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="editDeductions()" title="Edit Deductions"><span class="hidden sm:block">EDIT </span>DEDUCTIONS</button> 
         
-                <button id="button_1" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addPayroll()" title="Add New Payroll Period">ADD PAYROLL</button> 
+                <button id="button_1" class="h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" onclick="addPayroll()" title="Add New Payroll Period"><span class="hidden sm:block">ADD </span>PAYROLL</button> 
             </div>
         </div>
        
@@ -283,27 +283,27 @@
         <table class="bg-white w-full my-3 border-none rounded-2xl text-xs-center overflow-hidden shadow-md/10">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="text-base text-center">
-                    <th class="p-2 text-base font-[League Spartan]">TYPE</th>
-                    <th class="p-2 text-base font-[League Spartan]">START</th>
-                    <th class="p-2 text-base font-[League Spartan]">END</th>
+                    <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">TYPE</th>
+                    <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">START</th>
+                    <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">END</th>
                     
-                    <th class="p-2 text-base font-[League Spartan]">STATUS</th>
+                    <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">STATUS</th>
                     
-                    <th class="p-2 text-base font-[League Spartan]">PAYMENT DATE</th>
+                    <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">PAYMENT DATE</th>
                 </tr>
             </thead>
             <tbody>
                 {% for payroll in pending_payrolls %}
                 <tr id="payroll-data">
-                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll.type }}</td>
-                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll.start_date }}</td>
-                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll.end_date }}</td>
+                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll.type }}</td>
+                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll.start_date }}</td>
+                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll.end_date }}</td>
                     
-                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll.payroll_status }}</td>
+                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll.payroll_status }}</td>
                     
-                    <td class="px-2 py-4 text-sm font-[Inter]">{{ payroll.payment_date }}</td>
-                    <td class="px-2 py-4 text-sm font-[Inter] ">
-                    <td class="px-2 py-4 text-sm font-[Inter] space-x-2">
+                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ payroll.payment_date }}</td>
+                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter] ">
+                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter] space-x-2">
                         <a href="{% url 'payroll_system:generate_payroll' payroll.payroll_period_id %}" class="font-bold hover:text-[#F8D146] duration-100">GENERATE</a>
                         <a href="{% url 'payroll_system:payroll_record' %}?payroll_id={{ payroll.payroll_period_id }}" class="font-bold hover:text-[#F8D146] duration-100">MORE</a>
                     </td>
