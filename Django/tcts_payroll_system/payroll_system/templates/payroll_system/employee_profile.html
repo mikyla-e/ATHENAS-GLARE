@@ -26,6 +26,22 @@
     .messages {
         display: none;
     }
+
+    #close-error{
+        padding: 0 20px;
+
+        border-radius: 30px;
+        border: none;
+
+        background-image: linear-gradient(to right, #F8D146 , #F5B93F); 
+        color: #1E1E1E;
+    }
+
+    #close-error:hover{
+        cursor: pointer;
+        scale: 1.05;
+        transition: 0.5s;
+    }
 </style>
 <link rel="stylesheet" href="{% static 'css/employee_profile.css' %}">
 <link rel="stylesheet" href="{% static 'css/table.css' %}">
@@ -522,5 +538,34 @@ onclick="cancelEditAttendance()">
     document.addEventListener('DOMContentLoaded', function() {
         const messages = document.querySelectorAll('.messages .message');
     });
+
+    // When the document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if there are any error messages
+        const errorPopup = document.getElementById('error-popup');
+        const bg = document.getElementById("background");
+        if (errorPopup) {
+            // Show the popup
+            errorPopup.classList.remove('invisible', 'opacity-0');
+            errorPopup.classList.add('visible', 'opacity-100');
+            bg.classList.add("show");
+        }
+    });
+
+    // Function to close the error popup
+    function closeErrorPopup() {
+        const errorPopup = document.getElementById('error-popup');
+        const bg = document.getElementById("background");
+        if (errorPopup) {
+            errorPopup.classList.add('invisible', 'opacity-0');
+            errorPopup.classList.remove('visible', 'opacity-100');
+            bg.classList.remove("show");
+            
+            // Optional: remove the popup from DOM after animation
+            setTimeout(() => {
+                errorPopup.remove();
+            }, 300);
+        }
+    }
 </script>
 {% endblock %}
