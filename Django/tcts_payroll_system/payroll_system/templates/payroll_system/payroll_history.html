@@ -53,14 +53,14 @@
     <div class="w-full h-[40px] flex justify-between items-center">
         <p class="mx-3 text-[League Spartan] text-3xl font-bold">HISTORY</p>
 
-        <select class="h-full">
-            <option value="">This Week</option>
-            <option value="">This Month</option>
-            <option value="">Last 6 Months Ago</option>
-            <option value="">This Year</option>
-            <option value="">Last Year</option>
-            <option value="">All</option>
-        </select> 
+        <select id="dateFilter" onchange="applyDateFilter(this.value)">
+            <option value="this_week" {% if filter_period == 'this_week' %}selected{% endif %}>This Week</option>
+            <option value="this_month" {% if filter_period == 'this_month' %}selected{% endif %}>This Month</option>
+            <option value="last_6_months" {% if filter_period == 'last_6_months' %}selected{% endif %}>Last 6 Months Ago</option>
+            <option value="this_year" {% if filter_period == 'this_year' %}selected{% endif %}>This Year</option>
+            <option value="last_year" {% if filter_period == 'last_year' %}selected{% endif %}>Last Year</option>
+            <option value="all" {% if filter_period == 'all' %}selected{% endif %}>All</option>
+        </select>
     </div>
 
     <table class="bg-white w-full border-none rounded-2xl text-xs-center overflow-hidden shadow-lg">
