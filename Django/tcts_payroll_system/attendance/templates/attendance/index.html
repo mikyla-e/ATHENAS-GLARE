@@ -67,9 +67,14 @@
         <!-- Main camera area -->
         <div class="bg-[#1E1E1E] order-1 relative">
             <div class="h-full overflow-hidden">
-                <video id="video" class="w-full h-full object-cover" autoplay playsinline></video>
-                <canvas id="canvas" class="hidden"></canvas>
-                
+                <div class="relative size-full flex items-center justify-center overflow-hidden">
+                    <video id="video" autoplay playsinline class="w-full h-full object-cover bg-white brightness-[0.5]"></video>
+                    <canvas id="canvas" class="hidden"></canvas>
+
+                    <div class="absolute z-10 w-[45%] h-[75%] bg-white mix-blend-overlay" style="border-radius: 100%/90%;"></div>
+                    
+                </div>
+
                 <!-- Status overlay -->
                 <div id="status-overlay" class="absolute bottom-4 left-0 right-0 text-center p-4">
                     <div id="status-message" class="inline-block bg-black/70 text-white py-2 px-4 rounded-lg text-xl text-[League Spartan]">
@@ -139,7 +144,7 @@
 
                         <!-- Previous days attendance -->
                         <div>
-                            <div class="bg-[#89734d30] text-[#1E1E1ECC] px-2 py-1 rounded font-semibold sticky top-0 z-10">Previous Attendance</div>
+                            <div class="bg-[#89734d15] text-[#1E1E1ECC] px-2 py-1 rounded font-semibold sticky top-0 z-10">Previous Attendance</div>
                             <div id="previous-history" class="text-sm overflow-y-auto"></div>
                         </div>
                     </div>
@@ -248,7 +253,7 @@
                                     .then(() => {
                                         // Start processing frames after a short delay
                                         setTimeout(processFrame, 1000);
-                                        statusMessage.textContent = "Camera ready. Looking for faces...";
+                                        statusMessage.textContent = "Camera ready. Please align your face within the frame...";
                                     })
                                     .catch(err => {
                                         console.error('Error playing video:', err);
@@ -267,7 +272,7 @@
                                         video.play()
                                             .then(() => {
                                                 setTimeout(processFrame, 1000);
-                                                statusMessage.textContent = "Camera ready. Looking for faces...";
+                                                statusMessage.textContent = "Camera ready. Please align your face within the frame...";
                                             })
                                             .catch(err => {
                                                 console.error('Error playing video:', err);
