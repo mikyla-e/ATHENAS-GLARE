@@ -109,7 +109,7 @@
                     {{ form.region }}
                     <datalist id="region-list">
                         {% for region in regions %}
-                            <option value="{{ region.regDesc }}" data-code="{{ region.regCode }}">
+                            <option value="{{ region.regDesc }}">
                         {% endfor %}
                     </datalist>
                 </div>
@@ -123,9 +123,11 @@
 
                     {{ form.province }}
                     <datalist id="province-list">
-                        {% for province in provinces %}
-                            <option value="{{ province.provDesc }}" data-code="{{ province.provCode }}">
-                        {% endfor %}
+                        {% if form.instance.region %}
+                            {% for province in provinces %}
+                                <option value="{{ province.provDesc }}">
+                            {% endfor %}
+                        {% endif %}
                     </datalist>
                 </div>
                 <div class="flex flex-col my-1">
@@ -138,9 +140,11 @@
 
                     {{ form.city }}
                     <datalist id="city-list">
-                        {% for city in cities %}
-                            <option value="{{ city.citymunDesc }}" data-code="{{ city.citymunCode }}">
-                        {% endfor %}
+                        {% if form.instance.province %}
+                            {% for city in cities %}
+                                <option value="{{ city.citymunDesc }}">
+                            {% endfor %}
+                        {% endif %}
                     </datalist>
                 </div>
             </div>
@@ -158,10 +162,13 @@
 
                         {{ form.barangay }}
                         <datalist id="barangay-list">
-                            {% for barangay in barangays %}
-                                <option value="{{ barangay.brgyDesc }}" data-code="{{ barangay.brgyCode }}">
-                            {% endfor %}
+                            {% if form.instance.city %}
+                                {% for barangay in barangays %}
+                                    <option value="{{ barangay.brgyDesc }}">
+                                {% endfor %}
+                            {% endif %}
                         </datalist>
+                        
                     </div>
                     <div class="flex flex-col my-1">
                         <div class="">
@@ -266,8 +273,7 @@
             baseUrl: "/payroll_system/ajax"
         });
     });
-</script>
-<script>
+
     document.addEventListener('DOMContentLoaded', function() {
         // Get the date of birth input field
         const dobInput = document.querySelector('input[name="date_of_birth"]');
@@ -289,5 +295,152 @@
             });
         }
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const regionField = document.getElementById('region-dropdown');
+        const provinceField = document.getElementById('province-dropdown');
+        const cityField = document.getElementById('city-dropdown');
+        const barangayField = document.getElementById('barangay-dropdown');
+        
+        // Store original values
+        const originalValues = {
+            region: regionField ? regionField.value : '',
+            province: provinceField ? provinceField.value : '',
+            city: cityField ? cityField.value : '',
+            barangay: barangayField ? barangayField.value : ''
+        };
+        
+        // Function to fetch provinces
+        function fetchProvinces(regionValue) {
+            if (!regionValue) return;
+            
+            fetch(`/api/provinces/?region=${encodeURIComponent(regionValue)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear the province datalist
+                    const provinceList = document.getElementById('province-list');
+                    provinceList.innerHTML = '';
+                    
+                    // Add new options
+                    data.forEach(province => {
+                        const option = document.createElement('option');
+                        option.value = province.provDesc;
+                        provinceList.appendChild(option);
+                    });
+                    
+                    // Restore province value if it should exist in this region
+                    if (originalValues.province) {
+                        const matchingProvince = data.find(p => p.provDesc === originalValues.province);
+                        if (matchingProvince) {
+                            provinceField.value = originalValues.province;
+                            // Trigger province change to load cities
+                            fetchCities(originalValues.province);
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching provinces:', error));
+        }
+        
+        // Function to fetch cities
+        function fetchCities(provinceValue) {
+            if (!provinceValue) return;
+            
+            fetch(`/api/cities/?province=${encodeURIComponent(provinceValue)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear the city datalist
+                    const cityList = document.getElementById('city-list');
+                    cityList.innerHTML = '';
+                    
+                    // Add new options
+                    data.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.citymunDesc;
+                        cityList.appendChild(option);
+                    });
+                    
+                    // Restore city value if it should exist in this province
+                    if (originalValues.city) {
+                        const matchingCity = data.find(c => c.citymunDesc === originalValues.city);
+                        if (matchingCity) {
+                            cityField.value = originalValues.city;
+                            // Trigger city change to load barangays
+                            fetchBarangays(originalValues.city);
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching cities:', error));
+        }
+        
+        // Function to fetch barangays
+        function fetchBarangays(cityValue) {
+            if (!cityValue) return;
+            
+            fetch(`/api/barangays/?city=${encodeURIComponent(cityValue)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear the barangay datalist
+                    const barangayList = document.getElementById('barangay-list');
+                    barangayList.innerHTML = '';
+                    
+                    // Add new options
+                    data.forEach(barangay => {
+                        const option = document.createElement('option');
+                        option.value = barangay.brgyDesc;
+                        barangayList.appendChild(option);
+                    });
+                    
+                    // Restore barangay value if it should exist in this city
+                    if (originalValues.barangay) {
+                        const matchingBarangay = data.find(b => b.brgyDesc === originalValues.barangay);
+                        if (matchingBarangay) {
+                            barangayField.value = originalValues.barangay;
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching barangays:', error));
+        }
+        
+        // Add event listeners
+        if (regionField) {
+            regionField.addEventListener('change', function() {
+                fetchProvinces(this.value);
+                // Clear dependent fields if region changes
+                if (this.value !== originalValues.region) {
+                    provinceField.value = '';
+                    cityField.value = '';
+                    barangayField.value = '';
+                }
+            });
+        }
+        
+        if (provinceField) {
+            provinceField.addEventListener('change', function() {
+                fetchCities(this.value);
+                // Clear dependent fields if province changes
+                if (this.value !== originalValues.province) {
+                    cityField.value = '';
+                    barangayField.value = '';
+                }
+            });
+        }
+        
+        if (cityField) {
+            cityField.addEventListener('change', function() {
+                fetchBarangays(this.value);
+                // Clear dependent field if city changes
+                if (this.value !== originalValues.city) {
+                    barangayField.value = '';
+                }
+            });
+        }
+        
+        // Initial load if values exist
+        if (regionField && regionField.value) {
+            // This will trigger the cascade
+            fetchProvinces(regionField.value);
+        }
+    });
+    
 </script>
 {% endblock %}

@@ -72,17 +72,17 @@
 <div id="task-popup" class="task fixed h-fit w-[300px] sm:w-[400px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col gap-5 justify-around invisible opacity-0 rounded-lg z-60 overflow-hidden shadow-lg/20">
     
     <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">COMPLETE</h1>
-    <div class="w-full h-[2px] my-1 border border-2 border-[#1e1e1e40] rounded-full"></div>
-    <h1 class="text-sm sm:text-base my-2 py-4 font-[Inter] font-normal text-center">Are you sure you want to mark this task as <i>completed</i>? Confirm to proceed.</h1>
+    <div class="w-full h-[2px] border border-2 border-[#1e1e1e40] rounded-full"></div>
+    <h1 class="text-sm sm:text-base py-4 font-[Inter] font-normal text-center">Are you sure you want to mark this task as <i>completed</i>? Confirm to proceed.</h1>
     
-    <div class="w-full h-[40px] my-1 flex justify-evenly items-center gap-3">
+    <div class="w-full h-[40px] flex justify-evenly items-center gap-3">
         <button id="cancel" class="w-fit h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CANCEL" onclick="cancelTask()">CANCEL</button>
         <button id="confirm" class="w-fit h-full text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] text-center" value="CONFIRM" onclick="addIncentives()">CONFIRM</button>
     </div>
     <input type="hidden" id="selected-task-id" value="">
 </div>
 
-<div id="incentives-popup" class="incentives fixed h-[30%] w-[80%] sm:w-[450px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-80 overflow-hidden">
+<div id="incentives-popup" class="incentives fixed h-[30%] w-[80%] sm:w-[450px] py-5 px-10 bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around invisible opacity-0 rounded-lg z-80 overflow-hidden shadow-lg/20">
     <h1 class="text-2xl font-[League Spartan] font-semibold">Add Incentives for this Employee?</h1>
     <form id="cash-form" class="size-full flex flex-col" method="post" action="{% url 'payroll_system:status' %}">
         {% csrf_token %}
@@ -178,13 +178,17 @@
         document.getElementById("incentives-task-id").value = taskId;
         
         const popup = document.getElementById("incentives-popup");
+        const popup2 = document.getElementById("task-popup");
         
         popup.classList.add("show");
+        popup2.classList.remove("show");
     }
 
     function cancelIncentives(){
         const popup = document.getElementById("incentives-popup");
+        const popup2 = document.getElementById("task-popup");
         popup.classList.remove("show");
+        popup2.classList.add("show");
     }
 
     function confirmTask(taskId){

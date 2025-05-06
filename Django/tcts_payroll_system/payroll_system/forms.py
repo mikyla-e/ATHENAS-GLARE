@@ -317,6 +317,12 @@ class EmployeeEditForm(forms.ModelForm):
         # Set initial values for location fields using descriptive names
         instance = kwargs.get('instance')
         if instance:
+            # Store location objects for reference in the form instance
+            self._region_obj = instance.region
+            self._province_obj = instance.province
+            self._city_obj = instance.city
+            self._barangay_obj = instance.barangay
+            
             if instance.region:
                 self.initial['region'] = instance.region.regDesc
             if instance.province:
@@ -325,6 +331,16 @@ class EmployeeEditForm(forms.ModelForm):
                 self.initial['city'] = instance.city.citymunDesc
             if instance.barangay:
                 self.initial['barangay'] = instance.barangay.brgyDesc
+        
+        # Make sure to add these fields to form data for GET requests
+        if self.is_bound and 'city' not in self.data and 'city' in self.initial:
+            self.data = self.data.copy()  # Make mutable
+            self.data['city'] = self.initial['city']
+        
+        if self.is_bound and 'barangay' not in self.data and 'barangay' in self.initial:
+            self.data = self.data.copy()  # Make mutable
+            self.data['barangay'] = self.initial['barangay']
+
 
     #Helper function to validate 11-digit numbers.
     def validate_contact_number(self, contact_number):
