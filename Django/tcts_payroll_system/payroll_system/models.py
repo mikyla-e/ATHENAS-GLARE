@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
+from django.utils.timezone import localtime
 from django.core.exceptions import ValidationError
 
 def rename_employee_image(instance, filename):
@@ -409,7 +409,7 @@ class PayrollPeriod(models.Model):
     type = models.CharField(max_length=9, choices=Type.choices)
 
     def save(self, *args, **kwargs):
-        today = timezone.now().date()
+        today = localtime(timezone.now()).date()
 
         # Block INPROGRESS if start_date is in the future
         if self.payroll_status == self.PayrollStatus.INPROGRESS and self.start_date > today:
@@ -433,7 +433,7 @@ class PayrollPeriod(models.Model):
 
     def generate(self):
         """Generate or update payroll calculations for this period"""
-        today = timezone.now().date()
+        today = localtime(timezone.now()).date()
 
         if self.start_date > today:
             raise ValidationError("Cannot generate payroll period before the start date.")
@@ -477,7 +477,11 @@ class PayrollPeriod(models.Model):
         Confirm and finalize this payroll period.
         Transfers any cash advances to the next available payroll period.
         """
-        today = timezone.now().date()
+        today = localtime(timezone.now()).date()
+
+        print(f"Today: {today} ({type(today)})")
+        print(f"End Date: {self.end_date} ({type(self.end_date)})")
+
         
         # Validate end date
         if self.end_date > today:

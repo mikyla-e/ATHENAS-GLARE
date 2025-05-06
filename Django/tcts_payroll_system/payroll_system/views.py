@@ -999,7 +999,7 @@ def confirm_payroll(request, payroll_period_id):
             payroll_period.confirm()
             
             # Add success message
-            messages.success(request, f"Payroll period from {payroll_period.start_date} to {payroll_period.end_date} has been successfully processed.")
+            # messages.success(request, f"Payroll period from {payroll_period.start_date} to {payroll_period.end_date} has been successfully processed.")
             
             # Redirect to payslip page instead of payroll history
             return redirect('payroll_system:payslip', payroll_period_id=payroll_period.payroll_period_id)
