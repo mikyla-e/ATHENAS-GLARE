@@ -224,57 +224,57 @@
         popup.classList.remove("show");
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get and store initial city value
-        const cityField = document.getElementById('id_city'); // Adjust if your ID is different
-        const initialCityValue = cityField ? cityField.value : '';
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     // Get and store initial city value
+    //     const cityField = document.getElementById('id_city'); // Adjust if your ID is different
+    //     const initialCityValue = cityField ? cityField.value : '';
         
-        // Add this to your existing region/province change event listeners
-        // to restore the city value when needed
+    //     // Add this to your existing region/province change event listeners
+    //     // to restore the city value when needed
         
-        // Example for province change event (adjust to your actual code):
-        const provinceField = document.getElementById('id_province');
-        if (provinceField) {
-            provinceField.addEventListener('change', function() {
-                // Your existing code to fetch cities...
+    //     // Example for province change event (adjust to your actual code):
+    //     const provinceField = document.getElementById('id_province');
+    //     if (provinceField) {
+    //         provinceField.addEventListener('change', function() {
+    //             // Your existing code to fetch cities...
                 
-                // After cities are loaded, restore initial city if it's the first page load
-                // and we haven't changed the province from its initial value
-                if (this.value === 'ZAMBOANGA DEL SUR' && initialCityValue) {
-                    setTimeout(() => {
-                        cityField.value = initialCityValue;
-                    }, 100); // Short timeout to ensure datalist is populated
-                }
-            });
+    //             // After cities are loaded, restore initial city if it's the first page load
+    //             // and we haven't changed the province from its initial value
+    //             if (this.value === 'ZAMBOANGA DEL SUR' && initialCityValue) {
+    //                 setTimeout(() => {
+    //                     cityField.value = initialCityValue;
+    //                 }, 100); // Short timeout to ensure datalist is populated
+    //             }
+    //         });
             
-            // Trigger the change event once on page load to ensure cities are loaded
-            if (provinceField.value) {
-                const event = new Event('change');
-                provinceField.dispatchEvent(event);
-            }
-        }
-    });
+    //         // Trigger the change event once on page load to ensure cities are loaded
+    //         if (provinceField.value) {
+    //             const event = new Event('change');
+    //             provinceField.dispatchEvent(event);
+    //         }
+    //     }
+    // });
     
     document.addEventListener("DOMContentLoaded", function() {
-        // Clear sessionStorage when loading the page with a new service
-        if (document.getElementById('should-clear-storage')) {
-            // Clear all form data from sessionStorage
-            const formFields = [
-                'id_first_name', 'id_middle_name', 'id_last_name', 
-                'id_contact_number', 'id_vehicle_name', 'id_vehicle_color', 'id_plate_number'
-            ];
+        // // Clear sessionStorage when loading the page with a new service
+        // if (document.getElementById('should-clear-storage')) {
+        //     // Clear all form data from sessionStorage
+        //     const formFields = [
+        //         'id_first_name', 'id_middle_name', 'id_last_name', 
+        //         'id_contact_number', 'id_vehicle_name', 'id_vehicle_color', 'id_plate_number'
+        //     ];
             
-            // Add address fields to the array based on which ones exist
-            if (document.getElementById('region-dropdown')) {
-                formFields.push('region-dropdown', 'province-dropdown', 'city-dropdown', 'barangay-dropdown');
-            } else if (document.getElementById('id_region')) {
-                formFields.push('id_region', 'id_province', 'id_city', 'id_barangay');
-            }
+        //     // Add address fields to the array based on which ones exist
+        //     if (document.getElementById('region-dropdown')) {
+        //         formFields.push('region-dropdown', 'province-dropdown', 'city-dropdown', 'barangay-dropdown');
+        //     } else if (document.getElementById('id_region')) {
+        //         formFields.push('id_region', 'id_province', 'id_city', 'id_barangay');
+        //     }
             
-            formFields.forEach(id => {
-                sessionStorage.removeItem(id);
-            });
-        }
+        //     formFields.forEach(id => {
+        //         sessionStorage.removeItem(id);
+        //     });
+        // }
 
         // Assuming your initializeAddressFields function works correctly
         initializeAddressFields({
