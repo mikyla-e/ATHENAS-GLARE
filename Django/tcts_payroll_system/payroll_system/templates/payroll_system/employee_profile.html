@@ -148,13 +148,13 @@ onclick="cancelAddAttendance(); cancelEditAttendance();">
 </div>
 
 {% if messages %}
-<div id="error-popup" class="popup absolute w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-3">
+<div id="error-popup" class="popup fixed w-[400px] py-5 px-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col justify-around rounded-lg bg-white z-60 overflow-hidden shadow-lg/20 gap-3">
     <div class="space-y-2">
         <h1 class="text-xl sm:text-2xl font-[League Spartan] font-semibold text-left m-0">NOTICE</h1>
         <div class="w-full h-[2px] my-3 border border-2 border-[#1e1e1e40] rounded-full"></div>
     </div>
     
-    <div class="messages">
+    <div class="msg">
         {% for message in messages %}
         <p class="{% if message.tags %}{{ message.tags }}{% endif %} text-base sm:text-base my-2 font-[League Spartan] font-normal text-center">
             {{ message }}

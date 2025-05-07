@@ -325,7 +325,6 @@
 <!--(optional)script-->
 {% block script %}
 <script>
-    console.log({{ messages|length }} + " messages found.")
     function confirmPayroll(payrollId) {
         const form = document.getElementById("confirm-payroll-form");
         const popup = document.getElementById("confirm-payroll-popup");
