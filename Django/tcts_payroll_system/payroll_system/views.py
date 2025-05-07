@@ -191,6 +191,8 @@ def employee_picture(request):
                 del request.session['employee_form_data']
                 
                 messages.success(request, "Employee registered successfully!")
+                print("cnksnk")
+
                 return redirect('payroll_system:employee_profile', employee_id=employee.employee_id)
             else:
                 messages.error(request, "Error in form data. Please try again.")
@@ -373,6 +375,7 @@ def employee_edit(request, employee_id):
             )
 
             messages.success(request, f'Employee "{employee.first_name} {employee.last_name}" updated successfully.')
+
             return redirect('payroll_system:employee_profile', employee_id=employee_id)  # Redirect to employee list after successful edit
         else:
             # If form has errors, display them
@@ -464,6 +467,24 @@ def payrolls(request):
 
 @login_required
 def payroll_record(request):
+    employees = Employee.objects.filter(is_active=True)
+    if employees.exists():
+        # Calculate the average daily rate from all active employees
+        avg_rate = employees.aggregate(Avg('daily_rate'))['daily_rate__avg']
+        
+        # Compare with previous period for percentage change if needed
+        # For example, assuming you have a way to get previous period's average rate
+        previous_avg_rate = get_previous_avg_rate()  # You'll need to implement this function
+        
+        if previous_avg_rate and previous_avg_rate > 0:
+            rate_percentage = ((avg_rate - previous_avg_rate) / previous_avg_rate) * 100
+        else:
+            rate_percentage = 0
+    else:
+        avg_rate = "No rate data"  
+        rate_percentage = 0
+    
+
     payroll_id = request.GET.get('payroll_id')
     
     if payroll_id:
@@ -507,6 +528,8 @@ def payroll_record(request):
                 payroll_percentage = ((total_payroll - previous_total) / previous_total) * 100
         
         context = {
+            'avg_rate': avg_rate,
+            'rate_percentage': rate_percentage,
             'records': records,
             'selected_payroll': payroll,
             'total_payroll': total_payroll,
@@ -517,6 +540,8 @@ def payroll_record(request):
         # If no payroll is selected, show nothing or default view
         payroll_periods = PayrollPeriod.objects.all().order_by('-start_date')
         context = {
+            'avg_rate': avg_rate,
+            'rate_percentage': rate_percentage,
             'payroll_periods': payroll_periods,
             'records': [],
             'total_payroll': 0,
@@ -1012,7 +1037,7 @@ def confirm_payroll(request, payroll_period_id):
             payroll_period.confirm()
             
             # Add success message
-            # messages.success(request, f"Payroll period from {payroll_period.start_date} to {payroll_period.end_date} has been successfully processed.")
+            messages.success(request, f"Payroll period from {payroll_period.start_date} to {payroll_period.end_date} has been successfully processed.")
             
             # Redirect to payslip page instead of payroll history
             return redirect('payroll_system:payslip', payroll_period_id=payroll_period.payroll_period_id)
@@ -1058,32 +1083,23 @@ def services_client(request):
     if service_id:
         request.session['selected_service_id'] = service_id
     
-    # Create form with defaults handled in the form's __init__
-    customer_form = CustomerForm()
-    vehicle_form = VehicleForm()
     
-    # Get all location data for the form
+    initial_data = {
+        'region': 'REGION IX (ZAMBOANGA PENINSULA)',
+        'province': 'ZAMBOANGA DEL SUR',
+        'city': 'ZAMBOANGA CITY'
+    }
+
+    customer_form = CustomerForm(initial=initial_data)
+    vehicle_form = VehicleForm()
+
     regions = list(Region.objects.all().values('regDesc', 'regCode'))
     
-    # Get the pre-defined region, province and city objects
-    region = Region.objects.filter(regDesc='REGION IX (ZAMBOANGA PENINSULA)').first()
-    province = Province.objects.filter(provDesc='ZAMBOANGA DEL SUR', regCode=region.regCode).first()
-    city = City.objects.filter(citymunDesc='ZAMBOANGA CITY', provCode=province.provCode).first()
+    province = Province.objects.filter(provDesc='ZAMBOANGA DEL SUR').first()
     
-    # Get provinces for the selected region
-    provinces = []
-    if region:
-        provinces = Province.objects.filter(regCode=region.regCode).values('provDesc', 'provCode')
-    
-    # Get cities for the selected province
     cities = []
     if province:
         cities = City.objects.filter(provCode=province.provCode).values('citymunDesc', 'citymunCode')
-    
-    # Get barangays for the selected city
-    barangays = []
-    if city:
-        barangays = Barangay.objects.filter(citymunCode=city.citymunCode).values('brgyDesc', 'brgyCode')
     
     customers = Customer.objects.all()
 
@@ -1091,9 +1107,7 @@ def services_client(request):
         'customer_form': customer_form,
         'vehicle_form': vehicle_form,
         'regions': regions,
-        'provinces': provinces,
         'cities': cities,
-        'barangays': barangays,
         'customers': customers,
         'should_clear_storage': True,
     }
@@ -1351,9 +1365,6 @@ def status(request):
                         History.objects.create(
                             description=f"Added incentive of {float(amount)} to {task.employee.first_name} {task.employee.last_name} for completing task: {task.task_name}"
                         )
-                        
-                        # Log success for debugging
-                        print(f"Added incentive of {amount} to payroll record {payroll_record.id}")
                 
                 # Update task status
                 task.task_status = Task.TaskStatus.COMPLETED
@@ -1588,7 +1599,9 @@ def payslip(request, payroll_period_id):
     
     return render(request, 'payslip.html', context)
     
-@login_required
+
+
+
 def payroll_view(request):
     # Existing view code...
     

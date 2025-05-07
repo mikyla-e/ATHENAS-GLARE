@@ -189,11 +189,10 @@
         <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 xl:col-span-3 flex flex-col justify-center items-center bg-white rounded-xl shadow-lg" id="attendance">
             <div class="w-full px-3 pt-3">
                 <h2 class="text-[#1E1E1E] font-bold text-base">ATTENDANCE</h2>
-                <p class="text-[#1E1E1ECC] font-normal text-xs lg:text-sm">Current employee attendance statistics</p>
+                <p class="text-[#1E1E1ECC] font-normal text-xs lg:text-sm">Employee attendance for today</p>
             </div>
         
-            <!-- WRAP THE CANVAS IN A HEIGHT-LIMITED DIV -->
-            <div class="h-48 w-48 relative">
+            <div class="size-full relative">
                 <canvas id="donut" class="p-[15px] absolute inset-0"></canvas>
             </div>
         </div>
@@ -385,8 +384,8 @@
             datasets: [{
                 label: 'Attendance',
                 data: [{{ present_count }}, {{ absent_count }}],
-                backgroundColor: ['#4CAF50', '#F44336'],
-                borderColor: ['#388E3C', '#D32F2F'],
+                backgroundColor: ['#F8D146', '#DC4646'],
+                borderColor: ['#F8D146', '#DC4646'],
                 borderWidth: 1
             }]
         },
