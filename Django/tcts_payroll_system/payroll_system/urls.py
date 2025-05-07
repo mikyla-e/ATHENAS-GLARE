@@ -42,5 +42,5 @@ urlpatterns = [
     path('payslip/<int:payroll_period_id>/', views.payslip, name='payslip'),
     #new - flores
     path('attendance/summary/', views.attendance_summary, name='attendance-summary'),
-    path('api/payroll/chart-data/', views.payroll_chart_data, name='payroll_chart_data'),
+    path('api/payroll-chart-data/', views.payroll_chart_data, name='payroll_chart_data'),
 ]

@@ -1760,4 +1760,21 @@ def print(request):
     
     return render(request, 'print.html', context)
 
+@login_required
+def payroll_chart_data(request):
+    processed_periods = PayrollPeriod.objects.filter(
+        payroll_status=PayrollPeriod.PayrollStatus.PROCESSED
+    ).order_by('end_date')
 
+    data = []
+    for period in processed_periods:
+        total = PayrollRecord.objects.filter(
+            payroll_period=period
+        ).aggregate(total=Sum('net_pay'))['total'] or 0
+
+        data.append({
+            'label': period.end_date.strftime('%Y-%m-%d'),
+            'value': float(total)
+        })
+
+    return JsonResponse(data, safe=False)

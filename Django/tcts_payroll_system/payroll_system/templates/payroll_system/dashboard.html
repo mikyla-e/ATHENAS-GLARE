@@ -408,123 +408,57 @@
 </script>
 
 <script>
-    // Setup the chart when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize the payroll chart
-        initializePayrollChart();
-        
-        // Add event listener for the refresh button
-        document.getElementById('refresh-payroll-chart').addEventListener('click', function() {
-            fetchPayrollData().then(data => {
-                updatePayrollChart(payrollChart, data);
-            }).catch(error => {
-                console.error('Error refreshing payroll chart:', error);
-            });
-        });
-    });
-
-    // Global variable to hold the chart instance
-    let payrollChart = null;
-
-    // Initialize the payroll chart
-    function initializePayrollChart() {
+    document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('bar').getContext('2d');
-        
-        // Create the initial chart with loading state
-        payrollChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Loading...'],
-                datasets: [{
-                    label: 'Payroll Amount',
-                    data: [0],
-                    backgroundColor: '#F8D146',
-                    borderColor: '#F8D146',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '₱' + value.toLocaleString();
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += '₱' + context.parsed.y.toLocaleString();
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        
-        // Fetch initial data
-        fetchPayrollData().then(data => {
-            updatePayrollChart(payrollChart, data);
-        }).catch(error => {
-            console.error('Error loading payroll chart:', error);
-            // Show error state
-            updatePayrollChart(payrollChart, {
-                labels: ['No data available'],
-                values: [0]
-            });
-        });
-    }
+        let chart;
 
-    // Fetch payroll data from the server
-    async function fetchPayrollData() {
-        try {
-            const response = await fetch('/api/payroll/chart-data/');
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching payroll data:', error);
-            throw error;
+        function loadPayrollChart() {
+            fetch("{% url 'payroll_system:payroll_chart_data' %}")
+                .then(response => response.json())
+                .then(data => {
+                    const labels = data.map(item => item.label);
+                    const values = data.map(item => item.value);
+
+                    if (chart) chart.destroy();
+
+                    chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Total Payroll (₱)',
+                                data: values,
+                                backgroundColor: '#F8D146',
+                                borderRadius: 6,
+                                barPercentage: 0.6,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function (value) {
+                                            return '₱' + value.toLocaleString();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
         }
-    }
 
-    // Update the chart with new data
-    function updatePayrollChart(chart, data) {
-        if (!chart) return;
-        
-        chart.data.labels = data.labels;
-        chart.data.datasets[0].data = data.values;
-        
-        // Update chart colors based on values (optional visual enhancement)
-        const colors = data.values.map(() => '#F8D146');
-        chart.data.datasets[0].backgroundColor = colors;
-        chart.data.datasets[0].borderColor = colors;
-        
-        chart.update();
-    }
+        // Load initially
+        loadPayrollChart();
+
+        // Reload on refresh button click
+        document.getElementById('refresh-payroll-chart').addEventListener('click', loadPayrollChart);
+    });
 </script>
+
 
 <script>
     // Store payroll values from Django context with safe defaults
