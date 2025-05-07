@@ -186,19 +186,18 @@
         </div>
         
         <!-- Donut Chart -->
-        <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 xl:col-span-3 flex flex-col justify-around items-center bg-white rounded-xl shadow-lg" id="attendance">
-            <div class="w-full px-3 pt-3 ">
+        <div class="order-3 col-span-5 lg:order-5 lg:col-span-4 xl:col-span-3 flex flex-col justify-center items-center bg-white rounded-xl shadow-lg" id="attendance">
+            <div class="w-full px-3 pt-3">
                 <h2 class="text-[#1E1E1E] font-bold text-base">ATTENDANCE</h2>
-                <p class="text-[#1E1E1ECC] font-normal text-xs lg:text-sm">Employee attendance based on...</p>
-                <div class="flex justify-center gap-2 mt-2">
-                    <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#F8D146] text-[#1E1E1E]" data-period="day">Day</button>
-                    <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="week">Week</button>
-                    <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="month">Month</button>
-                    <button class="period-toggle px-2 py-1 text-xs rounded font-[Roboto] font-medium bg-[#E1E1E1] text-[#1E1E1E]" data-period="year">Year</button>
-                </div>
+                <p class="text-[#1E1E1ECC] font-normal text-xs lg:text-sm">Current employee attendance statistics</p>
             </div>
-            <canvas id="donut" class="p-[15px]"></canvas>
+        
+            <!-- WRAP THE CANVAS IN A HEIGHT-LIMITED DIV -->
+            <div class="h-48 w-48 relative">
+                <canvas id="donut" class="p-[15px] absolute inset-0"></canvas>
+            </div>
         </div>
+        
 
         <!-- Recent History Chart -->
         <div class="relative order-4 col-span-5 lg:col-span-3 row-span-2 rounded-xl overflow-hidden shadow-lg bg-[#FAFAFA]" id="recent-history">
@@ -377,202 +376,35 @@
 <script src="{% static 'js/attendance_chart.js' %}"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get the canvas element
-        const donutCanvas = document.getElementById('donut');
-        const periodToggles = document.querySelectorAll('.period-toggle');
-        const attendancePeriodDisplay = document.getElementById('attendance-period');
-        
-        // Set up Chart.js donut chart
-        let attendanceChart = null;
-        
-        // Global state 
-        let activePeriod = 'day'; // Default is daily view
-        
-        // Colors for chart
-        const chartColors = {
-            present: '#F8D146', // Yellow for present
-            absent: '#DC4646'   // Red for absent
-        };
-        
-        // Function to fetch attendance data from API
-        async function fetchAttendanceData(period) {
-            try {
-                // Updated endpoint for attendance data
-                const endpoint = `/api/attendance-stats/?period=${period}`;
-                const response = await fetch(endpoint);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('Received attendance data:', data); // Debug line
-                return data;
-            } catch (error) {
-                console.error('Error fetching attendance data:', error);
-                // Return default data in case of error
-                return {
-                    period_display: capitalizeFirstLetter(period),
-                    labels: ['Present', 'Absent'],
-                    data: [0, 0] // Default to zeros instead of arbitrary values
-                };
-            }
-        }
-        
-        // Helper function to capitalize first letter
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
-        
-        // Function to update chart with new data
-        function updateChart(data) {
-            // Validate data structure
-            if (!data || !Array.isArray(data.data) || !Array.isArray(data.labels)) {
-                console.error('Invalid data format received:', data);
-                data = {
-                    period_display: capitalizeFirstLetter(activePeriod),
-                    labels: ['Present', 'Absent'],
-                    data: [0, 0]
-                };
-            }
-            
-            // Destroy existing chart if it exists
-            if (attendanceChart) {
-                attendanceChart.destroy();
-            }
-            
-            // Update period display if the element exists
-            if (attendancePeriodDisplay) {
-                attendancePeriodDisplay.innerText = data.period_display || capitalizeFirstLetter(activePeriod);
-            }
-            
-            // Create new chart
-            attendanceChart = new Chart(donutCanvas, {
-                type: 'doughnut',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        data: data.data,
-                        backgroundColor: [chartColors.present, chartColors.absent],
-                        borderWidth: 0,
-                        hoverOffset: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 15,
-                                padding: 15,
-                                font: {
-                                    family: 'Roboto',
-                                    size: 14
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.raw || 0;
-                                    const total = context.dataset.data.reduce((acc, current) => acc + current, 0);
-                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                    return `${label}: ${value} (${percentage}%)`;
-                                }
-                            }
+    const ctx = document.getElementById('donut').getContext('2d');
+
+    const donutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Present', 'Absent'],
+            datasets: [{
+                label: 'Attendance',
+                data: [{{ present_count }}, {{ absent_count }}],
+                backgroundColor: ['#4CAF50', '#F44336'],
+                borderColor: ['#388E3C', '#D32F2F'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        font: {
+                            size: 12
                         }
                     }
-                },
-                plugins: [{
-                    id: 'centerText',
-                    beforeDraw: function(chart) {
-                        const width = chart.width;
-                        const height = chart.height;
-                        const ctx = chart.ctx;
-                        
-                        ctx.restore();
-                        
-                        // Total count
-                        const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
-                        
-                        // Font settings for total
-                        ctx.font = 'bold 20px Roboto';
-                        ctx.textBaseline = 'middle';
-                        ctx.textAlign = 'center';
-                        ctx.fillStyle = '#1E1E1E';
-                        
-                        // Draw total number
-                        ctx.fillText(total, width / 2, height / 2 - 10);
-                        
-                        // Font settings for "Total" label
-                        ctx.font = '12px Roboto';
-                        ctx.fillStyle = '#1E1E1ECC';
-                        
-                        // Draw "Total" label
-                        ctx.fillText('Total', width / 2, height / 2 + 10);
-                        
-                        ctx.save();
-                    }
-                }]
-            });
-        }
-        
-        // Function to initialize dashboard with data
-        async function initializeAttendanceChart(period) {
-            // Update active toggle button
-            periodToggles.forEach(toggle => {
-                if (toggle.dataset.period === period) {
-                    toggle.classList.remove('bg-[#E1E1E1]');
-                    toggle.classList.add('bg-[#F8D146]');
-                } else {
-                    toggle.classList.remove('bg-[#F8D146]');
-                    toggle.classList.add('bg-[#E1E1E1]');
                 }
-            });
-            
-            // Show loading state (optional)
-            if (attendancePeriodDisplay) {
-                attendancePeriodDisplay.innerText = 'Loading...';
-            }
-            
-            try {
-                // Fetch data for the selected period
-                const data = await fetchAttendanceData(period);
-                
-                // Update chart with new data
-                updateChart(data);
-            } catch (error) {
-                console.error('Failed to initialize attendance chart:', error);
-                // Update chart with default data
-                updateChart({
-                    period_display: capitalizeFirstLetter(period),
-                    labels: ['Present', 'Absent'],
-                    data: [0, 0]
-                });
             }
         }
-        
-        // Add event listeners to period toggle buttons
-        periodToggles.forEach(toggle => {
-            toggle.addEventListener('click', function() {
-                const period = this.dataset.period;
-                activePeriod = period;
-                initializeAttendanceChart(period);
-            });
-        });
-        
-        // Initialize with default period (day)
-        initializeAttendanceChart(activePeriod);
-        
-        // Refresh data periodically (every 5 minutes)
-        setInterval(function() {
-            initializeAttendanceChart(activePeriod);
-        }, 300000); // 5 minutes
     });
 </script>
 

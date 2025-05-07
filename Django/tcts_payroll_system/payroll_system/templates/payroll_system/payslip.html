@@ -161,10 +161,15 @@
   <div class="flex justify-between">
     <h1 class="text-2xl font-bold mb-4 flex justify-end">Payslips for Period: {{ payroll_period.start_date|date:"M d, Y" }} to {{ payroll_period.end_date|date:"M d, Y" }}</h1>
 
-    <div class=" flex justify-end print-button mb-4">
-      <button onclick="printPayslips()" 
-      id="button_2">
-      Print All Payslips
+    <div class=" flex justify-end print-button mb-4 gap-2">
+      <a href="{% url 'payroll_system:payrolls' %}">
+        <button id="button_2" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Print All Payslips">
+          Go Back To Payroll
+        </button>
+      </a>
+      
+      <button onclick="printPayslips()" id="button_1" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Print All Payslips">
+        Print All Payslips
       </button>
     </div>
   </div>

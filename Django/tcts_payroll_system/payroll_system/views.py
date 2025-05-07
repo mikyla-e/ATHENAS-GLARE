@@ -66,6 +66,16 @@ def dashboard(request):
         attendance_status=Attendance.AttendanceStatus.PRESENT,
         employee__is_active=True
     ).values('employee').distinct().count()
+    
+    # Count how many unique employees have a PRESENT record **today**
+    present_count = Attendance.objects.filter(
+        date=today,
+        attendance_status=Attendance.AttendanceStatus.PRESENT,
+        employee__is_active=True
+    ).values('employee').distinct().count()
+    
+    # Absentees = all active employees MINUS those present today
+    absent_count = Employee.objects.filter(is_active=True).count() - present_count
 
     # Count payroll periods grouped by status
     processed_payroll_count = PayrollPeriod.objects.filter(
@@ -95,6 +105,8 @@ def dashboard(request):
         'weekly_payroll': payroll_totals.get('weekly_payroll', 0),
         'monthly_payroll': payroll_totals.get('monthly_payroll', 0),
         'yearly_payroll': payroll_totals.get('yearly_payroll', 0),
+        'present_count': present_count,
+        'absent_count': absent_count,
     }
     return render(request, 'payroll_system/dashboard.html', context)
 
@@ -1734,3 +1746,5 @@ def print(request):
     }
     
     return render(request, 'print.html', context)
+
+

@@ -124,6 +124,7 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="w-full grid grid-cols-4 grid-rows-[50px_50px_70px] md:grid-rows-[60px_60px_70px] lg:grid-cols-[2fr_2fr_2fr_1fr_1fr_1fr_1fr] lg:grid-rows-[90px_50px] gap-5">
     
     <div class="bg-[#1E1E1E] px-4 order-1 col-span-4 lg:col-span-3 row-span-2 flex flex-row justify-evenly items-center rounded-xl">
@@ -146,11 +147,21 @@
         <div class="h-full w-[30%] py-5 flex flex-col justify-between overflow-hidden">
             <p class="text-[10px]/3 sm:text-sm/3.5 md:text-base/4 lg:text-lg/4.5 font-bold font-[League Spartan] text-left" id="title">EMPLOYEES AVR. RATE</p>
             <div class="flex flex-col justify-end items-end text-right">
-                <p class="text-[#FFF] text-[18px] sm:text-[24px] md:text-[26px] lg:text-3xl font-[Inter] font-semibold">{% if avg_rate == "No rate data" %} No rate data {% else %} ₱{{ avg_rate|floatformat:2 }} {% endif %}</p>
-                {% if rate_percentage >= 0 %}
-                    <p id="" class="text-base sm:text-lg font-[Inter] font-semibold text-[#F8D146]">{% if rate_percentage > 0 %}+{% endif %}{{ rate_percentage|floatformat:1 }}%</p>
-                {% elif rate_percentage <= -1 %}
-                    <p id="" class="text-base sm:text-lg font-[Inter] font-semibold text-[#DC4646]">{{ rate_percentage|floatformat:1 }}%</p>
+                <p class="text-[#FFF] text-[18px] sm:text-[24px] md:text-[26px] lg:text-3xl font-[Inter] font-semibold">
+                    {% if avg_rate == "No rate data" %}
+                        No rate data
+                    {% elif avg_rate == None %}
+                        No rate data
+                    {% else %}
+                        ₱{{ avg_rate|floatformat:2 }}
+                    {% endif %}
+                </p>
+                {% if avg_rate != "No rate data" %}
+                    {% if rate_percentage >= 0 %}
+                        <p id="" class="text-base sm:text-lg font-[Inter] font-semibold text-[#F8D146]">{% if rate_percentage > 0 %}+{% endif %}{{ rate_percentage|floatformat:1 }}%</p>
+                    {% elif rate_percentage <= -1 %}
+                        <p id="" class="text-base sm:text-lg font-[Inter] font-semibold text-[#DC4646]">{{ rate_percentage|floatformat:1 }}%</p>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
@@ -277,6 +288,8 @@
 
 <!--(optional)script-->
 {% block script %}
+
+
     <script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
     <script src="{% static 'javascript/dataTables.js' %}"></script>
 
