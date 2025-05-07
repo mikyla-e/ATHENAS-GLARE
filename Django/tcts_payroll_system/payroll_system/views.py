@@ -1096,14 +1096,9 @@ def services_client(request):
     if service_id:
         request.session['selected_service_id'] = service_id
     
-    
-    initial_data = {
-        'region': 'REGION IX (ZAMBOANGA PENINSULA)',
-        'province': 'ZAMBOANGA DEL SUR',
-        'city': 'ZAMBOANGA CITY'
-    }
-
-    customer_form = CustomerForm(initial=initial_data)
+    # Don't use initial_data dictionary as it can be overridden by form's __init__
+    # Let the form handle its own initialization
+    customer_form = CustomerForm()
     vehicle_form = VehicleForm()
 
     regions = list(Region.objects.all().values('regDesc', 'regCode'))
@@ -1112,7 +1107,7 @@ def services_client(request):
     
     cities = []
     if province:
-        cities = City.objects.filter(provCode=province.provCode).values('citymunDesc', 'citymunCode')
+        cities = list(City.objects.filter(provCode=province.provCode).values('citymunDesc', 'citymunCode'))
     
     customers = Customer.objects.all()
 
@@ -1123,6 +1118,9 @@ def services_client(request):
         'cities': cities,
         'customers': customers,
         'should_clear_storage': True,
+        'default_region': 'REGION IX (ZAMBOANGA PENINSULA)',
+        'default_province': 'ZAMBOANGA DEL SUR',
+        'default_city': 'ZAMBOANGA CITY',
     }
     
     return render(request, 'payroll_system/services_client.html', context)

@@ -672,24 +672,27 @@ class CustomerForm(forms.ModelForm):
     last_name = forms.CharField(widget=forms.TextInput(attrs={'class': ''}))
     contact_number = forms.CharField(widget=forms.TextInput(attrs={'class': '', 'type': 'tel'}))
     
-    # Keep visible fields but with initial values
+    # Modified to ensure values display properly
     region = forms.CharField(label='Region', widget=forms.TextInput(attrs={
         'class': '', 
         'id': 'region-dropdown', 
         'list': 'region-list',
-        'autocomplete': 'off'
+        'autocomplete': 'off',
+        'value': 'REGION IX (ZAMBOANGA PENINSULA)'  # Set default value directly in the widget
     }))
     province = forms.CharField(label='Province', widget=forms.TextInput(attrs={
         'class': '', 
         'id': 'province-dropdown', 
         'list': 'province-list',
-        'autocomplete': 'off'
+        'autocomplete': 'off',
+        'value': 'ZAMBOANGA DEL SUR'  # Set default value directly in the widget
     }))
     city = forms.CharField(label='City', widget=forms.TextInput(attrs={
         'class': '', 
         'id': 'city-dropdown', 
         'list': 'city-list',
-        'autocomplete': 'off'
+        'autocomplete': 'off',
+        'value': 'ZAMBOANGA CITY'  # Set default value directly in the widget
     }))
     
     # Barangay is user-editable
@@ -769,10 +772,16 @@ class CustomerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Set default values
-        self.fields['region'].initial = 'REGION IX (ZAMBOANGA PENINSULA)'
-        self.fields['province'].initial = 'ZAMBOANGA DEL SUR'
-        self.fields['city'].initial = 'ZAMBOANGA CITY'
+        # Set default values in form initialization
+        if not self.is_bound:  # Only set defaults if form is not bound
+            self.initial['region'] = 'REGION IX (ZAMBOANGA PENINSULA)'
+            self.initial['province'] = 'ZAMBOANGA DEL SUR'
+            self.initial['city'] = 'ZAMBOANGA CITY'
+            
+            # Explicitly set the value in the widget as well
+            self.fields['region'].widget.attrs['value'] = self.initial['region']
+            self.fields['province'].widget.attrs['value'] = self.initial['province']
+            self.fields['city'].widget.attrs['value'] = self.initial['city']
 
     def save(self, commit=True):
         customer = super().save(commit=False)
