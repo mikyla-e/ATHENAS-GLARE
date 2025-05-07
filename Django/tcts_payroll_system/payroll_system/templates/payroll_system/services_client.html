@@ -224,57 +224,57 @@
         popup.classList.remove("show");
     }
 
-    // document.addEventListener('DOMContentLoaded', function() {
-    //     // Get and store initial city value
-    //     const cityField = document.getElementById('id_city'); // Adjust if your ID is different
-    //     const initialCityValue = cityField ? cityField.value : '';
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get and store initial city value
+        const cityField = document.getElementById('id_city'); // Adjust if your ID is different
+        const initialCityValue = cityField ? cityField.value : '';
         
-    //     // Add this to your existing region/province change event listeners
-    //     // to restore the city value when needed
+        // Add this to your existing region/province change event listeners
+        // to restore the city value when needed
         
-    //     // Example for province change event (adjust to your actual code):
-    //     const provinceField = document.getElementById('id_province');
-    //     if (provinceField) {
-    //         provinceField.addEventListener('change', function() {
-    //             // Your existing code to fetch cities...
+        // Example for province change event (adjust to your actual code):
+        const provinceField = document.getElementById('id_province');
+        if (provinceField) {
+            provinceField.addEventListener('change', function() {
+                // Your existing code to fetch cities...
                 
-    //             // After cities are loaded, restore initial city if it's the first page load
-    //             // and we haven't changed the province from its initial value
-    //             if (this.value === 'ZAMBOANGA DEL SUR' && initialCityValue) {
-    //                 setTimeout(() => {
-    //                     cityField.value = initialCityValue;
-    //                 }, 100); // Short timeout to ensure datalist is populated
-    //             }
-    //         });
+                // After cities are loaded, restore initial city if it's the first page load
+                // and we haven't changed the province from its initial value
+                if (this.value === 'ZAMBOANGA DEL SUR' && initialCityValue) {
+                    setTimeout(() => {
+                        cityField.value = initialCityValue;
+                    }, 100); // Short timeout to ensure datalist is populated
+                }
+            });
             
-    //         // Trigger the change event once on page load to ensure cities are loaded
-    //         if (provinceField.value) {
-    //             const event = new Event('change');
-    //             provinceField.dispatchEvent(event);
-    //         }
-    //     }
-    // });
+            // Trigger the change event once on page load to ensure cities are loaded
+            if (provinceField.value) {
+                const event = new Event('change');
+                provinceField.dispatchEvent(event);
+            }
+        }
+    });
     
     document.addEventListener("DOMContentLoaded", function() {
-        // // Clear sessionStorage when loading the page with a new service
-        // if (document.getElementById('should-clear-storage')) {
-        //     // Clear all form data from sessionStorage
-        //     const formFields = [
-        //         'id_first_name', 'id_middle_name', 'id_last_name', 
-        //         'id_contact_number', 'id_vehicle_name', 'id_vehicle_color', 'id_plate_number'
-        //     ];
+        // Clear sessionStorage when loading the page with a new service
+        if (document.getElementById('should-clear-storage')) {
+            // Clear all form data from sessionStorage
+            const formFields = [
+                'id_first_name', 'id_middle_name', 'id_last_name', 
+                'id_contact_number', 'id_vehicle_name', 'id_vehicle_color', 'id_plate_number'
+            ];
             
-        //     // Add address fields to the array based on which ones exist
-        //     if (document.getElementById('region-dropdown')) {
-        //         formFields.push('region-dropdown', 'province-dropdown', 'city-dropdown', 'barangay-dropdown');
-        //     } else if (document.getElementById('id_region')) {
-        //         formFields.push('id_region', 'id_province', 'id_city', 'id_barangay');
-        //     }
+            // Add address fields to the array based on which ones exist
+            if (document.getElementById('region-dropdown')) {
+                formFields.push('region-dropdown', 'province-dropdown', 'city-dropdown', 'barangay-dropdown');
+            } else if (document.getElementById('id_region')) {
+                formFields.push('id_region', 'id_province', 'id_city', 'id_barangay');
+            }
             
-        //     formFields.forEach(id => {
-        //         sessionStorage.removeItem(id);
-        //     });
-        // }
+            formFields.forEach(id => {
+                sessionStorage.removeItem(id);
+            });
+        }
 
         // Assuming your initializeAddressFields function works correctly
         initializeAddressFields({
@@ -289,57 +289,57 @@
             baseUrl: "/payroll_system/ajax"
         });
 
-        // Custom function for the pre-filled customer form
-        function setupCustomerFormFields() {
-            const regionInput = document.getElementById('region-dropdown');
-            const provinceInput = document.getElementById('province-dropdown');
-            const cityInput = document.getElementById('city-dropdown');
-            const barangayInput = document.getElementById('barangay-dropdown');
+        // // Custom function for the pre-filled customer form
+        // function setupCustomerFormFields() {
+        //     const regionInput = document.getElementById('region-dropdown');
+        //     const provinceInput = document.getElementById('province-dropdown');
+        //     const cityInput = document.getElementById('city-dropdown');
+        //     const barangayInput = document.getElementById('barangay-dropdown');
             
-            // Verify all required elements exist
-            if (!regionInput || !provinceInput || !cityInput || !barangayInput) {
-                return;
-            }
+        //     // Verify all required elements exist
+        //     if (!regionInput || !provinceInput || !cityInput || !barangayInput) {
+        //         return;
+        //     }
             
-            // Make sure readonly attributes are applied
-            regionInput.setAttribute('readonly', 'readonly');
-            provinceInput.setAttribute('readonly', 'readonly');
-            cityInput.setAttribute('readonly', 'readonly');
+        //     // Make sure readonly attributes are applied
+        //     regionInput.setAttribute('readonly', 'readonly');
+        //     provinceInput.setAttribute('readonly', 'readonly');
+        //     cityInput.setAttribute('readonly', 'readonly');
             
-            // Add slight visual indicator for readonly fields
-            const readonlyFields = [regionInput, provinceInput, cityInput];
-            readonlyFields.forEach(field => {
-                field.style.backgroundColor = '#f8f9fa'; // Light gray background
-                field.style.cursor = 'default';
-            });
+        //     // Add slight visual indicator for readonly fields
+        //     const readonlyFields = [regionInput, provinceInput, cityInput];
+        //     readonlyFields.forEach(field => {
+        //         field.style.backgroundColor = '#f8f9fa'; // Light gray background
+        //         field.style.cursor = 'default';
+        //     });
             
-            // Ensure the barangay field is enabled
-            barangayInput.disabled = false;
+        //     // Ensure the barangay field is enabled
+        //     barangayInput.disabled = false;
             
-            // Trigger "change" events to ensure the JS cascading logic works
-            // This forces the original script to load the proper options
-            const changeEvent = new Event('change', { bubbles: true });
-            const inputEvent = new Event('input', { bubbles: true });
+        //     // Trigger "change" events to ensure the JS cascading logic works
+        //     // This forces the original script to load the proper options
+        //     const changeEvent = new Event('change', { bubbles: true });
+        //     const inputEvent = new Event('input', { bubbles: true });
             
-            // Trigger events in sequence with small delays to ensure proper loading
-            setTimeout(() => {
-                regionInput.dispatchEvent(changeEvent);
-                regionInput.dispatchEvent(inputEvent);
+        //     // Trigger events in sequence with small delays to ensure proper loading
+        //     setTimeout(() => {
+        //         regionInput.dispatchEvent(changeEvent);
+        //         regionInput.dispatchEvent(inputEvent);
                 
-                setTimeout(() => {
-                    provinceInput.dispatchEvent(changeEvent);
-                    provinceInput.dispatchEvent(inputEvent);
+        //         setTimeout(() => {
+        //             provinceInput.dispatchEvent(changeEvent);
+        //             provinceInput.dispatchEvent(inputEvent);
                     
-                    setTimeout(() => {
-                        cityInput.dispatchEvent(changeEvent);
-                        cityInput.dispatchEvent(inputEvent);
-                    }, 100);
-                }, 100);
-            }, 100);
-        }
+        //             setTimeout(() => {
+        //                 cityInput.dispatchEvent(changeEvent);
+        //                 cityInput.dispatchEvent(inputEvent);
+        //             }, 100);
+        //         }, 100);
+        //     }, 100);
+        // }
         
-        // Call our setup function with a delay to ensure DOM is fully loaded
-        setTimeout(setupCustomerFormFields, 300);
+        // // Call our setup function with a delay to ensure DOM is fully loaded
+        // setTimeout(setupCustomerFormFields, 300);
 
         // Customer search functionality
         const customerSearchInput = document.getElementById('customer-search');
