@@ -209,6 +209,36 @@
 {% block script %}
 <script src="{% static 'javascript/phLocations.js' %}"></script>
 <script>
+    // Set default values directly in the HTML
+    document.addEventListener('DOMContentLoaded', function() {
+        // Define default values from the context
+        const defaultValues = {
+            region: "{{ default_region }}",
+            province: "{{ default_province }}",
+            city: "{{ default_city }}"
+        };
+        
+        // Set values directly in the HTML
+        const cityField = document.getElementById('city-dropdown');
+        if (cityField) {
+            cityField.value = defaultValues.city;
+            // Add this attribute for visibility troubleshooting
+            cityField.setAttribute('data-initialized', 'true');
+        }
+        
+        // Same for other fields
+        const regionField = document.getElementById('region-dropdown');
+        if (regionField) {
+            regionField.value = defaultValues.region;
+        }
+        
+        const provinceField = document.getElementById('province-dropdown');
+        if (provinceField) {
+            provinceField.value = defaultValues.province;
+        }
+    });
+</script>
+<script>
     // These functions need to be available in the global scope
     function confirmCustomer() {
         let bg = document.getElementById("background");
@@ -226,107 +256,103 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Get and store initial city value
-        const cityField = document.getElementById('city-dropdown'); // Updated to use your actual ID
-        const initialCityValue = cityField ? cityField.value : 'ZAMBOANGA CITY'; // Default if not set
+        // Constants for default values
+        const DEFAULT_REGION = 'REGION IX (ZAMBOANGA PENINSULA)';
+        const DEFAULT_PROVINCE = 'ZAMBOANGA DEL SUR';
+        const DEFAULT_CITY = 'ZAMBOANGA CITY';
         
-        // Ensure the city value is displayed on page load
-        if (cityField && (!cityField.value || cityField.value.trim() === '')) {
-            cityField.value = initialCityValue;
-        }
-        
-        // Force display of default values
-        setTimeout(() => {
+        // Ensure all fields display their values on page load
+        function ensureAddressFieldsDisplayValues() {
             const addressFields = {
-                'region-dropdown': 'REGION IX (ZAMBOANGA PENINSULA)',
-                'province-dropdown': 'ZAMBOANGA DEL SUR',
-                'city-dropdown': 'ZAMBOANGA CITY'
+                'region-dropdown': DEFAULT_REGION,
+                'province-dropdown': DEFAULT_PROVINCE,
+                'city-dropdown': DEFAULT_CITY
             };
             
             Object.keys(addressFields).forEach(id => {
                 const field = document.getElementById(id);
-                if (field && (!field.value || field.value.trim() === '')) {
-                    field.value = addressFields[id];
+                if (field) {
+                    // Directly set the value if empty or missing
+                    if (!field.value || field.value.trim() === '') {
+                        field.value = addressFields[id];
+                    }
+                    
+                    // Store the value as a data attribute for recovery
+                    field.setAttribute('data-default-value', addressFields[id]);
                 }
             });
-        }, 200);
-        
-        // Add this to your existing region/province change event listeners
-        // to restore the city value when needed
-        const provinceField = document.getElementById('province-dropdown');
-        if (provinceField) {
-            provinceField.addEventListener('change', function() {
-                // Your existing code to fetch cities...
-                
-                // After cities are loaded, restore initial city if it's the first page load
-                // and we haven't changed the province from its initial value
-                if (this.value === 'ZAMBOANGA DEL SUR') {
-                    setTimeout(() => {
-                        cityField.value = initialCityValue;
-                    }, 100); // Short timeout to ensure datalist is populated
-                }
-            });
-            
-            // Trigger the change event once on page load to ensure cities are loaded
-            if (provinceField.value) {
-                const event = new Event('change');
-                provinceField.dispatchEvent(event);
-            }
         }
         
-        // Ensure the city field is not cleared when the form is reset
-        const forms = document.querySelectorAll('form');
-        forms.forEach(form => {
-            form.addEventListener('reset', function() {
-                // Use setTimeout to run after the reset has completed
-                setTimeout(() => {
-                    if (cityField) {
-                        cityField.value = initialCityValue;
-                    }
-                }, 10);
-            });
-        });
+        // Run immediately and again after a short delay to ensure values are set
+        ensureAddressFieldsDisplayValues();
+        setTimeout(ensureAddressFieldsDisplayValues, 100);
         
-        // Ensure address fields maintain their values when interacting with datalists
+        // Critical fix: Apply a more aggressive approach for city field specifically
+        const cityField = document.getElementById('city-dropdown');
+        if (cityField) {
+            // Force value in multiple ways
+            cityField.value = DEFAULT_CITY;
+            
+            // Observe the city field for changes to its value property
+            const cityObserver = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
+                        if (!cityField.value || cityField.value.trim() === '') {
+                            cityField.value = DEFAULT_CITY;
+                        }
+                    }
+                });
+            });
+            
+            cityObserver.observe(cityField, { attributes: true });
+            
+            // Additional event listeners specific to city field
+            ['focus', 'blur', 'change', 'input'].forEach(event => {
+                cityField.addEventListener(event, function() {
+                    // Short delay to let other handlers run first
+                    setTimeout(() => {
+                        if (!this.value || this.value.trim() === '') {
+                            this.value = DEFAULT_CITY;
+                        }
+                    }, 0);
+                });
+            });
+        }
+        
+        // Address field event listeners for all fields
         const addressFields = ['region-dropdown', 'province-dropdown', 'city-dropdown'];
         addressFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
             if (field) {
-                // Save value before blur
+                // Save value before focus/interaction
                 field.addEventListener('focus', function() {
-                    this.setAttribute('data-prev-value', this.value);
+                    this.setAttribute('data-prev-value', this.value || this.getAttribute('data-default-value'));
                 });
                 
                 // Restore value if emptied after interaction
                 field.addEventListener('blur', function() {
-                    if (!this.value && this.getAttribute('data-prev-value')) {
-                        this.value = this.getAttribute('data-prev-value');
+                    if (!this.value || this.value.trim() === '') {
+                        this.value = this.getAttribute('data-prev-value') || this.getAttribute('data-default-value');
                     }
                 });
             }
         });
-
-        // Clear sessionStorage when loading the page with a new service
-        if (document.getElementById('should-clear-storage')) {
-            // Clear all form data from sessionStorage
-            const formFields = [
-                'id_first_name', 'id_middle_name', 'id_last_name', 
-                'id_contact_number', 'id_vehicle_name', 'id_vehicle_color', 'id_plate_number'
-            ];
-            
-            // Add address fields to the array based on which ones exist
-            if (document.getElementById('region-dropdown')) {
-                formFields.push('region-dropdown', 'province-dropdown', 'city-dropdown', 'barangay-dropdown');
-            } else if (document.getElementById('id_region')) {
-                formFields.push('id_region', 'id_province', 'id_city', 'id_barangay');
-            }
-            
-            formFields.forEach(id => {
-                sessionStorage.removeItem(id);
+        
+        // Handle province change to maintain city value
+        const provinceField = document.getElementById('province-dropdown');
+        if (provinceField) {
+            provinceField.addEventListener('change', function() {
+                // If selecting default province, ensure city is set to default
+                if (this.value === DEFAULT_PROVINCE && cityField) {
+                    // Allow time for any city list population to occur
+                    setTimeout(() => {
+                        cityField.value = DEFAULT_CITY;
+                    }, 100);
+                }
             });
         }
-
-        // Initialize address fields (your existing function)
+        
+        // Initialize existing address fields functionality if available
         if (typeof initializeAddressFields === 'function') {
             initializeAddressFields({
                 regionInputId: "region-dropdown",
@@ -339,7 +365,12 @@
                 barangayListId: "barangay-list",
                 baseUrl: "/payroll_system/ajax"
             });
+            
+            // After initialization, ensure values are still correct
+            setTimeout(ensureAddressFieldsDisplayValues, 300);
         }
+    
+        
 
         // Customer search functionality
         const customerSearchInput = document.getElementById('customer-search');

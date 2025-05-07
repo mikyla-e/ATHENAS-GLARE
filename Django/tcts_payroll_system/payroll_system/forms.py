@@ -678,21 +678,18 @@ class CustomerForm(forms.ModelForm):
         'id': 'region-dropdown', 
         'list': 'region-list',
         'autocomplete': 'off',
-        'value': 'REGION IX (ZAMBOANGA PENINSULA)'  # Set default value directly in the widget
     }))
     province = forms.CharField(label='Province', widget=forms.TextInput(attrs={
         'class': '', 
         'id': 'province-dropdown', 
         'list': 'province-list',
         'autocomplete': 'off',
-        'value': 'ZAMBOANGA DEL SUR'  # Set default value directly in the widget
     }))
     city = forms.CharField(label='City', widget=forms.TextInput(attrs={
         'class': '', 
         'id': 'city-dropdown', 
         'list': 'city-list',
         'autocomplete': 'off',
-        'value': 'ZAMBOANGA CITY'  # Set default value directly in the widget
     }))
     
     # Barangay is user-editable
@@ -773,15 +770,15 @@ class CustomerForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         # Set default values in form initialization
-        if not self.is_bound:  # Only set defaults if form is not bound
-            self.initial['region'] = 'REGION IX (ZAMBOANGA PENINSULA)'
-            self.initial['province'] = 'ZAMBOANGA DEL SUR'
-            self.initial['city'] = 'ZAMBOANGA CITY'
-            
-            # Explicitly set the value in the widget as well
-            self.fields['region'].widget.attrs['value'] = self.initial['region']
-            self.fields['province'].widget.attrs['value'] = self.initial['province']
-            self.fields['city'].widget.attrs['value'] = self.initial['city']
+        self.initial['region'] = 'REGION IX (ZAMBOANGA PENINSULA)'
+        self.initial['province'] = 'ZAMBOANGA DEL SUR'
+        self.initial['city'] = 'ZAMBOANGA CITY'
+        
+        # Important: Set value attributes directly on the widget attrs
+        # This ensures the HTML input element has the value attribute set
+        self.fields['region'].widget.attrs['value'] = self.initial['region']
+        self.fields['province'].widget.attrs['value'] = self.initial['province']
+        self.fields['city'].widget.attrs['value'] = self.initial['city']
 
     def save(self, commit=True):
         customer = super().save(commit=False)

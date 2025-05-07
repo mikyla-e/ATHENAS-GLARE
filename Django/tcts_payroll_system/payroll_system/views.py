@@ -1096,21 +1096,32 @@ def services_client(request):
     if service_id:
         request.session['selected_service_id'] = service_id
     
-    # Don't use initial_data dictionary as it can be overridden by form's __init__
-    # Let the form handle its own initialization
+    # Create forms with default values
     customer_form = CustomerForm()
     vehicle_form = VehicleForm()
 
+    # Get regions for dropdown
     regions = list(Region.objects.all().values('regDesc', 'regCode'))
     
+    # Get province for filtered dropdown
     province = Province.objects.filter(provDesc='ZAMBOANGA DEL SUR').first()
     
+    # Get cities for the province
     cities = []
     if province:
         cities = list(City.objects.filter(provCode=province.provCode).values('citymunDesc', 'citymunCode'))
     
+    # Get all customers for search functionality
     customers = Customer.objects.all()
 
+    # Define default values - these will be used in both the template and JavaScript
+    default_values = {
+        'region': 'REGION IX (ZAMBOANGA PENINSULA)',
+        'province': 'ZAMBOANGA DEL SUR',
+        'city': 'ZAMBOANGA CITY',
+    }
+
+    # Context for template rendering
     context = {
         'customer_form': customer_form,
         'vehicle_form': vehicle_form,
@@ -1118,9 +1129,9 @@ def services_client(request):
         'cities': cities,
         'customers': customers,
         'should_clear_storage': True,
-        'default_region': 'REGION IX (ZAMBOANGA PENINSULA)',
-        'default_province': 'ZAMBOANGA DEL SUR',
-        'default_city': 'ZAMBOANGA CITY',
+        'default_region': default_values['region'],
+        'default_province': default_values['province'],
+        'default_city': default_values['city'],
     }
     
     return render(request, 'payroll_system/services_client.html', context)
