@@ -223,9 +223,11 @@ def employees(request):
     }
     return render(request, 'payroll_system/employees.html', context)
 
+
 @login_required
 def employee_profile(request, employee_id):
-    employee = Employee.objects.prefetch_related('attendances').get(employee_id=employee_id)
+    employee = Employee.objects.prefetch_related('payroll_records', 'attendances').get(employee_id=employee_id)
+    
     
     if request.method == 'POST' and 'add_attendance' in request.POST:
         date = request.POST.get('date')
@@ -335,24 +337,35 @@ def employee_profile(request, employee_id):
     ).order_by('-date')
     
     # Calculate attendance statistics for the filtered period
+    # Count DISTINCT days present to avoid counting multiple attendances on the same day
+    days_present = filtered_attendance.filter(
+        attendance_status=Attendance.AttendanceStatus.PRESENT
+    ).values('date').distinct().count()
+    
+    # Count DISTINCT days absent
+    days_absent = filtered_attendance.filter(
+        attendance_status=Attendance.AttendanceStatus.ABSENT
+    ).values('date').distinct().count()
+    
     attendance_stats = {
         'total_days': (end_date - start_date).days + 1,
-        'days_present': filtered_attendance.filter(attendance_status=Attendance.AttendanceStatus.PRESENT).count(),
-        'days_absent': filtered_attendance.filter(attendance_status=Attendance.AttendanceStatus.ABSENT).count(),
+        'days_present': days_present,
+        'days_absent': days_absent,
         'total_hours': sum(a.hours_worked for a in filtered_attendance if a.hours_worked)
     }
-    #new
+    
+    # Try to get the latest payroll record for this employee
+    latest_payroll_record = employee.payroll_records.order_by('-payroll_period__end_date').first()
     
     context = {
         'employee': employee,
         'latest_attendance': latest_attendance,
-        #bago
+        'latest_payroll_record': latest_payroll_record,  # Add this to context
         'filtered_attendance': filtered_attendance,
         'attendance_stats': attendance_stats,
         'selected_duration': duration,
         'start_date': start_date,
         'end_date': end_date,
-        #bago
     }
     
     return render(request, 'payroll_system/employee_profile.html', context)
@@ -1712,28 +1725,40 @@ def print(request):
     # Get all active employees
     employees = Employee.objects.filter(is_active=True)
     
-    # Get the most recent payroll period
-    latest_payroll_period = PayrollPeriod.objects.order_by('-payment_date').first()
+    # Get the current in-progress payroll period
+    in_progress_payroll_period = PayrollPeriod.objects.filter(
+        payroll_status=PayrollPeriod.PayrollStatus.INPROGRESS
+    ).first()
+    
+    # If no in-progress period, fall back to the latest period
+    if not in_progress_payroll_period:
+        in_progress_payroll_period = PayrollPeriod.objects.order_by('-payment_date').first()
     
     # Prepare data for the template
     employee_data = []
     total_salary = 0
     
-    for employee in employees:
-        # Try to get the payroll record for this employee
-        if latest_payroll_period:
-            try:
-                payroll_record = PayrollRecord.objects.get(
-                    employee=employee, 
-                    payroll_period=latest_payroll_period
-                )
-                
+    if in_progress_payroll_period:
+        # Get all payroll records for this period (more efficient than querying for each employee)
+        payroll_records = PayrollRecord.objects.filter(
+            payroll_period=in_progress_payroll_period
+        ).select_related('employee')
+        
+        # Create a dictionary for faster lookups
+        payroll_dict = {record.employee_id: record for record in payroll_records}
+        
+        for employee in employees:
+            # Try to get the payroll record for this employee
+            payroll_record = payroll_dict.get(employee.employee_id)
+            
+            if payroll_record:
                 # Calculate total deductions
                 total_deductions = payroll_record.calculate_total_deductions()
                 
                 # Create the payroll data dictionary
-                latest_payroll = {
+                current_payroll = {
                     'rate': employee.daily_rate,
+                    'days_worked': payroll_record.days_worked,
                     'incentives': payroll_record.incentives,
                     'deductions': total_deductions,
                     'salary': payroll_record.net_pay,
@@ -1742,20 +1767,26 @@ def print(request):
                 
                 # Add to total salary
                 total_salary += payroll_record.net_pay
-            except PayrollRecord.DoesNotExist:
-                latest_payroll = None
-        else:
-            latest_payroll = None
-        
-        # Add to employee data list - always add the employee even if they have no payroll
-        employee_data.append({
-            'employee': employee,
-            'latest_payroll': latest_payroll
-        })
+            else:
+                current_payroll = None
+            
+            # Add to employee data list - always add the employee even if they have no payroll
+            employee_data.append({
+                'employee': employee,
+                'current_payroll': current_payroll
+            })
+    else:
+        # No payroll period found, just add employee data with no payroll info
+        for employee in employees:
+            employee_data.append({
+                'employee': employee,
+                'current_payroll': None
+            })
     
     context = {
         'employee_data': employee_data,
-        'total_salary': total_salary
+        'total_salary': total_salary,
+        'payroll_period': in_progress_payroll_period
     }
     
     return render(request, 'print.html', context)

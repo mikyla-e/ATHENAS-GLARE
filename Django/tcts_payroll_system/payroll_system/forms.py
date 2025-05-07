@@ -292,7 +292,7 @@ class EmployeeEditForm(forms.ModelForm):
     work_experience = forms.CharField(widget=forms.Textarea(), required=False)
     daily_rate = forms.FloatField(widget=forms.NumberInput())
     date_of_employment = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), initial=timezone.now)
-    is_active = forms.BooleanField(widget=forms.CheckboxInput())
+    is_active = forms.BooleanField(widget=forms.CheckboxInput(), required=False)
     
     class Meta:
         model = Employee
@@ -677,22 +677,19 @@ class CustomerForm(forms.ModelForm):
         'class': '', 
         'id': 'region-dropdown', 
         'list': 'region-list',
-        'autocomplete': 'off',
-        'readonly': 'readonly'  # Make it read-only
+        'autocomplete': 'off'
     }))
     province = forms.CharField(label='Province', widget=forms.TextInput(attrs={
         'class': '', 
         'id': 'province-dropdown', 
         'list': 'province-list',
-        'autocomplete': 'off',
-        'readonly': 'readonly'  # Make it read-only
+        'autocomplete': 'off'
     }))
     city = forms.CharField(label='City', widget=forms.TextInput(attrs={
         'class': '', 
         'id': 'city-dropdown', 
         'list': 'city-list',
-        'autocomplete': 'off',
-        'readonly': 'readonly'  # Make it read-only
+        'autocomplete': 'off'
     }))
     
     # Barangay is user-editable
@@ -776,11 +773,6 @@ class CustomerForm(forms.ModelForm):
         self.fields['region'].initial = 'REGION IX (ZAMBOANGA PENINSULA)'
         self.fields['province'].initial = 'ZAMBOANGA DEL SUR'
         self.fields['city'].initial = 'ZAMBOANGA CITY'
-        
-        # Generate readonly attribute for admin UI
-        self.fields['region'].widget.attrs['readonly'] = True 
-        self.fields['province'].widget.attrs['readonly'] = True
-        self.fields['city'].widget.attrs['readonly'] = True
 
     def save(self, commit=True):
         customer = super().save(commit=False)
@@ -933,20 +925,20 @@ class CustomerEditForm(forms.ModelForm):
         
         return barangay_name
     
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
-    #     # Set initial values for location fields using descriptive names
-    #     instance = kwargs.get('instance')
-    #     if instance:
-    #         if instance.region:
-    #             self.initial['region'] = instance.region.regDesc
-    #         if instance.province:
-    #             self.initial['province'] = instance.province.provDesc
-    #         if instance.city:
-    #             self.initial['city'] = instance.city.citymunDesc
-    #         if instance.barangay:
-    #             self.initial['barangay'] = instance.barangay.brgyDesc
+        # Set initial values for location fields using descriptive names
+        instance = kwargs.get('instance')
+        if instance:
+            if instance.region:
+                self.initial['region'] = instance.region.regDesc
+            if instance.province:
+                self.initial['province'] = instance.province.provDesc
+            if instance.city:
+                self.initial['city'] = instance.city.citymunDesc
+            if instance.barangay:
+                self.initial['barangay'] = instance.barangay.brgyDesc
     
     def save(self, commit=True):
         customer = super().save(commit=False)

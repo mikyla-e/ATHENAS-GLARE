@@ -116,7 +116,7 @@ class Employee(models.Model):
     daily_rate = models.FloatField(default=0, null=False)
     date_of_employment = models.DateField(default=timezone.now)
     employee_status = models.CharField(max_length=9, choices=EmployeeStatus.choices, null=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, null=True)
     absences = models.IntegerField(default=0, null=False)
     employee_image = models.ImageField(null=False, upload_to='images/', validators=[validate_image_size])
 

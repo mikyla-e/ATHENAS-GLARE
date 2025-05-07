@@ -347,7 +347,7 @@ onclick="cancelAddAttendance(); cancelEditAttendance();">
                     </div>
                     <div class="flex flex-col justify-between">
                         <h2 id="title" class="font-bold text-base">DAYS WORKED</h2>
-                        <p class="font-extrabold text-xl text-[#1e1e1e80] text-nowrap">{% if employee.days_worked %} {{ employee.days_worked }} Days {% else %} None {% endif %}</p>
+                        <p class="font-extrabold text-xl text-[#1e1e1e80] text-nowrap">{{ attendance_stats.days_present }} Days</p>
                     </div>
                 </div>
                 
@@ -355,7 +355,7 @@ onclick="cancelAddAttendance(); cancelEditAttendance();">
                     <div class="w-full flex justify-start items-center gap-1">
                         <h2 id="title" class="font-bold text-sm md:text-base">WORKED</h2>
                     </div>
-                    <p class="font-extrabold text-base md:text-lg text-[#1e1e1e80] text-nowrap">{% if employee.days_worked %} {{ employee.days_worked }} Days {% else %} None {% endif %}</p>
+                    <p class="font-extrabold text-base md:text-lg text-[#1e1e1e80] text-nowrap">{{ attendance_stats.days_present }} Days</p>
                 </div>
             </div>
         </div>

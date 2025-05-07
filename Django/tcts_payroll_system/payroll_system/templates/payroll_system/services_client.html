@@ -288,58 +288,7 @@
             barangayListId: "barangay-list",
             baseUrl: "/payroll_system/ajax"
         });
-
-        // // Custom function for the pre-filled customer form
-        // function setupCustomerFormFields() {
-        //     const regionInput = document.getElementById('region-dropdown');
-        //     const provinceInput = document.getElementById('province-dropdown');
-        //     const cityInput = document.getElementById('city-dropdown');
-        //     const barangayInput = document.getElementById('barangay-dropdown');
-            
-        //     // Verify all required elements exist
-        //     if (!regionInput || !provinceInput || !cityInput || !barangayInput) {
-        //         return;
-        //     }
-            
-        //     // Make sure readonly attributes are applied
-        //     regionInput.setAttribute('readonly', 'readonly');
-        //     provinceInput.setAttribute('readonly', 'readonly');
-        //     cityInput.setAttribute('readonly', 'readonly');
-            
-        //     // Add slight visual indicator for readonly fields
-        //     const readonlyFields = [regionInput, provinceInput, cityInput];
-        //     readonlyFields.forEach(field => {
-        //         field.style.backgroundColor = '#f8f9fa'; // Light gray background
-        //         field.style.cursor = 'default';
-        //     });
-            
-        //     // Ensure the barangay field is enabled
-        //     barangayInput.disabled = false;
-            
-        //     // Trigger "change" events to ensure the JS cascading logic works
-        //     // This forces the original script to load the proper options
-        //     const changeEvent = new Event('change', { bubbles: true });
-        //     const inputEvent = new Event('input', { bubbles: true });
-            
-        //     // Trigger events in sequence with small delays to ensure proper loading
-        //     setTimeout(() => {
-        //         regionInput.dispatchEvent(changeEvent);
-        //         regionInput.dispatchEvent(inputEvent);
-                
-        //         setTimeout(() => {
-        //             provinceInput.dispatchEvent(changeEvent);
-        //             provinceInput.dispatchEvent(inputEvent);
-                    
-        //             setTimeout(() => {
-        //                 cityInput.dispatchEvent(changeEvent);
-        //                 cityInput.dispatchEvent(inputEvent);
-        //             }, 100);
-        //         }, 100);
-        //     }, 100);
-        // }
         
-        // // Call our setup function with a delay to ensure DOM is fully loaded
-        // setTimeout(setupCustomerFormFields, 300);
 
         // Customer search functionality
         const customerSearchInput = document.getElementById('customer-search');

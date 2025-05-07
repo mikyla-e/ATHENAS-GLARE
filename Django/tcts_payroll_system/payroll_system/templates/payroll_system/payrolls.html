@@ -201,7 +201,9 @@
                     <p class="hidden md:block text-[League Spartan] text-lg font-semibold text-[#1E1E1E80]">{{ current_payroll.get_payroll_status_display }}</p>
                 </div>
                 <div class="h-[30px] flex flex-row gap-2">
-                    <button id="button_1" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Print Payroll Report">PRINT</button>
+                    <a href="{% url 'payroll_system:print' %}">
+                        <button id="button_1" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Print Payroll Report">PRINT</button>
+                    </a>
                     <button id="confirm" class="text-xs/3 lg:text-sm/4 font-bold text-[League Spartan] h-full text-center" title="Confirm Payroll Period" onclick="confirmPayroll({{ current_payroll.payroll_period_id }})">CONFIRM PAYROLL</button>
                 </div>
             </div>
