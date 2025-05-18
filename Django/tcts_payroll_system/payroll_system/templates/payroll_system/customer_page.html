@@ -7,6 +7,12 @@
 <!--(optional)head content-->
 {% block headcontent %}
 <link rel="stylesheet" href="{% static 'css/default_design.css' %}">
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
+
+<!--Datatables-->
+<link rel="stylesheet" href="{% static 'css/dataTables.css' %}">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
+<script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
 {% endblock %}
 
 <!--header-->
@@ -28,9 +34,11 @@
             </div>
         </div>
         
-        <div class="mt-4">
-            <p class="opacity-50 text-sm font-medium">DETAILS</p>
-            <div class="w-full h-[1px] border border-"></div>
+        <div class="space-y-3">
+            <div class="flex items-center gap-3">
+                <div class="font-[League Spartan] text-sm font-extrabold text-[#1e1e1e80]">DETAILS</div>
+                <div class="border-2 border-[#1e1e1e20] w-[100%] h-[1px] rounded-full"></div>
+            </div>
             
             <div class="flex flex-col sm:flex-row sm:gap-8">
                 <div class="w-full sm:w-1/2">
@@ -49,53 +57,72 @@
     <!-- Vehicles Section dito -->
     <h1 class="mb-2 ml-2 font-bold text-xs md:text-sm">VEHICLES</h1>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {% for vehicle in customer.vehicles.all %}
-            <div class="bg-white rounded-xl py-4 px-5 shadow-sm space-y-3">
-                <h1 class="font-bold text-lg sm:text-xl md:text-2xl">{{ vehicle.plate_number }}</h1>
-                
-                <div class="space-y-2">
-                    <div>
-                        <h2 class="opacity-50 font-bold text-xs md:text-sm">VEHICLE NAME</h2>
-                        <p class="text-sm md:text-base">{{ vehicle.vehicle_name }}</p>
-                    </div>
-                    
-                    <div>
-                        <h2 class="opacity-50 font-bold text-xs md:text-sm">COLOR</h2>
-                        <p class="text-sm md:text-base">{{ vehicle.vehicle_color }}</p>
-                    </div>
-                </div>
-            </div>
-        {% empty %}
-            <div class="bg-white rounded-xl p-4 col-span-full">
-                <p class="text-center text-gray-500">No vehicles found for this customer.</p>
-            </div>
-        {% endfor %}
+    <div class="size-full flex flex-col">
+        <div class="w-full h-[40px] flex justify-between items-center bg-[#FFFFFF] rounded-full overflow-hidden" id="search">
+            <form class="w-full flex justify-center items-center gap-3" method="get" action="{% url 'payroll_system:payrolls' %}">
+                <button class="w-fit h-full pl-[15px] border-none outline-none bg-transparent flex justify-center items-center" type="submit">
+                    <img class="h-[25px] w-[25px]" src="{% static 'images/search_icon.png' %}" alt="Search">
+                </button>
+                <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
+            </form>
+        </div>
+    {% for vehicle in customer.vehicles.all %}
+        <div class="flex flex-col justify-center">
+            <table class="bg-white w-full my-5 border border-solid rounded-2xl text-xs-center overflow-hidden" id="vehicle-table">
+                <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
+                    <tr class="text-base font-[League Spartan]">
+                        <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">VEHICLE NAME</th>
+                        <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">VEHICLE COLOR</th> 
+                        <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">PLATE NUMBER</th>
+                        <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="vehicle-data">
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ vehicle.vehicle_name }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ vehicle.vehicle_color }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ vehicle.plate_number }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">
+                            <a class="font-bold hover:text-[#F8D146] duration-100" title="View More" href="{% url 'payroll_system:vehicle_details' %}">MORE</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% empty %}
+        <p class="my-5 text-center text-gray-500">No vehicles found for this customer.</p>
+    {% endfor %}
     </div>
-
-    {% block script %}
-    <script>
-        // Function to update button text based on screen width
-        // function updateButtonText() {
-        //     const editButton = document.querySelector('#editButton button');
-            
-        //     if (editButton) {
-        //         if (window.innerWidth <= 640) {
-        //             editButton.textContent = 'EDIT';
-        //         } else {
-        //             editButton.textContent = 'EDIT CUSTOMER';
-        //         }
-        //     }
-        // }
-        
-        // Run on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            updateButtonText();
-            
-            // Add resize event listener
-            window.addEventListener('resize', updateButtonText);
-        });
-        </script>
-        {% endblock %}
-
 {% endblock %}
+
+{% block script %}
+<script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'javascript/dataTables.js' %}"></script>
+
+<script>
+    let table;  
+
+    $(document).ready(function () {
+        table = $('#vehicle-table').DataTable({
+            responsive: true
+        });
+
+        // Make search input work with DataTables
+        $('#search-input').on('keyup', function () {
+            table.search(this.value).draw();
+        });
+    });
+
+    $(document).on('keypress', '#search-input', function (e) {
+        if (e.which == 13) e.preventDefault();
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        updateButtonText();
+        
+        // Add resize event listener
+        window.addEventListener('resize', updateButtonText);
+    });
+</script>
+{% endblock %}
+

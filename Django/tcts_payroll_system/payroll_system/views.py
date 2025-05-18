@@ -191,7 +191,6 @@ def employee_picture(request):
                 del request.session['employee_form_data']
                 
                 messages.success(request, "Employee registered successfully!")
-                print("cnksnk")
 
                 return redirect('payroll_system:employee_profile', employee_id=employee.employee_id)
             else:
@@ -1458,6 +1457,11 @@ def customer_edit(request, customer_id):
     }
     
     return render(request, 'payroll_system/customer_edit.html', context)
+
+@login_required
+def vehicle_details(request):
+
+    return render(request, 'vehicle_details.html')
     
 @login_required
 def payroll_by_week(request):

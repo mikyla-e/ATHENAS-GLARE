@@ -27,6 +27,7 @@
         </form>
     </div>
     
+    {% for customer in customers %}
     <div class="flex flex-col justify-center">
         <table class="bg-white w-full my-5 border border-solid rounded-2xl text-xs-center overflow-hidden" id="customer-table">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
@@ -34,27 +35,26 @@
                     <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">CUSTOMER NAME</th>
                     <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">CONTACT NUMBER</th> 
                     <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">ADDRESS</th>
+                    <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]">VEHICLES</th>
                     <th class="p-2 text-xs md:text-sm xl:text-base font-[League Spartan]"></th>
                 </tr>
             </thead>
             <tbody>
-            {% for customer in customers %}
                 <tr id="customer-data">
                     <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
                     <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.contact_number }}</td>
                     <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.city }}, {{ customer.barangay }}</td>
+                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">vehicle plate numbers</td>
                     <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">
                         <a class="font-bold hover:text-[#F8D146] duration-100" title="View More" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
                     </td>
                 </tr>
-            {% empty %}
-                <tr id="customer-data">
-                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">No customer records found</td>
-                </tr>
-            {% endfor %}
             </tbody>
         </table>
     </div>
+    {% empty %}
+        <p class="my-5 text-center text-gray-500">No customer records found.</p>
+    {% endfor %}
 </div>
 {% endblock %}
 

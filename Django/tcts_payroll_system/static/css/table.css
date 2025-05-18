@@ -15,7 +15,8 @@ tbody tr:nth-child(odd),
 #employee-data:nth-child(odd),
 #payroll-data:nth-child(odd),
 #customer-data:nth-child(odd),
-#attendance-data:nth-child(odd){
+#attendance-data:nth-child(odd),
+#vehicle-data:nth-child(odd){
     background-color: #f2f2f2 !important;
 }
 
@@ -23,7 +24,8 @@ tbody tr:nth-child(odd),
 #employee-data td,
 #payroll-data td,
 #customer-data td,
-#attendance-data td{
+#attendance-data td,
+#vehicle-data td{
     border-bottom: 2px solid rgba(30, 30, 30, 0.20) !important;
 }
 
@@ -33,7 +35,8 @@ tbody tr:last-child td,
 #employee-data:last-child td,
 #payroll-data:last-child td,
 #customer-data:last-child td,
-#attendance-data:last-child td{
+#attendance-data:last-child td,
+#vehicle-data:last-child td{
     border-bottom:none !important;
 }
 
@@ -41,6 +44,7 @@ table,
 #employee-table_info,
 #payroll-table_info,
 #customer-table_info,
-#attendance-table_info{
+#attendance-table_info,
+#vehicle-table_info{
     font-family: 'League Spartan';
 }
