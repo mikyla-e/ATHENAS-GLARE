@@ -27,7 +27,7 @@
         </form>
     </div>
     
-    {% for customer in customers %}
+    {% if customers %}
     <div class="flex flex-col justify-center">
         <table class="bg-white w-full my-5 border border-solid rounded-2xl text-xs-center overflow-hidden" id="customer-table">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
@@ -40,21 +40,37 @@
                 </tr>
             </thead>
             <tbody>
-                <tr id="customer-data">
-                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
-                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.contact_number }}</td>
-                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.city }}, {{ customer.barangay }}</td>
-                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">vehicle plate numbers</td>
-                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">
-                        <a class="font-bold hover:text-[#F8D146] duration-100" title="View More" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
-                    </td>
-                </tr>
+                {% for customer in customers %}
+                {% if customer.vehicles.all %}
+                    {% for vehicle in customer.vehicles.all %}
+                    <tr class="customer-data">
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.contact_number }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.city }}, {{ customer.barangay }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ vehicle.plate_number }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">
+                            <a class="font-bold hover:text-[#F8D146] duration-100" title="View More" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr class="customer-data">
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.first_name }} {{ customer.middle_name }} {{ customer.last_name }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.contact_number }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ customer.city }}, {{ customer.barangay }}</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">No vehicles</td>
+                        <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">
+                            <a class="font-bold hover:text-[#F8D146] duration-100" title="View More" href="{% url 'payroll_system:customer_page' customer.customer_id %}">MORE</a>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% endfor %}
             </tbody>
         </table>
     </div>
-    {% empty %}
+    {% else %}
         <p class="my-5 text-center text-gray-500">No customer records found.</p>
-    {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}
 

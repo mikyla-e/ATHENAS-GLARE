@@ -1404,8 +1404,11 @@ def status(request):
 @login_required
 def customers(request):
     customers = Customer.objects.all()
+    detail_number = Vehicle.objects.all()
+
     context = {
-        'customers': customers
+        'customers': customers,
+        'detail_number': detail_number
     }
     return render(request, 'payroll_system/customers.html', context)
 
