@@ -1459,9 +1459,17 @@ def customer_edit(request, customer_id):
     return render(request, 'payroll_system/customer_edit.html', context)
 
 @login_required
-def vehicle_details(request):
+def vehicle_details(request, vehicle_id):   
+    # Get the specific vehicle using vehicle_id (which is the primary key)
+    vehicle = get_object_or_404(Vehicle, vehicle_id=vehicle_id)
+    
+    # Get all tasks for this specific vehicle
+    vehicle_detail = Task.objects.filter(vehicle=vehicle).select_related('employee', 'service')
 
-    return render(request, 'vehicle_details.html')
+    return render(request, 'vehicle_details.html', {
+        'vehicle_detail': vehicle_detail,
+        'vehicle': vehicle
+    })
     
 @login_required
 def payroll_by_week(request):

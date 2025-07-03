@@ -83,7 +83,7 @@
                         <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ vehicle.vehicle_color }}</td>
                         <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ vehicle.plate_number }}</td>
                         <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">
-                            <a class="font-bold hover:text-[#F8D146] duration-100" title="View More" href="{% url 'payroll_system:vehicle_details' %}">MORE</a>
+                            <a class="font-bold hover:text-[#F8D146] duration-100" title="View More" href="{% url 'payroll_system:vehicle_details' vehicle_id=vehicle.vehicle_id %}">MORE</a>
                         </td>
                     </tr>
                 </tbody>

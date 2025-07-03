@@ -32,8 +32,16 @@
             <input class="size-full border-none outline-none placeholder:text-base placeholder:font-semibold placeholder:font-[League_Spartan]" type="text" name="q" id="search-input" placeholder="Search" value="{{ query }}">
         </form>
     </div>
-
     <div class="flex flex-col justify-center">
+        <!-- <ul>
+        {% for Task in vehicle_detail %}
+        <li>{{ Task.employee }}</li>
+        <li>{{ Task.customer }}</li>
+        <li>{{ Task.vehicle }}</li>
+        
+        {% endfor %}
+        </ul> -->
+        
         <table class="bg-white w-full my-5 border border-solid rounded-2xl text-xs-center overflow-hidden" id="vehicle-table">
             <thead class="border-b-[3px] border-b-[rgba(30,30,30,0.2)]">
                 <tr class="text-base font-[League Spartan]">
@@ -43,19 +51,21 @@
                 </tr>
             </thead>
             <tbody>
-                <tr id="vehicle-data">
-                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">employee who did the service</td>
-                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">service</td>
-                    <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">date started</td>
-                </tr>
+                    {% for Task in vehicle_detail %}
+                        <tr>
+                            <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ Task.employee.first_name }} {{ Task.employee.last_name }}</td>
+                            <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ Task.service }}</td>
+                            <td class="px-2 py-4 text-[10px] md:text-xs xl:text-sm font-[Inter]">{{ Task.created_at }}</td>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-sm text-gray-500">No services available for this vehicle.</td>
+                            </tr>
+                        {% endfor %}
             </tbody>
         </table>
     </div>
-    {% for vehicle in customer.vehicles.all %}
-{% empty %}
-    <p class="my-5 text-center text-gray-500">No services done for this vehicle.</p>
-{% endfor %}
 </div>
+
 {% endblock %}
 
 <!--(optional)script-->
@@ -68,7 +78,14 @@
 
     $(document).ready(function () {
         table = $('#vehicle-table').DataTable({
-            responsive: true
+            responsive: true,
+            language: {
+                emptyTable: "No services available for this vehicle",
+                zeroRecords: "No matching services found",
+                info: "Showing _START_ to _END_ of _TOTAL_ services",
+                infoEmpty: "Showing 0 to 0 of 0 services",
+                infoFiltered: "(filtered from _MAX_ total services)"
+            }
         });
 
         // Make search input work with DataTables
@@ -82,10 +99,12 @@
     });
     
     document.addEventListener('DOMContentLoaded', function() {
-        updateButtonText();
-        
-        // Add resize event listener
-        window.addEventListener('resize', updateButtonText);
+        if (typeof updateButtonText === 'function') {
+            updateButtonText();
+            
+            // Add resize event listener
+            window.addEventListener('resize', updateButtonText);
+        }
     });
 </script>
 {% endblock %}
