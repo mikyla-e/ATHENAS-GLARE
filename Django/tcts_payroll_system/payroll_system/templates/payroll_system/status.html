@@ -57,6 +57,35 @@
         border-radius: 10px;
         resize: none
     }
+
+    /* Search input styling */
+    #search-input {
+        height: 40px;
+        padding: 0 15px;
+        border: 2px solid #1E1E1E20;
+        background-color: #EFEDE6;
+        border-radius: 10px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+
+    #search-input:focus {
+        border-color: #F8D146;
+    }
+
+    #search-container {
+        display: none;
+    }
+
+    body.show-complete #search-container {
+        display: block;
+    }
+
+    .task-item.hidden {
+        display: none !important;
+    }
 </style>
 {% endblock %}
 
@@ -121,9 +150,19 @@
     
     <span class="w-full h-[2px] bg-[#1E1E1E80] rounded-xl"></span> <!--horizontal line-->
     
+    <!-- Search container - only visible when viewing complete tasks -->
+    <div id="search-container" class="w-full px-3 py-3">
+        <div class="flex items-center gap-2">
+            <input type="text" id="search-input" placeholder="Search by plate number..." class="w-full sm:w-[300px]">
+            <button onclick="clearSearch()" class="px-3 py-2 text-sm font-[League Spartan] font-bold text-[#1E1E1E] hover:text-[#F8D146] duration-300">
+                CLEAR
+            </button>
+        </div>
+    </div>
+    
     <div class="size-full my-5 flex flex-col gap-5" id="tasks-container">
         {% for task in tasks %}
-        <div class="w-full h-fit flex justify-between rounded-xl bg-white py-4 px-6 gap-2 task-item {% if task.task_status == 'Completed' %}complete{% else %}in-progress{% endif %}" data-task-id="{{ task.id }}">
+        <div class="w-full h-fit flex justify-between rounded-xl bg-white py-4 px-6 gap-2 task-item {% if task.task_status == 'Completed' %}complete{% else %}in-progress{% endif %}" data-task-id="{{ task.id }}" data-plate-number="{{ task.vehicle.plate_number }}">
             <div class="w-[85%] h-full flex flex-col justify-between">
                 <div class="w-full h-[30%]">
                     <div class="size-full flex flex-col gap-1">
@@ -170,6 +209,11 @@
         <div id="no-in-progress-tasks" class="flex justify-center items-center p-10" style="display: none;">
             <h2>No in-progress tasks available.</h2>
         </div>
+
+        <!-- No search results message -->
+        <div id="no-search-results" class="flex justify-center items-center p-10" style="display: none;">
+            <h2>No tasks found matching your search.</h2>
+        </div>
     </div>
 </div>
 
@@ -214,17 +258,65 @@
         popup.classList.remove("show");
     }
 
+    // Search functionality
+    function searchTasks() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const completeTasks = document.querySelectorAll('.task-item.complete');
+        let visibleTasksCount = 0;
+
+        completeTasks.forEach(task => {
+            const plateNumber = task.getAttribute('data-plate-number').toLowerCase();
+            
+            if (plateNumber.includes(searchTerm)) {
+                task.classList.remove('hidden');
+                visibleTasksCount++;
+            } else {
+                task.classList.add('hidden');
+            }
+        });
+
+        // Show/hide no results message
+        const noResultsMessage = document.getElementById('no-search-results');
+        const noCompleteTasksMessage = document.getElementById('no-complete-tasks');
+        
+        if (searchTerm && visibleTasksCount === 0) {
+            noResultsMessage.style.display = 'flex';
+            noCompleteTasksMessage.style.display = 'none';
+        } else {
+            noResultsMessage.style.display = 'none';
+            if (visibleTasksCount === 0 && !searchTerm) {
+                noCompleteTasksMessage.style.display = 'flex';
+            } else {
+                noCompleteTasksMessage.style.display = 'none';
+            }
+        }
+    }
+
+    function clearSearch() {
+        document.getElementById('search-input').value = '';
+        searchTasks();
+    }
+
     // Task filtering functionality
     function showCompleteTasks() {
         document.body.classList.add('show-complete');
         document.getElementById('complete-link').classList.add('active');
         document.getElementById('in-progress-link').classList.remove('active');
         
+        // Clear search when switching to complete tasks
+        document.getElementById('search-input').value = '';
+        
         // Check if there are complete tasks
         const completeTasks = document.querySelectorAll('.task-item.complete');
         
         // Show/hide empty state messages
         document.getElementById('no-in-progress-tasks').style.display = 'none';
+        document.getElementById('no-search-results').style.display = 'none';
+        
+        // Remove hidden class from all complete tasks
+        completeTasks.forEach(task => {
+            task.classList.remove('hidden');
+        });
         
         if (completeTasks.length === 0) {
             document.getElementById('no-complete-tasks').style.display = 'flex';
@@ -249,6 +341,7 @@
         
         // Show/hide empty state messages
         document.getElementById('no-complete-tasks').style.display = 'none';
+        document.getElementById('no-search-results').style.display = 'none';
         
         if (inProgressTasks.length === 0) {
             document.getElementById('no-in-progress-tasks').style.display = 'flex';
@@ -266,6 +359,9 @@
     // Initialize with in-progress tasks shown
     document.addEventListener('DOMContentLoaded', function() {
         showInProgressTasks();
+        
+        // Add event listener for search input
+        document.getElementById('search-input').addEventListener('input', searchTasks);
     });
 </script>
 {% endblock %}
